@@ -1,8 +1,17 @@
 @echo off
 setlocal DisableDelayedExpansion
 
+if exist "%~dp0.env" (
+    for /f "usebackq eol=# tokens=1,* delims==" %%A in ("%~dp0.env") do (
+        if /I "%%A"=="CFX_SERVER_KEY" if not defined CFX_SERVER_KEY set "CFX_SERVER_KEY=%%B"
+        if /I "%%A"=="STEAM_WEB_API_KEY" if not defined STEAM_WEB_API_KEY set "STEAM_WEB_API_KEY=%%B"
+        if /I "%%A"=="INTERIOR_CITY_WEBHOOK_LOGS" if not defined INTERIOR_CITY_WEBHOOK_LOGS set "INTERIOR_CITY_WEBHOOK_LOGS=%%B"
+        if /I "%%A"=="INTERIOR_CITY_WEBHOOK_BUGS" if not defined INTERIOR_CITY_WEBHOOK_BUGS set "INTERIOR_CITY_WEBHOOK_BUGS=%%B"
+    )
+)
+
 if not defined CFX_SERVER_KEY (
-    echo CFX_SERVER_KEY is required. Set it in the server environment before starting.
+    echo CFX_SERVER_KEY is required. Set it in .env or the server environment before starting.
     exit /b 1
 )
 
