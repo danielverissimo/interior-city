@@ -75,27 +75,37 @@ else
   echo 'Target release lacks its pristine manifest.' >&2
   exit 1
 fi
+for path in server.cfg config/config.cfg config/resources.cfg \
+  resources/oxmysql/fxmanifest.lua resources/vrp_oxmysql/fxmanifest.lua \
+  'resources/[vRP]/vrp/fxmanifest.lua'; do
+  [[ -f "$release/$path" ]] || { echo "Missing FXServer file in release: $path" >&2; exit 1; }
+done
 ln -sfn "releases/$sha" "$root/current.next"
 
 restore_old() {
+  trap - ERR
   if [[ -n "$old" ]]; then
     ln -sfn "$old" "$root/current.next"
     mv -Tf "$root/current.next" "$root/current"
-    compose up -d --build --force-recreate --wait
+    compose up -d --build --force-recreate --wait --wait-timeout 180 || {
+      echo 'Rollback restart failed; inspect the previous release and container logs.' >&2
+      return 1
+    }
     echo 'Previous release restored; inspect logs before retrying.' >&2
   else
+    compose down --remove-orphans || true
     rm -f "$root/current"
   fi
 }
 
 if [[ -n "$old" ]]; then
   trap restore_old ERR
-  compose stop playit fxserver
+  compose --profile listing stop connect_proxy playit fxserver
   compose run --rm --no-deps backup predeploy
 fi
 trap restore_old ERR
 mv -Tf "$root/current.next" "$root/current"
 compose config --quiet
-compose up -d --build --force-recreate --wait
+compose up -d --build --force-recreate --wait --wait-timeout 180
 trap - ERR
 printf 'Installed release %s. Previous release: %s\n' "$sha" "${old:-none}"

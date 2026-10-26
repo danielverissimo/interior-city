@@ -33,6 +33,8 @@ O SQL é montado em `/docker-entrypoint-initdb.d/01-base.sql` e roda **somente c
 
 Reconcilie alterações feitas no txAdmin com os arquivos locais antes da próxima implantação. O script de instalação deve vir do mesmo commit implantado.
 
+O FXServer inicia pelo `run.sh` sem `+exec`, como exige o modo de monitoramento do txAdmin. Seu healthcheck verifica a porta interna 40120; o deploy aguarda até 180 segundos e falha se o painel não abrir. Esse check confirma o painel, não a inicialização do jogo. Após vincular os arquivos existentes no primeiro acesso, confira no console que `oxmysql`, `vrp`, `vrp_oxmysql`, `[System]` e `[Core]` iniciaram nessa ordem e sem erros. O artefato Linux x86_64 não pôde ser executado no Mac ARM por emulação (SIGSEGV mesmo sem arquivos da base); a execução nativa no Uriel é uma etapa de aceite.
+
 ## Playit e listagem
 
 Depois que o agente aparecer na conta Playit, crie dois túneis nele:

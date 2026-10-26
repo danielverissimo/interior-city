@@ -40,6 +40,7 @@ services:
       TXHOST_GAME_NAME: fivem
       TXHOST_TXA_PORT: "40120"
       TXHOST_INTERFACE: 0.0.0.0
+      TXHOST_FXS_PORT: "30120"
       TXHOST_MAX_SLOTS: "7"
       PLAYIT_PUBLIC_ENDPOINT: ${PLAYIT_PUBLIC_ENDPOINT:-}
       PLAYIT_HTTPS_HOST: ${PLAYIT_HTTPS_HOST:-}
@@ -67,6 +68,12 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/40120"]
+      start_period: 30s
+      interval: 10s
+      timeout: 3s
+      retries: 12
 
   playit:
     profiles: [public]

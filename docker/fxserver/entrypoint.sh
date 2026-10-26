@@ -36,7 +36,7 @@ valid_cfg_value webhook_bugs "$webhook_bugs"
 
 mkdir -p /server-data/runtime
 {
-  printf 'set sv_licenseKey "%s"\n' "$license"
+  printf 'sv_licenseKey "%s"\n' "$license"
   printf 'set mysql_connection_string "mysql://vrp:%s@db:3306/vrp?multipleStatements=true"\n' "$db_password"
   if [[ -n "$steam_key" ]]; then printf 'set steam_webApiKey "%s"\n' "$steam_key"; fi
   if [[ -n "$webhook_logs" ]]; then printf 'set interior_city_webhook_logs "%s"\n' "$webhook_logs"; fi
