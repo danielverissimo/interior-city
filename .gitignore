@@ -3,3 +3,7 @@
 .env.*
 !.env.example
 config/keys.cfg
+secrets/
+backups/
+state/
+runtime/

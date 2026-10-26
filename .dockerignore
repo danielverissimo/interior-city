@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+!.env.example
+cache
+secrets
+backups
+state
+runtime
+.replxx_history
