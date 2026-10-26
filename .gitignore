@@ -7,3 +7,7 @@ secrets/
 backups/
 state/
 runtime/
+
+# Generated FXServer files.
+cache/
+.replxx_history
