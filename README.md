@@ -7,6 +7,7 @@ Configure these variables:
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `CFX_SERVER_KEY` | Yes | Cfx.re server license key |
+| `MYSQL_CONNECTION_STRING` | Yes | Local Windows MariaDB URI; retain `multipleStatements=true` |
 | `STEAM_WEB_API_KEY` | No | Steam authentication identifiers |
 | `INTERIOR_CITY_WEBHOOK_LOGS` | No | Admin and vehicle event logs |
 | `INTERIOR_CITY_WEBHOOK_BUGS` | No | In-game bug reports |
@@ -16,3 +17,5 @@ The optional webhook features are skipped when their variables are empty. The la
 `config/keys.cfg` is no longer loaded. `.env` is ignored by Git; `.env.example` contains no credentials and is versioned. If starting FXServer without `start.bat`, provide the corresponding `+set` options through your deployment system before `+exec config/config.cfg`.
 
 The license key, Steam key, and Discord webhook URLs present in the old initial commit must be revoked and replaced in their respective provider consoles. A later commit that deletes those strings would still send the old secret in Git history; publish only the replacement root commit.
+
+The Docker deployment generates its server-only convars from private Docker secret files and starts txAdmin using this repository's `server.cfg`. See [docs/URIEL_DOCKER.md](docs/URIEL_DOCKER.md) for deployment, Playit tunnels, backups, and rollback.

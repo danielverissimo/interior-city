@@ -19,11 +19,9 @@ files {
 	"nui/*.html",
 	"nui/*.js",
 	"nui/*.css",
+	"nui/logo.png",
 	"nui/bibs/loading-bar.css",
 	"nui/bibs/loading-bar.js",
 	"nui/svgs/*.svg",
 	"nui/svgs/*.png",
 }
-
-
-                            
