@@ -81,10 +81,14 @@ printf 'cfxk_testonly' > "$test_secrets/cfx_license"
 printf '%048d' 2 > "$test_secrets/db_app_password"
 for name in steam_web_api webhook_logs webhook_bugs; do : > "$test_secrets/$name"; done
 chmod 0444 "$test_secrets/"*
+secret_args=()
+for name in cfx_license db_app_password steam_web_api webhook_logs webhook_bugs; do
+  secret_args+=(--mount "type=bind,src=$test_secrets/$name,dst=/run/secrets/$name,readonly")
+done
 
 docker run -d "${common_args[@]}" \
   --tmpfs /server-data/runtime:uid=1000,gid=1000,mode=0700 \
-  --mount "type=bind,src=$test_secrets,dst=/run/secrets,readonly" \
+  "${secret_args[@]}" \
   "$image" >/dev/null
 wait_http
 docker exec "$container" bash -c '
