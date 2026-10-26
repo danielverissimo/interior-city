@@ -76,6 +76,7 @@ else
   exit 1
 fi
 for path in server.cfg config/config.cfg config/resources.cfg \
+  docker/db/02-vrp-user-defaults.sql \
   resources/oxmysql/fxmanifest.lua resources/vrp_oxmysql/fxmanifest.lua \
   'resources/[vRP]/vrp/fxmanifest.lua'; do
   [[ -f "$release/$path" ]] || { echo "Missing FXServer file in release: $path" >&2; exit 1; }

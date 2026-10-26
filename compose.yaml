@@ -15,6 +15,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ${INTERIOR_CITY_RELEASE_PATH:-.}/Banco de Dados.sql:/docker-entrypoint-initdb.d/01-base.sql:ro
+      - ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/db/02-vrp-user-defaults.sql:/docker-entrypoint-initdb.d/02-vrp-user-defaults.sql:ro
     networks:
       - backend
     mem_limit: 2g
