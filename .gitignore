@@ -1,0 +1,4 @@
+# Local secrets must not be committed.
+.env
+.env.*
+config/keys.cfg
