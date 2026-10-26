@@ -35,7 +35,7 @@ Reconcilie alterações feitas no txAdmin com os arquivos locais antes da próxi
 
 O FXServer inicia pelo `run.sh` sem `+exec`, como exige o modo de monitoramento do txAdmin. Seu healthcheck verifica a porta interna 40120; o deploy aguarda até 180 segundos e falha se o painel não abrir. Esse check confirma o painel, não a inicialização do jogo. Após vincular os arquivos existentes no primeiro acesso, confira no console que `oxmysql`, `vrp`, `vrp_oxmysql`, `[System]` e `[Core]` iniciaram nessa ordem e sem erros. O artefato Linux x86_64 não pôde ser executado no Mac ARM por emulação (SIGSEGV mesmo sem arquivos da base); a execução nativa no Uriel é uma etapa de aceite.
 
-Para testar apenas o artefato e txAdmin no Uriel antes da implantação, copie `scripts/test-fxserver-uriel.sh` e `docker/fxserver/` juntos para uma pasta privada no host e execute `sudo bash test-fxserver-uriel.sh`. O teste constrói uma imagem temporária, inicia o FXServer sem licença ou recursos, verifica HTTP dentro do contêiner e remove imagem e contêiner ao terminar. Não publica porta no host nem cria o banco. O resultado fica em `result.txt`; logs privados ficam na mesma pasta.
+Para testar o boot no Uriel antes da implantação, copie `scripts/test-fxserver-uriel.sh` e `docker/fxserver/` juntos para uma pasta privada no host e execute `sudo bash test-fxserver-uriel.sh`. O teste constrói uma imagem temporária e verifica o artefato/txAdmin e, depois, o entrypoint com credenciais fictícias. Confere HTTP e o arquivo privado gerado dentro do contêiner e remove imagem e contêiner ao terminar. Não publica porta no host nem cria o banco. O resultado fica em `result.txt`; logs privados ficam na mesma pasta. Ainda não valida os recursos nem a licença real do jogo.
 
 ## Playit e listagem
 
