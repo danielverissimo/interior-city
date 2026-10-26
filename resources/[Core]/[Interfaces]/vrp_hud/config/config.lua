@@ -3,7 +3,7 @@
 --------------------------
 config_vida = 300
 config_fomeSede = true -- Ativa/desativa a fome e sede da hud.
-config_logo = "http://unitydev.discloud.app/assets/logo.png"
+config_logo = "logo.png"
 config_permstaff = "admin.permissao"
 config_cupom = true -- Ativa/desativa o cupom na tela.
 
