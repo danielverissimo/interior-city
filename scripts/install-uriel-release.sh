@@ -39,7 +39,7 @@ compose() {
   if grep -Eq '^PLAYIT_HTTPS_HOST=[A-Za-z0-9.-]+$' "$root/.env"; then
     profiles+=(--profile listing)
   fi
-  docker compose --env-file "$root/.env" --project-directory "$root" -f "$root/current/compose.yaml" "${profiles[@]}" "$@"
+  COMPOSE_PROGRESS=plain docker compose --env-file "$root/.env" --project-directory "$root" -f "$root/current/compose.yaml" "${profiles[@]}" "$@"
 }
 
 old=''
@@ -105,7 +105,9 @@ if [[ -n "$old" ]]; then
 fi
 trap restore_old ERR
 mv -Tf "$root/current.next" "$root/current"
-compose config --quiet
-compose up -d --build --force-recreate --wait --wait-timeout 180
+if ! compose config --quiet || ! compose up -d --build --force-recreate --wait --wait-timeout 180; then
+  restore_old
+  exit 1
+fi
 trap - ERR
 printf 'Installed release %s. Previous release: %s\n' "$sha" "${old:-none}"
