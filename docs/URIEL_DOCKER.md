@@ -44,7 +44,7 @@ Depois que o agente aparecer na conta Playit, crie dois túneis nele:
 1. **FiveM TCP+UDP**, origem `127.0.0.1:30120`. Anote IPv4 e porta públicos em `PLAYIT_PUBLIC_ENDPOINT` no `.env` do Uriel.
 2. **HTTPS**, origem `127.0.0.1:8443`, associado a um domínio Playit. Coloque somente o hostname em `PLAYIT_HTTPS_HOST`. O Caddy obtém certificado pelo túnel TLS transparente e encaminha ao FXServer em 30120. Verifique seus logs antes de divulgar o endereço.
 
-Defina ambos os valores juntos e recrie os serviços. O entrypoint gera `sv_forceIndirectListing`, `sv_listingHostOverride` e `sv_endpoints` em tmpfs, seguindo o [fluxo de proxy Cfx](https://docs.fivem.net/docs/server-manual/proxy-setup/). `sv_endpoints` deve receber **IPv4:porta**, não o hostname Playit. Se a listagem não aparecer após o período normal de atualização, use conexão direta temporária pelo endereço Playit e registre a limitação. O guia FiveM da Playit mostra conexão direta, sem garantir listagem.
+Defina ambos os valores juntos e recrie os serviços. O entrypoint gera `sv_forceIndirectListing`, `sv_listingIpOverride`, `sv_listingHostOverride` e `sv_endpoints` em tmpfs, seguindo o [fluxo de proxy Cfx](https://docs.fivem.net/docs/server-manual/proxy-setup/). O IP de listagem vem do túnel Playit; `sv_endpoints` deve receber **IPv4:porta**, não o hostname Playit. Se a listagem não aparecer após o período normal de atualização, use conexão direta temporária pelo endereço Playit e registre a limitação. O guia FiveM da Playit mostra conexão direta, sem garantir listagem.
 
 Não exponha o txAdmin pela Playit. Acesse-o por SSH/Tailscale. Nenhuma porta do roteador precisa ser encaminhada.
 

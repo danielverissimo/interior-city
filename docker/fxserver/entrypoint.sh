@@ -53,6 +53,7 @@ if [[ -n "$public_endpoint" || -n "$https_host" ]]; then
   }
   {
     printf 'set sv_forceIndirectListing true\n'
+    printf 'set sv_listingIpOverride "%s"\n' "${public_endpoint%:*}"
     printf 'set sv_listingHostOverride "%s"\n' "$https_host"
     printf 'set sv_endpoints "%s"\n' "$public_endpoint"
   } > /server-data/runtime/listing.cfg
