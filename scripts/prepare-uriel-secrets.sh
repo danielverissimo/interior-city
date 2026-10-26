@@ -39,6 +39,7 @@ if [[ ! -e "$root/.env" ]]; then
 INTERIOR_CITY_RELEASE_PATH=/opt/uriel/interior-city/current
 PLAYIT_PUBLIC_ENDPOINT=
 PLAYIT_HTTPS_HOST=
+FIVEM_LISTING_ENABLED=false
 EOF
   chmod 0600 "$root/.env"
 fi

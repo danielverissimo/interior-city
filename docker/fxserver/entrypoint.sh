@@ -46,19 +46,32 @@ chmod 0600 /server-data/runtime/secrets.cfg
 
 public_endpoint="${PLAYIT_PUBLIC_ENDPOINT:-}"
 https_host="${PLAYIT_HTTPS_HOST:-}"
+listing_enabled="${FIVEM_LISTING_ENABLED:-false}"
+[[ "$listing_enabled" == true || "$listing_enabled" == false ]] || {
+  echo 'FIVEM_LISTING_ENABLED must be true or false.' >&2
+  exit 1
+}
 if [[ -n "$public_endpoint" || -n "$https_host" ]]; then
   [[ "$public_endpoint" =~ ^[0-9.]+:[0-9]+$ && "$https_host" =~ ^[A-Za-z0-9.-]+$ ]] || {
-    echo 'Both PLAYIT_PUBLIC_ENDPOINT (IPv4:port) and PLAYIT_HTTPS_HOST are required for listing.' >&2
+    echo 'Both PLAYIT_PUBLIC_ENDPOINT (IPv4:port) and PLAYIT_HTTPS_HOST are required for Playit access.' >&2
     exit 1
   }
   {
-    printf 'set sv_forceIndirectListing true\n'
-    printf 'set sv_listingIpOverride "%s"\n' "${public_endpoint%:*}"
-    printf 'set sv_listingHostOverride "%s"\n' "$https_host"
     printf 'set sv_endpoints "%s"\n' "$public_endpoint"
+    if [[ "$listing_enabled" == true ]]; then
+      printf 'set sv_forceIndirectListing true\n'
+      printf 'set sv_listingIpOverride "%s"\n' "${public_endpoint%:*}"
+      printf 'set sv_listingHostOverride "%s"\n' "$https_host"
+    else
+      printf 'sv_lan true\n'
+    fi
   } > /server-data/runtime/listing.cfg
 else
-  : > /server-data/runtime/listing.cfg
+  [[ "$listing_enabled" == false ]] || {
+    echo 'Playit endpoints are required when FIVEM_LISTING_ENABLED=true.' >&2
+    exit 1
+  }
+  printf 'sv_lan true\n' > /server-data/runtime/listing.cfg
 fi
 chmod 0600 /server-data/runtime/listing.cfg
 
