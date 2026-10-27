@@ -1,6 +1,6 @@
 # Separação da base TocadoMago
 
-Registro de 26/10/2026. Branch local: `migration/tocado-mago`.
+Registro da separação de 26/10/2026, originalmente na branch `migration/tocado-mago`. Posteriormente, essa branch foi promovida a `master`, sem merge com a base anterior.
 
 ## Resultado
 
@@ -13,7 +13,7 @@ Registro de 26/10/2026. Branch local: `migration/tocado-mago`.
 | Perfil `core` instalado e verificado | 39 pacotes; 439 arquivos; aproximadamente 191,8 MiB |
 | Esquema SQL sem dados | 204 definições CREATE TABLE |
 
-O checkout da migração fica em `/Volumes/Extreme SSD/gta/InteriorCity-code`. A origem `/Volumes/Extreme SSD/gta/TocadoMago_delux/TocadoMago_delux` permanece preservada. O checkout e os ambientes da base anterior não foram substituídos.
+O checkout foi inicialmente criado em `/Volumes/Extreme SSD/gta/InteriorCity-code` e depois movido para `/Users/danyelsanches/Documents/projetos/interior_city/code/Base`, que agora é o repositório principal da nova `master`. A origem `/Volumes/Extreme SSD/gta/TocadoMago_delux/TocadoMago_delux` permanece preservada. As alterações locais pendentes da base anterior foram guardadas em backup privado antes da substituição; não foram incorporadas à nova base.
 
 Os pacotes, recibos e catálogo estão no disco USB do Uriel em `/srv/diskaux/interior-city-assets/tocado-mago`. Foram conferidos 84 objetos e 84 recibos, com arquivos em modo `0600` e diretório privado. Nenhum serviço de jogo foi alterado por esta separação.
 

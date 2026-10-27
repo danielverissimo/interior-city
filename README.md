@@ -1,10 +1,10 @@
-# Interior City — migração TocadoMago
+# Interior City — base TocadoMago
 
-Esta branch separa código e pacotes de assets da base fornecida. A base original não é alterada. O ambiente anterior permanece no checkout anterior; este checkout é independente para a migração e ainda não foi homologado como servidor de jogo.
+Este repositório separa código e pacotes de assets da base fornecida. O código principal fica em `/Users/danyelsanches/Documents/projetos/interior_city/code/Base`, na branch `master`, promovida de `migration/tocado-mago` sem merge com a base anterior. O diretório Git é local a esta pasta; não depende da antiga worktree no SSD. O pacote original permanece preservado.
 
 As medições, verificações e pendências desta importação estão em [docs/SEPARACAO.md](docs/SEPARACAO.md).
 
-O fluxo Docker, as chaves privadas e o deploy isolado da nova base estão em [docs/URIEL_DOCKER.md](docs/URIEL_DOCKER.md). A branch antiga não receberá merge: a promoção desta branch a principal será uma etapa posterior.
+O fluxo Docker, as chaves privadas e o deploy da nova base estão em [docs/URIEL_DOCKER.md](docs/URIEL_DOCKER.md). A substituição local da branch principal não altera o GitHub nem a versão em execução no Uriel. A homologação com jogadores e dos sistemas da cidade continua sendo uma etapa separada da validação de infraestrutura.
 
 ## Organização
 

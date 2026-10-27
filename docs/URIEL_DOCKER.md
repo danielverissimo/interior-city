@@ -1,6 +1,6 @@
 # Docker da nova base no Uriel
 
-Esta implementação pertence à branch `migration/tocado-mago`. A `master` anterior não recebe merge e permanece preservada até a futura troca da branch principal. Os comandos abaixo preparam e implantam **apenas a nova base**; não executam essa troca de branches.
+Esta implementação pertence à branch `master`, promovida de `migration/tocado-mago` sem merge com a base anterior. O caminho local principal é `/Users/danyelsanches/Documents/projetos/interior_city/code/Base`, com diretório Git próprio. Os comandos abaixo preparam e implantam a base TocadoMago; a promoção local da branch não executa um deploy nem altera o repositório remoto.
 
 ## Estrutura isolada
 
