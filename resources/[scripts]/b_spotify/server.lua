@@ -49,6 +49,270 @@ Citizen.CreateThread(function()
     DebugLog("Configurações carregadas")
 end)
 
+-- ============================================================================
+-- PESQUISA DE MÚSICAS / YOUTUBE
+-- ============================================================================
+-- A pesquisa acontece no servidor, e não dentro da NUI. Isso elimina CORS do
+-- Chromium/CEF do FiveM e permite usar vários provedores com fallback automático.
+
+local YoutubeSearchCache = {}
+local YoutubeSearchRateLimit = {}
+local YoutubeSearchCacheTTL = 300 -- 5 minutos
+
+local YoutubeSearchProviders = {
+    -- Invidious
+    { kind = 'invidious', base = 'https://inv.nadeko.net' },
+    { kind = 'invidious', base = 'https://invidious.nerdvpn.de' },
+    { kind = 'invidious', base = 'https://yt.chocolatemoo53.com' },
+
+    -- Piped
+    { kind = 'piped', base = 'https://pipedapi.kavin.rocks' },
+    { kind = 'piped', base = 'https://pipedapi.adminforge.de' },
+    { kind = 'piped', base = 'https://api.piped.private.coffee' },
+    { kind = 'piped', base = 'https://api.piped.yt' },
+    { kind = 'piped', base = 'https://piped-api.codespace.cz' },
+    { kind = 'piped', base = 'https://piped-api.privacy.com.de' },
+    { kind = 'piped', base = 'https://pipedapi.drgns.space' },
+}
+
+local function urlEncode(value)
+    value = tostring(value or '')
+    value = value:gsub('\n', '\r\n')
+    value = value:gsub('([^%w%-_%.~])', function(char)
+        return string.format('%%%02X', string.byte(char))
+    end)
+    return value
+end
+
+local function formatYoutubeDuration(seconds)
+    seconds = math.max(0, math.floor(tonumber(seconds) or 0))
+    local hours = math.floor(seconds / 3600)
+    local minutes = math.floor((seconds % 3600) / 60)
+    local secs = seconds % 60
+
+    if hours > 0 then
+        return string.format('%d:%02d:%02d', hours, minutes, secs)
+    end
+
+    return string.format('%d:%02d', minutes, secs)
+end
+
+local function extractYoutubeVideoId(value)
+    value = tostring(value or '')
+
+    if value:match('^[%w_-]+$') and #value >= 6 and #value <= 20 then
+        return value
+    end
+
+    return value:match('[?&]v=([%w_-]+)')
+        or value:match('youtu%.be/([%w_-]+)')
+        or value:match('/shorts/([%w_-]+)')
+end
+
+local function normalizeInvidiousResults(decoded)
+    if type(decoded) ~= 'table' then return {} end
+
+    local results = {}
+    for _, item in ipairs(decoded) do
+        if type(item) == 'table' and (item.type == nil or item.type == 'video') then
+            local videoId = item.videoId
+            local title = item.title
+            local duration = tonumber(item.lengthSeconds) or 0
+
+            if videoId and title and duration > 0 then
+                results[#results + 1] = {
+                    id = tostring(videoId),
+                    title = tostring(title),
+                    thumbnail = 'https://i.ytimg.com/vi/' .. tostring(videoId) .. '/mqdefault.jpg',
+                    author = tostring(item.author or 'Artista desconhecido'),
+                    duration = formatYoutubeDuration(duration),
+                    views = tonumber(item.viewCount) or 0
+                }
+
+                if #results >= 20 then break end
+            end
+        end
+    end
+
+    return results
+end
+
+local function normalizePipedResults(decoded)
+    if type(decoded) ~= 'table' then return {} end
+
+    local items = decoded.items or decoded
+    if type(items) ~= 'table' then return {} end
+
+    local results = {}
+    for _, item in ipairs(items) do
+        if type(item) == 'table' then
+            local itemType = tostring(item.type or ''):lower()
+            local isVideo = itemType == '' or itemType == 'stream' or itemType == 'video'
+            local videoId = extractYoutubeVideoId(item.url or item.videoId or item.id)
+            local duration = tonumber(item.duration or item.lengthSeconds) or 0
+            local title = item.title
+
+            if isVideo and videoId and title and duration > 0 then
+                results[#results + 1] = {
+                    id = tostring(videoId),
+                    title = tostring(title),
+                    thumbnail = 'https://i.ytimg.com/vi/' .. tostring(videoId) .. '/mqdefault.jpg',
+                    author = tostring(item.uploaderName or item.author or item.uploader or 'Artista desconhecido'),
+                    duration = formatYoutubeDuration(duration),
+                    views = tonumber(item.views or item.viewCount) or 0
+                }
+
+                if #results >= 20 then break end
+            end
+        end
+    end
+
+    return results
+end
+
+local function buildYoutubeSearchUrl(provider, query)
+    local encoded = urlEncode(query)
+
+    if provider.kind == 'invidious' then
+        return provider.base .. '/api/v1/search?q=' .. encoded .. '&type=video&sort_by=relevance&region=BR&hl=pt-BR'
+    end
+
+    return provider.base .. '/search?q=' .. encoded .. '&filter=music_songs'
+end
+
+local function decodeProviderResults(provider, body)
+    if not body or body == '' then return {} end
+
+    local ok, decoded = pcall(json.decode, body)
+    if not ok or type(decoded) ~= 'table' then
+        return {}
+    end
+
+    if provider.kind == 'invidious' then
+        return normalizeInvidiousResults(decoded)
+    end
+
+    return normalizePipedResults(decoded)
+end
+
+local function searchYoutubeOnline(query, done)
+    local finished = false
+    local completed = 0
+    local total = #YoutubeSearchProviders
+
+    local function finish(success, results, providerName, errorMessage)
+        if finished then return end
+        finished = true
+        done(success, results or {}, providerName, errorMessage)
+    end
+
+    -- As tentativas são escalonadas. Se uma responder, as próximas nem chegam
+    -- a ser disparadas. Assim há redundância sem bombardear APIs públicas.
+    for index, provider in ipairs(YoutubeSearchProviders) do
+        SetTimeout((index - 1) * 900, function()
+            if finished then return end
+
+            local url = buildYoutubeSearchUrl(provider, query)
+            PerformHttpRequest(url, function(statusCode, body, headers, errorData)
+                if finished then return end
+
+                completed = completed + 1
+
+                if tonumber(statusCode) == 200 then
+                    local results = decodeProviderResults(provider, body)
+                    if #results > 0 then
+                        finish(true, results, provider.base, nil)
+                        return
+                    end
+                end
+
+                if completed >= total then
+                    finish(false, {}, nil, 'Nenhum provedor de pesquisa respondeu com resultados.')
+                end
+            end, 'GET', '', {
+                ['Accept'] = 'application/json',
+                ['User-Agent'] = 'Mozilla/5.0 (FiveM b_spotify)'
+            })
+        end)
+    end
+
+    SetTimeout(14000, function()
+        if not finished then
+            finish(false, {}, nil, 'Tempo limite ao consultar os provedores de pesquisa.')
+        end
+    end)
+end
+
+RegisterNetEvent('b_spotify:searchYouTube')
+AddEventHandler('b_spotify:searchYouTube', function(requestId, query)
+    local src = source
+    requestId = tostring(requestId or '')
+    query = tostring(query or ''):gsub('^%s+', ''):gsub('%s+$', '')
+
+    if requestId == '' then return end
+
+    if #query < 2 then
+        TriggerClientEvent('b_spotify:searchYouTubeResult', src, requestId, {
+            success = true,
+            results = {}
+        })
+        return
+    end
+
+    if #query > 120 then
+        query = query:sub(1, 120)
+    end
+
+    local nowMs = GetGameTimer()
+    local last = YoutubeSearchRateLimit[src] or 0
+    if nowMs - last < 500 then
+        TriggerClientEvent('b_spotify:searchYouTubeResult', src, requestId, {
+            success = false,
+            results = {},
+            error = 'Pesquise novamente em alguns instantes.'
+        })
+        return
+    end
+    YoutubeSearchRateLimit[src] = nowMs
+
+    local cacheKey = query:lower()
+    local cached = YoutubeSearchCache[cacheKey]
+    if cached and (os.time() - cached.time) <= YoutubeSearchCacheTTL then
+        TriggerClientEvent('b_spotify:searchYouTubeResult', src, requestId, {
+            success = true,
+            results = cached.results,
+            cached = true
+        })
+        return
+    end
+
+    searchYoutubeOnline(query, function(success, results, providerName, errorMessage)
+        if success then
+            YoutubeSearchCache[cacheKey] = {
+                time = os.time(),
+                results = results
+            }
+
+            TriggerClientEvent('b_spotify:searchYouTubeResult', src, requestId, {
+                success = true,
+                results = results,
+                provider = providerName
+            })
+        else
+            print(('^1[b_spotify] Falha ao pesquisar "%s": %s^0'):format(query, errorMessage or 'erro desconhecido'))
+            TriggerClientEvent('b_spotify:searchYouTubeResult', src, requestId, {
+                success = false,
+                results = {},
+                error = 'Não foi possível consultar o YouTube agora. Tente novamente em alguns segundos.'
+            })
+        end
+    end)
+end)
+
+AddEventHandler('playerDropped', function()
+    YoutubeSearchRateLimit[source] = nil
+end)
+
 -- Sistema de armazenamento local (fallback se DB falhar)
 local storage = {
     favorites = {},

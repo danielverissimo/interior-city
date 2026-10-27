@@ -24,6 +24,43 @@ local TipoVeh = ''
 local qtdPecasRemovidas = 0
 local PecasVeh = 0
 
+-- O painel pode excluir/renomear o local enquanto o client está em execução.
+local function validConfig(config)
+    if type(config) ~= 'table' then return false end
+    for _,field in ipairs({'inicio','local_veiculo','local_ferramentas','local_finalizar'}) do
+        local point = config[field]
+        if type(point) ~= 'table' then return false end
+        for axis=1,(field == 'local_ferramentas' and 4 or 3) do
+            if type(point[axis]) ~= 'number' then return false end
+        end
+    end
+    return true
+end
+
+local function currentConfig()
+    local config = cfg and cfg.table and cfg.table[type_desmanche]
+    if type_desmanche ~= 'none' and validConfig(config) then return config end
+    if desmanchando then
+        if veh and DoesEntityExist(veh) then
+            FreezeEntityPosition(veh, false)
+            SetVehicleDoorsLocked(veh, 1)
+        end
+        FreezeEntityPosition(PlayerPedId(), false)
+        ClearPedTasks(PlayerPedId())
+        TriggerEvent('Notify', 'aviso', 'Este desmanche foi removido ou teve sua configuração alterada. Inicie novamente.')
+    end
+    type_desmanche = 'none'
+    desmanche = nil
+    desmanchando = false
+    etapa = 0
+    PosVeh = {}
+    PecasRemovidas = {}
+    TipoVeh = ''
+    qtdPecasRemovidas = 0
+    PecasVeh = 0
+    return nil
+end
+
 ---------------------------------------------------------------------
 -- MAIN THREAD / INICIO
 ---------------------------------------------------------------------
@@ -31,7 +68,9 @@ local PecasVeh = 0
 Citizen.CreateThread(function()
     while true do
         local idle = 1000
-        for k,v in pairs(cfg.table) do
+        currentConfig()
+        for k,v in pairs((cfg and cfg.table) or {}) do
+            if k ~= 'none' and validConfig(v) then
                 local ped = PlayerPedId()
 
                 local coords = GetEntityCoords(ped)
@@ -49,19 +88,19 @@ Citizen.CreateThread(function()
                             text3D(v.inicio[1], v.inicio[2], v.inicio[3]+0.1, '~y~[E] ~w~PARA COMEÇAR O DESMANCHE')
                             if IsControlJustPressed(0,38) then
 
-                                if vSERVER.CheckPerm(cfg.table[type_desmanche]['permissao']) then               
+                                if vSERVER.CheckPerm(v.permissao) then
                                    
-                                    veh = CheckVeiculo(cfg.table[type_desmanche]['local_veiculo'][1], cfg.table[type_desmanche]['local_veiculo'][2], cfg.table[type_desmanche]['local_veiculo'][3])
+                                    veh = CheckVeiculo(v.local_veiculo[1], v.local_veiculo[2], v.local_veiculo[3])
                                     
                                     if veh then 
                                       
                                         local VehPermitido, ClasseVeh = CheckClasse(veh)
 
-                                        placa = GetVehicleNumberPlateText(veh)
-                                        modeloCarro = vSERVER.getVehicleModel(GetEntityModel(veh))
-                                        vehmodel = vSERVER.getVehicleName(GetEntityModel(veh))
-                                        precoveiculo = vSERVER.getVehiclePrice(GetEntityModel(veh))
-                                        typevehicle = vSERVER.getVehicleType(GetEntityModel(veh))
+                                        placa = GetVehicleNumberPlateText(veh):gsub(" ", "")
+                                        vehmodel = vSERVER.getVehicleModel(GetEntityModel(veh))
+                                        modeloCarro = vSERVER.getVehicleName(vehmodel)
+                                        precoveiculo = vSERVER.getVehiclePrice(vehmodel)
+                                        typevehicle = vSERVER.getVehicleType(vehmodel)
 
                                         if checkservice() then
                                             
@@ -115,6 +154,7 @@ Citizen.CreateThread(function()
                         end
                     end
                 end    
+            end
         end
         Citizen.Wait(idle)
     end
@@ -133,18 +173,20 @@ Citizen.CreateThread(function()
 
         local coords = GetEntityCoords(ped)
 
-        local distance = #(vector3(coords[1],coords[2],coords[3]) - vector3(cfg.table[type_desmanche]['local_ferramentas'][1], cfg.table[type_desmanche]['local_ferramentas'][2], cfg.table[type_desmanche]['local_ferramentas'][3]))
+        local config = currentConfig()
 
-        if etapa == 1 then
+        if etapa == 1 and config then
+            local point = config.local_ferramentas
+            local distance = #(vector3(coords[1],coords[2],coords[3]) - vector3(point[1],point[2],point[3]))
 
             if distance <= 10.0 then
                 idle = 1
 
-                DrawMarker(21, cfg.table[type_desmanche]['local_ferramentas'][1], cfg.table[type_desmanche]['local_ferramentas'][2], cfg.table[type_desmanche]['local_ferramentas'][3]-0.5, 0, 0, 0, 180.0, 0, 0, 0.4, 0.4, 0.4, 207, 158, 25, 150, 0, 0, 0, 1)
+                DrawMarker(21, config.local_ferramentas[1], config.local_ferramentas[2], config.local_ferramentas[3]-0.5, 0, 0, 0, 180.0, 0, 0, 0.4, 0.4, 0.4, 207, 158, 25, 150, 0, 0, 0, 1)
                         
                 if distance <= 5.0 then
                     idle = 1
-                    text3D(cfg.table[type_desmanche]['local_ferramentas'][1], cfg.table[type_desmanche]['local_ferramentas'][2], cfg.table[type_desmanche]['local_ferramentas'][3]-0.5, '~y~[E] ~w~PARA REUNIR AS ~y~FERRAMENTAS')
+                    text3D(config.local_ferramentas[1], config.local_ferramentas[2], config.local_ferramentas[3]-0.5, '~y~[E] ~w~PARA REUNIR AS ~y~FERRAMENTAS')
 
                             if distance <= 1.5 and IsControlJustPressed(0,38) then
 
@@ -164,15 +206,16 @@ Citizen.CreateThread(function()
                                     PecasVeh = 3
                                 end
                                 FreezeEntityPosition(ped, true)
-                                SetEntityHeading(ped, cfg.table[type_desmanche]['local_ferramentas'][4])
+                                SetEntityHeading(ped, config.local_ferramentas[4])
                                 vRP.playAnim(false, {{"amb@medic@standing@kneel@idle_a", "idle_a"}}, true)
                                 TriggerEvent('progress', 2, 'REUNINDO FERRAMENTAS')
 
                                 Wait(2000)  
 
-                                etapa = 2
-
-                                TriggerEvent('Notify', 'sucesso','Você pegou todas as ferramentas, vá e desmanche o veículo.')
+                                if currentConfig() and desmanchando then
+                                    etapa = 2
+                                    TriggerEvent('Notify', 'sucesso','Você pegou todas as ferramentas, vá e desmanche o veículo.')
+                                end
                                 FreezeEntityPosition(ped, false)
                                 ClearPedTasks(ped)
 
@@ -201,9 +244,10 @@ Citizen.CreateThread(function()
 
         local coords = GetEntityCoords(ped)
 
-        local heading = GetEntityHeading(veh)
+        local config = currentConfig()
 
-        if etapa == 2 then
+        if etapa == 2 and config then
+            local heading = GetEntityHeading(veh)
 
             if qtdPecasRemovidas == PecasVeh then
                 etapa = 3
@@ -280,23 +324,25 @@ Citizen.CreateThread(function()
 
         local coords = GetEntityCoords(ped)
 
-        local distance = #(vector3(coords[1],coords[2],coords[3]) - vector3(cfg.table[type_desmanche]['local_finalizar'][1], cfg.table[type_desmanche]['local_finalizar'][2], cfg.table[type_desmanche]['local_finalizar'][3]))
+        local config = currentConfig()
 
-        if etapa == 3 then
+        if etapa == 3 and config then
+            local point = config.local_finalizar
+            local distance = #(vector3(coords[1],coords[2],coords[3]) - vector3(point[1],point[2],point[3]))
 
             if distance <= 10.0 then
                 idle = 1
-                DrawMarker(21, cfg.table[type_desmanche]['local_finalizar'][1], cfg.table[type_desmanche]['local_finalizar'][2], cfg.table[type_desmanche]['local_finalizar'][3]-0.5, 0, 0, 0, 180.0, 0, 0, 0.4, 0.4, 0.4, 207, 158, 25, 150, 0, 0, 0, 1)
+                DrawMarker(21, config.local_finalizar[1], config.local_finalizar[2], config.local_finalizar[3]-0.5, 0, 0, 0, 180.0, 0, 0, 0.4, 0.4, 0.4, 207, 158, 25, 150, 0, 0, 0, 1)
                 
                 if distance <= 2.0 then
                     idle = 1
 
-                    text3D(cfg.table[type_desmanche]['local_finalizar'][1], cfg.table[type_desmanche]['local_finalizar'][2], cfg.table[type_desmanche]['local_finalizar'][3]-0.5, '~y~[E] ~w~PARA FINALIZAR O ~y~DESMANCHE')
+                    text3D(config.local_finalizar[1], config.local_finalizar[2], config.local_finalizar[3]-0.5, '~y~[E] ~w~PARA FINALIZAR O ~y~DESMANCHE')
                     
                     if IsControlJustPressed(0,38) then
                         ClearPedTasks(ped)
 
-                    if typevehicle == "exclusive" then
+                    if (typevehicle == "vip" or typevehicle == "exclusive") then
                         porcentagem = cfg.porcentagem_veiculovip
                     else
                         porcentagem = cfg.porcentagem_veiculocomum
@@ -305,9 +351,8 @@ Citizen.CreateThread(function()
                         pagamento = (precoveiculo * porcentagem)
 
                         tipo = type_desmanche
-                        vSERVER.GerarPagamento(placa, vehmodel, modeloCarro, pagamento,tipo)
-                        local vehicle = vRP.getNearestVehicle(10)
-                        DeleteEntity(vehicle)
+                        if vSERVER.GerarPagamento(placa, vehmodel, modeloCarro, pagamento,tipo) then
+                        DeleteEntity(veh)
                         desmanchando = false
                         etapa = 0 
                         PosVeh = {}
@@ -315,6 +360,7 @@ Citizen.CreateThread(function()
                         TipoVeh = ''
                         qtdPecasRemovidas = 0
                         PecasVeh = 0
+                        end
                     end
 
                 end
@@ -344,7 +390,7 @@ function checkservice()
     if cfg.desmanchar_veiculo_trabalho then
         return true
     else
-        if typevehicle ~= 'work' then
+        if typevehicle ~= 'work' and typevehicle ~= 'service' then
             return true
         else
             TriggerEvent('Notify', 'negado', 'Veiculos de serviço não podem ser desmanchados!.')

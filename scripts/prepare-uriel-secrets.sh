@@ -18,8 +18,8 @@ if [[ -n "$incoming" ]]; then
   done
 fi
 install -d -m 0700 "$root" "$root/secrets" "$root/state" "$root/state/txData" \
-  "$root/state/cache" "$root/state/manifests" "$root/releases" "$root/backups"
-chown 1000:1000 "$root/state/txData" "$root/state/cache"
+  "$root/state/kvp" "$root/state/resources" "$root/state/resources/radio" "$root/state/manifests" "$root/releases" "$root/backups"
+chown -R 1000:1000 "$root/state/txData" "$root/state/kvp" "$root/state/resources"
 if [[ -n "$incoming" ]]; then
   for name in "${names[@]}"; do install -o root -g root -m 0444 "$incoming/$name" "$root/secrets/$name"; done
 fi

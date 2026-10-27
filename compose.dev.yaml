@@ -17,6 +17,8 @@ services:
       - dev_server_data:/server-data
       - dev_txdata:/txData
       - dev_cache:/server-data/cache
+      - dev_kvp:/server-data/db
+      - ./state/dev/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json
       - ./resources:/server-data/resources:ro
       - ./config:/server-data/config:ro
       - ./server.cfg:/server-data/server.cfg:ro
@@ -29,8 +31,11 @@ services:
     profiles: [backup]
     volumes:
       - dev_txdata:/txData:ro
+      - dev_kvp:/kvp:ro
+      - ./state/dev/resources:/resource-state:ro
 
 volumes:
   dev_server_data:
   dev_txdata:
   dev_cache:
+  dev_kvp:

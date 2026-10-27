@@ -1081,9 +1081,36 @@ function updateModuleFilters(reset=false){
     filterEl.classList.toggle('hidden',!showFilter);
 }
 
-function setModule(m){
-    module=m;
+function resetTransientUI(){
+    // Cada modulo deve abrir limpo. Um drawer/modal de outra aba nunca pode
+    // permanecer visivel ao trocar de categoria ou ao reabrir o painel.
+    const confirm=$('#confirm');
+    if(confirm && !confirm.classList.contains('hidden')){
+        const cancel=$('#confirm-cancel');
+        if(cancel && !cancel.disabled && typeof cancel.onclick==='function') cancel.click();
+        else{
+            confirm.classList.add('hidden');
+            pending=null;
+        }
+    }
+
+    if($('#item-picker') && !$('#item-picker').classList.contains('hidden')){
+        closeItemPicker();
+        restoreShopPickerHeader();
+        pickerSelection.clear();
+    }
+
+    closeMapPicker();
+    closeDrawer();
+    pending=null;
     editing=null;
+    pickerContext=null;
+    mansionDoorDraft=[];
+}
+
+function setModule(m){
+    resetTransientUI();
+    module=m;
 
     if(m==='mapmarkings'){
         loadMapBlipCatalog().then(()=>refreshMapBlipIcons());
@@ -1114,6 +1141,23 @@ function currentKind(){
     if(module==='mansions') return 'mansion';
     if(module==='dealership') return 'dealershipvehicle';
     return garageTab==='points'?'garage':'type';
+}
+
+function handlePrimaryNewAction(){
+    // A ação do botão principal deve ser resolvida no MOMENTO DO CLIQUE.
+    // A concessionária troca dinamicamente o comportamento desse botão e,
+    // se o callback antigo ficar preso, ele abre o formulário de veículo em
+    // outras abas (ex.: Mansões). Centralizando aqui, a ação sempre respeita
+    // o módulo/visualização atualmente ativos.
+    if([].includes(module)){
+        return toast('Módulo preparado. Envie o resource correspondente para habilitarmos os cadastros.','error');
+    }
+
+    if(module==='dealership' && dealershipView==='server'){
+        return serverVehicleForm(null);
+    }
+
+    return openDrawer(currentKind());
 }
 
 function actions(kind,id,canTp=true){
@@ -1345,9 +1389,13 @@ function syncGroupTopActions(){
         serverVehicleBulkDeleteBtn.textContent=`Apagar selecionados (${serverVehicleBulkSelection.size})`;
         serverVehicleBulkDeleteBtn.disabled=serverVehicleBulkSelection.size===0;
 
-        newBtn.textContent='＋ Cadastrar veículo concessionária';
-        newBtn.onclick=()=>openDrawer('dealershipvehicle',null);
+        newBtn.textContent=dealershipView==='server'?'＋ Cadastrar veículo servidor':'＋ Cadastrar veículo concessionária';
+        newBtn.onclick=handlePrimaryNewAction;
     }else{
+        // Nunca deixa o callback especial da concessionária escapar para
+        // outra categoria. O texto do botão será definido pelo render do
+        // módulo atual e a ação volta ao roteador central.
+        newBtn.onclick=handlePrimaryNewAction;
         dealershipView='dealership';
         serverVehicleBulkMode=false;
         serverVehicleBulkSelection.clear();
@@ -1692,7 +1740,7 @@ function render(){
         if(dealershipView==='server'){
             $('#page-title').textContent='Veículos cadastrados servidor';
             $('#page-sub').textContent='Catálogo completo do m_garage / shared-side/listcars.json. Edite ou exclua veículos do servidor em tempo real.';
-            $('#new').textContent='＋ Cadastrar veículo concessionária';
+            $('#new').textContent='＋ Cadastrar veículo servidor';
 
             const vehicles=Object.entries(serverVehicleCatalog||{}).map(([spawn,data])=>({spawn,...data}));
             const bannedCount=vehicles.filter(v=>v.banned===true).length;
@@ -5948,13 +5996,8 @@ $('#sort').onchange=render;
 $('#group-filter').onchange=render;
 updateModuleFilters(true);
 $('#refresh').onclick=()=>loadAll();
-$('#new').onclick=()=>{
-    if([].includes(module)){
-        return toast('Módulo preparado. Envie o resource correspondente para habilitarmos os cadastros.','error');
-    }
-    openDrawer(currentKind());
-};
-$('#close').onclick=()=>{$('#app').classList.add('hidden');nui('close')};
+$('#new').onclick=handlePrimaryNewAction;
+$('#close').onclick=()=>{resetTransientUI();$('#app').classList.add('hidden');nui('close')};
 $('#drawer-close').onclick=closeDrawer;
 $('#overlay').onclick=closeDrawer;
 
@@ -6117,12 +6160,16 @@ window.addEventListener('message',e=>{
     const d=e.data||{};
 
     if(d.action==='open'){
+        resetTransientUI();
         $('#app').classList.remove('hidden');
         serverItems=[];
         loadAll(true);
     }
 
-    if(d.action==='close')$('#app').classList.add('hidden');
+    if(d.action==='close'){
+        resetTransientUI();
+        $('#app').classList.add('hidden');
+    }
 
     if(d.action==='mansionPositionCaptured'){
         applyMansionCapturedPosition(String(d.target||''),d.coords||{});

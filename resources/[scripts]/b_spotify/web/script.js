@@ -1731,6 +1731,15 @@ const ExpandedPlayer = (() => {
 })()
 
 // Abrir overlay ao clicar no bloco now-playing
+function escapeSearchHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const np = document.querySelector(".now-playing")
   if (np) {
@@ -2427,52 +2436,40 @@ function loadPlaylistVideos(playlistId) {
 }
 
 /////////////////////////////////////////////////////////////////youtube pesquisa////////////////////////
-const CACHE_NAME = "youtube_search_cache_v3"
+const CACHE_NAME = "youtube_search_cache_v4"
 const CACHE_EXPIRATION_HOURS = 6 // cache expira em 6h
 const MAX_CACHE_ITEMS = 200
 
 const sessionCache = new Map()
 const searchQueue = new Map()
 
-// CORRIGIDO: Instâncias Invidious atualizadas e funcionais
-const INVIDIOUS_INSTANCES = [
-  "https://iv.melmac.space",
-]
+// A pesquisa é feita pelo SERVER do FiveM.
+// Isso evita bloqueios de CORS/CEF e não depende de uma única instância pública no navegador.
+async function searchYouTubeServer(query) {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 15000)
 
+  try {
+    const response = await fetch(`https://${safeGetParentResourceName()}/searchYouTube`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+      signal: controller.signal,
+    })
 
-// NOVO: Sistema de fallback local melhorado
-const LOCAL_SEARCH_DATA = {
-  // Cache local básico para pesquisas comuns
-  mc: [
-    {
-      id: "dQw4w9WgXcQ",
-      title: "MC Test - Música Exemplo",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-      author: "MC Artista",
-      duration: "3:32",
-      views: 1000000,
-    },
-  ],
-  funk: [
-    {
-      id: "dQw4w9WgXcQ",
-      title: "Funk Exemplo - Batida Pesada",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-      author: "Funk Artist",
-      duration: "2:45",
-      views: 500000,
-    },
-  ],
-  ryan: [
-    {
-      id: "dQw4w9WgXcQ",
-      title: "MC Ryan - Exemplo",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-      author: "MC Ryan",
-      duration: "3:15",
-      views: 2000000,
-    },
-  ],
+    if (!response.ok) {
+      throw new Error(`Falha no callback de pesquisa (HTTP ${response.status})`)
+    }
+
+    const payload = await response.json()
+    if (!payload || payload.success !== true || !Array.isArray(payload.results)) {
+      throw new Error(payload?.error || "A pesquisa não retornou resultados válidos")
+    }
+
+    return payload.results
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 async function searchYouTubeWithCache(query) {
@@ -2480,91 +2477,44 @@ async function searchYouTubeWithCache(query) {
 
   const normalizedQuery = query.toLowerCase().trim()
 
-  // 1. Verificar cache em memória
+  // 1. Cache da sessão
   if (sessionCache.has(normalizedQuery)) {
-    console.log("[Cache] Retornando da sessão:", query)
+    console.log("[Busca] Retornando cache da sessão:", query)
     return sessionCache.get(normalizedQuery)
   }
 
-  // 2. Verificar se já está buscando (para evitar chamadas duplicadas)
+  // 2. Evita buscas duplicadas simultâneas
   if (searchQueue.has(normalizedQuery)) {
-    console.log("[Cache] Aguardando busca em andamento:", query)
     return await searchQueue.get(normalizedQuery)
   }
 
-  // 3. Verificar cache no localStorage
+  // 3. Cache persistente da NUI
   const cachedResults = await getFromCache(normalizedQuery)
   if (cachedResults) {
-    console.log("[Cache] Retornando do armazenamento:", query)
     sessionCache.set(normalizedQuery, cachedResults)
     return cachedResults
   }
 
-  // 4. Buscar pela API Invidious
-  console.log("[API] Buscando online:", query)
-  const searchPromise = tryInvidiousAPI(query)
+  // 4. Busca real executada pelo servidor FiveM
+  const searchPromise = searchYouTubeServer(query)
   searchQueue.set(normalizedQuery, searchPromise)
 
   try {
     const results = await searchPromise
-    searchQueue.delete(normalizedQuery)
 
-    if (results?.length > 0) {
+    if (Array.isArray(results) && results.length > 0) {
       sessionCache.set(normalizedQuery, results)
       await saveToCache(normalizedQuery, results)
       return results
-    } else {
-      // NOVO: Fallback para dados locais se API falhar
-      console.log("[Fallback] Tentando busca local para:", query)
-      const localResults = tryLocalSearch(query)
-      if (localResults.length > 0) {
-        sessionCache.set(normalizedQuery, localResults)
-        return localResults
-      }
     }
 
     return []
   } catch (error) {
+    console.error("[Busca] Falha na pesquisa do servidor:", error)
+    throw error
+  } finally {
     searchQueue.delete(normalizedQuery)
-    console.error("Erro na busca:", error)
-
-    // NOVO: Fallback para dados locais em caso de erro
-    console.log("[Fallback] API falhou, tentando busca local para:", query)
-    const localResults = tryLocalSearch(query)
-    if (localResults.length > 0) {
-      sessionCache.set(normalizedQuery, localResults)
-      return localResults
-    }
-
-    return []
   }
-}
-
-// NOVO: Função de busca local melhorada
-function tryLocalSearch(query) {
-  const normalizedQuery = query.toLowerCase().trim()
-  const results = []
-
-  // Buscar em dados locais
-  for (const [key, data] of Object.entries(LOCAL_SEARCH_DATA)) {
-    if (normalizedQuery.includes(key) || key.includes(normalizedQuery)) {
-      results.push(...data)
-    }
-  }
-
-  // Se não encontrou nada específico, retornar alguns resultados genéricos
-  if (results.length === 0) {
-    results.push({
-      id: "dQw4w9WgXcQ",
-      title: `Resultado para "${query}"`,
-      thumbnail: getOptimizedThumbnail("dQw4w9WgXcQ", "medium"),
-      author: "Artista Desconhecido",
-      duration: "3:00",
-      views: 100000,
-    })
-  }
-
-  return results.slice(0, 10) // Limitar a 10 resultados
 }
 
 async function getFromCache(query) {
@@ -2610,66 +2560,6 @@ async function saveToCache(query, results) {
     localStorage.setItem(CACHE_NAME, JSON.stringify(cache))
   } catch (error) {
     console.warn("Erro ao salvar no cache:", error)
-  }
-}
-
-// CORRIGIDO: Pesquisa usando API Invidious com melhor tratamento de erros
-async function tryInvidiousAPI(query) {
-  const promises = INVIDIOUS_INSTANCES.map(async (instance, index) => {
-    try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 8000) // Aumentado para 8s
-
-      const url = `${instance}/api/v1/search?q=${encodeURIComponent(query)}&type=video&sort_by=relevance&region=BR`
-
-      console.log(`[API] Tentando instância ${index + 1}/${INVIDIOUS_INSTANCES.length}: ${instance}`)
-
-      const response = await fetch(url, {
-        signal: controller.signal,
-        referrerPolicy: "no-referrer",
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-          Accept: "application/json",
-        },
-      })
-
-      clearTimeout(timeout)
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} - ${response.statusText}`)
-      }
-
-      const data = await response.json()
-
-      if (!Array.isArray(data) || data.length === 0) {
-        throw new Error("Nenhum resultado encontrado")
-      }
-
-      const results = data
-        .filter((video) => video.videoId && video.title && video.lengthSeconds > 0)
-        .map((video) => ({
-          id: video.videoId,
-          title: video.title,
-          thumbnail: getBestThumbnail(video),
-          author: video.author || "Artista Desconhecido",
-          duration: formatDuration(video.lengthSeconds),
-          views: video.viewCount || 0,
-        }))
-        .slice(0, 20)
-
-      console.log(`[API] ✅ Sucesso com ${instance} - ${results.length} resultados`)
-      return results
-    } catch (error) {
-      console.log(`[API] ❌ Falha com ${instance}: ${error.message}`)
-      throw new Error(`${instance}: ${error.message}`)
-    }
-  })
-
-  try {
-    return await Promise.any(promises)
-  } catch (error) {
-    console.error("[API] ❌ Todas as instâncias falharam")
-    throw new Error("Todas as instâncias falharam")
   }
 }
 
@@ -2829,14 +2719,14 @@ document.addEventListener("DOMContentLoaded", () => {
                       data-src="${optimizedThumbnail}" 
                       data-video-id="${item.id}"
                       src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='63'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3C/svg%3E"
-                      alt="${item.title}" 
+                      alt="${escapeSearchHtml(item.title)}"
                       onerror="this.src='${fallbackThumbnail}'"
                       loading="lazy"
                     >
                   </div>
                   <div class="info">
-                    <h3 class="track-title">${item.title}</h3>
-                    <p class="track-duration">${item.author} • ${item.duration}</p>
+                    <h3 class="track-title">${escapeSearchHtml(item.title)}</h3>
+                    <p class="track-duration">${escapeSearchHtml(item.author)} • ${escapeSearchHtml(item.duration)}</p>
                   </div>
                   <div class="actions">
                     <button class="favorite">🤍</button>
@@ -2880,7 +2770,7 @@ document.addEventListener("DOMContentLoaded", () => {
           console.warn("Falha ao recarregar conteúdo após limpar busca:", err)
         }
       }
-    }, 300) // Reduzido para 300ms para resposta mais rápida
+    }, 650) // Evita disparar requisições a cada tecla
   })
 
   // Botão de limpar (ícone "x") — limpa input e reseta resultados

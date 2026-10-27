@@ -30,9 +30,13 @@ if [[ -n "$endpoint" || -n "$https_host" ]]; then
 fi
 compose_at() {
   local release="$1"; shift
+  local runtime_override=()
+  if [[ -f "$root/state/compose.runtime.yaml" ]]; then
+    runtime_override=(-f "$root/state/compose.runtime.yaml")
+  fi
   INTERIOR_CITY_RELEASE_PATH="$release" COMPOSE_PROJECT_NAME=interior-city-tocado \
     docker compose --env-file "$root/.env" --project-directory "$root" -p interior-city-tocado \
-    -f "$release/compose.yaml" ${profiles[@]+"${profiles[@]}"} "$@"
+    -f "$release/compose.yaml" ${runtime_override[@]+"${runtime_override[@]}"} ${profiles[@]+"${profiles[@]}"} "$@"
 }
 old=''
 if [[ -L "$root/current" ]]; then
@@ -65,6 +69,13 @@ for name in db_root_password db_app_password cfx_license steam_web_api webhook_l
     echo "Invalid private file ownership/mode: $name" >&2; exit 1;
   }
 done
+mkdir -p "$root/state/kvp" "$root/state/resources/radio"
+if [[ ! -f "$root/state/resources/radio/private_radios.json" ]]; then
+  cp "$release/resources/[voip]/radio/private_radios.json" "$root/state/resources/radio/private_radios.json"
+fi
+chown -R 1000:1000 "$root/state/kvp" "$root/state/resources"
+chmod 0600 "$root/state/resources/radio/private_radios.json"
+install -m 0600 "$release/compose.runtime.yaml" "$root/state/compose.runtime.yaml"
 # Validate/build the candidate before stopping a currently running release.
 compose_at "$release" config --quiet
 compose_at "$release" build

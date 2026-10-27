@@ -100,7 +100,8 @@ class DockerReleaseTests(unittest.TestCase):
 
     def test_archive_rejects_paths_links_and_private_state(self):
         for name, kind in [('../escape', None), ('/escape', None), ('secrets/cfx_license', None),
-                           ('.env.dev', None), ('config/keys.cfg', None), ('resources/link', tarfile.SYMTYPE)]:
+                           ('.env.dev', None), ('db/default/CURRENT', None), ('.replxx_history', None),
+                           ('config/keys.cfg', None), ('resources/link', tarfile.SYMTYPE)]:
             with self.assertRaises(ValueError): r.extract(self.archive(name, kind), self.root/'release')
 
     def test_manifest_detects_edit_addition_and_deletion(self):
@@ -118,6 +119,8 @@ class DockerReleaseTests(unittest.TestCase):
         release = self.root/'release'; release.mkdir(); (release/'server.cfg').write_text('original')
         (release/'runtime').mkdir(); (release/'runtime/secrets.cfg').write_text('fixture')
         (release/'.assets-state.json').write_text('{}')
+        (release/'db').mkdir(); (release/'db/CURRENT').write_text('runtime KVP')
+        (release/'.replxx_history').write_text('runtime console history')
         self.assertEqual(set(r.inventory(release)), {'server.cfg'})
 
     def simulated_deploy(self, fail=False):
@@ -129,6 +132,9 @@ class DockerReleaseTests(unittest.TestCase):
         (source/'config/resource-secrets.schema.json').write_text('{}')
         (source/'assets.lock.json').write_text(json.dumps({'format':1,'project':a.PROJECT,'packages':[]}))
         (source/'compose.yaml').write_text('services: {}\n')
+        shutil.copyfile(ROOT/'compose.runtime.yaml',source/'compose.runtime.yaml')
+        (source/'resources/[voip]/radio').mkdir(parents=True)
+        (source/'resources/[voip]/radio/private_radios.json').write_text('{}')
         (source/'server.cfg').write_text('fixture configuration\n')
         archive = stage/'release.tar'
         with tarfile.open(archive,'w') as tar:
@@ -139,6 +145,9 @@ class DockerReleaseTests(unittest.TestCase):
         old_sha, new_sha = 'a'*40, 'b'*40
         old = base/'releases'/old_sha; old.parent.mkdir(parents=True); shutil.copytree(source,old)
         (base/'state/manifests').mkdir(parents=True)
+        radio_state=base/'state/resources/radio/private_radios.json'
+        radio_state.parent.mkdir(parents=True)
+        radio_state.write_text('{"fixture_channel":777}')
         r.manifest(old,base/'state/manifests'/(old_sha+'.json'))
         (base/'current').symlink_to(old)
         c.initialize(base/'secrets'); c.write_private(base/'secrets/cfx_license',self.license)
@@ -160,6 +169,7 @@ shutil.move(*args)
         for name,script in commands.items(): p=binary/name; p.write_text(script); p.chmod(0o755)
         env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],FIXTURE_LOG=str(log),FIXTURE_FAIL_UP='1' if fail else '0')
         result=subprocess.run(['bash',str(stage/'install.sh'),new_sha,str(archive)],capture_output=True,text=True,env=env)
+        self.assertEqual(json.loads(radio_state.read_text()), {'fixture_channel':777})
         events=[json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
         return result, (base/'current').resolve().name, events
 
@@ -178,6 +188,7 @@ shutil.move(*args)
         self.assertEqual(current,'a'*40)
         self.assertIn('Database was not rolled back',result.stderr)
         self.assertEqual(sum('up' in e for e in events),2)
+        self.assertTrue(all(any(arg.endswith('/state/compose.runtime.yaml') for arg in e) for e in events if 'up' in e))
 
     def test_unicode_code_and_assets_use_same_linux_directory(self):
         archive = self.archive('resources/cafe\u0301/server.lua')

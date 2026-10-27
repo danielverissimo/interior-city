@@ -157,7 +157,7 @@ RegisterCommand('911',function(source,args,rawCommand)
 						message = identity.nome.." "..identity.sobrenome.." ["..user_id.."] "..rawCommand:sub(4) ,
 					})
 
-					vRP.sendLog('','O ID: '..user_id..' enviou um aviso de emergência para o chat de emergência descrição: '..rawCommand:sub(4)..' nas coords: '..vec3(GetEntityCoords(GetPlayerPed(source))))
+					vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")),'O ID: '..user_id..' enviou um aviso de emergência para o chat de emergência descrição: '..rawCommand:sub(4)..' nas coords: '..vec3(GetEntityCoords(GetPlayerPed(source))))
 				end
 			end
 		end
@@ -1056,7 +1056,7 @@ RegisterCommand('skin',function(source,args,rawCommand)
             if nplayer then
                 TriggerClientEvent("skinmenu",nplayer,args[2], true)
                 TriggerClientEvent("Notify",source,"sucesso","Você setou a skin <b>"..args[2].."</b> no passaporte <b>"..parseInt(args[1]).."</b>.", 5)
-				vRP.sendLog('', 'O ADMIN '..user_id..' SETOU A SKIN '..args[2]..' NO PASSAPORTE '..parseInt(args[1]))
+				vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), 'O ADMIN '..user_id..' SETOU A SKIN '..args[2]..' NO PASSAPORTE '..parseInt(args[1]))
             end
         end
     elseif skinConfig[user_id] then
@@ -1074,7 +1074,7 @@ RegisterCommand('skin',function(source,args,rawCommand)
 		end
 
         TriggerClientEvent("skinmenu",source,skin.skin, true)
-		vRP.sendLog('', 'O USUARIO: '..user_id..' SETOU A SKIN '..skin.skin)
+		vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), 'O USUARIO: '..user_id..' SETOU A SKIN '..skin.skin)
         skinCooldown[user_id] = os.time()
 		skinsActive[user_id] = true
     end

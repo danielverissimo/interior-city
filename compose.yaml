@@ -58,6 +58,8 @@ services:
     volumes:
       - ${INTERIOR_CITY_RELEASE_PATH:-.}:/server-data
       - ./state/txData:/txData
+      - ./state/kvp:/server-data/db
+      - ./state/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json
     tmpfs:
       - /server-data/runtime:uid=1000,gid=1000,mode=0700
       - /tmp:uid=1000,gid=1000,mode=1777
@@ -138,6 +140,8 @@ services:
       - ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/backup/backup.sh:/usr/local/bin/interior-city-backup:ro
       - ./backups:/backups
       - ./state/txData:/txData:ro
+      - ./state/kvp:/kvp:ro
+      - ./state/resources:/resource-state:ro
     tmpfs:
       - /tmp:mode=0700
     networks:

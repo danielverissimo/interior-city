@@ -1707,7 +1707,7 @@ function src.isInDomination()
 end
 
 RegisterNetEvent("novak:markerYouOrganization", function(permission, orgName)
-	local coordsInMap = exports["fusion_garage"]:foundGarageByPermission(permission)
+	local coordsInMap = exports["m_garage"]:foundGarageByPermission(permission)
 	if coordsInMap and next(coordsInMap) then
 		if coordsInMap.coords then
 			local blip = AddBlipForCoord(coordsInMap.coords.x + 2.5, coordsInMap.coords.y + 1.5, coordsInMap.coords.z)

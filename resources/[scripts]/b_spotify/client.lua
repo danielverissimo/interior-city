@@ -1706,6 +1706,53 @@ RegisterNUICallback('audioDeviceChanged', function(data, cb)
     cb('ok')
 end)
 
+-- Pesquisa de músicas: NUI -> client -> server.
+-- A requisição HTTP é executada no server para evitar CORS e bloqueios do CEF/NUI.
+local pendingYoutubeSearches = {}
+local youtubeSearchSequence = 0
+
+RegisterNUICallback('searchYouTube', function(data, cb)
+    local query = tostring((data and data.query) or '')
+    query = query:gsub('^%s+', ''):gsub('%s+$', '')
+
+    if #query < 2 then
+        cb({ success = true, results = {} })
+        return
+    end
+
+    if #query > 120 then
+        query = query:sub(1, 120)
+    end
+
+    youtubeSearchSequence = youtubeSearchSequence + 1
+    local requestId = ('%s:%s:%s'):format(GetPlayerServerId(PlayerId()), GetGameTimer(), youtubeSearchSequence)
+
+    pendingYoutubeSearches[requestId] = cb
+    TriggerServerEvent('b_spotify:searchYouTube', requestId, query)
+
+    -- Segurança: nunca deixa um callback NUI preso para sempre.
+    SetTimeout(16000, function()
+        local callback = pendingYoutubeSearches[requestId]
+        if callback then
+            pendingYoutubeSearches[requestId] = nil
+            callback({
+                success = false,
+                results = {},
+                error = 'Tempo limite ao pesquisar músicas.'
+            })
+        end
+    end)
+end)
+
+RegisterNetEvent('b_spotify:searchYouTubeResult')
+AddEventHandler('b_spotify:searchYouTubeResult', function(requestId, payload)
+    local callback = pendingYoutubeSearches[requestId]
+    if not callback then return end
+
+    pendingYoutubeSearches[requestId] = nil
+    callback(payload or { success = false, results = {}, error = 'Resposta inválida da pesquisa.' })
+end)
+
 RegisterNUICallback('saveSearchToJson', function(data, cb)
     local query = data.query
     local results = data.results

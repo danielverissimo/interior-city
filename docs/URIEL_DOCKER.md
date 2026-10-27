@@ -12,7 +12,7 @@ Esta implementação pertence à branch `master`, promovida de `migration/tocado
 | txAdmin | `127.0.0.1:40121` no host; 40120 dentro do contêiner |
 | Jogo | TCP/UDP 30120 dentro do contêiner; sem porta publicada no host |
 | Banco | MariaDB 10.11.19; volume próprio; usuário `vrp`; sem publicar 3306 |
-| Estado | `state/txData`, `state/manifests`; cache gerado dentro de cada release |
+| Estado | `state/txData`, `state/kvp`, `state/resources`, `state/manifests`; cache gerado dentro de cada release |
 | Credenciais | `secrets/`, fora de releases e imagens |
 | Backups | `backups/`, neste host, com retenção de sete dias |
 | Assets | pacotes privados em `/srv/diskaux/interior-city-assets/tocado-mago` |
@@ -90,6 +90,10 @@ Quando já existe uma release, para os escritores e cria backup do banco e txDat
 O SQL `database/schema.sql` contém 204 definições de tabelas, sem dados importados. A inicialização acontece somente em volume novo. Seeds necessários, compatibilidade de SQL/recursos e criação do primeiro usuário ainda precisam de validação; nunca aplique o dump bruto do fornecedor no banco vivo anterior.
 
 A importação desativa a verificação de chaves estrangeiras somente na sessão do dump, pois a ordem fornecida não respeita as dependências entre tabelas, e restaura o valor anterior ao terminar. O healthcheck do banco verifica também a existência de todas as tabelas declaradas no esquema: uma inicialização parcial não pode liberar o FXServer. O cache fica no mesmo bind mount dos recursos no Uriel, permitindo hardlinks de streaming; ele é descartável e não acompanha uma troca de release.
+
+Os KVPs do FXServer (`db/`) ficam em `state/kvp`. A configuração mutável de rádios privados fica em `state/resources/radio/private_radios.json`, montada sobre o arquivo do recurso. Não copie esses dados de jogadores/configurações para o Git. O instalador aplica `state/compose.runtime.yaml` também à release anterior durante rollback, preservando os mesmos dados mesmo quando o Compose antigo ainda não declarava esses mounts. O perfil local usa volume KVP e arquivo de rádio próprios, inicializados por `scripts/dev.sh init`.
+
+Na primeira atualização de uma instalação que ainda guardava esses dados dentro da release, pare os escritores, arquive e migre `db/` e o JSON de rádios privados para `state/`. Restaure apenas o JSON padrão da release antiga depois de guardar sua configuração efetiva. O verificador passa a ignorar `db/` e `.replxx_history`, mas continua recusando qualquer mudança de código ou de configuração versionada não revisada. O backup `predeploy` das versões novas inclui também KVPs e configurações persistentes dos recursos; essa cópia precisa ocorrer com FXServer parado.
 
 ## txAdmin e conexão de teste
 

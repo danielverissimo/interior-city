@@ -10,7 +10,7 @@ import sys
 import tarfile
 import unicodedata
 
-IGNORED = {'cache', 'runtime', '.assets-cache', '.assets-state.json'}
+IGNORED = {'cache', 'runtime', 'db', '.replxx_history', '.assets-cache', '.assets-state.json'}
 PRIVATE = {'secrets', '.env', '.env.dev', '.assets-store.json', 'state', 'txData', 'backups', '.git'}
 
 

@@ -1,0 +1,7 @@
+# Applied to both candidate and previous releases by the installer, so rollback
+# keeps using the same mutable state even when the old Compose predates these mounts.
+services:
+  fxserver:
+    volumes:
+      - ./state/kvp:/server-data/db
+      - ./state/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json

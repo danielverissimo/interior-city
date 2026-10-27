@@ -1,9 +1,15 @@
 Config = {}
 
 Config.Command = 'painelconfig'
-Config.RequirePermission = false
-Config.Permissions = { 'perm.admin', 'admin.permissao' }
-Config.AcePermission = 'mgconfig.admin'
+Config.RequirePermission = true
+-- Somente estes cargos exatos podem abrir/usar o painel.
+-- A verificacao e feita novamente no servidor em todas as operacoes da NUI.
+Config.AllowedGroups = { 'developer', 'dono' }
+
+-- Mantidos apenas por compatibilidade com configuracoes antigas; nao concedem acesso
+-- enquanto AllowedGroups estiver configurado.
+Config.Permissions = {}
+Config.AcePermission = ''
 
 Config.InventoryResource = 'inventory'
 Config.GarageResource = 'm_garage'

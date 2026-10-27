@@ -1,14 +1,5 @@
---[[
-    mg_config_panel - OPEN CLIENT TRANSPORT / GAME BRIDGE
-    NAO OFUSCAR ESTE ARQUIVO.
-
-    Esta camada possui Tunnel/NUI e as rotinas de captura/teleporte que precisam
-    permanecer fora do virtualizador para garantir compatibilidade total.
-    Toda alteracao persistente continua validada no server.lua protegido.
-]]
-
 local Tunnel = module('vrp','lib/Tunnel')
-local Server = Tunnel["getInterface"](GetCurrentResourceName())
+local Server = Tunnel.getInterface(GetCurrentResourceName())
 
 local panelOpen=false
 local positionMode=nil
@@ -54,27 +45,49 @@ local function setPanel(state)
     SendNUIMessage({action=state and 'open' or 'close'})
 end
 
-local function openPanel()
-    if panelOpen then return end
-    if not Server.hasAccess() then
-        TriggerEvent('Notify','negado','Você não possui permissão para acessar este painel.',5000)
-        return
-    end
-    setPanel(true)
+-- ============================================================================
+-- BRIDGE CLIENT ABERTA / ESTAVEL
+-- ============================================================================
+-- NUI, Tunnel e natives sensiveis permanecem nesta camada aberta. O resultado
+-- server-side da AUTH/permissao e entregue ao core protegido apenas como boolean.
+local function notifyDenied(message)
+    TriggerEvent('Notify','negado',message or 'Você não possui permissão para acessar este painel.',5000)
 end
 
-RegisterCommand(Config["Command"],openPanel,false)
+local function requestProtectedOpen()
+    local protectedDecision = rawget(_G, "MGCFG_ClientAuthorizeOpen")
+    if type(protectedDecision) ~= 'function' then
+        notifyDenied('Núcleo protegido do painel indisponível.')
+        return
+    end
+
+    -- A chamada Tunnel ocorre somente na bridge aberta, sem atravessar a camada
+    -- ofuscada com promise/coroutine/callback.
+    local serverAllowed = Server.hasAccess() == true
+    local ok, approved = pcall(protectedDecision, serverAllowed)
+
+    if not ok or approved ~= true then
+        notifyDenied('Você não possui permissão para acessar este painel ou a licença não está autorizada.')
+        return
+    end
+
+    if not panelOpen then
+        setPanel(true)
+    end
+end
+
+RegisterCommand(Config.Command,requestProtectedOpen,false)
 
 -- Atalho padrão do painel: HOME
 RegisterCommand('+mg_config_panel_home',function()
-    openPanel()
+    requestProtectedOpen()
 end,false)
 
 RegisterCommand('-mg_config_panel_home',function()
 end,false)
 
 RegisterKeyMapping('+mg_config_panel_home','Abrir Painel de Configurações','keyboard','HOME')
-RegisterNetEvent('mg_config:open',openPanel)
+RegisterNetEvent('mg_config:open',requestProtectedOpen)
 RegisterNUICallback('close',function(_,cb) setPanel(false); cb({ok=true}) end)
 
 for _,name in ipairs({'getChests','getGarages','getGarageTypes','getShops','getItemList','getCraftSetups','getClothingShops','getBarbershops','getTattooShops','getCloakrooms','getMapMarkings','getManagedGroups','getDesmanches','getSafeZones','getJobs','getRoubos','getBancoCentral','getJoalheria','getRoubocofre','getResidences','getDealership','getServerVehicleCatalog','getMansions'}) do
@@ -188,7 +201,7 @@ RegisterNUICallback('startMansionDoorCapture',function(_,cb)
         cb({ok=false,message='Sem permissão.'})
         return
     end
-    if GetResourceState(Config["DoorsResource"] or 'doorsv2') ~= 'started' then
+    if GetResourceState(Config.DoorsResource or 'doorsv2') ~= 'started' then
         cb({ok=false,message='O doorsv2 não está iniciado.'})
         return
     end

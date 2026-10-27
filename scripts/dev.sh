@@ -112,6 +112,11 @@ init() {
   chmod 0700 secrets
   chmod 0444 secrets/*
   python3 scripts/configure-secrets.py init
+  install -d -m 0700 state/dev/resources/radio
+  if [[ ! -f state/dev/resources/radio/private_radios.json ]]; then
+    cp 'resources/[voip]/radio/private_radios.json' state/dev/resources/radio/private_radios.json
+    chmod 0600 state/dev/resources/radio/private_radios.json
+  fi
   require_checkout
   printf 'Local project %s initialized. Set its Cfx license with scripts/dev.sh set-license.\n' "$project"
 }
