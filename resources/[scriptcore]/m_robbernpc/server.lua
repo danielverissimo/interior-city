@@ -10,6 +10,7 @@ local openSessions = {}        -- [source] = { chestId, netId, maxWeight }
 local activeAlerts = {}        -- [alertId] = { source, coords }
 local alertBySource = {}       -- [source] = alertId
 local requestCooldown = {}     -- [source] = game timer aproximado (os.time)
+local failedAttemptUntil = {}  -- [userId] = unix timestamp da próxima tentativa
 local activeTrackers = {}       -- [alertId] = { source, expiresAt }
 local trackerBySource = {}      -- [source] = alertId
 local playerVehicleCooldowns = {} -- [ownerId:plate] = unix timestamp em que poderá ser roubado novamente
@@ -151,6 +152,7 @@ local function clearAllRobberyHistory()
     -- Cooldowns dos veículos pertencentes a jogadores existem apenas em memória
     -- e também no state bag da entidade enquanto ela está spawnada.
     playerVehicleCooldowns = {}
+    failedAttemptUntil = {}
     activeVehicles = {}
 
     local ok, vehicles = pcall(GetAllVehicles)
@@ -1097,39 +1099,61 @@ local function allLootWasTaken(session, userId)
 end
 
 local function buildRandomLoot()
-    local sourceList = {}
+    local commonItems = {}
+    local rareItems = {}
 
     for _, entry in ipairs(Config.Loot or {}) do
         -- getItemName retorna "Deleted" nessa vRP quando o item não existe.
         -- Evita transportar a tabela inteira de itens (que contém funções) pelo Proxy.
         local exists = entry.item and vRP.getItemName(entry.item) ~= 'Deleted'
         if exists then
-            sourceList[#sourceList + 1] = entry
+            local pool = entry.rare == true and rareItems or commonItems
+            pool[#pool + 1] = entry
         else
             print(('^3[m_robbernpc]^7 Item ignorado na Config.Loot porque não existe na base: %s'):format(tostring(entry.item)))
         end
     end
 
-    if #sourceList < Config.LootCount then
-        return nil, ('Há apenas %s item(ns) válido(s) na Config.Loot; são necessários %s.'):format(#sourceList, Config.LootCount)
+    local lootCount = math.max(0, math.floor(tonumber(Config.LootCount) or 0))
+    if #commonItems < lootCount then
+        return nil, ('Há apenas %s item(ns) comuns válidos na Config.Loot; são necessários %s.'):format(#commonItems, lootCount)
     end
 
-    -- Fisher-Yates para garantir itens diferentes sem repetição.
-    for i = #sourceList, 2, -1 do
+    -- Uma única rolagem por porta-malas, com no máximo um item raro.
+    local rareChance = math.max(0, math.min(100, tonumber(Config.RareLootChance) or 0))
+    local rareEntry = nil
+    if lootCount > 0 and #rareItems > 0 and math.random(100) <= rareChance then
+        rareEntry = rareItems[math.random(#rareItems)]
+    end
+
+    -- Fisher-Yates mantém os itens comuns diferentes entre si.
+    for i = #commonItems, 2, -1 do
         local j = math.random(i)
-        sourceList[i], sourceList[j] = sourceList[j], sourceList[i]
+        commonItems[i], commonItems[j] = commonItems[j], commonItems[i]
     end
 
     local loot = {}
-    for i = 1, Config.LootCount do
-        local entry = sourceList[i]
+    local function addLoot(entry)
         local min = tonumber(entry.min) or 1
         local max = tonumber(entry.max) or min
         if max < min then min, max = max, min end
         loot[entry.item] = { amount = math.random(min, max) }
     end
+    for i = 1, lootCount - (rareEntry and 1 or 0) do
+        addLoot(commonItems[i])
+    end
+    if rareEntry then addLoot(rareEntry) end
 
     return loot
+end
+
+local function applyFailedRobbery(userId, source)
+    failedAttemptUntil[userId] = os.time() + math.max(0, tonumber(Config.FailedAttemptCooldown) or 0)
+    local breakChance = math.max(0, math.min(100, tonumber(Config.FailedLockpickBreakChance) or 0))
+    if math.random(100) <= breakChance
+        and vRP.tryGetInventoryItem(userId, Config.LockpickItem, 1, true) then
+        notify(source, 'negado', 'Sua lockpick quebrou durante o arrombamento.', 5)
+    end
 end
 
 local function denyStart(source, message, netId)
@@ -1286,7 +1310,7 @@ RegisterNetEvent('m_robbernpc:validateCandidate', function(netId, validationId)
     local entity = getVehicleFromNetId(netId)
     local eligible = false
 
-    if userId and entity ~= 0
+    if userId and (failedAttemptUntil[userId] or 0) <= os.time() and entity ~= 0
         and validateDistance(source, entity, Config.ServerMaxDistance + 4.0)
         and isVehicleStationary(entity)
         and not hasBlockingOccupant(entity)
@@ -1346,6 +1370,12 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
         return
     end
     requestCooldown[source] = now + 1
+
+    local failedRemaining = (failedAttemptUntil[userId] or 0) - now
+    if failedRemaining > 0 then
+        denyStart(source, ('Aguarde %s segundo(s) antes de tentar outro arrombamento.'):format(failedRemaining), netId)
+        return
+    end
 
     local entity = getVehicleFromNetId(netId)
     if entity == 0 then
@@ -1425,14 +1455,18 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
 
     TriggerClientEvent('m_robbernpc:attemptStarted', source, netId)
 
-    -- Mantida exatamente a chamada de taskbar solicitada pelo usuário.
-    local finished = vRPclient.taskBar(source, 3000, math.random(7, 15))
+    local startedAt = GetGameTimer()
+    local finished = vRPclient.taskBar(source, Config.RobberyTaskbar)
+    if finished and GetGameTimer() - startedAt < 1500 then
+        finished = false
+    end
 
     entity = getVehicleFromNetId(netId)
 
     if not finished then
         clearVehicleBusy(netId, entity)
         TriggerClientEvent('m_robbernpc:attemptEnded', source, false, netId)
+        applyFailedRobbery(userId, source)
         notify(source, 'negado', 'Você falhou ao arrombar o porta-malas.', 5)
         return
     end
@@ -1457,6 +1491,14 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
         clearVehicleBusy(netId, entity)
         TriggerClientEvent('m_robbernpc:attemptEnded', source, false, netId)
         notify(source, 'negado', 'Alguém entrou no veículo durante o arrombamento.', 5)
+        return
+    end
+
+    if vRP.getInventoryItemAmount(userId, Config.LockpickItem) < 1 then
+        clearVehicleBusy(netId, entity)
+        TriggerClientEvent('m_robbernpc:attemptEnded', source, false, netId)
+        applyFailedRobbery(userId, source)
+        notify(source, 'negado', 'Você precisa manter a lockpick até concluir o arrombamento.', 5)
         return
     end
 

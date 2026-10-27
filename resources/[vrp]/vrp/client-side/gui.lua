@@ -216,7 +216,7 @@ local resultTask = nil
 	end
 end ]]
 
-function tvRP.taskBar()
+function tvRP.taskBar(settings)
 	Citizen.Wait(100)
 
 	if taskInProcess then
@@ -224,7 +224,7 @@ function tvRP.taskBar()
 	end
 
 	taskInProcess = true
-	openGui()
+	openGui(settings)
 	activeTasks = 1
 	resultTask = nil
 
@@ -246,9 +246,9 @@ function tvRP.taskBar()
 	end ]]
 end
 
-function openGui(sentLength,taskID,chancesent,skillGapSent)
+function openGui(settings)
 	SetNuiFocus(true,false)
-	SendNUIMessage({ action = 'createTask' })
+	SendNUIMessage({ action = 'createTask', settings = type(settings) == 'table' and settings or nil })
 	-- SendNUIMessage({ create = true, Length = sentLength, Task = taskID, chance = chancesent, skillGap = skillGapSent })
 end
 

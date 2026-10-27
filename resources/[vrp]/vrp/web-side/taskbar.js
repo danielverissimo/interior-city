@@ -19,6 +19,27 @@ let game_started = false;
 
 let streak = 0;
 let max_streak = 3;
+let taskSettings = null;
+
+function boundedInt(value, min, max, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(min, Math.min(max, Math.round(number))) : fallback;
+}
+
+function configureTask(settings) {
+  taskSettings = null;
+  max_streak = 3;
+  if (!settings || typeof settings !== "object") return;
+
+  const targetMinDegrees = boundedInt(settings.targetMinDegrees, 5, 90, 25);
+  taskSettings = {
+    targetMinDegrees,
+    targetMaxDegrees: boundedInt(settings.targetMaxDegrees, targetMinDegrees, 90, 35),
+    initialIntervalMs: boundedInt(settings.initialIntervalMs, 5, 50, 12),
+    finalIntervalMs: boundedInt(settings.finalIntervalMs, 5, 50, 9),
+  };
+  max_streak = boundedInt(settings.rounds, 1, 8, 3);
+}
 
 let gradientCanvas = document.createElement("canvas");
 let gradientCtx = gradientCanvas.getContext("2d");
@@ -173,15 +194,21 @@ function draw() {
   if (typeof animation_loop !== undefined) clearInterval(animation_loop);
 
   g_start = getRandomInt(20, 40) / 10;
-  g_end = getRandomInt(3, 5) / 5;
-  g_end = g_start + g_end;
+  const targetWidth = taskSettings
+    ? getRandomInt(taskSettings.targetMinDegrees, taskSettings.targetMaxDegrees) * Math.PI / 180
+    : getRandomInt(3, 5) / 5;
+  g_end = g_start + targetWidth;
 
   degrees = 0;
   new_degrees = 360;
 
   key_to_press = "" + getRandomInt(1, 4);
 
-  time = 12;
+  time = taskSettings
+    ? Math.round(taskSettings.initialIntervalMs +
+      (taskSettings.finalIntervalMs - taskSettings.initialIntervalMs) *
+      streak / Math.max(1, max_streak - 1))
+    : 12;
 
   animation_loop = setInterval(animate_to, time);
 }
@@ -274,7 +301,7 @@ document.addEventListener("keydown", function ({ code }) {
       correct();
     }
     init(true);
-    if (streak != 3) {
+    if (streak !== max_streak) {
       draw();
     } else {
       finishsound();
@@ -291,6 +318,8 @@ document.addEventListener("keydown", function ({ code }) {
 
 window.addEventListener("message", ({ data }) => {
   if (data.action === "createTask") {
+    streak = 0;
+    configureTask(data.settings);
     canvas.style.display = "";
     draw();
     document.querySelector('.taskImageProgress').style.display = 'flex'
