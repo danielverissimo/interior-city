@@ -8,13 +8,13 @@ Config.mainCommand = 'mdt'
 Config.staffCommand = 'mdtadm'
 
 Config.Webhooks = {
-    contract = '',
-    demote = '',
-    promote = '',
-    dismiss = '',
-    prison = '',
-    arrestVehicles = '',
-    fine = '',
+    contract = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
+    demote = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
+    promote = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
+    dismiss = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
+    prison = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
+    arrestVehicles = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
+    fine = GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")),
 }
 
 Config.prisonCoord = vec3(1716.85,2525.78,45.54)

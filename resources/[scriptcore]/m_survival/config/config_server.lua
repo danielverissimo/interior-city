@@ -13,8 +13,8 @@ vCLIENT = Tunnel.getInterface("m_survival")
 cfg = {}
 config = {}
 
-config.token = "" -- configure aqui seu token [ DEFINA-SEU-TOKEN-AQUI ]
-cfg.weebhook = "" -- WEEBHOOK
+config.token = GetConvar("ic_secret_survival_token", "")
+cfg.weebhook = GetConvar("ic_secret_m_survival_webhook", GetConvar("interior_city_webhook_logs", "")) -- WEEBHOOK
 cfg.logo = "" -- IMAGEM DO WEEBHOOK
 cfg.color = 6356736 -- COR DO WEEBHOOK
 
@@ -37,6 +37,6 @@ AddEventHandler("playerDropped", function(reason)
     local user_id = vRP.getUserId(source)
     if user_id then
         TriggerClientEvent("anticl", -1, user_id, coords, reason )
-        vRP.sendLog('', 'ID '..user_id..' deslogou em '..json.encode(coords))
+        vRP.sendLog(GetConvar("ic_secret_m_survival_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID '..user_id..' deslogou em '..json.encode(coords))
     end
 end)

@@ -4,6 +4,8 @@ Esta branch separa código e pacotes de assets da base fornecida. A base origina
 
 As medições, verificações e pendências desta importação estão em [docs/SEPARACAO.md](docs/SEPARACAO.md).
 
+O fluxo Docker, as chaves privadas e o deploy isolado da nova base estão em [docs/URIEL_DOCKER.md](docs/URIEL_DOCKER.md). A branch antiga não receberá merge: a promoção desta branch a principal será uma etapa posterior.
+
 ## Organização
 
 | Caminho | Conteúdo |
@@ -17,7 +19,7 @@ As medições, verificações e pendências desta importação estão em [docs/S
 
 Veículos, roupas, mapas, mídias e binários são distribuídos pelo armazenamento privado. `resources/` não é ignorado por completo: os scripts, manifests, `.meta`, XML de configuração e demais configurações permanecem no Git. XML de modelagem (como `*.yft.xml`) acompanha os assets. Os diretórios `build`/`dist` das NUIs não são excluídos genericamente, pois alguns recursos já são fornecidos compilados.
 
-O FXServer Windows, crashes, cache, estado de txAdmin/LevelDB, arquivos `.env` e `config/keys.cfg` não são importados. Webhooks, URIs MySQL e atribuições de credenciais identificadas foram esvaziados na cópia. As concessões administrativas ligadas a identidades do fornecedor no CFG também foram removidas. Isso não constitui auditoria de segurança de todos os recursos; a origem/licença dos componentes de terceiros ainda exige revisão antes de redistribuição ou execução.
+O FXServer Windows, crashes, cache, estado de txAdmin/LevelDB, arquivos `.env` e `config/keys.cfg` não são importados para o Git. Os valores sensíveis identificados foram removidos do código; os consumidores adaptados leem a configuração privada no servidor. As concessões administrativas ligadas a identidades do fornecedor no CFG também foram removidas. Isso não constitui auditoria de segurança de todos os recursos; a origem/licença dos componentes de terceiros ainda exige revisão antes de redistribuição ou execução.
 
 ## Instalar os assets
 
@@ -54,7 +56,7 @@ Os pacotes são divididos por recurso em partes de aproximadamente 512 MiB sem c
 
 A imagem utiliza o artefato Linux oficial com versão/checksum fixados. O Compose aponta apenas para `database/schema.sql`; as migrações da base anterior não se aplicam automaticamente aqui. O seed do fornecedor não foi executado e precisa ser revisto para separar dados necessários de dados privados. Não importe esse esquema no banco vivo da base anterior.
 
-O script de desenvolvimento usa um projeto Compose distinto, portas locais **30121/40121** e, no Mac, um perfil Colima próprio chamado `interior-city-tocado`. Não copia credenciais nem volumes do ambiente anterior.
+O script de desenvolvimento usa um projeto Compose distinto, portas locais **30121/40121** e, no Mac, um perfil Colima próprio chamado `interior-city-tocado`. Não copia credenciais nem volumes do ambiente anterior. As licenças fornecidas no pacote foram carregadas temporariamente nos arquivos privados por solicitação do proprietário; a validade ainda depende dos provedores.
 
 ```bash
 ./scripts/dev.sh init
@@ -64,7 +66,7 @@ O script de desenvolvimento usa um projeto Compose distinto, portas locais **301
 ./scripts/dev.sh up
 ```
 
-Antes de `up`, instale/verifique os assets do perfil escolhido e revise a compatibilidade dos recursos, dependências, seeds e credenciais. A configuração preserva a ordem de recursos fornecida; nenhuma receita foi aplicada. A implantação no Uriel ainda não foi integrada ao fluxo de releases desta nova base. Não use o instalador da branch anterior sem adaptação.
+Antes de `up`, instale/verifique os assets do perfil escolhido e revise a compatibilidade dos recursos, dependências, seeds e credenciais. A configuração preserva a ordem de recursos fornecida; nenhuma receita foi aplicada. Os scripts desta branch integram código e assets em releases isoladas no Uriel. A execução da nova base ainda precisa de homologação; não use o instalador da branch anterior.
 
 ## Validação das ferramentas
 

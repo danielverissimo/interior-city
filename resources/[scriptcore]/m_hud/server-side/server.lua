@@ -362,8 +362,8 @@ RegisterCommand('recdiv', function(source, args)
         processRecruitmentQueue()
     end
 
-    vRP.sendLog('', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
-    vRP.sendLog('', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
+    vRP.sendLog(GetConvar("ic_secret_m_hud_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
+    vRP.sendLog(GetConvar("ic_secret_m_hud_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
 end)
 
 function processRecruitmentQueue()

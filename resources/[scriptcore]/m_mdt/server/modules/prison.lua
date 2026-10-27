@@ -463,7 +463,7 @@ RegisterCommand('prenderadm', function(source, args)
     
     TriggerClientEvent('Notify', source, 'sucesso', 'Cidadão preso com sucesso.')
     
-    vRP.sendLog('', '```prolog\n[ID]: '..userId..'\n[PRENDEU]: '..nuserId..'\n[MOTIVO]: '..reason..'\n[TEMPO]: '..months..' Mês(es)```')
+    vRP.sendLog(GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: '..userId..'\n[PRENDEU]: '..nuserId..'\n[MOTIVO]: '..reason..'\n[TEMPO]: '..months..' Mês(es)```')
     exports["vrp_admin"]:generateLog({
         category = "admin",
         room = "prenderadm",
@@ -540,7 +540,7 @@ RegisterCommand('revprisao', function(source, args)
 
     TriggerClientEvent('Notify', source, 'sucesso', 'Cidadão liberado da prisão.')
 
-    vRP.sendLog('', '```prolog\n[ID]: '..userId..'\n[LIBEROU]: '..nuserId..'```')
+    vRP.sendLog(GetConvar("ic_secret_m_mdt_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: '..userId..'\n[LIBEROU]: '..nuserId..'```')
     exports["vrp_admin"]:generateLog({
         category = "admin",
         room = "revprisao",

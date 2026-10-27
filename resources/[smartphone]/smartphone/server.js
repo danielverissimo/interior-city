@@ -176,6 +176,11 @@ class p8 {
 }
 
 const p9 = require('./config.json');
+// Keep private settings server-side and out of JSON serialization/persisted config.
+Object.defineProperties(p9, {
+  token: { enumerable: false, get: () => GetConvar('ic_secret_smartphone_token', '') },
+  webhookURL: { enumerable: false, get: () => GetConvar('ic_secret_smartphone_webhook', GetConvar('interior_city_webhook_logs', '')) }
+});
 
 function pa() {
   for (let c of ['oxmysql', 'ghmattimysql', 'GHMattiMySQL', 'haze_mysql', 'mysql-async']) {

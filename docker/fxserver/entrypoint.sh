@@ -13,7 +13,7 @@ secret() {
 
 valid_cfg_value() {
   local name="$1" value="$2"
-  if [[ "$value" == *'"'* || "$value" == *$'\n'* || "$value" == *$'\r'* ]]; then
+  if [[ "$value" == *'"'* || "$value" == *'\'* || "$value" =~ [[:cntrl:]] ]]; then
     printf 'Invalid characters in %s\n' "$name" >&2
     exit 1
   fi
@@ -42,6 +42,13 @@ mkdir -p /server-data/runtime
   if [[ -n "$webhook_logs" ]]; then printf 'set interior_city_webhook_logs "%s"\n' "$webhook_logs"; fi
   if [[ -n "$webhook_bugs" ]]; then printf 'set interior_city_webhook_bugs "%s"\n' "$webhook_bugs"; fi
 } > /server-data/runtime/secrets.cfg
+# Resource-specific credentials arrive as data, never executable CFG commands.
+while IFS='=' read -r name value || [[ -n "$name" ]]; do
+  [[ -n "$name" ]] || continue
+  [[ "$name" =~ ^ic_secret_[a-z0-9_]+$ ]] || { echo 'Invalid resource secret name.' >&2; exit 1; }
+  valid_cfg_value resource_secret "$value"
+  printf 'set %s "%s"\n' "$name" "$value" >> /server-data/runtime/secrets.cfg
+done < /run/secrets/resource_convars
 chmod 0600 /server-data/runtime/secrets.cfg
 
 public_endpoint="${PLAYIT_PUBLIC_ENDPOINT:-}"

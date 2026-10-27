@@ -12,8 +12,8 @@ Config.Main = {
 }
 
 Config.weebhooks = {
-    Withdraw = '',
-    Deposit = '',
+    Withdraw = (IsDuplicityVersion() and GetConvar("ic_secret_m_orgs_v2_webhook", GetConvar("interior_city_webhook_logs", "")) or ""),
+    Deposit = (IsDuplicityVersion() and GetConvar("ic_secret_m_orgs_v2_webhook", GetConvar("interior_city_webhook_logs", "")) or ""),
 }
 
 Config.defaultPermissions = { 

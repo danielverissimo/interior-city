@@ -114,7 +114,7 @@ function RegisterTunnel.requestVehInfos(info, data)
             
             vRP._execute("bm_module/garages/updateOwnerVehicle", { new_owner = nuser_id, user_id = user_id, veiculo = data.index, portamalas = json.encode({}) })
 
-            vRP.sendLog("", "[COMPROU] " ..nuser_id.. " | [VENDEU] "..user_id.." | VALOR "..price.." | VEICULO: "..vehName.."")
+            vRP.sendLog(GetConvar("ic_secret_bm_module_webhook", GetConvar("interior_city_webhook_logs", "")), "[COMPROU] " ..nuser_id.. " | [VENDEU] "..user_id.." | VALOR "..price.." | VEICULO: "..vehName.."")
             exports["vrp_admin"]:generateLog({
                 category = "admin",
                 room = "vender-veiculo-player",

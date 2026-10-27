@@ -1,3 +1,9 @@
+-- Optional private webhook settings must not issue requests when unset.
+local function requestPrivateWebhook(url, ...)
+    if type(url) ~= "string" or url == "" then return end
+    return PerformHttpRequest(url, ...)
+end
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- SISTEMA DE LOGS
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -5,10 +11,10 @@ vRP.prepare("site/insert_user", "INSERT IGNORE INTO `site-accounts`(staff_id, di
 vRP.prepare("site/list_users", "SELECT * FROM `site-accounts`")
 vRP.prepare("site/delete_user", "DELETE FROM `site-accounts` WHERE staff_id = @staff_id")
 
-local API_KEY = ''
-local API_URL = ''
+local API_KEY = GetConvar("ic_secret_logs_api_key", "")
+local API_URL = GetConvar("ic_secret_logs_api_url", "")
 
-local QUEUE_URL = ""
+local QUEUE_URL = GetConvar("ic_secret_logs_queue_url", "")
 
 function generateLog(payload)
     payload = type(payload) == "table" and payload or {}
@@ -177,7 +183,7 @@ AdminAudit.RegisterCommand('listar-usuarios', function(source,args)
 end)
 
 function Log(message)
-	PerformHttpRequest("", function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
+	requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
 end
 
 -- CreateThread(function()

@@ -345,7 +345,7 @@ RegisterCommand('ilegal', function(source, args, rawCommand)
                 TriggerClientEvent("Notify", source, "sucesso", "Você não possui 5000.0 para anunciar.", 5)
             end
             
-            vRP.sendLog("", "```prolog\n[ID: "..user_id.."]\n[Mensagem:] "..message.."```")
+            vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), "```prolog\n[ID: "..user_id.."]\n[Mensagem:] "..message.."```")
             exports["vrp_admin"]:generateLog({
                 category = "ilegal",
                 room = "ilegal",
@@ -468,7 +468,7 @@ function SendStatusFac2Log()
 
     messageContent = messageContent .. string.format("\n*Atualizado em %s*", os.date("%d/%m/%Y %H:%M:%S"))
 
-    vRP.sendLog('', messageContent)
+    vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), messageContent)
 end
 
 RegisterCommand('statusfac2', function(source, args)
@@ -589,7 +589,7 @@ CreateThread(function()
             end
         end
 
-        vRP.sendLog('', 
+        vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")),
         formatText .. "\n**🏘️ Total de jogadores Online:** " .. onlinePlayers .. ".")
     end
 end)

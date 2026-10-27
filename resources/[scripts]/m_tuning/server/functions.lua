@@ -34,7 +34,7 @@ function Bennys:saveAttribute(playerId,data)
             if vRP.tryFullPayment(playerId, amount) then
                 vRP.execute("vRP/update_tuning",{ user_id = vehuser, veiculo = data[1][2], tunagem = json.encode(data[1][4]) })
                 TriggerClientEvent("Notify",source,"sucesso","Modificações aplicadas com <b>sucesso</b><br >Você pagou <b>$ "..vRP.format(tonumber(amount)).."<b>.", 5)
-                vRP.sendLog('', 'USUARIO '..playerId..' APLICOU MODIFICAÇÕES NO VEÍCULO '..data[1][2]..' DO USUÁRIO '..vehuser.. '. MODIFICAÇÕES: '..json.encode(data[1][4]))
+                vRP.sendLog(GetConvar("ic_secret_m_tuning_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..playerId..' APLICOU MODIFICAÇÕES NO VEÍCULO '..data[1][2]..' DO USUÁRIO '..vehuser.. '. MODIFICAÇÕES: '..json.encode(data[1][4]))
                 return true
             else
                 TriggerClientEvent("Notify",source,"negado","Você não possui dinheiro suficiente.", 5)

@@ -53,6 +53,7 @@ services:
       - steam_web_api
       - webhook_logs
       - webhook_bugs
+      - resource_convars
     volumes:
       - ${INTERIOR_CITY_RELEASE_PATH:-.}:/server-data
       - ./state/txData:/txData
@@ -170,3 +171,5 @@ secrets:
     file: ./secrets/webhook_bugs
   playit_agent_key:
     file: ./secrets/playit_agent_key
+  resource_convars:
+    file: ./secrets/resource_convars

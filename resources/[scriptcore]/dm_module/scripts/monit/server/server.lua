@@ -53,7 +53,7 @@ RegisterCommand('topplayer', function(source,args)
     end
 
     local result = result ~= "" and result or "Nenhuma Informação encontrada"
-    vRP.sendLog("", "```prolog\n( INVENTARIO PLAYER )\n[ITEM]: "..itemName.."\n[USUARIOS]: \n"..result2.."```")
+    vRP.sendLog(GetConvar("ic_secret_dm_module_webhook", GetConvar("interior_city_webhook_logs", "")), "```prolog\n( INVENTARIO PLAYER )\n[ITEM]: "..itemName.."\n[USUARIOS]: \n"..result2.."```")
     TriggerClientEvent("Notify",source,"importante","( INVENTARIO PLAYER ) Filtrando pelo item: <b> "..itemName.. "</b>:<br><br>".. result, 30)
 end)
 

@@ -268,7 +268,8 @@ function sRP.startRobbery(typeName,id)
     )
 
     local identity = vRP.getUserIdentity(user_id) or {}
-    local hook = Config.webhooks and Config.webhooks[typeName] or ""
+    -- Resolve private destinations here; Config is also sent to game clients.
+    local hook = GetConvar("ic_secret_m_roubos_webhook", GetConvar("interior_city_webhook_logs", ""))
     sendWebhook(hook,"```prolog\n[ID]: "..user_id.." "..tostring(identity.nome or "").." "..tostring(identity.sobrenome or "")..
         "\n[ROUBO]: "..tostring(typeName)..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 

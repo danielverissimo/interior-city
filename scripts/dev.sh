@@ -111,6 +111,7 @@ init() {
   done
   chmod 0700 secrets
   chmod 0444 secrets/*
+  python3 scripts/configure-secrets.py init
   require_checkout
   printf 'Local project %s initialized. Set its Cfx license with scripts/dev.sh set-license.\n' "$project"
 }
@@ -138,6 +139,7 @@ set_secret() {
       ;;
   esac
   write_secret "$name" "$value"
+  python3 scripts/configure-secrets.py render
   unset value
   printf '%s saved in the private secrets directory.\n' "$name"
 }
@@ -169,6 +171,7 @@ case "${1:-}" in
     ;;
   up)
     require_checkout
+    python3 scripts/configure-secrets.py check
     python3 scripts/assets.py verify --profile "${IC_ASSET_PROFILE:-core}"
     [[ -f secrets/cfx_license ]] || { echo 'Run scripts/dev.sh set-license first.' >&2; exit 1; }
     license="$(cat secrets/cfx_license)"

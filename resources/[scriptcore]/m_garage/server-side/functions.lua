@@ -289,7 +289,7 @@ function serverFunctions.garageTryPaymentVehicle(name)
                     if vRP.tryFullPayment(user_id, payment) then
                         vRP._execute("bm_module/garages/updateStatus", { status = 0, user_id = user_id, veiculo = name })
                         TriggerClientEvent("Notify",source,"sucesso","Você Pagou $ "..vRP.format(payment).." para tirar o veiculo da retenção.", 5)
-                        vRP.sendLog('', 'USUARIO '..user_id..' RETIROU O VEICULO '..name..' DA RETENÇÃO')
+                        vRP.sendLog(GetConvar("ic_secret_m_garage_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..user_id..' RETIROU O VEICULO '..name..' DA RETENÇÃO')
                     else
                         TriggerClientEvent("Notify",source,"negado","Você não possui dinheiro.", 5)
                     end
@@ -316,7 +316,7 @@ function serverFunctions.garageTryPaymentVehicle(name)
                     if vRP.tryFullPayment(user_id, payment) then
                         vRP._execute("bm_module/garages/updateIpva", { ipva = os.time(), user_id = user_id, veiculo = name })
                         TriggerClientEvent("Notify",source,"sucesso","Você Pagou $ "..vRP.format(payment).." para deixar o ipva de seu veiculo em dia.", 5)
-                        vRP.sendLog('', 'ID '..user_id..' PAGOU O IPVA DO VEICULO '..name)
+                        vRP.sendLog(GetConvar("ic_secret_m_garage_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID '..user_id..' PAGOU O IPVA DO VEICULO '..name)
                     else
                         TriggerClientEvent("Notify",source,"negado","Você não possui dinheiro.", 5)
                     end

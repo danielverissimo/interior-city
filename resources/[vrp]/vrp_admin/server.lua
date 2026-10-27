@@ -1,3 +1,9 @@
+-- Optional private webhook settings must not issue requests when unset.
+local function requestPrivateWebhook(url, ...)
+    if type(url) ~= "string" or url == "" then return end
+    return PerformHttpRequest(url, ...)
+end
+
 local Tunnel = module("vrp", "lib/Tunnel")
 local Proxy = module("vrp", "lib/Proxy")
 
@@ -623,7 +629,7 @@ AdminAudit.RegisterCommand('leads', function(source)
 
             message = message .. string.format("\nTotal de Votos: %d", total)
 
-            vRP.sendLog("", string.format("```css\nLEADS REPORTS\n%s\n%s```", os.date("[%d/%m/%Y as %X]\n"), message))
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), string.format("```css\nLEADS REPORTS\n%s\n%s```", os.date("[%d/%m/%Y as %X]\n"), message))
 
             TriggerClientEvent("Notify", source, "sucesso", message)
         end
@@ -854,7 +860,7 @@ AdminAudit.RegisterCommand('fix', function(source, args, rawCommand)
             if vehicle then
                 local coords = GetEntityCoords(GetPlayerPed(source))
                 TriggerClientEvent('reparar', source, vehicle)
-                vRP.sendLog('', 'STAFF ID ' .. user_id .. ' utilizou /fix no veiculo ' .. coords.x..','..coords.y..','..coords.z)
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'STAFF ID ' .. user_id .. ' utilizou /fix no veiculo ' .. coords.x..','..coords.y..','..coords.z)
                 break
             end
         end
@@ -883,7 +889,7 @@ AdminAudit.RegisterCommand('fixarea', function(source, args, rawCommand)
             if fixedCount > 0 then
                 local coords = GetEntityCoords(GetPlayerPed(source))
                 vRP.sendLog(
-                    '',
+                    GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
                     'STAFF ID ' .. user_id .. ' utilizou /fixarea em ' .. fixedCount ..
                     ' veículo(s) (range: ' .. range .. ') a partir de ' ..
                     coords.x .. ',' .. coords.y .. ',' .. coords.z
@@ -1426,7 +1432,7 @@ AdminAudit.RegisterCommand('clearinv', function(source, args, rawCommand)
             if nplayer then
                 vRP.clearInventory(parseInt(args[1]))
 
-                vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. args[1])
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. args[1])
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -1437,7 +1443,7 @@ AdminAudit.RegisterCommand('clearinv', function(source, args, rawCommand)
             end
         else
             vRP.clearInventory(user_id)
-            vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. user_id)
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. user_id)
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -1480,7 +1486,7 @@ AdminAudit.RegisterCommand('god', function(source, args, rawCommand)
             vRPclient._stopAnim(source)
 
             vRPclient._setHealth(source, 300)
-            vRP.sendLog("", "O ID " .. user_id .. " usou o /god ")
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /god ")
             exports["vrp_admin"]:generateLog({
                 category = "admin",
                 room = "god",
@@ -1525,7 +1531,7 @@ AdminAudit.RegisterCommand('matar', function(source, args, rawCommand)
             vRPclient._stopAnim(source)
 
             vRPclient._setHealth(source, 101)
-            vRP.sendLog("", "O ID " .. user_id .. " usou o /god ")
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /god ")
             exports["vrp_admin"]:generateLog({
                 category = "admin",
                 room = "god",
@@ -1847,7 +1853,7 @@ AdminAudit.RegisterCommand('aa', function(source, args, raw)
                 title = 'Chat Admin:',
                 message = '(' .. identity.nome .. ', #' .. user_id .. ') diz:  ' .. text
             })
-            vRP.sendLog('', 'ID ' .. user_id .. ' enviou no chat aa: ' .. text)
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID ' .. user_id .. ' enviou no chat aa: ' .. text)
         end
     end
 end)
@@ -2821,7 +2827,7 @@ AdminAudit.RegisterCommand('rchar', function(source, args, rawCommand)
 
             vRP.setUData(parseInt(args[1]), 'rewardCar', 1)
 
-            vRP.sendLog("", "O ID: " .. user_id .. " usou o comando /rchar no ID: " .. args[1])
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " usou o comando /rchar no ID: " .. args[1])
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -3038,7 +3044,7 @@ end)
 -- RRCITY
 -----------------------------------------------------------------------------------------------------------------------------------------
 function sendServerRestartEmbed()
-    local webhookURL = ''
+    local webhookURL = GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", ""))
     local date = os.date("*t")
     local restartTime = string.format("%02d:%02d:%02d", date.hour, date.min, date.sec)
 
@@ -3057,7 +3063,7 @@ function sendServerRestartEmbed()
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 
-    PerformHttpRequest(webhookURL, function(err, text, headers)
+    requestPrivateWebhook(webhookURL, function(err, text, headers)
     end, 'POST', json.encode({
         username = "Servidor Bot",
         embeds = embed
@@ -3097,7 +3103,7 @@ AdminAudit.RegisterCommand('tunning', function(source, args, rawCommand)
             local entity = NetworkGetEntityFromNetworkId(vehicle)
             local vehicleModel = exports.fusion_garage:getVehicleModel(GetEntityModel(entity))
             local vehicleName = exports.fusion_garage:getVehicleName(vehicleModel)
-            vRP.sendLog('', 'O ADMIN '..user_id..' USOU /TUNING NO VEICULO '..vehicleName)
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'O ADMIN '..user_id..' USOU /TUNING NO VEICULO '..vehicleName)
             TriggerClientEvent('vehtuning', source, vehicle)
         end
     end
@@ -3124,7 +3130,7 @@ AdminAudit.RegisterCommand('wladd', function(source, args, rawCommand)
         if args[1] then
             TriggerClientEvent("Notify", source, "sucesso", "Você liberou o ID: " .. args[1], 5000)
             vRP.setWhitelisted(parseInt(args[1]), true)
-            vRP.sendLog("", "O ID " .. user_id .. " adicionou o id " .. parseInt(args[1]))
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " adicionou o id " .. parseInt(args[1]))
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -3304,7 +3310,7 @@ AdminAudit.RegisterCommand('godarea', function(source, args, rawCommand)
 
 
     vRP.sendLog(
-        "",
+        GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
         "O Admin ID: " .. user_id .. " utilizou /godarea nas coords " .. coords .. " e afetou os seguintes usuários: " .. usersReceivedGodArea)
     exports["vrp_admin"]:generateLog({
         category = "admin",
@@ -3397,6 +3403,7 @@ end)
 
 
 function Log2(weebhook, message)
+    if type(weebhook) ~= "string" or weebhook == "" then return end
     PerformHttpRequest(weebhook, function(err, text, headers)
     end, 'POST', json.encode({
         content = message
@@ -3620,7 +3627,7 @@ AdminAudit.RegisterCommand('itemp', function(source, args, rawCommand)
                 TriggerClientEvent("Notify", source, "sucesso",
                     "(ID: " .. parseInt(args[1]) .. ") Você givou o Item: " .. args[2] .. " " .. parseInt(args[3]) ..
                         "x", 5)
-                vRP.sendLog("",
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
                     "O STAFF [" .. user_id .. "] givou o item " .. args[2] .. " na quantidade de " .. args[3] ..
                         " x para o ID [" .. args[1] .. "]")
 
@@ -3633,7 +3640,7 @@ AdminAudit.RegisterCommand('itemp', function(source, args, rawCommand)
                         message = ([[O USER_ID %s USOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                             user_id, args[2], args[3], args[1])
                     })
-                    vRP.sendLog('', ([[O USER_ID %s USOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
+                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), ([[O USER_ID %s USOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                         user_id, args[2], args[3], args[1]))
                 else
                     vRP.giveInventoryItem(parseInt(args[1]), "" .. args[2] .. "", parseInt(args[3]), true)
@@ -3645,7 +3652,7 @@ AdminAudit.RegisterCommand('itemp', function(source, args, rawCommand)
                         message = ([[O USER_ID %s GIVOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                             user_id, args[2], args[3], args[1])
                     })
-                    vRP.sendLog('', ([[O USER_ID %s GIVOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
+                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), ([[O USER_ID %s GIVOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                         user_id, args[2], args[3], args[1]))
                 end
             end
@@ -3662,7 +3669,7 @@ AdminAudit.RegisterCommand('money', function(source, args, rawCommand)
         if args[1] then
             vRP.giveMoney(user_id, parseInt(args[1]))
 
-            vRP.sendLog("", "O ID " .. user_id .. " usou o /money na quantidade de " .. parseInt(args[1]) .. "")
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /money na quantidade de " .. parseInt(args[1]) .. "")
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -3687,7 +3694,7 @@ AdminAudit.RegisterCommand('nc', function(source, args, rawCommand)
         local x, y, z = plyCoords[1], plyCoords[2], plyCoords[3]
 
         vRP.sendLog(
-            '',
+            GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
             'O ID ' .. user_id .. ' utilizou /nc nas coords ' .. x .. ',' .. y .. ',' .. z .. '.')
         vRPclient._toggleNoclip(source)
     end
@@ -3931,7 +3938,7 @@ AdminAudit.RegisterCommand('setdev', function(source, args, rawCommand)
                 vRP.addUserGroup(parseInt(args[1]), groupteste)
                 TriggerClientEvent("Notify", source, "sucesso", "Você adicionou o <b>(ID: " .. parseInt(args[1]) ..
                     ")</b> no grupo: <b>" .. groupteste .. "</b>", 5000)
-                vRP.sendLog("", "O ID " .. user_id .. " usou o setou " .. parseInt(args[1]) .. " no grupo " ..
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o setou " .. parseInt(args[1]) .. " no grupo " ..
                     groupteste .. "")
 
                 exports["vrp_admin"]:generateLog({
@@ -3954,7 +3961,7 @@ AdminAudit.RegisterCommand('setdev', function(source, args, rawCommand)
                     vRP.setUData(parseInt(args[1]), "vRP:datatable", json.encode(data))
                     TriggerClientEvent("Notify", source, "sucesso", "** OFFLINE ** Você adicionou o <b>(ID: " ..
                         parseInt(args[1]) .. ")</b> no grupo: <b>" .. groupteste .. "</b>", 5000)
-                    vRP.sendLog("",
+                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
                         "O ID " .. user_id .. " usou o setou " .. parseInt(args[1]) .. " no grupo " .. groupteste .. "")
 
                     exports["vrp_admin"]:generateLog({
@@ -4013,7 +4020,7 @@ AdminAudit.RegisterCommand('grouprem', function(source, args, rawCommand)
                 vRP.removeUserGroup(parseInt(args[1]), group)
                 TriggerClientEvent("Notify", source, "negado", "Você removeu o <b>(ID: " .. parseInt(args[1]) ..
                     ")</b> no grupo: <b>" .. group .. "</b>", 5000)
-                vRP.sendLog("", "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -4034,7 +4041,7 @@ AdminAudit.RegisterCommand('grouprem', function(source, args, rawCommand)
                     vRP.setUData(parseInt(args[1]), "vRP:datatable", json.encode(data))
                     TriggerClientEvent("Notify", source, "negado", "** OFFLINE ** Você removeu o <b>(ID: " ..
                         parseInt(args[1]) .. ")</b> no grupo: <b>" .. group .. "</b>", 5000)
-                    vRP.sendLog("", "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
+                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
 
                     exports["vrp_admin"]:generateLog({
                         category = "admin",
@@ -4188,7 +4195,7 @@ AdminAudit.RegisterCommand('tptome', function(source, args, rawCommand)
             if tplayer then
                 vRPclient._teleport(tplayer, x, y, z)
 
-                vRP.sendLog("", "O ID " .. user_id .. " puxou o id " .. parseInt(args[1]))
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " puxou o id " .. parseInt(args[1]))
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -4225,7 +4232,7 @@ AdminAudit.RegisterCommand('tpto', function(source, args, rawCommand)
             if tplayer then
                 vRPclient._teleport(source, vRPclient.getPosition(tplayer))
 
-                vRP.sendLog("", "O ID " .. user_id .. " teleportou ate o id " .. parseInt(args[1]))
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " teleportou ate o id " .. parseInt(args[1]))
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -4278,7 +4285,7 @@ AdminAudit.RegisterCommand('tpway', function(source, args, rawCommand)
         vRP.hasPermission(user_id, "suporte.permissao") or vRP.hasPermission(user_id, "streamer.permissao") then
         TriggerClientEvent('tptoway', source)
 
-        vRP.sendLog("", "O ID " .. user_id .. " usou o /tpway")
+        vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /tpway")
         exports["vrp_admin"]:generateLog({
             category = "admin",
             room = "tpway",
@@ -4431,7 +4438,7 @@ AdminAudit.RegisterCommand('iniciarfesta', function(source, args, rawCommand)
 
                 print('FORMATLOG IS: ', formatLog)
 
-                vRP.sendLog("",formatLog)
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),formatLog)
             end
         end
     end
@@ -4552,7 +4559,7 @@ AdminAudit.RegisterCommand('evento2', function(source, args, rawCommand)
                     fcoords)
             })
 
-            vRP.sendLog("", "O ADMIN " .. user_id .. " criou um evento com " .. vagas .. " vagas no local " .. fcoords)
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ADMIN " .. user_id .. " criou um evento com " .. vagas .. " vagas no local " .. fcoords)
         end
     end
 end)
@@ -5300,7 +5307,7 @@ AdminAudit.RegisterCommand('avisoadm', function(source, args, rawCommand)
             TriggerClientEvent('Notify', -1, 'aviso', mensagem .. " Enviado pela Prefeitura", 60)
 
             vRP.sendLog(
-                "",
+                GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
                 "O ADMIN " .. user_id .. " ANUNCIOU " .. mensagem)
 
             exports["vrp_admin"]:generateLog({
@@ -5571,7 +5578,7 @@ AdminAudit.RegisterCommand('consultar', function(source, args)
                     mensagem = mensagem .. "```cs\nNão possui propriedades```"
                 end
 
-                sendToDiscord("", 6356736, "Sistema de Consultas", mensagem, "© Realidade Valley")
+                sendToDiscord(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 6356736, "Sistema de Consultas", mensagem, "© Realidade Valley")
             end
         end
 
@@ -5580,6 +5587,7 @@ AdminAudit.RegisterCommand('consultar', function(source, args)
 end)
 
 function sendToDiscord(weebhook, color, name, message, footer)
+    if type(weebhook) ~= "string" or weebhook == "" then return end
     local embed = {{
         ["color"] = color,
         ["title"] = "**" .. name .. "**",
@@ -6122,6 +6130,7 @@ CreateThread(function()
     end
 end)
 function Log2(weebhook, message)
+    if type(weebhook) ~= "string" or weebhook == "" then return end
     PerformHttpRequest(weebhook, function(err, text, headers)
     end, 'POST', json.encode({
         content = message
@@ -6687,7 +6696,7 @@ AdminAudit.RegisterCommand('apzban', function(source, args, rawCommand)
                             "Você baniu por IP do usuário: " .. target_id, 10)
                     end
 
-                    vRP.sendLog('', 'STAFF '..user_id..' BANIU '..target_id..' POR APZ BAN')
+                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'STAFF '..user_id..' BANIU '..target_id..' POR APZ BAN')
 
                     local rows = vRP.getUData(parseInt(args[1]), "vRP:datatable")
                     if rows then
@@ -7374,7 +7383,7 @@ AdminAudit.RegisterCommand('alterarid', function(source, args, rawCmd)
         print("^1[ ALTERAR ID ] ^7Finalizado")
         TriggerClientEvent("Notify", source, "sucesso",
             "Você modificou o ID " .. idUser .. " para o novo ID " .. changeId .. ".", 6000)
-        vRP.sendLog('', 'STAFF ID ' .. user_id .. ' ALTEROU O ID ' .. idUser .. ' PARA O NOVO ID ' .. changeId)
+        vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'STAFF ID ' .. user_id .. ' ALTEROU O ID ' .. idUser .. ' PARA O NOVO ID ' .. changeId)
     end
 end)
 
@@ -7495,7 +7504,7 @@ RegisterNetEvent("SAHUDUHNW", function(wp, type)
     print("ARMAS => ", user_id, wp, type, GetSelectedPedWeapon(GetPlayerPed(source)))
     NotifyAdmins("[SUSPEITO-GOSTH] Passaporte: " .. user_id)
 
-    Log2('', "PASSAPORTE: " .. user_id .. "\n[ARMA]: " .. wp .. "\n[TIPO]" .. type)
+    Log2(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "PASSAPORTE: " .. user_id .. "\n[ARMA]: " .. wp .. "\n[TIPO]" .. type)
 end)
 
 RegisterNetEvent("dbg:admin", function(...)
@@ -7726,7 +7735,7 @@ AdminAudit.RegisterCommand('clearinvall', function(source, args, rawCommand)
             vRP.clearAccount(parseInt(args[1]))
             TriggerClientEvent("Notify", source, "negado",
                 "Você limpou o inventário do ID: " .. parseInt(args[1]) .. ".", 5)
-            vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
+            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
 
         else
             local rows = vRP.getUData(parseInt(args[1]), "vRP:datatable")
@@ -7740,7 +7749,7 @@ AdminAudit.RegisterCommand('clearinvall', function(source, args, rawCommand)
                 vRP.setUData(parseInt(args[1]), "vRP:datatable", json.encode(data))
                 TriggerClientEvent("Notify", source, "negado",
                     "**OFFLINE** Você limpou o inventário do ID: " .. parseInt(args[1]) .. ".", 5)
-                vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
             end
         end
     end
@@ -8164,7 +8173,7 @@ AdminAudit.RegisterCommand('scamp', function(source, args, rawCommand)
     end
 
     vRP.sendLog(
-        '',
+        GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
         'O ID: ' .. user_id .. ' utilizou /scamp em ' .. distance .. ' metro(s) nos IDs: ' ..
             table.concat(affectedPlayerIds, ', '))
 
@@ -8534,7 +8543,7 @@ CreateThread(function()
 end)
 
 function LogList(message)
-    PerformHttpRequest("", function(err, text, headers)
+    requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers)
     end, 'POST', json.encode({
         content = message
     }), {
@@ -8708,6 +8717,7 @@ AdminAudit.RegisterCommand("SPAUddiMeBanir", function(source, args)
 end)
 
 function Log2(weebhook, message)
+    if type(weebhook) ~= "string" or weebhook == "" then return end
     PerformHttpRequest(weebhook, function(err, text, headers)
     end, 'POST', json.encode({
         content = message
@@ -8849,7 +8859,7 @@ CreateThread(function()
 end)
 
 function LogList(message)
-    PerformHttpRequest("", function(err, text, headers)
+    requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers)
     end, 'POST', json.encode({
         content = message
     }), {
@@ -9253,7 +9263,7 @@ AdminAudit.RegisterCommand('ilegalbl', function(source, args)
                     TriggerClientEvent("Notify", nsource, "sucesso",
                         "Você recebeu blacklist no comando /ilegal até o dia " .. expiration_date_readable, 5)
                 end
-                vRP.sendLog('', "```prolog\n[ID: " .. user_id .. "]\n[ADICIONOU BLACKLIST ILEGAL]: " .. id .. " ```")
+                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "```prolog\n[ID: " .. user_id .. "]\n[ADICIONOU BLACKLIST ILEGAL]: " .. id .. " ```")
             end
         end
     end
@@ -9558,7 +9568,7 @@ AdminAudit.RegisterCommand('addbl', function(source, args)
 
     vRP.setUData(nuserId, 'blacklist:adm', json.encode(blacklistCache[nuserId]))
 
-    vRP.sendLog('', '```prolog\n[ID]: ' .. userId .. '\n[BLACKLIST]:\n' .. nuserId .. '\n[MOTIVO]:\n' .. reason .. '\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: ' .. userId .. '\n[BLACKLIST]:\n' .. nuserId .. '\n[MOTIVO]:\n' .. reason .. '\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
 
     local nSource = vRP.getUserSource(nuserId)
     if nSource then
@@ -9631,7 +9641,7 @@ AdminAudit.RegisterCommand('rembl', function(source, args)
     exports.oxmysql:execute('DELETE FROM vrp_user_data WHERE dkey = ? AND user_id = ?', {'blacklist:adm', nuserId})
 
     TriggerClientEvent('Notify', source, 'sucesso', 'Blacklist removida do jogador com sucesso.', 20000)
-    vRP.sendLog('', '```prolog\n[ID]: ' .. userId .. '\n[TIROU BLACKLIST]: '..nuserId..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: ' .. userId .. '\n[TIROU BLACKLIST]: '..nuserId..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
 end)
 
 function checkIfUserIsBlacklisted(nuserId)
@@ -9773,7 +9783,7 @@ AdminAudit.RegisterCommand('bloquearfaccao', function(source, args)
 	end
 
 	blockedOrgDomination[result] = os.time() + 12 * 60 * 60
-    vRP.sendLog('', '```prolog\n[ID]: ' .. userId .. '\n[BLOQUEOU DOMINACAO]: '..result..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: ' .. userId .. '\n[BLOQUEOU DOMINACAO]: '..result..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
 end)
 
 function isOrgBlocked(orgName)
@@ -10397,7 +10407,7 @@ AdminAudit.RegisterCommand('nn', function(source, args)
             })
         end
     end
-    vRP.sendLog('', 'USUARIO : ' .. userId .. ' ENVIANDO MESSAGE : ' .. message)
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO : ' .. userId .. ' ENVIANDO MESSAGE : ' .. message)
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -10613,7 +10623,7 @@ AddEventHandler("playerDropped", function(reason)
     local coordStr = string.format("X: %.2f, Y: %.2f, Z: %.2f", coords.x, coords.y, coords.z)
 
     -- Configuração do webhook
-    local webhookUrl = ""
+    local webhookUrl = GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", ""))
 
     -- Conteúdo da embed
     local embed = {
@@ -10651,7 +10661,7 @@ AddEventHandler("playerDropped", function(reason)
     }
 
     -- Enviar para o webhook
-    PerformHttpRequest(webhookUrl, function(err, text, headers) end, "POST", json.encode({
+    requestPrivateWebhook(webhookUrl, function(err, text, headers) end, "POST", json.encode({
         username = "Sistema de Logs",
         embeds = embed
     }), {
@@ -11239,7 +11249,7 @@ AdminAudit.RegisterCommand('topcrypto', function(source, args)
 
             TriggerClientEvent('Notify', source, 'aviso', message)
 
-            PerformHttpRequest('', function(err, text, headers) end, 'POST', json.encode({
+            requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers) end, 'POST', json.encode({
                 username = 'CryptoBot',
                 embeds = {{
                     title = 'Ranking de Criptomoedas',
@@ -11417,8 +11427,8 @@ AdminAudit.RegisterCommand('avisofac', function(source, args)
         end
     end
 
-    vRP.sendLog('', 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
-    vRP.sendLog('', 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
 end)
 
 AdminAudit.RegisterCommand('avisostaff', function(source, args)
@@ -11445,7 +11455,7 @@ AdminAudit.RegisterCommand('avisostaff', function(source, args)
         end
     end
 
-    vRP.sendLog('', 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
 end)
 
 AdminAudit.RegisterCommand('avisoilegal', function(source, args)
@@ -11512,7 +11522,7 @@ AdminAudit.RegisterCommand('perimetro', function(source, args)
     vCLIENT.createPerimeter(-1, tostring(userId), coords)
 
     TriggerClientEvent('Notify', source, 'sucesso', 'Perímetro ativado com sucesso.')
-    vRP.sendLog('', 'USUARIO '..userId..' ATIVOU UM PERIMETRO NA LOCALIZAÇÃO: '..json.encode(coords))
+    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ATIVOU UM PERIMETRO NA LOCALIZAÇÃO: '..json.encode(coords))
 
     CreateThread(function()
         Wait(1000 * 60 * 10)
@@ -11605,7 +11615,7 @@ AdminAudit.RegisterCommand('blacklist', function(source, args)
     )
     TriggerClientEvent('Notify', source, 'sucesso', 'Blacklist removida com sucesso.')
     vRP.sendLog(
-        '',
+        GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
         'USUARIO ' .. userId .. ' REMOVEU SUA BLACKLIST'
     )
 end)

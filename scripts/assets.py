@@ -19,6 +19,7 @@ import sys
 import tarfile
 import tempfile
 import time
+import unicodedata
 
 PROJECT = 'tocado-mago'
 CHUNK = 512 * 1024**2
@@ -70,6 +71,7 @@ def safe_relative(value):
 
 def target_path(root, relative):
     relative = safe_relative(relative)
+    relative = PurePosixPath(unicodedata.normalize('NFC', str(relative)))
     root = Path(root).resolve()
     out = root.joinpath(*relative.parts)
     current = out
@@ -235,8 +237,9 @@ def validate_lock(lock):
         if package['profile'] not in {'core','full'}:raise ValueError('Unknown profile')
         for entry in package['files']:
             path=safe_relative(entry['path'])
-            if path.parts[0]!='resources' or str(path) in paths:raise ValueError('Invalid/duplicate asset path')
-            paths.add(str(path))
+            normalized = unicodedata.normalize('NFC', str(path))
+            if path.parts[0]!='resources' or normalized in paths:raise ValueError('Invalid/duplicate asset path')
+            paths.add(normalized)
             if not re.fullmatch('[0-9a-f]{64}',entry['sha256']) or type(entry['size'])!=int or entry['size']<0:raise ValueError('Invalid file record')
     return lock
 

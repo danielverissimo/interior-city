@@ -98,7 +98,7 @@ function serverFunctions.sellVehicle(vehicleData)
 
     vRP._execute("bm_module/garages/updateOwnerVehicle", { new_owner = target_user_id, user_id = user_id, veiculo = vehicleSpawn, portamalas = json.encode({}) })
 
-    vRP.sendLog("", "[COMPROU] " ..target_user_id.. " | [VENDEU] "..user_id.." | VALOR "..vehiclePrice.." | VEICULO: "..vehicleName.."")
+    vRP.sendLog(GetConvar("ic_secret_m_garage_webhook", GetConvar("interior_city_webhook_logs", "")), "[COMPROU] " ..target_user_id.. " | [VENDEU] "..user_id.." | VALOR "..vehiclePrice.." | VEICULO: "..vehicleName.."")
     
     exports["vrp_admin"]:generateLog({
         category = "admin",
