@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Wall</title>
+</head>
+<body>
+    <main id="wall-panel" class="panel hidden">
+        <header class="panel-header">
+            <div>
+                <span class="eyebrow">ADMIN</span>
+                <h1>Configurações do Wall</h1>
+            </div>
+            <button id="close" class="close" type="button" aria-label="Fechar">×</button>
+        </header>
+
+        <section class="options">
+            <label class="option">
+                <span>Nome e sobrenome</span>
+                <input type="checkbox" data-setting="showName" checked>
+                <i></i>
+            </label>
+
+            <label class="option">
+                <span>User ID</span>
+                <input type="checkbox" data-setting="showUserId" checked>
+                <i></i>
+            </label>
+
+            <label class="option">
+                <span>Source ID</span>
+                <input type="checkbox" data-setting="showSourceId" checked>
+                <i></i>
+            </label>
+
+            <label class="option">
+                <span>Staff / Org</span>
+                <input type="checkbox" data-setting="showRole" checked>
+                <i></i>
+            </label>
+
+            <label class="option">
+                <span>Todos os cargos</span>
+                <input type="checkbox" data-setting="showAllGroups">
+                <i></i>
+            </label>
+
+            <label class="option">
+                <span>Ativar linhas</span>
+                <input type="checkbox" data-setting="showLines" checked>
+                <i></i>
+            </label>
+
+            <label class="option">
+                <span>Mostrar wall em mim</span>
+                <input type="checkbox" data-setting="showSelf" checked>
+                <i></i>
+            </label>
+        </section>
+
+        <footer>
+            <span>Alterações aplicadas em tempo real</span>
+            <small>ESC fecha • /wallmenu reabre</small>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

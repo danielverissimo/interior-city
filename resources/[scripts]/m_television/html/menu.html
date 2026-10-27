@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>m_television</title>
+    <link rel="stylesheet" href="menu.css">
+</head>
+<body>
+    <main id="app" class="hidden" aria-hidden="true">
+        <section class="panel">
+            <header class="panel-header">
+                <div>
+                    <small>CONTROLE</small>
+                    <h1 id="title">Televisão</h1>
+                </div>
+                <button id="closeBtn" class="icon-btn" aria-label="Fechar">×</button>
+            </header>
+
+            <div id="tvView" class="view hidden">
+                <div class="grid">
+                    <button class="card" data-page="media"><strong>Reproduzir mídia</strong><span>YouTube, Twitch ou mídia direta</span></button>
+                    <button class="card" data-page="browser"><strong>Navegador</strong><span>Abrir uma página diretamente na TV</span></button>
+                    <button class="card" data-page="channels"><strong>Canais</strong><span>Escolher um canal disponível</span></button>
+                    <button id="interactBtn" class="card"><strong>Interagir com a tela</strong><span>Controlar mouse e rolagem da página</span></button>
+                    <button class="card" data-page="volume"><strong>Volume</strong><span>Ajuste individual para você</span></button>
+                    <button id="offBtn" class="card danger"><strong>Desligar TV</strong><span>Retornar para sem sinal</span></button>
+                </div>
+            </div>
+
+            <div id="mediaView" class="view hidden">
+                <label>URL da mídia</label>
+                <input id="mediaUrl" type="text" maxlength="700" placeholder="youtube.com/watch?v=... ou twitch.tv/...">
+                <p class="hint">Aceita YouTube, Twitch, imagens e vídeos por link direto.</p>
+                <div class="actions"><button class="secondary backBtn">Voltar</button><button id="playMediaBtn" class="primary">Reproduzir</button></div>
+            </div>
+
+            <div id="browserView" class="view hidden">
+                <label>Endereço</label>
+                <input id="browserUrl" type="text" maxlength="700" placeholder="https://exemplo.com">
+                <p class="hint">A página será aberta diretamente no DUI da televisão.</p>
+                <div class="actions"><button class="secondary backBtn">Voltar</button><button id="openBrowserBtn" class="primary">Abrir</button></div>
+            </div>
+
+            <div id="channelsView" class="view hidden">
+                <div id="channelList" class="list"></div>
+                <div class="actions"><button class="secondary backBtn">Voltar</button></div>
+            </div>
+
+            <div id="volumeView" class="view hidden">
+                <div class="volume-row"><span>0</span><input id="volumeRange" type="range" min="0" max="100" step="1"><span>100</span></div>
+                <div class="volume-value"><strong id="volumeValue">50%</strong></div>
+                <p class="hint">O volume é individual e diminui conforme você se afasta da TV.</p>
+                <div class="actions"><button class="secondary backBtn">Voltar</button></div>
+            </div>
+
+            <div id="broadcastView" class="view hidden">
+                <div id="broadcastInactive">
+                    <label>Nome do canal</label>
+                    <input id="broadcastName" type="text" maxlength="40" placeholder="Nome da transmissão">
+                    <label>URL da transmissão</label>
+                    <input id="broadcastUrl" type="text" maxlength="700" placeholder="youtube.com/... ou twitch.tv/...">
+                    <div class="actions"><button id="startBroadcastBtn" class="primary">Iniciar transmissão</button></div>
+                </div>
+                <div id="broadcastActive" class="hidden status-box">
+                    <small>TRANSMISSÃO ATIVA</small>
+                    <h2 id="broadcastChannelName"></h2>
+                    <p id="broadcastChannelIndex"></p>
+                    <button id="stopBroadcastBtn" class="danger-btn">Encerrar transmissão</button>
+                </div>
+            </div>
+
+            <div id="modelsView" class="view hidden">
+                <p class="hint top">Escolha o modelo. Depois você poderá posicioná-lo livremente no mundo.</p>
+                <div id="modelList" class="list"></div>
+            </div>
+        </section>
+    </main>
+    <script src="menu.js"></script>
+</body>
+</html>

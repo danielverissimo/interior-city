@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="./styles/creator.css" />
+  <link rel="stylesheet" href="./styles/whitelist.css" />
+  <link rel="stylesheet" href="./styles/activationScreen.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap" rel="stylesheet">
+
+  <title>@pedrosilvx</title>
+
+  <script src="jquery.js" type="text/javascript"></script>
+  <script src="vue.js"></script>
+</head>
+
+<body>
+  <div id="app" v-show="CharacterMode">
+    <section class="left">
+      <div class="head">
+        <div class="title">
+          <p>CRIAÇÃO</p>
+          <h2>CIRURGICA</h2>
+        </div>
+        <!-- <div class="genres">
+            <img src="./assets/icons/male.svg" class="selected">
+            <img src="./assets/icons/female.svg">
+          </div> -->
+      </div>
+      <div class="categories">
+        <button class="selected" data-menu="parents">
+          <img src="./assets/icons/genetic.svg" />
+        </button>
+        <button data-menu="eyes">
+          <img src="./assets/icons/eye.svg" />
+        </button>
+        <button data-menu="nose">
+          <img src="./assets/icons/nose.svg" />
+        </button>
+        <button data-menu="chin">
+          <img src="./assets/icons/chin.svg" />
+        </button>
+        <button data-menu="cheek">
+          <img src="./assets/icons/cheek.svg" />
+        </button>
+        <button data-menu="lips">
+          <img src="./assets/icons/lips.svg" />
+        </button>
+        <button data-menu="neck">
+          <img src="./assets/icons/neck.svg" />
+        </button>
+      </div>
+      <div class="options">
+        <div class="subCategory" id="parents">
+          <div class="option">
+            <p>Traços Paternos</p>
+            <div class="input">
+              <input type="range" min="0" max="24" value="0" step="1" class="slider" data-type="parents"
+                id="changeShapeFirstID" oninput="ShapeFirstID.value=value" v-model.number="father"
+                @input="changeAppearance" />
+              <p class="value">{{ fathers[father] }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Traços Maternos</p>
+            <div class="input">
+              <input type="range" min="0" max="22" value="0" step="1" class="slider" data-type="parents"
+                id="changeShapeSecondID" oninput="ShapeSecondID.value=value" v-model.number="mother"
+                @input="changeAppearance" />
+              <p class="value">{{ mothers[mother] }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Genética predominante</p>
+            <div class="input">
+              <input type="range" min="0.0" max="1.0" step="0.05" class="slider" data-type="parents" id="changeShapeMix"
+                oninput="ShapeMix.value=value" v-model.number="shapeMix" @input="changeAppearance" />
+              <p class="shapeMix">{{ shapeMix }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Gene ancestral predominante</p>
+            <div class="input">
+              <input type="range" min="0" max="12" value="6" step="1" class="slider" data-type="parents"
+                id="changeSkinMix" oninput="SkinMix.value=value" v-model.number="skinColor" @input="changeAppearance" />
+              <p class="skinMix">{{ skinColor }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="eyes" style="display: none">
+          <div class="option">
+            <p>Cor dos olhos</p>
+            <div class="input">
+              <input type="range" min="0" max="31" value="0" step="1" class="slider" id="changeEyeColor"
+                data-type="eyes" oninput="colorEye.value=value" v-model.number="eyesColor" @input="changeAppearance" />
+              <p id="colorEye">{{ eyesColor }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Sobrancelhas</p>
+            <div class="input">
+              <input type="range" min="0" max="33" step="1" class="slider" id="changeEyebrows" data-type="overlay"
+                oninput="Eyebrows.value=value" v-model.number="eyebrowsModel" @input="changeAppearance" />
+              <p id="Eyebrows">{{ eyebrowsModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Cor das sobrancelhas</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeEyebrows"
+                data-type="overlay_color" oninput="eyebrowsColor.value=value" v-model.number="eyebrowsColor"
+                @input="changeAppearance" />
+              <p id="eyebrowsColor">{{ eyebrowsColor }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Altura da sobrancelha</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" id="changeBrowWidth"
+                data-type="face" oninput="widthBrow.value=value" v-model.number="eyebrowsWidth"
+                @input="changeAppearance" />
+              <p id="widthBrow">{{ eyebrowsWidth }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Design da sobrancelha</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" step="0.01" value="0" class="slider" id="changeBrowHeight"
+                data-type="face" oninput="shapeBrow.value=value" v-model.number="eyebrowsHeight"
+                @input="changeAppearance" />
+              <p id="shapeBrow">{{ eyebrowsHeight }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="nose" style="display: none">
+          <div class="option">
+            <p>Largura do Nariz</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeNoseWidth" oninput="widthNose.value=value" v-model.number="noseWidth"
+                @input="changeAppearance" />
+              <p id="widthNose">{{ noseWidth }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Distância da boca</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeNoseHeight" oninput="heightNose.value=value" v-model.number="noseHeight"
+                @input="changeAppearance" />
+              <p id="heightNose">{{ noseHeight }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Comprimento do Nariz</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeNoseLength" oninput="lengthNose.value=value" v-model.number="noseLength"
+                @input="changeAppearance" />
+              <p id="lengthNose">{{ noseLength }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Ponte Nasal</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeNoseBridge" oninput="bridgeNose.value=value" v-model.number="noseBridge"
+                @input="changeAppearance" />
+              <p id="bridgeNose">{{ noseBridge }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Ponta do Nariz</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeNoseTip" oninput="tipNose.value=value" v-model.number="noseTip" @input="changeAppearance" />
+              <p id="tipNose">{{ noseTip }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Espaço do Nariz</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeNoseShift" oninput="shiftNose.value=value" v-model.number="noseShift"
+                @input="changeAppearance" />
+              <p id="shiftNose">{{ noseShift }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="chin" style="display: none">
+          <div class="option">
+            <p>Comprimento do queixo</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeChinLength" oninput="lengthChin.value=value" v-model.number="chinLength"
+                @input="changeAppearance" />
+              <p id="lengthChin">{{ chinLength }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Posição do queixo</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeChinPosition" oninput="positionChin.value=value" v-model.number="chinPosition"
+                @input="changeAppearance" />
+              <p id="positionChin">{{ chinPosition }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Largura do queixo</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeChinWidth" oninput="widthChin.value=value" v-model.number="chinWidth"
+                @input="changeAppearance" />
+              <p id="widthChin">{{ chinWidth }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Altura do queixo</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeChinHeight" oninput="heightChin.value=value" v-model.number="chinShape"
+                @input="changeAppearance" />
+              <p id="heightChin">{{ chinShape }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Largura da mandíbula</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeJawWidth" oninput="widthJawOut.value=value" v-model.number="jawWidth"
+                @input="changeAppearance" />
+              <p id="widthJawOut">{{ jawWidth }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Altura da mandíbula</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" data-type="face"
+                id="changeJawHeight" oninput="heightJaw.value=value" v-model.number="jawHeight"
+                @input="changeAppearance" />
+              <p id="heightJaw">{{ jawHeight }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="cheek" style="display: none">
+          <div class="option">
+            <p>Altura da bochecha</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" id="changeCheekboneHeight"
+                data-type="face" oninput="heightCheekbone.value=value" v-model.number="cheekboneHeight"
+                @input="changeAppearance" />
+              <p id="heightCheekbone">{{ cheekboneHeight }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Largura da bochecha</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" id="changeCheekboneWidth"
+                data-type="face" oninput="widthCheekbone.value=value" v-model.number="cheekboneWidth"
+                @input="changeAppearance" />
+              <p id="widthCheekbone">{{ cheekboneWidth }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Tamanho da bochecha</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" id="changeCheeksWidth"
+                data-type="face" oninput="widthCheeks.value=value" v-model.number="cheeksWidth"
+                @input="changeAppearance" />
+              <p id="widthCheeks">{{ cheeksWidth }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="lips" style="display: none">
+          <div class="option">
+            <p>Tamanho da boca</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" id="changeLipsWidth"
+                data-type="face" oninput="widthLips.value=value" v-model.number="lips" @input="changeAppearance" />
+              <p id="widthLips">{{ lips }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="neck" style="display: none">
+          <div class="option">
+            <p>Largura do pescoço</p>
+            <div class="input">
+              <input type="range" min="-1.0" max="0.99" value="0" step="0.01" class="slider" id="changeNeckHeight"
+                data-type="face" oninput="heightNeck.value=value" v-model.number="neckWidth"
+                @input="changeAppearance" />
+              <p id="heightNeck">{{ neckWidth }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="right">
+      <div class="head">
+        <div class="title">
+          <div class="text">
+            <p>PESSOAL</p>
+            <h2>ESTILO</h2>
+          </div>
+        </div>
+      </div>
+      <div class="categories">
+        <button class="selected" data-menu="face_skin">
+          <img src="./assets/icons/face.svg" />
+        </button>
+        <button data-menu="hair">
+          <img src="./assets/icons/hair.svg" />
+        </button>
+        <button data-menu="beard">
+          <img src="./assets/icons/beard.svg" />
+        </button>
+        <button data-menu="makeup">
+          <img src="./assets/icons/make.svg" />
+        </button>
+        <button data-menu="age">
+          <img src="./assets/icons/expressions.svg" />
+        </button>
+        <button data-menu="chest">
+          <img src="./assets/icons/chest-hair.svg" />
+        </button>
+        <button>
+          <img src="./assets/icons/body.svg" />
+        </button>
+      </div>
+      <div class="options">
+        <div class="subCategory" id="face_skin">
+          <div class="option">
+            <p>Manchas</p>
+            <div class="input">
+              <input type="range" min="-1" max="23" value="-1" step="1" class="slider" id="changeBlemishes"
+                data-type="overlay" oninput="blemishes.value=value" v-model.number="blemishesModel"
+                @input="changeAppearance" />
+              <p class="blemishes">{{ blemishesModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Sardas</p>
+            <div class="input">
+              <input type="range" min="-1" max="17" value="-1" step="1" class="slider" id="changeFreckles"
+                data-type="overlay" oninput="freckles.value=value" v-model.number="frecklesModel"
+                @input="changeAppearance" />
+              <p class="freckles">{{ frecklesModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Aspectos</p>
+            <div class="input">
+              <input type="range" min="-1" max="11" value="-1" step="1" class="slider" id="changeComplexion"
+                data-type="overlay" oninput="complexion.value=value" v-model.number="complexionModel"
+                @input="changeAppearance" />
+              <p class="complexion">{{ complexionModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Blush</p>
+            <div class="input">
+              <input type="range" min="-1" max="7" value="-1" step="1" class="slider" id="changeBlush"
+                data-type="overlay" oninput="blush.value=value" v-model.number="blushModel" @input="changeAppearance" />
+              <p class="blush">{{ blushModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Cor do Blush</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeBlush"
+                data-type="overlay_color" oninput="blushColorOut.value=value" v-model.number="blushColor"
+                @input="changeAppearance" />
+              <p class="blushColorOut">{{ blushColor }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="hair" style="display: none">
+          <div class="option">
+            <p>Cabelo</p>
+            <div class="input">
+              <input type="range" min="0" max="250" value="4" step="1" class="slider" id="changeHair" data-type="hair"
+                oninput="hairModelOut.value=value" v-model.number="hairModel" @input="changeAppearance" />
+              <p class="hairModelOut">{{ hairModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Cor do cabelo</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeHair"
+                data-type="hairColor" oninput="hairColor.value=value" v-model.number="firstHairColor"
+                @input="changeAppearance" />
+              <p class="hairColor">{{ firstHairColor }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Luzes do cabelo</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeHair"
+                data-type="hairColorHighlight" oninput="hairColorHighlight.value=value" v-model.number="secondHairColor"
+                @input="changeAppearance" />
+              <p class="hairColorHighlight">{{ secondHairColor }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="beard" style="display: none">
+          <div class="option">
+            <p>Barba</p>
+            <div class="input">
+              <input type="range" min="-1" max="28" value="-1" step="1" class="slider" id="changeFacialHair"
+                data-type="overlay" oninput="beardValue.value=value" v-model.number="beardModel"
+                @input="changeAppearance" />
+              <p class="beardValue">{{ beardModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Cor da barba</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeFacialHair"
+                data-type="overlay_color" oninput="beardColorOut.value=value" v-model.number="beardColor"
+                @input="changeAppearance" />
+              <p class="beardColorOut">{{ beardColor }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="makeup" style="display: none">
+          <div class="option">
+            <p>Makeup</p>
+            <div class="input">
+              <input type="range" min="-1" max="71" value="-1" step="1" class="slider" id="changeMakeup"
+                data-type="overlay" oninput="makeupValue.value=value" v-model.number="makeupModel"
+                @input="changeAppearance" />
+              <p class="makeupValue">{{ makeupModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Batom</p>
+            <div class="input">
+              <input type="range" min="-1" max="9" value="-1" step="1" class="slider" id="changeLipstick"
+                data-type="overlay" oninput="lipstickValue.value=value" v-model.number="lipstickModel"
+                @input="changeAppearance" />
+              <p class="lipstickValue">{{ lipstickModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Cor do batom</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeLipstick"
+                data-type="overlay_color" oninput="lipstickColor.value=value" v-model.number="lipstickColor"
+                @input="changeAppearance" />
+              <p class="lipstickColor">{{ lipstickColor }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="age" style="display: none">
+          <div class="option">
+            <p>Envelhecimento</p>
+            <div class="input">
+              <input type="range" min="-1" max="14" value="-1" step="1" class="slider" id="changeAgeing"
+                data-type="overlay" oninput="ageingValue.value=value" v-model.number="ageingModel"
+                @input="changeAppearance" />
+              <p class="ageingValue">{{ ageingModel }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="chest" style="display: none">
+          <div class="option">
+            <p>Cabelo do peito</p>
+            <div class="input">
+              <input type="range" min="-1" max="16" value="-1" step="1" class="slider" id="changeChestHair"
+                data-type="overlay" oninput="chestHairValue.value=value" v-model.number="chestModel"
+                @input="changeAppearance" />
+              <p class="chestHairValue">{{ chestModel }}</p>
+            </div>
+          </div>
+          <div class="option">
+            <p>Cor do cabelo do peito</p>
+            <div class="input">
+              <input type="range" min="0" max="63" value="0" step="1" class="slider" id="changeChestHair"
+                data-type="overlay_color" oninput="chestHairColor.value=value" v-model.number="chestColor"
+                @input="changeAppearance" />
+              <p class="chestHairColor">{{ chestColor }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="subCategory" id="body" style="display: none">
+          <div class="option">
+            <p>Etnia</p>
+            <div class="input">
+              <input type="range" min="-1" max="10" value="-1" step="1" class="slider" id="changeSunDamage"
+                data-type="overlay" oninput="sunDamageValue.value=value" v-model.number="sundamageModel"
+                @input="changeAppearance" />
+              <p class="chestHairColor">{{ sundamageModel }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="informations">
+      <div class="actions">
+        <div class="rotate">
+          <div class="title">
+            <p>ROTAÇÃO</p>
+            <p id="camRotationOut">{{ camRotation }}</p>
+          </div>
+          <input type="range" min="90" max="270" value="0" step="5" class="slider" id="changeCamRotation"
+            data-type="face" oninput="camRotationOut.value=value" v-model.number="camRotation"
+            @input="changeCamRotation" />
+        </div>
+        <div class="buttons">
+          <button onclick="resetChar()">RECARREGAR</button>
+          <button @click="done">CONFIRMAR</button>
+        </div>
+      </div>
+      <div class="warning">
+        <img src="./assets/icons/warning.svg" />
+        <p>
+          CASO O BONECO NAO CARREGUE BASTA CLICAR NO BOTÃO <b>RECARREGAR</b>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="whitelist" style="display: none">
+    <div
+      style="display: flex; align-items: center; flex-direction: column; width: 20rem; animation: fadeIn .5s ease-in-out;">
+      <img style="height: 3.0625rem;margin-bottom: 1rem;" src="./assets/images/logo.png" />
+      <h1>REALIZE SUA <br> <strong>WHITELIST</strong></h1>
+      <div class="steps">
+        <div class="step">
+          <span>1</span>
+        </div>
+        <div id="firstStep" class="line"></div>
+        <div class="step">
+          <span>2</span>
+        </div>
+        <div id="secondStep" class="line"></div>
+        <div class="step">3</div>
+      </div>
+      <main>
+        <section style="display: flex; margin-top: 47px;">
+          <article>
+            <div class="box">
+              <div class="title">NOME</div>
+              <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_334_1266)">
+                  <path
+                    d="M7.99989 0.5C5.92868 0.5 4.24996 2.22672 4.24996 4.35658C4.24996 6.48644 5.92868 8.21316 7.99989 8.21316C10.0706 8.21316 11.7498 6.48644 11.7498 4.35658C11.7498 2.22672 10.0706 0.5 7.99989 0.5ZM7.99989 8.7847C3.85747 8.7847 2 10.6953 2 14.9552V15.4694C2.01875 16.4824 2.45424 16.5123 3.37498 16.4979H12.6248C13.7985 16.4968 14.0078 16.4991 13.9998 15.4694V14.9552C13.9998 10.6953 12.1418 8.7847 7.99989 8.7847Z"
+                    fill="white" fill-opacity="0.4" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_334_1266">
+                    <rect width="16" height="16" fill="white" transform="translate(0 0.5)" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <input id="name" placeholder="Nome do personagem" type="text" maxlength="15" />
+            </div>
+            <div class="box">
+              <div class="title">SOBRENOME</div>
+              <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_334_1266)">
+                  <path
+                    d="M7.99989 0.5C5.92868 0.5 4.24996 2.22672 4.24996 4.35658C4.24996 6.48644 5.92868 8.21316 7.99989 8.21316C10.0706 8.21316 11.7498 6.48644 11.7498 4.35658C11.7498 2.22672 10.0706 0.5 7.99989 0.5ZM7.99989 8.7847C3.85747 8.7847 2 10.6953 2 14.9552V15.4694C2.01875 16.4824 2.45424 16.5123 3.37498 16.4979H12.6248C13.7985 16.4968 14.0078 16.4991 13.9998 15.4694V14.9552C13.9998 10.6953 12.1418 8.7847 7.99989 8.7847Z"
+                    fill="white" fill-opacity="0.4" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_334_1266">
+                    <rect width="16" height="16" fill="white" transform="translate(0 0.5)" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <input id="surname" placeholder="Sobrenome do personagem" type="text" />
+            </div>
+            <div class="box">
+              <div class="title">IDADE</div>
+              <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_334_1244)">
+                  <path
+                    d="M7.99152 0.5C3.57664 0.5048 0 4.08496 0 8.5C0.0016 12.8744 3.51664 16.4365 7.89056 16.4963C7.41136 15.2806 7.67008 13.7902 8.4 12.695V12.3608H8.64256C8.89312 12.0624 9.24512 11.7998 9.664 11.5608H8.4V8.9H9.1264C9.1424 8.63088 9.19392 8.36128 9.276 8.1H8.4V5.4392H11.4712C11.5128 5.59856 11.5504 5.7624 11.5856 5.92816C11.8827 5.88016 12.1514 5.87808 12.399 5.90944C12.3681 5.75198 12.334 5.59515 12.2968 5.43904H14.5192C14.8679 6.18192 15.0864 6.97916 15.1653 7.796C15.2338 8.58656 15.2328 9.29808 14.9883 10.2344C14.8887 10.6348 14.7549 11.026 14.5883 11.4035C14.7688 11.5933 14.9874 11.7728 15.207 11.956C15.7265 10.8778 15.9975 9.69681 16 8.5C16 4.08176 12.4182 0.5 8 0.5H7.99152ZM8.4 1.40912C9.24288 1.55248 10.0483 2.24688 10.6829 3.39904C10.8874 3.7704 11.0701 4.18736 11.2282 4.63904H8.4V1.40912ZM7.6 1.44064V4.63904H4.92C5.07808 4.18736 5.2608 3.7704 5.46528 3.39904C6.0624 2.31456 6.81136 1.63616 7.6 1.44064ZM5.7568 1.65712C5.38496 2.03344 5.0512 2.49232 4.76432 3.01312C4.49552 3.50112 4.26432 4.04784 4.0744 4.63904H1.9216C2.8072 3.24608 4.1576 2.17984 5.7568 1.65712ZM10.4624 1.7312C11.9661 2.27728 13.2336 3.31008 14.0784 4.63904H12.0728C11.8834 4.04784 11.6525 3.50112 11.3837 3.01312C11.1155 2.52592 10.8054 2.09328 10.4624 1.7312ZM1.48112 5.4392H3.8504C3.6512 6.26512 3.52912 7.1608 3.49792 8.10016H0.81152C0.861254 7.17839 1.08856 6.27491 1.48096 5.43936M4.6768 5.43936H7.6V8.1H4.29872C4.33264 7.1504 4.4656 6.25152 4.6768 5.43936ZM0.81152 8.9H3.49344C3.51408 9.83696 3.62464 10.7326 3.81248 11.5608H1.48096C1.08856 10.7252 0.861254 9.82176 0.81152 8.9ZM4.29344 8.9H7.6V11.5608H4.6368C4.4376 10.7448 4.31584 9.8464 4.29344 8.9ZM1.9216 12.3608H4.02336C4.22208 13.0144 4.47136 13.6152 4.76432 14.1472C4.9944 14.5648 5.2552 14.9422 5.54096 15.2699C4.03584 14.7243 2.7672 13.6907 1.9216 12.3608ZM4.86464 12.361H7.6V15.6886C7.55072 15.6859 7.50208 15.681 7.45312 15.6774C6.71872 15.4374 6.02528 14.7782 5.46528 13.7614C5.2368 13.3464 5.03456 12.8755 4.86464 12.3611"
+                    fill="white" fill-opacity="0.4" />
+                  <path
+                    d="M12.16 6.54303C10.8344 6.54303 9.76001 7.61759 9.76001 8.94303C9.76001 10.2685 10.8344 11.343 12.16 11.343C13.4853 11.343 14.56 10.2685 14.56 8.94303C14.56 7.61759 13.4853 6.54303 12.16 6.54303ZM12.16 11.6987C9.50881 11.6987 8.32001 12.8877 8.32001 15.5387V15.8587C8.33201 16.4891 8.61073 16.5077 9.20001 16.4987H15.12C15.8712 16.4981 16.0051 16.4995 16 15.8587V15.5387C16 12.8877 14.8109 11.6987 12.16 11.6987Z"
+                    fill="white" fill-opacity="0.4" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_334_1244">
+                    <rect width="16" height="16" fill="white" transform="translate(0 0.5)" />
+                  </clipPath>
+                </defs>
+              </svg>
+
+              <input id="age" placeholder="Idade do personagem" type="number" />
+            </div>
+          </article>
+          <hr />
+          <div class="accent">SELECIONAR GÊNERO</div>
+          <div class="buttons">
+            <!-- <div onclick="whitelistApp.changeGender(this, 1)" class="gender selected">
+              <span>MASCULINO</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9.1426 2.05176V3.30176H11.8037L9.25192 5.88476L8.84763 6.29491C8.56424 6.08296 8.25555 5.90713 7.9287 5.77148C7.41279 5.55815 6.85997 5.44833 6.3017 5.44826C5.74435 5.44826 5.19067 5.55826 4.67576 5.77151C4.16019 5.9851 3.69165 6.29799 3.29682 6.69238C2.90241 7.0872 2.5895 7.55572 2.37588 8.07129C2.1626 8.58629 2.05173 9.14091 2.0517 9.69829C2.05176 10.2562 2.16159 10.8087 2.37495 11.3242C2.58883 11.8399 2.90207 12.3084 3.29682 12.7032C3.69164 13.0976 4.16016 13.4105 4.67573 13.6241C5.19067 13.8374 5.74432 13.9483 6.30167 13.9483C6.85907 13.9483 7.41373 13.8374 7.92867 13.6241C8.44422 13.4105 8.91273 13.0975 9.30754 12.7031C9.70195 12.3083 10.0149 11.8398 10.2285 11.3242C10.4418 10.8087 10.5516 10.2562 10.5517 9.69829C10.5516 9.14001 10.4417 8.5872 10.2284 8.07129C10.0976 7.75608 9.92945 7.45774 9.72748 7.18266L10.1405 6.76373L12.6982 4.17388V6.85748H13.9482V2.05176H9.1426ZM6.30176 6.69826C6.69582 6.69874 7.08597 6.77636 7.4502 6.92676C7.81207 7.07666 8.14592 7.30019 8.42285 7.57716C8.69982 7.85404 8.92338 8.18794 9.07329 8.54979C9.22368 8.91402 9.30131 9.30417 9.30179 9.69823C9.30179 10.0899 9.22313 10.4839 9.07329 10.8457C8.92342 11.2075 8.70079 11.5424 8.42392 11.8193C8.14692 12.0963 7.8121 12.3198 7.45023 12.4696C7.086 12.62 6.69585 12.6977 6.30179 12.6982C5.91013 12.6982 5.51617 12.6196 5.15429 12.4697C4.79043 12.3185 4.45968 12.0976 4.1807 11.8194C3.90246 11.5403 3.68153 11.2096 3.53038 10.8457C3.38045 10.4838 3.30182 10.0899 3.30182 9.69823C3.30231 9.30417 3.37995 8.91402 3.53035 8.54979L3.53326 8.54291C3.68313 8.18373 3.90545 7.85135 4.1807 7.57613C4.45595 7.30098 4.78832 7.07951 5.14757 6.92966L5.15438 6.92673C5.51626 6.77688 5.91017 6.6982 6.30182 6.69823L6.30176 6.69826Z"
+                  fill="white" />
+              </svg>
+            </div> -->
+            <!-- <div onclick="whitelistApp.changeGender(this, 0)" class="gender">
+              <span>FEMININO</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9.16663 17.5V15.8333H7.49996V14.1666H9.16663V12.4166C8.0694 12.2222 7.16996 11.6978 6.46829 10.8433C5.76663 9.98887 5.41607 8.99942 5.41663 7.87498C5.41663 6.61109 5.86468 5.53831 6.76079 4.65665C7.6569 3.77498 8.73663 3.33387 9.99996 3.33331C11.2633 3.33276 12.3433 3.77387 13.24 4.65665C14.1366 5.53942 14.5844 6.6122 14.5833 7.87498C14.5833 8.99998 14.2325 9.9897 13.5308 10.8441C12.8291 11.6986 11.93 12.2228 10.8333 12.4166V14.1666H12.5V15.8333H10.8333V17.5H9.16663ZM9.99996 10.8333C10.8055 10.8333 11.493 10.5486 12.0625 9.97915C12.6319 9.4097 12.9166 8.7222 12.9166 7.91665C12.9166 7.11109 12.6319 6.42359 12.0625 5.85415C11.493 5.2847 10.8055 4.99998 9.99996 4.99998C9.1944 4.99998 8.5069 5.2847 7.93746 5.85415C7.36802 6.42359 7.08329 7.11109 7.08329 7.91665C7.08329 8.7222 7.36802 9.4097 7.93746 9.97915C8.5069 10.5486 9.1944 10.8333 9.99996 10.8333Z"
+                  fill="#840D0D" />
+              </svg>
+            </div> -->
+            <div class="gender selected" onclick="whitelistApp.changeGender(this, 1)">
+              <div class="icon">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M26.125 5.5C25.7603 5.5 25.4106 5.35513 25.1527 5.09727C24.8949 4.83941 24.75 4.48967 24.75 4.125C24.75 3.76033 24.8949 3.41059 25.1527 3.15273C25.4106 2.89487 25.7603 2.75 26.125 2.75H39.875C40.2397 2.75 40.5894 2.89487 40.8473 3.15273C41.1052 3.41059 41.25 3.76033 41.25 4.125V17.875C41.25 18.2397 41.1052 18.5894 40.8473 18.8473C40.5894 19.1051 40.2397 19.25 39.875 19.25C39.5103 19.25 39.1606 19.1051 38.9027 18.8473C38.6449 18.5894 38.5 18.2397 38.5 17.875V7.44425L27.1453 18.799C29.3777 21.5303 30.4751 25.0151 30.2104 28.5327C29.9457 32.0504 28.3391 35.3317 25.723 37.6981C23.1069 40.0645 19.6814 41.3349 16.1549 41.2466C12.6284 41.1582 9.2708 39.718 6.77643 37.2236C4.28206 34.7292 2.84177 31.3716 2.75346 27.8451C2.66515 24.3186 3.93556 20.8931 6.30195 18.277C8.66834 15.6609 11.9497 14.0544 15.4673 13.7896C18.9849 13.5249 22.4697 14.6223 25.201 16.8548L36.5558 5.5H26.125ZM16.5 16.5C13.5826 16.5 10.7847 17.6589 8.72185 19.7218C6.65895 21.7847 5.50002 24.5826 5.50002 27.5C5.50002 30.4174 6.65895 33.2153 8.72185 35.2782C10.7847 37.3411 13.5826 38.5 16.5 38.5C19.4174 38.5 22.2153 37.3411 24.2782 35.2782C26.3411 33.2153 27.5 30.4174 27.5 27.5C27.5 24.5826 26.3411 21.7847 24.2782 19.7218C22.2153 17.6589 19.4174 16.5 16.5 16.5Z"
+                    fill="black" />
+                </svg>
+              </div>
+              <p>MASCULINO</p>
+            </div>
+            <div class="gender" onclick="whitelistApp.changeGender(this, 0)">
+              <div class="icon">
+                <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M22.9643 29.9286C26.6678 29.9286 30.2197 28.4573 32.8385 25.8385C35.4573 23.2197 36.9286 19.6678 36.9286 15.9643C36.9286 12.2607 35.4573 8.70886 32.8385 6.09004C30.2197 3.47123 26.6678 2 22.9643 2C19.2607 2 15.7089 3.47123 13.09 6.09004C10.4712 8.70886 9 12.2607 9 15.9643C9 19.6678 10.4712 23.2197 13.09 25.8385C15.7089 28.4573 19.2607 29.9286 22.9643 29.9286ZM22.9643 29.9286V44.7143M16.3929 38.1429H29.5357"
+                    stroke="black" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <p>FEMININO</p>
+            </div>
+          </div>
+        </section>
+        <section style="display: none">
+          <img style="width: 236px; margin: 20px 0" src="./assets/images/connection.png" alt="" />
+          <legend>Siga as instruções para entrar <br> no nosso Discord.</legend>
+          <article style="margin: 0">
+            <h4>Copie seu token escrito abaixo e cole na sala <span>#discord</span> do nosso Discord.</h4>
+            <div onclick="whitelistApp.copyId()" class="passport">
+              <span>SEU ID</span>
+              <p id="passport">9999</p>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M15.04 0H4.8C4.54539 0 4.30121 0.101143 4.12118 0.281178C3.94114 0.461212 3.84 0.705392 3.84 0.96V3.84H0.96C0.705392 3.84 0.461212 3.94114 0.281178 4.12118C0.101143 4.30121 0 4.54539 0 4.8V15.04C0 15.2946 0.101143 15.5388 0.281178 15.7188C0.461212 15.8989 0.705392 16 0.96 16H11.2C11.4546 16 11.6988 15.8989 11.8788 15.7188C12.0589 15.5388 12.16 15.2946 12.16 15.04V12.16H15.04C15.2946 12.16 15.5388 12.0589 15.7188 11.8788C15.8989 11.6988 16 11.4546 16 11.2V0.96C16 0.705392 15.8989 0.461212 15.7188 0.281178C15.5388 0.101143 15.2946 0 15.04 0ZM10.24 14.08H1.92V5.76H10.24V14.08ZM14.08 10.24H12.16V4.8C12.16 4.54539 12.0589 4.30121 11.8788 4.12118C11.6988 3.94114 11.4546 3.84 11.2 3.84H5.76V1.92H14.08V10.24Z"
+                  fill="#2981FF" />
+              </svg>
+            </div>
+          </article>
+          <h3>ACESSE O DISCORD</h3>
+          <svg style="cursor: pointer; margin-top: .2rem;"
+            onclick="window.invokeNative('openUrl', 'https://discord.gg/DQswMRDMVV')" width="348" height="66"
+            viewBox="0 0 348 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g filter="url(#filter0_dd_334_1394)">
+              <path
+                d="M14 23C14 18.0294 18.0294 14 23 14H325C329.971 14 334 18.0294 334 23V43C334 47.9706 329.971 52 325 52H23C18.0294 52 14 47.9706 14 43V23Z"
+                fill="#D9D9D9" shape-rendering="crispEdges" />
+              <path
+                d="M142.229 39H137.928V27.3636H142.223C143.409 27.3636 144.429 27.5966 145.286 28.0625C146.145 28.5246 146.808 29.1913 147.274 30.0625C147.74 30.9299 147.973 31.9678 147.973 33.1761C147.973 34.3883 147.74 35.4299 147.274 36.3011C146.812 37.1723 146.151 37.8409 145.291 38.3068C144.431 38.7689 143.411 39 142.229 39ZM140.74 36.6023H142.121C142.772 36.6023 143.323 36.4924 143.774 36.2727C144.229 36.0492 144.571 35.6875 144.803 35.1875C145.037 34.6837 145.155 34.0133 145.155 33.1761C145.155 32.339 145.037 31.6723 144.803 31.1761C144.568 30.6761 144.221 30.3163 143.763 30.0966C143.308 29.8731 142.748 29.7614 142.081 29.7614H140.74V36.6023ZM152.428 27.3636V39H149.615V27.3636H152.428ZM160.483 30.8523C160.445 30.4356 160.277 30.1117 159.977 29.8807C159.682 29.6458 159.259 29.5284 158.71 29.5284C158.347 29.5284 158.044 29.5758 157.801 29.6705C157.559 29.7652 157.377 29.8958 157.256 30.0625C157.134 30.2254 157.072 30.4129 157.068 30.625C157.061 30.7992 157.095 30.9527 157.17 31.0852C157.25 31.2178 157.364 31.3352 157.511 31.4375C157.663 31.536 157.845 31.6231 158.057 31.6989C158.269 31.7746 158.508 31.8409 158.773 31.8977L159.773 32.125C160.348 32.25 160.856 32.4167 161.295 32.625C161.739 32.8333 162.11 33.0814 162.409 33.3693C162.712 33.6572 162.941 33.9886 163.097 34.3636C163.252 34.7386 163.331 35.1591 163.335 35.625C163.331 36.3598 163.146 36.9905 162.778 37.517C162.411 38.0436 161.883 38.447 161.193 38.7273C160.508 39.0076 159.68 39.1477 158.71 39.1477C157.737 39.1477 156.888 39.0019 156.165 38.7102C155.441 38.4186 154.879 37.9754 154.477 37.3807C154.076 36.786 153.869 36.0341 153.858 35.125H156.551C156.574 35.5 156.674 35.8125 156.852 36.0625C157.03 36.3125 157.275 36.5019 157.585 36.6307C157.9 36.7595 158.263 36.8239 158.676 36.8239C159.055 36.8239 159.377 36.7727 159.642 36.6705C159.911 36.5682 160.117 36.4261 160.261 36.2443C160.405 36.0625 160.479 35.8542 160.483 35.6193C160.479 35.3996 160.411 35.2121 160.278 35.0568C160.146 34.8977 159.941 34.7614 159.665 34.6477C159.392 34.5303 159.044 34.4223 158.619 34.3239L157.403 34.0398C156.396 33.8087 155.602 33.4356 155.023 32.9205C154.443 32.4015 154.155 31.7008 154.159 30.8182C154.155 30.0985 154.348 29.4678 154.739 28.9261C155.129 28.3845 155.669 27.9621 156.358 27.6591C157.047 27.3561 157.833 27.2045 158.716 27.2045C159.617 27.2045 160.4 27.358 161.062 27.6648C161.729 27.9678 162.246 28.3939 162.614 28.9432C162.981 29.4924 163.169 30.1288 163.176 30.8523H160.483ZM175.318 31.5795H172.477C172.439 31.2879 172.362 31.0246 172.244 30.7898C172.127 30.5549 171.972 30.3542 171.778 30.1875C171.585 30.0208 171.356 29.8939 171.091 29.8068C170.83 29.7159 170.54 29.6705 170.222 29.6705C169.657 29.6705 169.17 29.8087 168.761 30.0852C168.356 30.3617 168.044 30.7614 167.824 31.2841C167.608 31.8068 167.5 32.4394 167.5 33.1818C167.5 33.9545 167.61 34.6023 167.83 35.125C168.053 35.6439 168.366 36.036 168.767 36.3011C169.172 36.5625 169.652 36.6932 170.205 36.6932C170.515 36.6932 170.797 36.6534 171.051 36.5739C171.309 36.4943 171.534 36.3788 171.727 36.2273C171.924 36.072 172.085 35.8845 172.21 35.6648C172.339 35.4413 172.428 35.1894 172.477 34.9091L175.318 34.9261C175.269 35.4413 175.119 35.9489 174.869 36.4489C174.623 36.9489 174.284 37.4053 173.852 37.8182C173.42 38.2273 172.894 38.553 172.273 38.7955C171.655 39.0379 170.947 39.1591 170.148 39.1591C169.095 39.1591 168.152 38.928 167.318 38.4659C166.489 38 165.833 37.322 165.352 36.4318C164.871 35.5417 164.631 34.4583 164.631 33.1818C164.631 31.9015 164.875 30.8163 165.364 29.9261C165.852 29.036 166.513 28.3598 167.347 27.8977C168.18 27.4356 169.114 27.2045 170.148 27.2045C170.852 27.2045 171.504 27.303 172.102 27.5C172.701 27.6932 173.227 27.9773 173.682 28.3523C174.136 28.7235 174.506 29.1799 174.79 29.7216C175.074 30.2633 175.25 30.8826 175.318 31.5795ZM187.911 33.1818C187.911 34.4621 187.664 35.5473 187.172 36.4375C186.679 37.3277 186.013 38.0038 185.172 38.4659C184.335 38.928 183.395 39.1591 182.354 39.1591C181.308 39.1591 180.367 38.9261 179.53 38.4602C178.693 37.9943 178.028 37.3182 177.536 36.4318C177.047 35.5417 176.803 34.4583 176.803 33.1818C176.803 31.9015 177.047 30.8163 177.536 29.9261C178.028 29.036 178.693 28.3598 179.53 27.8977C180.367 27.4356 181.308 27.2045 182.354 27.2045C183.395 27.2045 184.335 27.4356 185.172 27.8977C186.013 28.3598 186.679 29.036 187.172 29.9261C187.664 30.8163 187.911 31.9015 187.911 33.1818ZM185.036 33.1818C185.036 32.4242 184.928 31.7841 184.712 31.2614C184.5 30.7386 184.193 30.3428 183.791 30.0739C183.393 29.8049 182.914 29.6705 182.354 29.6705C181.797 29.6705 181.318 29.8049 180.916 30.0739C180.515 30.3428 180.206 30.7386 179.99 31.2614C179.778 31.7841 179.672 32.4242 179.672 33.1818C179.672 33.9394 179.778 34.5795 179.99 35.1023C180.206 35.625 180.515 36.0208 180.916 36.2898C181.318 36.5587 181.797 36.6932 182.354 36.6932C182.914 36.6932 183.393 36.5587 183.791 36.2898C184.193 36.0208 184.5 35.625 184.712 35.1023C184.928 34.5795 185.036 33.9394 185.036 33.1818ZM189.553 39V27.3636H194.359C195.231 27.3636 195.982 27.5208 196.615 27.8352C197.251 28.1458 197.742 28.5928 198.087 29.1761C198.431 29.7557 198.604 30.4432 198.604 31.2386C198.604 32.0455 198.428 32.7311 198.075 33.2955C197.723 33.8561 197.223 34.2841 196.575 34.5795C195.928 34.8712 195.161 35.017 194.274 35.017H191.234V32.8011H193.751C194.176 32.8011 194.53 32.7462 194.814 32.6364C195.102 32.5227 195.32 32.3523 195.467 32.125C195.615 31.8939 195.689 31.5985 195.689 31.2386C195.689 30.8788 195.615 30.5814 195.467 30.3466C195.32 30.108 195.102 29.9299 194.814 29.8125C194.526 29.6913 194.172 29.6307 193.751 29.6307H192.365V39H189.553ZM196.104 33.6818L199.001 39H195.933L193.092 33.6818H196.104ZM204.447 39H200.146V27.3636H204.442C205.627 27.3636 206.648 27.5966 207.504 28.0625C208.364 28.5246 209.027 29.1913 209.493 30.0625C209.959 30.9299 210.192 31.9678 210.192 33.1761C210.192 34.3883 209.959 35.4299 209.493 36.3011C209.031 37.1723 208.37 37.8409 207.51 38.3068C206.65 38.7689 205.629 39 204.447 39ZM202.959 36.6023H204.339C204.991 36.6023 205.542 36.4924 205.993 36.2727C206.447 36.0492 206.79 35.6875 207.021 35.1875C207.256 34.6837 207.374 34.0133 207.374 33.1761C207.374 32.339 207.256 31.6723 207.021 31.1761C206.786 30.6761 206.44 30.3163 205.982 30.0966C205.527 29.8731 204.966 29.7614 204.3 29.7614H202.959V36.6023Z"
+                fill="#1E1E1E" />
+              <path
+                d="M321.664 26.8859C320.445 26.3175 319.125 25.905 317.75 25.6667C317.726 25.667 317.703 25.6769 317.686 25.6942C317.521 25.9967 317.328 26.3909 317.2 26.6934C315.742 26.4735 314.258 26.4735 312.8 26.6934C312.672 26.3817 312.479 25.9967 312.305 25.6942C312.296 25.6759 312.268 25.6667 312.241 25.6667C310.866 25.905 309.555 26.3175 308.327 26.8859C308.318 26.8859 308.308 26.895 308.299 26.9042C305.806 30.635 305.118 34.265 305.458 37.8584C305.458 37.8767 305.467 37.895 305.485 37.9042C307.135 39.1142 308.721 39.8475 310.288 40.3334C310.316 40.3425 310.343 40.3334 310.353 40.315C310.719 39.8109 311.049 39.2792 311.333 38.72C311.352 38.6834 311.333 38.6467 311.297 38.6375C310.774 38.4359 310.279 38.1975 309.793 37.9225C309.757 37.9042 309.757 37.8492 309.784 37.8217C309.885 37.7484 309.986 37.6659 310.087 37.5925C310.105 37.5742 310.133 37.5742 310.151 37.5834C313.304 39.0225 316.705 39.0225 319.822 37.5834C319.84 37.5742 319.868 37.5742 319.886 37.5925C319.987 37.675 320.088 37.7484 320.188 37.8309C320.225 37.8584 320.225 37.9134 320.179 37.9317C319.703 38.2159 319.198 38.445 318.676 38.6467C318.639 38.6559 318.63 38.7017 318.639 38.7292C318.933 39.2884 319.263 39.82 319.62 40.3242C319.648 40.3334 319.675 40.3425 319.703 40.3334C321.279 39.8475 322.865 39.1142 324.515 37.9042C324.533 37.895 324.543 37.8767 324.543 37.8584C324.946 33.7059 323.873 30.1034 321.701 26.9042C321.692 26.895 321.683 26.8859 321.664 26.8859ZM311.81 35.6675C310.866 35.6675 310.078 34.7967 310.078 33.7242C310.078 32.6517 310.848 31.7809 311.81 31.7809C312.782 31.7809 313.552 32.6609 313.543 33.7242C313.543 34.7967 312.773 35.6675 311.81 35.6675ZM318.199 35.6675C317.255 35.6675 316.467 34.7967 316.467 33.7242C316.467 32.6517 317.237 31.7809 318.199 31.7809C319.171 31.7809 319.941 32.6609 319.932 33.7242C319.932 34.7967 319.171 35.6675 318.199 35.6675Z"
+                fill="#1E1E1E" />
+            </g>
+            <defs>
+              <filter id="filter0_dd_334_1394" x="0" y="0" width="348" height="66" filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha" />
+                <feOffset />
+                <feGaussianBlur stdDeviation="7" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0.85098 0 0 0 0 0.85098 0 0 0 0 0.85098 0 0 0 0.45 0" />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_334_1394" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha" />
+                <feOffset />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                <feBlend mode="normal" in2="effect1_dropShadow_334_1394" result="effect2_dropShadow_334_1394" />
+                <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_334_1394" result="shape" />
+              </filter>
+            </defs>
+          </svg>
+          <legend style="margin-top: 1rem">
+            Ao realizar os passos espere a <br> página ficar disponível.
+          </legend>
+        </section>
+        <section style="display: none; height: 33rem;">
+          <article style="margin-top: 1.25rem; display: flex; flex-direction: column; gap: .75rem;">
+            <div onclick="whitelistApp.selectVehicle(this)" data-spawn="t20" class="vehicle">
+              <div class="text">
+                <p>Veículo</p>
+                <span>t20</span>
+              </div>
+              <img src="http://127.0.0.1/vrp_images/t20.png" alt="" />
+            </div>
+            <div onclick="whitelistApp.selectVehicle(this)" data-spawn="osiris" class="vehicle">
+              <div class="text">
+                <p>Veículo</p>
+                <span>Osiris</span>
+              </div>
+              <img src="http://127.0.0.1/vrp_images/osiris.png" alt="" />
+            </div>
+            <div onclick="whitelistApp.selectVehicle(this)" data-spawn="speedo" class="vehicle">
+              <div class="text">
+                <p>Veículo</p>
+                <span>Speedo 150 Kg</span>
+              </div>
+              <img src="http://127.0.0.1/vrp_images/speedo.png" alt="" />
+            </div>
+          </article>
+          <div class="box" style="margin-top: 2.5rem; height: 2.625rem">
+            <div class="title" style="left: 00px">QUEM TE INDICOU?</div>
+            <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_334_1493)">
+                <path
+                  d="M7.99152 0.5C3.57664 0.5048 0 4.08496 0 8.5C0.0016 12.8744 3.51664 16.4365 7.89056 16.4963C7.41136 15.2806 7.67008 13.7902 8.4 12.695V12.3608H8.64256C8.89312 12.0624 9.24512 11.7998 9.664 11.5608H8.4V8.9H9.1264C9.1424 8.63088 9.19392 8.36128 9.276 8.1H8.4V5.4392H11.4712C11.5128 5.59856 11.5504 5.7624 11.5856 5.92816C11.8827 5.88016 12.1514 5.87808 12.399 5.90944C12.3681 5.75198 12.334 5.59515 12.2968 5.43904H14.5192C14.8679 6.18192 15.0864 6.97916 15.1653 7.796C15.2338 8.58656 15.2328 9.29808 14.9883 10.2344C14.8887 10.6348 14.7549 11.026 14.5883 11.4035C14.7688 11.5933 14.9874 11.7728 15.207 11.956C15.7265 10.8778 15.9975 9.69681 16 8.5C16 4.08176 12.4182 0.5 8 0.5H7.99152ZM8.4 1.40912C9.24288 1.55248 10.0483 2.24688 10.6829 3.39904C10.8874 3.7704 11.0701 4.18736 11.2282 4.63904H8.4V1.40912ZM7.6 1.44064V4.63904H4.92C5.07808 4.18736 5.2608 3.7704 5.46528 3.39904C6.0624 2.31456 6.81136 1.63616 7.6 1.44064ZM5.7568 1.65712C5.38496 2.03344 5.0512 2.49232 4.76432 3.01312C4.49552 3.50112 4.26432 4.04784 4.0744 4.63904H1.9216C2.8072 3.24608 4.1576 2.17984 5.7568 1.65712ZM10.4624 1.7312C11.9661 2.27728 13.2336 3.31008 14.0784 4.63904H12.0728C11.8834 4.04784 11.6525 3.50112 11.3837 3.01312C11.1155 2.52592 10.8054 2.09328 10.4624 1.7312ZM1.48112 5.4392H3.8504C3.6512 6.26512 3.52912 7.1608 3.49792 8.10016H0.81152C0.861254 7.17839 1.08856 6.27491 1.48096 5.43936M4.6768 5.43936H7.6V8.1H4.29872C4.33264 7.1504 4.4656 6.25152 4.6768 5.43936ZM0.81152 8.9H3.49344C3.51408 9.83696 3.62464 10.7326 3.81248 11.5608H1.48096C1.08856 10.7252 0.861254 9.82176 0.81152 8.9ZM4.29344 8.9H7.6V11.5608H4.6368C4.4376 10.7448 4.31584 9.8464 4.29344 8.9ZM1.9216 12.3608H4.02336C4.22208 13.0144 4.47136 13.6152 4.76432 14.1472C4.9944 14.5648 5.2552 14.9422 5.54096 15.2699C4.03584 14.7243 2.7672 13.6907 1.9216 12.3608ZM4.86464 12.361H7.6V15.6886C7.55072 15.6859 7.50208 15.681 7.45312 15.6774C6.71872 15.4374 6.02528 14.7782 5.46528 13.7614C5.2368 13.3464 5.03456 12.8755 4.86464 12.3611"
+                  fill="white" fill-opacity="0.4" />
+                <path
+                  d="M12.1598 6.54303C10.8342 6.54303 9.75982 7.61759 9.75982 8.94303C9.75982 10.2685 10.8342 11.343 12.1598 11.343C13.4851 11.343 14.5598 10.2685 14.5598 8.94303C14.5598 7.61759 13.4851 6.54303 12.1598 6.54303ZM12.1598 11.6987C9.50862 11.6987 8.31982 12.8877 8.31982 15.5387V15.8587C8.33182 16.4891 8.61054 16.5077 9.19982 16.4987H15.1198C15.871 16.4981 16.0049 16.4995 15.9998 15.8587V15.5387C15.9998 12.8877 14.8107 11.6987 12.1598 11.6987Z"
+                  fill="white" fill-opacity="0.4" />
+              </g>
+              <defs>
+                <clipPath id="clip0_334_1493">
+                  <rect width="16" height="16" fill="white" transform="translate(0 0.5)" />
+                </clipPath>
+              </defs>
+            </svg>
+            <input id="recommendation" type="number" placeholder="Id do jogador que te indicou" />
+          </div>
+          <h4 style="margin-top: 1.25rem; margin-bottom: 1.25rem;">Após selecionar o veículo desejado <br> clique para finalizar.</h4>
+        </section>
+      </main>
+      <button style="margin-top: 20px;" onclick="whitelistApp.step()">PROSSEGUIR</button>
+    </div>
+  </div>
+
+  <div class="notify_list"></div>
+
+  <div id="activationScreen" style="display: none">
+    <img src="./assets/images/logo.png" alt="" id="logo">
+    <div class="content">
+      <main>
+        <img style="margin-bottom: 1.5rem;" src="./assets/images/flavio.png" alt="">
+        <h1>VOCÊ AGORA É UM USUÁRIO</h1>
+        <p>VIP</p>
+        <h2>Confira os beneficios que você ganha em nossa cidade:</h2>
+        <h6>Você pode ver todos os benefícios que irá receber abaixo</h6>
+        <div class="vip-initial">🎉 Vip inicial por 7 dia(s)</div>
+        <ul>
+          <li>SALÁRIO A CADA 30MIN</li>
+          <li>NÃO PERDE MOCHILA AO MORRER</li>
+          <li>ATTACHS E COR NA ARMA</li>
+          <li>ACESSO AO /FIXVIP PARA REPARAR O VEICULO</li>
+        </ul>
+
+      </main>
+      <footer><b>©2025 011 Roleplay, INC. TOCADOMAGO GROUP</b> e qualquer logotipo associado são marcas comerciais, marcas
+        de serviço
+        e/ou marcas registradas do TOCADOMAGO GROUP, INC. Este documento, incluindo todos os seus <b>conteúdos, gráficos,
+          logotipos</b>, marcas registradas e outras informações, está protegido por direitos autorais e outras leis de
+        propriedade intelectual.</footer>
+    </div>
+
+    <div class="ballons">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="146" src="./assets/images/ballon.png" alt="">
+      <img width="146" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="146" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="146" src="./assets/images/ballon.png" alt="">
+      <img width="146" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="92" src="./assets/images/ballon.png" alt="">
+      <img width="146" src="./assets/images/ballon.png" alt="">
+    </div>
+  </div>
+
+  <script src="./scripts/config.js"></script>
+  <script src="./scripts/creator.js"></script>
+  <script src="./scripts/main.js"></script>
+</body>
+
+</html>

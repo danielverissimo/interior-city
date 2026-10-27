@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="340" viewBox="0 0 200 170">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#efe5d4"/><stop offset="1" stop-color="#d9c6aa"/></linearGradient><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#9d7653"/><stop offset="1" stop-color="#5f4634"/></linearGradient></defs>
+<rect width="200" height="170" rx="18" fill="url(#bg)"/><circle cx="166" cy="24" r="46" fill="#ffffff" opacity=".15"/><circle cx="33" cy="150" r="58" fill="#8a745f" opacity=".07"/>
+<g fill="url(#g)" stroke="#4c382a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M69 77h62l-12-38H81zM100 77v45M79 132h42M86 122h28"/><circle cx="100" cy="58" r="9"/></g>
+<text x="100" y="158" text-anchor="middle" fill="#594638" font-family="Georgia,serif" font-size="10" letter-spacing="1.2">ILUMINAÇÃO</text>
+</svg>

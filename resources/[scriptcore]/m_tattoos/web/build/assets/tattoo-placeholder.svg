@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tattoo preview">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#242424"/>
+      <stop offset="1" stop-color="#0d0d0f"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6bb1ff"/>
+      <stop offset="1" stop-color="#2981ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="24" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="91" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="2"/>
+  <circle cx="128" cy="128" r="75" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="2" stroke-dasharray="5 8"/>
+  <!-- stylised tattoo / ink emblem -->
+  <path d="M128 57c-13 17-32 25-53 26 9 11 16 22 20 34-13-3-26-2-39 4 17 10 29 21 36 35-11 3-22 10-31 20 22 0 39 6 52 18 3-20 8-36 15-48 7 12 12 28 15 48 13-12 30-18 52-18-9-10-20-17-31-20 7-14 19-25 36-35-13-6-26-7-39-4 4-12 11-23 20-34-21-1-40-9-53-26Z" fill="none" stroke="#f4f4f5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 78v85M94 108c16 6 27 16 34 30M162 108c-16 6-27 16-34 30" fill="none" stroke="url(#accent)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M116 181c0-7 5-12 12-12s12 5 12 12-12 19-12 19-12-12-12-19Z" fill="url(#accent)"/>
+</svg>

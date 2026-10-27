@@ -1,0 +1,635 @@
+.notify {
+  border: none !important;
+
+  --color-primary: #bd5928;
+  background: radial-gradient(
+      292.44% 127.19% at -7.58% 105.36%,
+      rgba(189, 89, 40, 0.24) 0%,
+      rgba(77, 189, 96, 0) 100%
+    ),
+    rgba(0, 0, 0, 0.7);
+}
+
+.notify .title::before {
+  content: "";
+
+  top: 50%;
+  left: 6px;
+
+  width: 20px;
+  height: 20px;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.notify .icon {
+  border-radius: 0.25rem;
+  border: 0.0625rem solid #bd5928;
+  background: linear-gradient(270deg, #bd5928 0%, rgba(189, 89, 40, 0.7) 100%);
+  box-shadow: 0px 0px 13.5px 0px rgba(189, 89, 40, 0.35);
+}
+
+.notify.admin {
+  --color-primary: #b80100;
+  background: linear-gradient(
+      309deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(184, 1, 0, 0.2) 84.53%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.64) 100%);
+}
+
+.notify.admin .title {
+  border-radius: 3px;
+  border: 1px solid #b80100;
+  background: linear-gradient(270deg, #b80100 0%, #850100 100%);
+  box-shadow: 0px 0px 13.5px 0px rgba(179, 15, 35, 0.35);
+}
+
+.notify.admin .title::before {
+  background: url(./icons/admin.svg);
+}
+
+.notify.success {
+  --color-primary: #02c82d;
+  background: linear-gradient(
+      309deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(77, 189, 96, 0.2) 84.53%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.64) 100%);
+}
+
+.notify.success .title {
+  border-radius: 3px;
+  border: 1px solid #4dbd60;
+  background: linear-gradient(135deg, #4dbd60 0%, #388a46 100%);
+}
+
+.notify.success .title::before {
+  background: url(./icons/success.svg);
+}
+
+.notify.refused {
+  --color-primary: #d3132f;
+
+  background: linear-gradient(
+      309deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(174, 0, 0, 0.2) 84.53%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.64) 100%);
+}
+
+.notify.refused .title {
+  border-radius: 3px;
+  border: 1px solid #f92e3e;
+  background: linear-gradient(270deg, #f92e3e 0%, #ad202b 100%);
+  box-shadow: 0px 0px 13.5px 0px rgba(249, 46, 62, 0.35);
+}
+
+.notify.refused .title::before {
+  background: url(./icons/refused.svg);
+}
+
+.notify.important {
+  --color-primary: #ffba08;
+
+  background: linear-gradient(
+      309deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(255, 186, 8, 0.2) 84.53%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.64) 100%);
+}
+
+.notify.important .title {
+  border-radius: 3px;
+  border: 1px solid #ffba08;
+  background: linear-gradient(270deg, #ffba08 0%, #cc9506 100%);
+  box-shadow: 0px 0px 13.5px 0px rgba(255, 186, 8, 0.35);
+}
+
+.notify.important .title::before {
+  background: url(./icons/bell.svg);
+}
+
+.announce.police {
+  --color-primary: #2c64bd;
+
+  background: linear-gradient(
+      263deg,
+      rgba(44, 100, 189, 0) 30%,
+      rgba(44, 100, 189, 0.4) 100%
+    ),
+    rgba(0, 0, 0, 0.4);
+}
+
+.notifyTag.police {
+  background: #2c64bd;
+}
+
+.announce.hospital {
+  --color-primary: #ffffff;
+
+  background: linear-gradient(
+      263deg,
+      rgba(198, 198, 198, 0) 0%,
+      rgba(255, 0, 0, 0.4) 100%
+    ),
+    rgba(0, 0, 0, 0.22);
+}
+
+.notifyTag.hospital {
+  background: #ffffff;
+}
+
+.announce.mechanic {
+  --color-primary: #ff4c00;
+
+  background: linear-gradient(
+      263deg,
+      rgba(198, 198, 198, 0) 30%,
+      rgba(255, 76, 0, 0.4) 100%
+    ),
+    rgba(0, 0, 0, 0.4);
+}
+
+.announce.staff {
+  --color-primary: #5900ff;
+
+  background: linear-gradient(
+      263deg,
+      rgba(198, 198, 198, 0) 30%,
+      #5900ff66 100%
+    ),
+    rgba(0, 0, 0, 0.4);
+}
+
+.notifyTag.mechanic {
+  background: #ff4c00;
+}
+
+.announce.kids {
+  --color-primary: #c6c6c6;
+
+  background: linear-gradient(
+      263deg,
+      rgba(255, 243, 201, 0.13) 0%,
+      rgba(241, 203, 66, 0.4) 100%
+    ),
+    rgba(0, 0, 0, 0.22);
+}
+
+.notifyTag.kids {
+  background: #c6c6c6;
+}
+
+.announce.party {
+  --color-primary: #c6c6c6;
+
+  animation: rainbow-bg 3s linear;
+  animation-iteration-count: infinite;
+}
+
+.notifyTag.party {
+  background: #c6c6c6;
+}
+
+.announce.fireman {
+  --color-primary: #d3132f;
+  border-radius: 0.4375rem;
+  background: linear-gradient(
+      235deg,
+      rgba(211, 19, 47, 0.16) 43.18%,
+      rgba(211, 19, 47, 0) 108.06%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(17, 17, 17, 0.7) 0%,
+      rgba(11, 11, 11, 0.66) 100%
+    );
+}
+
+.announce.recruitment {
+  --color-primary: #d3132f;
+  border-radius: 0.3125rem;
+  box-shadow: inset 0 0 0 .05rem rgba(0, 0, 0, 0);
+  background: linear-gradient(
+      167deg,
+      rgba(0, 0, 0, 0) -7.5%,
+      rgba(211, 19, 47, 0.28) 87.87%
+    ),
+    rgba(15, 15, 15, 0.7);
+}
+
+.notifyTag.fireman {
+  background: #d3132f;
+}
+
+.announce.juridico {
+  --color-primary: #d69718;
+  border-radius: 0.4375rem;
+  background: linear-gradient(
+      235deg,
+      rgba(43, 42, 42, 0.774) 43.18%,
+      rgba(58, 58, 58, 0) 108.06%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(17, 17, 17, 0.7) 0%,
+      rgba(11, 11, 11, 0.66) 100%
+    );
+}
+
+.announce.vip {
+  --color-primary: #d69718;
+  border-radius: 0.4375rem;
+  background: linear-gradient(
+      235deg,
+      rgba(214, 151, 24, 0.16) 43.18%,
+      rgba(214, 151, 24, 0) 108.06%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(17, 17, 17, 0.7) 0%,
+      rgba(11, 11, 11, 0.66) 100%
+    );
+}
+
+.notifyTag.vip {
+  background: #d69718;
+}
+
+.gradient {
+  border-radius: 0.0625rem !important;
+  border: 1px solid #b80100 !important;
+  background: linear-gradient(135deg, #b80100 0%, #850100 100%) !important ;
+}
+
+@keyframes rainbow-bg {
+  100%,
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
+  8% {
+    background-color: rgba(255, 127, 0, 0.4);
+  }
+  16% {
+    background-color: rgba(255, 255, 0, 0.4);
+  }
+  25% {
+    background-color: rgba(127, 255, 0, 0.4);
+  }
+  33% {
+    background-color: rgba(0, 255, 0, 0.4);
+  }
+  41% {
+    background-color: rgba(0, 255, 127, 0.4);
+  }
+  50% {
+    background-color: rgba(0, 255, 255, 0.4);
+  }
+  58% {
+    background-color: rgba(0, 127, 255, 0.4);
+  }
+  66% {
+    background-color: rgba(0, 0, 255, 0.4);
+  }
+  75% {
+    background-color: rgba(127, 0, 255, 0.4);
+  }
+  83% {
+    background-color: rgba(255, 0, 255, 0.4);
+  }
+  91% {
+    background-color: rgba(255, 0, 127, 0.4);
+  }
+}
+
+.logo {
+  height: 6.5rem;
+  margin-top: -1rem;
+}
+
+.cupom {
+  height: 7rem;
+}
+
+
+/* ========================================================================== */
+/* FOME E SEDE - integrado diretamente na build usada pelo fxmanifest          */
+/* ========================================================================== */
+.needs-hud {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 6.2rem;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .42rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(.35rem);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease, bottom .22s ease;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.needs-hud.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.needs-hud.vehicle-open {
+  bottom: 15.5rem;
+}
+
+.needs-row {
+  height: 1.375rem;
+  display: flex;
+  align-items: center;
+  gap: .375rem;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .45));
+}
+
+.needs-icon {
+  width: 45px;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--needs-color);
+  background: linear-gradient(90deg, var(--needs-color) 0%, var(--needs-color-dark) 100%);
+  border-radius: .14rem;
+}
+
+.needs-icon img {
+  width: .95rem;
+  height: .95rem;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.needs-bar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.needs-bar > span {
+  width: .75rem;
+  height: 100%;
+  border-radius: .08rem;
+  border: 1px solid transparent;
+  background: linear-gradient(90deg, rgba(0, 0, 0, .52), rgba(0, 0, 0, .36));
+  transition: background .18s ease, border-color .18s ease, opacity .18s ease;
+}
+
+.needs-bar > span.is-filled {
+  border-color: var(--needs-color);
+  background: linear-gradient(90deg, var(--needs-color), var(--needs-color-dark));
+}
+
+
+.needs-food {
+  --needs-color: #e89c38;
+  --needs-color-dark: #a85f17;
+}
+
+.needs-water {
+  --needs-color: #2c9eff;
+  --needs-color-dark: #1761b5;
+}
+
+.needs-row.is-critical {
+  animation: needs-critical-pulse 1.25s ease-in-out infinite;
+}
+
+@keyframes needs-critical-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .58; }
+}
+
+@media (max-width: 1280px) {
+  .needs-hud { right: 1.25rem; bottom: 5.6rem; }
+  .needs-hud.vehicle-open { bottom: 14.5rem; }
+}
+
+/* ========================================================================== */
+/* FOME/SEDE ADAPTATIVOS - HUD V1 / HUD V2                                    */
+/* O /trocarhud informa o layout atual via evento hud:layout.                  */
+/* ========================================================================== */
+
+/* HUD V2: mantém o estilo em barras e posiciona conforme o velocímetro. */
+.needs-hud.hud-stats-2 {
+  right: 1.25rem;
+  bottom: 6.2rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .42rem;
+}
+
+.needs-hud.hud-stats-2.vehicle-open.hud-velo-1 {
+  bottom: 15.5rem;
+}
+
+.needs-hud.hud-stats-2.vehicle-open.hud-velo-2 {
+  bottom: 17.2rem;
+}
+
+/* HUD V1: fome e sede passam a seguir a linguagem circular da vida/colete. */
+.needs-hud.hud-stats-1 {
+  right: 5.15rem;
+  bottom: 1.1rem;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+}
+
+.needs-hud.hud-stats-1 .needs-row {
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--needs-color) 0deg var(--needs-progress, 360deg),
+    rgba(11, 11, 11, .82) var(--needs-progress, 360deg) 360deg
+  );
+  box-shadow: 0 0 0 .18rem rgba(0, 0, 0, .30), 0 .14rem .28rem rgba(0, 0, 0, .45);
+  filter: none;
+}
+
+.needs-hud.hud-stats-1 .needs-row::after {
+  content: '';
+  position: absolute;
+  inset: .24rem;
+  border-radius: 50%;
+  background: linear-gradient(90deg, rgba(17, 17, 17, .92), rgba(26, 26, 26, .84));
+  z-index: 0;
+}
+
+
+.needs-hud.hud-stats-1 .needs-food {
+  --needs-inner: rgba(67, 45, 17, .92);
+  --needs-glow: rgba(232, 156, 56, .20);
+}
+
+.needs-hud.hud-stats-1 .needs-water {
+  --needs-inner: rgba(17, 43, 67, .92);
+  --needs-glow: rgba(44, 158, 255, .20);
+}
+.needs-hud.hud-stats-1 .needs-icon {
+  position: relative;
+  z-index: 1;
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--needs-inner);
+  box-shadow: inset 0 0 .7rem var(--needs-glow);
+}
+
+.needs-hud.hud-stats-1 .needs-icon img {
+  width: 1rem;
+  height: 1rem;
+}
+
+.needs-hud.hud-stats-1 .needs-bar {
+  display: none;
+}
+
+/* HUD V1 + Velocímetro V1: dois círculos ficam acima do conjunto inferior. */
+.needs-hud.hud-stats-1.vehicle-open.hud-velo-1 {
+  right: 1.25rem;
+  bottom: 7.35rem;
+  flex-direction: row;
+  gap: .65rem;
+}
+
+/* HUD V1 + Velocímetro V2: cria uma segunda coluna ao lado da vida/colete. */
+.needs-hud.hud-stats-1.vehicle-open.hud-velo-2 {
+  right: 23rem;
+  bottom: 1.1rem;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+@media (max-width: 1280px) {
+  .needs-hud.hud-stats-2 { right: 1.1rem; bottom: 5.6rem; }
+  .needs-hud.hud-stats-2.vehicle-open.hud-velo-1 { bottom: 14.5rem; }
+  .needs-hud.hud-stats-2.vehicle-open.hud-velo-2 { bottom: 16.2rem; }
+
+  .needs-hud.hud-stats-1 { right: 4.85rem; bottom: .9rem; }
+  .needs-hud.hud-stats-1.vehicle-open.hud-velo-1 { right: 1.1rem; bottom: 6.85rem; }
+  .needs-hud.hud-stats-1.vehicle-open.hud-velo-2 { right: 21.8rem; bottom: .9rem; }
+}
+
+/* ========================================================================== */
+/* AJUSTE FINAL HUD V1 - FOME/SEDE EMPILHADAS E ANEL SEGMENTADO               */
+/* ========================================================================== */
+.needs-ring {
+  display: none;
+}
+
+.needs-hud.hud-stats-1 {
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.needs-hud.hud-stats-1 .needs-row {
+  width: 3rem;
+  height: 3rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(90deg, rgba(17, 17, 17, .80) 0%, rgba(26, 26, 26, .56) 100%);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, .25);
+  filter: none;
+}
+
+.needs-hud.hud-stats-1 .needs-row::after {
+  display: none;
+}
+
+.needs-hud.hud-stats-1 .needs-ring {
+  display: block;
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  overflow: visible;
+}
+
+.needs-hud.hud-stats-1 .needs-ring-progress {
+  transition: stroke-dashoffset .18s linear, stroke .18s ease;
+}
+
+.needs-hud.hud-stats-1 .needs-icon {
+  position: relative;
+  z-index: 2;
+  width: 1.875rem;
+  height: 1.875rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--needs-inner);
+  box-shadow: none;
+}
+
+.needs-hud.hud-stats-1 .needs-food {
+  --needs-inner: rgba(232, 156, 56, .15);
+}
+
+.needs-hud.hud-stats-1 .needs-water {
+  --needs-inner: rgba(44, 158, 255, .15);
+}
+
+.needs-hud.hud-stats-1 .needs-icon img {
+  width: .95rem;
+  height: .95rem;
+}
+
+/* Sempre um em cima do outro, inclusive HUD V1 + Velocímetro V1. */
+.needs-hud.hud-stats-1.vehicle-open.hud-velo-1 {
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: .75rem;
+}
+
+/* ========================================================================== */
+/* HUD V1 - COLUNA UNICA: FOME > SEDE > VIDA > COLETE                         */
+/* Mantem os quatro indicadores alinhados, inclusive com os dois velocimetros. */
+/* ========================================================================== */
+.needs-hud.hud-stats-1 {
+  right: 1.75rem !important;
+  bottom: 9rem !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: .75rem !important;
+}
+
+.needs-hud.hud-stats-1.vehicle-open.hud-velo-1 {
+  right: 1.75rem !important;
+  bottom: 9rem !important;
+}
+
+/* HUD V1 + Velo V2: a HUD fica à direita; o velocímetro é deslocado
+   para a esquerda no componente, mantendo um pequeno espaço entre ambos. */
+.needs-hud.hud-stats-1.vehicle-open.hud-velo-2 {
+  /* Alinha fome/sede exatamente no mesmo eixo visual de vida/colete. */
+  right: 2.35rem !important;
+  bottom: 9rem !important;
+}
+

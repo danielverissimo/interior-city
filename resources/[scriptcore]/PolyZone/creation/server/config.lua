@@ -1,0 +1,39 @@
+Config = Config or {}
+Config.ConfigFormatEnabled = false
+-- Default Format
+--
+-- This file is SERVER-side and is used by PolyZone/creation/server/creation.lua
+-- to decide which output format to print into polyzone_created_zones.txt.
+--
+-- IMPORTANT:
+-- Do NOT create zones here (PolyZone:Create / CircleZone:Create / BoxZone:Create),
+-- because PolyZone is a CLIENT library and does not exist on the server.
+--
+-- If you want to auto-create zones, put them in a CLIENT file (example: creation/client/custom_zones.lua)
+
+-- Example outputs (kept as reference):
+--
+-- Name: TestBox | 2022-04-13T22:46:17Z
+-- BoxZone:Create(vector3(-344.16, -103.25, 39.02), 1, 1, {
+--     name = "TestBox",
+--     heading = 0,
+--     --debugPoly = true
+-- })
+--
+-- Name: TestCircle | 2022-04-13T22:46:39Z
+-- CircleZone:Create(vector3(-344.16, -103.25, 39.02), 1.0, {
+--     name = "TestCircle",
+--     useZ = false,
+--     --debugPoly = true
+-- })
+--
+-- Name: TestPoly | 2022-04-13T22:46:55Z
+-- PolyZone:Create({
+--     vector2(-344.15713500977, -103.24993896484),
+--     vector2(-343.69491577148, -100.99839019775),
+--     vector2(-345.53350830078, -102.00588226318)
+-- }, {
+--     name = "TestPoly",
+--     minZ = 39.015644073486,
+--     maxZ = 39.015865325928
+-- })

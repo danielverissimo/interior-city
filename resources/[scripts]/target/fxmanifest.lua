@@ -1,0 +1,30 @@
+
+fx_version "bodacious"
+game "gta5"
+
+dependencies {
+    "vrp",
+    "PolyZone",
+    "inventory"
+}
+
+ui_page "web-side/index.html"
+
+client_scripts {
+	"@vrp/lib/utils.lua",
+	"@PolyZone/client.lua",
+	"@PolyZone/BoxZone.lua",
+	"@PolyZone/EntityZone.lua",
+	"@PolyZone/CircleZone.lua",
+	"@PolyZone/ComboZone.lua",
+	"client-side/*"
+}
+
+server_scripts {
+	"@vrp/lib/utils.lua",
+	"server-side/*"
+} 
+
+files {
+	"web-side/*"
+}                                                                      

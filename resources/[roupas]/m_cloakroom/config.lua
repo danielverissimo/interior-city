@@ -1,0 +1,2 @@
+-- Configuração migrada para config.json.
+-- Este arquivo permanece apenas para sobrescrever versões antigas durante a instalação.

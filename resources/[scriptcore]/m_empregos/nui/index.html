@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sweetalert2.min.css">
+    <title> </title>
+</head>
+<body>
+    <div id="app">
+            <div id="box" v-if="painel == 'central'">
+            
+                <div class="header_title">Central de Empregos</div>
+
+                <div class="emp_player">Atual emprego: {{ at_emprego }}</div>
+
+                <!-- <button class="uniform colocar_uniform"><img src="images/c_un.png" class="img_uniform img_c">Colocar Uniforme</button>
+                <button class="uniform retirar_uniform"><img src="images/r_un.png" class="img_uniform img_r">Retirar Uniforme</button> -->
+
+                <div class="container_box">
+                    <div class="container c_central" v-for="info in empInfosOrdenado" :key="info.index">
+
+                        <img src="images/star.png" class="favorite" v-if="at_emprego === info.index">
+                        <img class="img_emprego" :class="{ ativo: at_emprego === info.index }" :src="'images/' + info.index + '.jpg'" alt="" @click="confirm(at_emprego,info.index,info.inicio)">
+                        
+                        <div class="overlay_nome">
+                            <span>{{ info.index }}</span>
+                        </div>
+
+                        <div class="box_dados"v-if="emp_data.find(e => e.emprego === info.index)">
+
+                            <li class="t_dados">
+                            Nivel:
+                            {{ emp_data.find(e => e.emprego === info.index).nivel }} de {{ info.total_nivel }}
+                            </li>
+
+                            <li class="t_dados">
+                            
+                            <span v-if="emp_data.find(e => e.emprego === info.index).nivel >= info.total_nivel">Nível máximo</span>
+                            <span v-else>Experiência: {{ emp_data.find(e => e.emprego === info.index).xp }} / {{ info.xp_for_level[emp_data.find(e => e.emprego === info.index).nivel - 1] }}</span>
+                            </li>
+
+                            <img
+                            src="images/menu-bar.png"
+                            class="dados_options"
+                            v-if="at_emprego === info.index"
+                            @click.stop="toggleMenu(info.index, $event)"
+                            />
+
+                            <!-- Aba lateral -->
+                            <div
+                            class="menu_actions"
+                            v-if="menuOpen && menuEmprego === info.index"
+                            
+                            @click.stop
+                            >
+                            <button class="menu_item" @click="actionUniform('colocar', info.index)">Colocar Uniforme</button>
+                            <button class="menu_item" @click="actionUniform('retirar', info.index)">Retirar Uniforme</button>
+                            <button class="menu_item danger" @click="pedirDemissao(info.index)">Pedir Demissão</button>
+                            </div>
+
+                        </div>                       
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="box_status" v-if="painel == 'status'">
+
+                <div class="status_title">Status do emprego</div>
+
+                    <div class="box_dados_status">
+
+                        <li class="t_dados_status">
+                        Nivel
+                        {{ emp_data.find(e => e.emprego === at_emprego).nivel }}
+                        </li>
+
+                        <li class="t_dados_status">
+                        
+                        <span v-if="emp_data.find(e => e.emprego === at_emprego).nivel >= emp_infos[at_emprego].total_nivel">Nível máximo</span>
+                        <span v-else>Experiência: {{ emp_data.find(e => e.emprego === at_emprego).xp }} / {{ emp_infos[at_emprego].xp_for_level[emp_data.find(e => e.emprego === at_emprego).nivel - 1] }}</span>
+                        </li>
+
+                    </div>                       
+            
+                <!-- <div class="emp_player">Atual emprego: {{ at_emprego }}</div> -->
+                
+                <div class="container c_status" :key="at_emprego">
+                    <img src="images/star.png" class="favorite">
+                    <img class="img_emprego a_status" :src="'images/' + at_emprego + '.jpg'" alt="" @click="">     
+                    
+                    <div class="overlay_nome">
+                        <span v-if="at_emprego === 'Eletricista'">EM BREVE</span>
+                        <span v-else>{{ at_emprego }}</span>
+                    </div>
+                </div>   
+                <!-- <span class="esc_close">ESC para fechar</span> -->
+            </div>
+
+            <div id="box" v-if="painel == 'trucker'">
+            
+                <div class="header_title">Central de Caminhoneiros</div>
+
+                <div class="emp_player">Escolha sua carga:</div>
+
+                    <div class="container_box">
+                        <div class="container c_central" v-for="k in trucker">
+                            
+                            <img class="img_trucker" :src="'images/' + k.type + '.jpg'" alt="" @click="select_trucker(k.type)">
+                            
+                            <div class="overlay_nome">
+                                <span>{{ k.type }}</span>
+                            </div>
+
+                        </div>                       
+
+                    </div>
+                </div>     
+
+                    
+                </div>
+            </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script type="text/javascript" src="script.js"></script>
+</html>

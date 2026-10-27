@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Cloakroom</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,500,700,900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+    <div id="app">
+        <div class="actionmenu" v-if="show">
+            <div class="conteudo">
+				
+                <div class="itens">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="icon_cabd" viewBox="0 0 21 21" fill="none">
+                        <path d="M10.3268 9.30125V9.05275C10.3268 8.31425 11.1081 7.74112 11.6305 7.17237C11.9035 6.87487 12.061 6.47937 12.061 6.04625C12.061 5.12312 11.2289 4.375 10.2025 4.375C9.17525 4.375 8.344 5.12312 8.344 6.04625L10.3268 9.30125ZM10.3268 9.30125C10.974 9.29074 11.6092 9.47686 12.1485 9.835L14 11.0845L10.3268 9.30125ZM10.3268 9.30125C9.685 9.30547 9.05948 9.50427 8.53213 9.87L2.32313 14.2363C1.21013 15.0194 1.82613 16.625 3.24013 16.625H17.7608C19.1896 16.625 19.7951 14.9896 18.6524 14.2188L16.625 12.8537" stroke="#F8F8F8" stroke-width="1.125" stroke-linecap="round"/>
+                    </svg>
+                    <p id="text_top_title"><b>VESTIARIO</b></p>
+                    <section class="sessaoItens">
+                        <div class="conteudoSessao">
+
+                            <div class="itemSessao item-item" idd category="fardas" v-for="k in table">
+                                <div class="green_glow"></div>
+                                <div class="item-info" @click="take_un(k.fardas)">
+                                    <div class="fotoItem">
+                                        <svg xmlns="http://www.w3.org/2000/svg" id="imgdft" viewBox="0 0 21 24" fill="none">
+                                            <path d="M9.70781 11.1281L7.0875 3.26719C7.90312 3.73594 9.02812 4.125 10.5 4.125C11.9719 4.125 13.0969 3.73594 13.9125 3.26719L10.6172 13.1531C10.5422 13.3828 10.5 13.6219 10.5 13.8656V21.75C10.5 22.9922 11.5078 24 12.75 24H18.75C19.9922 24 21 22.9922 21 21.75V12.6797C21 12.2344 20.8687 11.8031 20.6203 11.4328L18.375 8.06719C18.1266 7.69688 17.9953 7.26562 17.9953 6.82031V2.25C17.9953 1.00781 16.9875 0 15.7453 0H15.45C14.5781 0 13.8609 0.454687 13.3922 0.88125C12.9563 1.275 12.0562 1.875 10.5 1.875C8.94375 1.875 8.04375 1.275 7.60781 0.88125C7.13906 0.454687 6.42188 0 5.54531 0H5.25C4.00781 0 3 1.00781 3 2.25V6.82031C3 7.26562 2.86875 7.69688 2.62031 8.06719L0.379688 11.4328C0.13125 11.8031 0 12.2391 0 12.6797V21.75C0 22.9922 1.00781 24 2.25 24H8.25C8.71406 24 9.14062 23.8594 9.50156 23.6203C9.18281 23.0719 9 22.4297 9 21.75V13.8656C9 13.4625 9.06563 13.0641 9.19219 12.6797L9.70781 11.1281ZM16.2797 16.7203L18.5297 18.9703C18.8203 19.2609 18.8203 19.7391 18.5297 20.0297C18.2391 20.3203 17.7609 20.3203 17.4703 20.0297L15.2203 17.7797C14.9297 17.4891 14.9297 17.0109 15.2203 16.7203C15.5109 16.4297 15.9891 16.4297 16.2797 16.7203ZM2.47031 18.9703L4.72031 16.7203C5.01094 16.4297 5.48906 16.4297 5.77969 16.7203C6.07031 17.0109 6.07031 17.4891 5.77969 17.7797L3.52969 20.0297C3.23906 20.3203 2.76094 20.3203 2.47031 20.0297C2.17969 19.7391 2.17969 19.2609 2.47031 18.9703Z" fill="#F8F8F8"/>
+                                        </svg> 
+                                    </div>
+                                    
+                                    <p id="text_item"><b>{{ k.tipo }}</b></p>
+                                    
+                                </div>
+                                <!-- <div class="triangle-frame-interactions-left"></div> -->
+                                <div class="triangle-frame-interactions-right"></div>
+                            </div>
+
+                            <!-- <div class="itemSessao item-item" category="fardas">
+                                <div class="item-info">
+                                    <div class="fotoItem">
+                                        <img src="images/offuniform.png">
+                                    </div>
+                                    <div class="tituloItem">
+                                        <p><b></b></p>
+                                    </div>
+                                </div>
+                            </div> -->
+
+                            
+                        </div>
+                        
+                        <div class="pagamento">
+                            <div class="red_glow"></div>
+                            <button data-action="off-uniform" class="menuoption" @click="remove_un()">RETIRAR UNIFORME</button>
+                        </div>
+
+                    </section>
+                </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+        <script type="text/javascript" src="script.js"></script>
+    </body>
+</html>

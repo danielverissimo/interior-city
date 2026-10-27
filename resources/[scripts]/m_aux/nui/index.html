@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel de Serviço</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <main id="panel" class="panel hidden" aria-hidden="true">
+        <header class="panel-header">
+            <div class="header-copy">
+                <span class="eyebrow">PAINEL DE SERVIÇO</span>
+                <h1 id="panelTitle">SERVIÇO</h1>
+                <p id="panelSubtitle">Selecione uma ação operacional</p>
+            </div>
+            <div class="key-hint"><kbd>ESC</kbd><span>fechar</span></div>
+        </header>
+
+        <section class="toolbar">
+            <div>
+                <strong>Ações disponíveis</strong>
+                <span id="actionCount">0 funções</span>
+            </div>
+            <label class="search-box">
+                <span>⌕</span>
+                <input id="search" type="text" autocomplete="off" placeholder="Buscar função..." />
+            </label>
+        </section>
+
+        <section id="actions" class="actions"></section>
+
+        <footer class="panel-footer">
+            <span class="status-dot"></span>
+            <span>Selecione uma função para continuar</span>
+        </footer>
+    </main>
+
+    <div id="valueModal" class="modal-layer hidden">
+        <div class="modal-card compact">
+            <button class="modal-close" data-close-modal="value">×</button>
+            <span class="modal-kicker">CONFIRMAÇÃO</span>
+            <h2 id="valueTitle">Informe o valor</h2>
+            <p id="valueDescription">Digite o valor para continuar com esta ação.</p>
+            <div class="currency-input">
+                <span>R$</span>
+                <input id="valueInput" type="number" inputmode="numeric" min="0" max="500000" placeholder="0" />
+            </div>
+            <div class="modal-actions">
+                <button class="btn secondary" data-close-modal="value">Cancelar</button>
+                <button id="confirmValue" class="btn primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal-layer hidden">
+        <div class="modal-card details-card">
+            <button class="modal-close" data-close-modal="details">×</button>
+            <span class="modal-kicker">CONSULTA</span>
+            <h2 id="detailsTitle">Dados do cidadão</h2>
+            <div id="detailsGrid" class="details-grid"></div>
+            <div class="modal-actions single">
+                <button class="btn primary" data-close-modal="details">Fechar consulta</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Aviso público do setor. Fica fora do painel para permanecer visível
+         mesmo quando o F2 estiver fechado. -->
+    <div id="departmentScreenAlert" class="department-screen-alert" aria-live="assertive" aria-hidden="true">
+        <div class="department-screen-alert-kicker">
+            <span class="department-screen-alert-kicker-dot"></span>
+            <span id="departmentScreenAlertKind">AVISO</span>
+        </div>
+        <div id="departmentScreenAlertText" class="department-screen-alert-text">Mensagem do setor</div>
+        <div class="department-screen-alert-timer-wrap">
+            <span class="department-screen-alert-dot"></span>
+            <span id="departmentScreenAlertTime" class="department-screen-alert-time">00:15</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

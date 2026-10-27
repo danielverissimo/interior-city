@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+.box {
+    position: relative;
+    width: 53vw;
+    height: 53vh;
+    /* border: 2px solid #655f5f98; */
+    /* background-color: #191919a8; */
+    border-radius: 12px;
+    background-image: url("images/panel1.png");
+    background-repeat: no-repeat;
+    background-position: center bottom; /* 👈 importante */
+    background-size: contain; /* 👈 NÃO CORTA */
+
+}
+
+.t_box {
+    position: absolute;
+    top: 3.2vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Ubuntu", sans-serif;
+    font-size: 1.1vw;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+
+    color: #ffffff79;
+}
+
+.ct_buttons {
+    position: absolute;
+    width: 14vw;
+    height: 38vh;
+    top: 8.555555vh;
+    border-radius: 1vw;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(120,180,255,.35);
+    box-shadow:
+        0 0 0.4vw rgba(120,180,255,.25),
+        inset 0 0 0.3vw rgba(120,180,255,.15);
+}
+
+.ct_buttons::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    border-radius: 1vw;
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.ct_buttons:hover::after {
+    opacity: 1;
+}
+
+.sul {
+    left: 4.25555vw;
+    background-image: url("images/sul.png");
+    background-repeat: no-repeat;
+    background-size: cover;  
+}
+
+.norte {
+    right: 20.244545545vw;
+    background-image: url("images/norte.png");
+    background-repeat: no-repeat;
+    background-size: cover;  
+}
+
+.sul,
+.norte {
+    transition: transform .35s ease;
+    will-change: transform;
+}
+
+.sul:hover,
+.norte:hover {
+    transform: rotate(-2deg) scale(1.02);
+}
+
+.overlay_nome {
+    position: absolute;
+    z-index: 1;
+
+    font-family: "Ubuntu", sans-serif;
+    font-size: 1.1vw;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+
+    color: #fff;
+
+
+    backdrop-filter: blur(1px);
+
+    opacity: 0;
+    transition: opacity 0.25s ease;
+
+    pointer-events: none;
+}
+
+.ct_buttons:hover .overlay_nome {
+    opacity: 1;
+}
+
+.ct_ranking {
+    position: absolute;
+    width: 16.0vw;
+    height: 39vh;
+    /* background: #111111a4; */
+    border: 1px solid rgba(120,180,255,.35);
+    box-shadow:
+        0 0 0.4vw rgba(120,180,255,.25),
+        inset 0 0 0.3vw rgba(120,180,255,.15);
+    top: 8.155555vh;
+    right: 3.8333vw;
+    border-radius: 1vw;
+}
+
+.t_rk {
+    position: absolute;
+    top: 3vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: #fff;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.0222vw;
+}
+
+.box_rk{
+    position: absolute;
+    width: 15.555vw;
+    height: 32vh;
+    top: 6vh;
+    left: 0.233333vw;
+    border-radius: 1vw;
+    padding: 0.8vh 0.5vw;
+    /* background: #1111116b; */
+    border: 1px solid rgba(255,255,255,.06);
+    /* backdrop-filter: blur(8px); */
+}
+
+.result_ranking{
+    position: relative;
+    width: 100%;
+    height: 3.3vh;
+    margin-bottom: 0.7vh;
+
+    display: flex;
+    align-items: center;
+    gap: 0.45vw;
+
+    /* background: rgba(255,255,255,.05); */
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 0.45vw;
+
+    padding: 0 0.6vw;
+}
+
+/* hover bem suave */
+.result_ranking:hover{
+    transform: translateY(-1px);
+    background: rgba(255,255,255,.08);
+    border-color: rgba(255,255,255,.10);
+}
+
+/* badge do rank [1] */
+.result_ranking .rk_badge{
+    min-width: 1.6vw;
+    height: 2.1vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.65vw;
+    font-weight: 700;
+    letter-spacing: .08em;
+
+    color: rgba(255,255,255,.92);
+    background: rgba(80,140,255,.22);
+    border: 1px solid rgba(80,140,255,.35);
+    border-radius: 0.35vw;
+}
+
+/* nome */
+.players{
+    position: static; /* tira o absolute */
+    color: rgba(255,255,255,.92);
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 600;
+    font-size: 0.82vw;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ptr_n{
+
+    position: absolute; /* tira o absolute */
+
+    right: 1vw;
+    color: rgba(255,255,255,.92);
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 500;
+    font-size: 0.62vw;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.b_enc {
+    position: absolute;
+    width: 10.555vw;
+    height: 3vh;
+    top: 4vh;
+    left: 5.833333vw;
+
+    border-radius: 6px;
+    border: 1px solid rgba(255, 90, 90, 0.45);
+
+    background: linear-gradient(
+        180deg,
+        rgba(255, 90, 90, 0.22),
+        rgba(140, 20, 20, 0.35)
+    );
+
+    font-family: "Ubuntu", sans-serif;
+    font-size: 0.72vw;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+
+    color: #ffb3b3;
+    
+    transition: all 0.25s ease;
+}
+
+.b_enc:hover {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 110, 110, 0.45),
+        rgba(170, 25, 25, 0.6)
+    );
+
+    color: #ffffff;
+    box-shadow:
+        0 0 0.6vw rgba(255, 80, 80, 0.55),
+        inset 0 0 0.4vw rgba(255, 120, 120, 0.35);
+}
+
+.b_enc:active {
+    transform: scale(0.97);
+}
+
+
+
+
+
+
+
+.swal-text {
+    color: #fff;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.swal-popup {
+    border: 1px solid #3b3e47;;
+}

@@ -1,0 +1,23 @@
+SISTEMA DE SLOTS RÁPIDOS / ARMAS
+================================
+
+Implementado neste recurso:
+- Slots 1, 2, 3, 4 e 5 acionados pelas teclas numéricas.
+- Armas só podem ser equipadas pelos slots rápidos 1..5.
+- Pressionar novamente o mesmo slot desequipa a arma.
+- A arma permanece no slot do inventário enquanto estiver equipada.
+- Feedback visual dos 5 slots por 2 segundos, com fade de saída.
+- Roda de armas nativa do GTA (TAB) e seleção nativa por números bloqueadas.
+- Munição pode ser utilizada de qualquer slot do inventário quando a arma correspondente estiver equipada.
+- Estado de munição salvo separadamente em pente (clip) + reserva.
+- Trocar/desequipar/equipar novamente preserva exatamente a munição restante.
+- Persistência em banco na tabela inventory_weapon_ammo.
+- A tabela e a migração são criadas automaticamente no start do resource.
+- Proteção para mover, enviar, derrubar, guardar em baú, vender ou ter a arma retirada enquanto ela estiver equipada.
+
+Não é necessário importar SQL manualmente quando o usuário do banco possui permissão para CREATE/ALTER.
+
+HUD DE ARMA EQUIPADA
+- Enquanto existir uma arma da hotbar fisicamente equipada, aparece no lado direito da tela a imagem do item da arma e a munição no formato PENTE/RESERVA (ex.: 12/130).
+- A contagem é atualizada em tempo real durante tiros e recargas, mas a NUI só recebe atualização quando o valor muda.
+- O HUD some automaticamente com fade ao desequipar, morrer, ser desarmado por outro recurso ou remover a arma do slot.

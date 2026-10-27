@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en" class="no-js">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Loadingscreen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+  <script src="https://unpkg.com/phosphor-icons"></script>
+</head>
+
+<body>
+  <div id="fare"></div>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      font-size: 17px;
+    }
+
+    #myVideo {
+      position: fixed;
+      right: 0;
+
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+
+
+    }
+
+    iframe {
+      display: block !important;
+      width: 100% !important;
+      border: none !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+
+  .overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    /* background: radial-gradient(circle at top right, #d702024f, #023ed700); */
+    transition: opacity .5s;
+    -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+.overlay .container {
+   display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    left: 15px;
+    position: absolute;
+}
+    
+.overlay .container > .socials {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.overlay .container > .socials > .title {
+    writing-mode: vertical-rl;
+    margin: 0;
+
+    color: white;
+    font-size: .8vw;
+    font-family: PoppinsSemibold;
+}
+
+.overlay .container > .socials > .line {
+    flex-shrink: 0;
+
+    margin: .7vw 0vw;
+
+    height: 5vw;
+    width: .05vw;
+
+    background: rgba(255, 255, 255, .2);
+}
+
+.overlay .container > .socials > .buttons > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    margin-bottom: .7vw;
+   
+    width: 2vw;
+    height: 2vw;
+
+    background: white;
+
+    box-shadow: 0 0 .3vw 0 rgba(255, 255, 255, .8);
+    transition: color 0.15s;
+}
+
+.overlay .container > .socials > .buttons > a:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.overlay .container > .socials > .buttons > a::after {
+    content: "Link!";
+    position: absolute;
+    left: 120%;
+    transform: scale(.7);
+
+    width: max-content;
+
+    margin: 0;
+    padding: .3vw .7vw;
+    background: rgba(0, 0, 0, .3);
+
+    color: white;
+    font-size: .6vw;
+    font-family: PoppinsMedium;
+    opacity: .0;
+    backdrop-filter: blur(.5vw);
+
+    pointer-events: none;
+    user-select: none;
+    z-index: 99999;
+    transition: all .15s;
+}
+
+.overlay .container > .socials > .buttons > a.copied::after {
+    transform: scale(1.0);
+    opacity: 1.0;
+}
+
+.overlay .container > .socials > .buttons > a > img {
+    width: 1vw;
+}
+
+@font-face {
+    font-family: "PoppinsSemibold";
+    src: url(./fonts/Poppins-SemiBold.ttf);
+    /* src: url(./fonts/Poppins-SemiBold.ttf); */
+    font-weight: bold;
+}
+
+  </style>
+
+ 
+<video autoplay muted loop id="myVideo" height="100vw">
+  <source src="http://127.0.0.1/loading/intro/intro.mp4" type="video/mp4">
+</video>
+
+<audio id="music" preload="auto" >
+</audio>
+  <div class="player">
+    <div class="button-items">
+      <div class="overlay">
+          <div class="container">
+                  
+        <div class="socials">
+            <p class="title">MIDIAS SOCIAIS</p>
+            <div class="line"></div>
+            <div class="buttons">
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+      <div class="button-row">
+        <button class="button | button--toggle | button--mute">
+          <i class="ph-speaker-none"></i>
+        </button>
+        <button class="button">
+          <i class="ph-skip-back"></i>
+        </button>
+        <button class="button | button--toggle button--play | is-active">
+          <i class="ph-play"></i>
+          <i class="ph-pause"></i>
+        </button>
+        <button class="button">
+          <i class="ph-skip-forward"></i>
+        </button>
+        <button class="button | button--toggle">
+          <i class="ph-repeat"></i>
+        </button>
+      </div>
+      <div class="controls">
+        <span class="expend">
+          <svg id="previous" class="step-backward" viewBox="0 0 25 25" xml:space="preserve">
+            <g>
+              <polygon points="4.9,4.3 9,4.3 9,11.6 21.4,4.3 21.4,20.7 9,13.4 9,20.7 4.9,20.7" />
+            </g>
+          </svg>
+        </span>
+        <svg id="play" viewBox="0 0 25 25" xml:space="preserve">
+          <defs>
+            <rect x="-49.5" y="-132.9" width="446.4" height="366.4" />
+          </defs>
+          <g>
+            <circle fill="none" cx="12.5" cy="12.5" r="10.8" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M8.7,6.9V18c0,0,0.2,1.4,1.8,0l8.1-4.8c0,0,1.2-1.1-1-2L9.8,6.5 C9.8,6.5,9.1,6,8.7,6.9z" />
+          </g>
+        </svg>
+        <svg id="pause" viewBox="0 0 25 25" xml:space="preserve">
+          <g>
+            <rect x="6" y="4.6" width="3.8" height="15.7" />
+            <rect x="14" y="4.6" width="3.9" height="15.7" />
+          </g>
+        </svg>
+        <span class="expend">
+          <svg id="next" class="step-foreward" viewBox="0 0 25 25" xml:space="preserve">
+            <g>
+              <polygon points="20.7,4.3 16.6,4.3 16.6,11.6 4.3,4.3 4.3,20.7 16.7,13.4 16.6,20.7 20.7,20.7" />
+            </g>
+          </svg>
+        </span>
+        <div class="slider">
+          <div class="volume"></div>
+          <input type="range" id="volume" min="0" max="1" step="0.01" value="1" />
+        </div>
+      </div>
+    </div>
+    </li>
+    </ul>
+  </div>
+
+
+
+  <script>
+  
+
+    var rot = 0;
+    var duration;
+    var playPercent;
+    var bufferPercent;
+    var currentSong = 0;
+    var music = $("#music");
+    var volume = document.getElementById("volume");
+    var playButton = document.getElementById("play");
+    var timeline = document.getElementById("slider");
+    var playhead = document.getElementById("elapsed");
+    var pauseButton = document.getElementById("pause");
+    var visablevolume = document.getElementsByClassName("volume")[0];
+    var playerStatus = true
+
+    function load() {
+      music[0].src = "http://127.0.0.1/loading/musicas/musica.mp3";
+      music[0].load();
+      music[0].play();
+      music[0].volume = 0.5;
+      $('.volume').css('width', '35px')
+      $('#volume').val('0.5')
+      setupMidia()
+
+    }
+
+
+
+    function reset() {
+      rotate_reset = setInterval(function () {
+        if (rot == 0) {
+          clearTimeout(rotate_reset);
+        }
+      }, 1);
+      fireEvent(pauseButton, 'click');
+      playhead.style.width = "0px";
+      bufferhead.style.width = "0px";
+      timer.innerHTML = "0:00";
+      music[0].innerHTML = "";
+      currentSong = 0;
+      music[0].src = "http://131.196.198.155/loading/musicas/Abertura_Alemao_01.mp3";
+
+      music[0].load();
+      music[0].play();
+
+    }
+
+    function formatSecondsAsTime(secs, format) {
+      var hr = Math.floor(secs / 3600);
+      var min = Math.floor((secs - (hr * 3600)) / 60);
+      var sec = Math.floor(secs - (hr * 3600) - (min * 60));
+      if (sec < 10) {
+        sec = "0" + sec;
+      }
+      return min + ':' + sec;
+    }
+
+    
+
+
+
+    function fireEvent(el, etype) {
+      if (el.fireEvent) {
+        el.fireEvent('on' + etype);
+      } else {
+        var evObj = document.createEvent('Events');
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
+      }
+    }
+
+
+    playButton.onclick = function () {
+      music[0].play();
+    }
+
+    pauseButton.onclick = function () {
+      music[0].pause();
+    }
+
+    music[0].addEventListener("play", function () {
+      playButton.style.visibility = "hidden";
+      pause.style.visibility = "visible";
+    }, false);
+
+    music[0].addEventListener("pause", function () {
+      playButton.style.visibility = "visible";
+      pause.style.visibility = "hidden";
+    }, false);
+
+
+
+    volume.oninput = function () {
+      music[0].volume = volume.value;
+      visablevolume.style.width = (80 - 11) * volume.value + "px";
+    }
+
+    var t = document.getElementById("cursor");
+
+
+    const bd = document.body, cur = document.getElementById("fare");
+    bd.addEventListener("mousemove", function (n) {
+      (cur.style.left = n.clientX + "px"), (cur.style.top = n.clientY + "px")
+    })
+
+    $('body').keyup(function (e) {
+      if (e.keyCode == 32) {
+        if (playerStatus) {
+          playerStatus = false
+          music[0].pause();
+        } else {
+          playerStatus = true
+          music[0].play();
+        }
+
+      }
+    });
+
+    // Nope. CSS is powerful.
+
+const buttons = document.querySelectorAll(".button--play");
+const checkbox = document.querySelector(".theme-toggle input");
+var play = true
+for (let button of buttons) {
+	button.addEventListener("click", function () {
+		button.classList.toggle("is-active");
+    if(play){
+      music[0].pause();
+      play = false
+    }else{
+      music[0].play();
+      play = true
+    }
+	});
+}
+
+var mute = false
+$('.button--mute').on('click', () => {
+  if(mute){
+      $('.button--mute').removeClass('is-active')
+      $('.button--mute').html('<i class="ph-speaker-none"></i>')
+      music[0].volume = 0.5
+      mute = false
+    }else{
+      $('.button--mute').addClass('is-active')
+      $('.button--mute').html('<i class="ph-speaker-x"></i>')
+      music[0].volume = 0
+      mute = true
+    }
+})
+
+
+// checkbox.addEventListener("keydown", function () {
+// 	if (event.key === "Enter") {
+// 		checkbox.checked = !checkbox.checked;
+// 	}
+// });
+
+window.onload = (event) => {
+  console.log("page is fully loaded");
+    load();
+};
+
+  function setupMidia() {
+      Config = {}; // Don't touch
+
+      // Social media buttons on the left side
+      Config.Socials = [
+        {name: "discord", icon: "icons/discord.png", link: "https://discord.gg/invite/"},
+        { name: "instagram", icon: "icons/instagram.png", link: "https://instagram.com/"},
+        { name: "youtube", icon: "icons/youtube.png", link: "https://www.youtube.com/@UrbanCityRoleplayofc"},
+      ];
+
+      Config.Socials.forEach((social, index) => {
+          $(".socials .buttons").append(`<a href="#" data-link="${social.link}" data-id="${index}"><img src="${social.icon}"></a>`)
+      });
+
+      var copyTimeouts = {};
+      $(".socials .buttons a").on("click", function() {
+          let id = $(this).data("id")
+          let link = $(this).data("link")
+          if(copyTimeouts[id]) clearTimeout(copyTimeouts[id]);
+
+          window.invokeNative('openUrl', link);
+
+
+          $(this).addClass("copied");
+          copyTimeouts[id] = setTimeout(() => {
+              $(this).removeClass("copied")
+              copyTimeouts[id] = undefined;
+          }, 1000);
+      })
+  }
+  
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,207 @@
+*{box-sizing:border-box}
+:root{
+  --ink:#171512;--panel:#1d1a16;--panel-2:#24201b;--panel-3:#2b261f;
+  --line:#3d352c;--line-soft:#312b24;--cream:#f3eadb;--muted:#a99b89;
+  --brass:#c4a36f;--brass-2:#9f7f50;--wood:#76563f;--wood-2:#5b4030;
+  --sage:#9db18b;--danger:#c8756c;
+}
+html,body{margin:0;width:100%;height:100%;font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--cream);background:transparent;overflow:hidden}
+button,input,select{font:inherit}.hidden{display:none!important}
+#app{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(12,10,8,.46)}
+
+.furniture-panel{width:min(1320px,94vw);height:min(820px,90vh);background:linear-gradient(180deg,#1c1915 0%,#171512 100%);border:1px solid rgba(196,163,111,.28);border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.68),inset 0 1px rgba(255,255,255,.025);overflow:hidden;display:flex;flex-direction:column}
+.furniture-header{min-height:112px;display:grid;grid-template-columns:1fr 2.15fr 1fr;align-items:center;padding:14px 26px 12px;border-bottom:1px solid var(--line-soft);background:linear-gradient(180deg,#221e19,#1b1814);position:relative}
+.furniture-header:after{content:"";position:absolute;left:32%;right:32%;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--brass),transparent);opacity:.65}
+.furniture-title-wrap{text-align:center;align-self:center;padding-top:3px;position:relative}
+.furniture-title-wrap h1{font-family:"Cormorant Garamond","Bodoni MT",Didot,Georgia,"Times New Roman",serif;font-size:30px;font-weight:600;letter-spacing:6px;line-height:1.05;margin:9px 0 8px;color:#f7efe2;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+.furniture-title-wrap span{display:block;font-size:11px;letter-spacing:1.25px;text-transform:uppercase;color:#a89479}
+.furniture-title-ornament{width:92px;height:1px;background:linear-gradient(90deg,transparent,var(--brass),transparent);margin:0 auto 4px;opacity:.9}
+.furniture-title-ornament:after{content:"◆";position:absolute;left:50%;top:-5px;transform:translateX(-50%);font-size:8px;color:var(--brass);background:#1f1b17;padding:0 6px}
+.furniture-head-side{display:flex;gap:10px;align-items:center}.furniture-head-side-right{justify-content:flex-end}
+
+.furniture-btn{border:1px solid #493e33;background:#28231e;color:#e8ded0;border-radius:10px;height:40px;padding:0 15px;font-weight:700;cursor:pointer;outline:none;transition:background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease}
+.furniture-btn:hover{background:#342c24;border-color:var(--brass-2);color:#fff8ed;box-shadow:0 7px 20px rgba(0,0,0,.2);transform:translateY(-1px)}
+.furniture-btn:active{transform:translateY(0)}
+.furniture-icon{width:42px;padding:0;font-size:19px}.furniture-btn-primary{background:linear-gradient(180deg,#a88555,#82643f);border-color:#b99863;color:#fff9ef}.furniture-btn-primary:hover{background:linear-gradient(180deg,#b7925d,#927249);border-color:#d0b17c}.furniture-btn-ghost{background:#29241f}
+
+.furniture-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 220px auto;gap:12px;padding:16px 22px;border-bottom:1px solid var(--line-soft);background:#191612}
+.furniture-toolbar input,.furniture-toolbar select,.furniture-config-tools input,.furniture-price-row input{height:43px;border:1px solid #40372e;border-radius:10px;background:#24201c;color:#f0e8dc;padding:0 13px;outline:none;transition:border-color .16s ease,box-shadow .16s ease,background .16s ease}
+.furniture-toolbar input::placeholder,.furniture-config-tools input::placeholder{color:#83786b}.furniture-toolbar input:focus,.furniture-toolbar select:focus,.furniture-config-tools input:focus,.furniture-price-row input:focus{border-color:#9e815b;box-shadow:0 0 0 3px rgba(196,163,111,.09);background:#29241f}
+.furniture-count{display:flex;align-items:center;color:#9d907f;font-size:12px;padding:0 6px;white-space:nowrap}
+
+.furniture-grid{flex:1;min-height:0;padding:18px 22px 26px;overflow-y:auto;overflow-x:hidden;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:max-content;gap:15px;align-content:start;background:radial-gradient(circle at 50% 0%,rgba(118,86,63,.07),transparent 45%),#171512}
+.furniture-card{display:flex;flex-direction:column;min-width:0;min-height:270px;background:linear-gradient(180deg,#28231e,#211d19);border:1px solid #3a322a;border-radius:13px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.16);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.furniture-card:hover{transform:translateY(-3px);border-color:#7c6548;box-shadow:0 15px 30px rgba(0,0,0,.28)}
+.furniture-thumb{height:145px;min-height:145px;background:linear-gradient(145deg,#d8c5a9,#bca486);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-bottom:1px solid #443a30}
+.furniture-thumb:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 -28px 35px rgba(40,29,20,.08)}
+.furniture-thumb>img.furniture-main-image{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;padding:7px;display:block}
+.furniture-fallback{position:absolute;z-index:1;inset:0;display:flex;align-items:stretch;justify-content:stretch;background:#d7c4a7}
+.furniture-fallback img{width:100%;height:100%;object-fit:cover;display:block}
+.furniture-fallback-badge{position:absolute;right:8px;bottom:8px;padding:4px 7px;border-radius:6px;background:rgba(34,26,20,.72);border:1px solid rgba(255,255,255,.12);color:#f4e8d6;font-size:8px;letter-spacing:.5px;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:3}
+.furniture-card-body{display:flex;flex-direction:column;flex:1;padding:13px 12px 12px}.furniture-name{font-family:Georgia,"Times New Roman",serif;font-size:14px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f3e8d8}.furniture-model{font-size:9.5px;color:#877a6b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:5px 0 10px;letter-spacing:.2px}.furniture-price{color:#b8cc9d;font-weight:800;font-size:14px;margin-top:auto}.furniture-buy{width:100%;height:36px;margin-top:10px;border:1px solid #9c7a4d;border-radius:9px;background:linear-gradient(180deg,#76583d,#61452f);color:#fff4e5;font-weight:800;letter-spacing:.75px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}.furniture-buy:hover{background:linear-gradient(180deg,#94704c,#755236);border-color:#c4a36f;transform:translateY(-1px);box-shadow:0 7px 17px rgba(0,0,0,.22)}.furniture-buy:active{transform:translateY(0)}.furniture-buy:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.furniture-empty{grid-column:1/-1;min-height:260px;display:flex;align-items:center;justify-content:center;text-align:center;color:#9b8f7f;font-size:14px;border:1px dashed #4a4035;border-radius:12px;background:#201c18}
+
+.furniture-modal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,12,9,.82);z-index:20}.furniture-modal-card{width:min(940px,86vw);height:min(700px,82vh);background:#1b1814;border:1px solid #554735;border-radius:15px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 28px 85px rgba(0,0,0,.66)}.furniture-modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid #393028;background:#221e19}.furniture-modal-head h2{margin:0;font-family:Georgia,serif;font-size:19px;letter-spacing:1.4px;color:#f3e8d8}.furniture-modal-head p{margin:5px 0 0;color:#958877;font-size:12px}.furniture-config-tools{display:grid;grid-template-columns:minmax(180px,1fr) 170px auto auto;gap:10px;padding:14px 18px;border-bottom:1px solid #393028}.furniture-price-list{padding:14px 18px;overflow:auto}.furniture-price-row{display:grid;grid-template-columns:1fr 190px;gap:16px;align-items:center;padding:11px 12px;border-bottom:1px solid #332c25;border-radius:7px}.furniture-price-row:hover{background:#24201b}.furniture-price-row strong{font-size:13px;color:#eee4d6}.furniture-price-row small{display:block;color:#887b6d;margin-top:3px}.furniture-price-input{width:100%;text-align:right}
+.furniture-grid::-webkit-scrollbar,.furniture-price-list::-webkit-scrollbar{width:8px}.furniture-grid::-webkit-scrollbar-thumb,.furniture-price-list::-webkit-scrollbar-thumb{background:#5d4d3c;border:2px solid #1a1713;border-radius:12px}.furniture-grid::-webkit-scrollbar-thumb:hover,.furniture-price-list::-webkit-scrollbar-thumb:hover{background:#80684e}.furniture-grid::-webkit-scrollbar-track,.furniture-price-list::-webkit-scrollbar-track{background:#181512}
+@media(max-width:1100px){.furniture-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.furniture-config-tools{grid-template-columns:1fr 160px}.furniture-config-tools .furniture-btn{width:100%}}
+@media(max-width:850px){.furniture-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.furniture-header{grid-template-columns:1fr 1.7fr 1fr}.furniture-title-wrap h1{font-size:22px;letter-spacing:3.6px}.furniture-toolbar{grid-template-columns:1fr 180px}.furniture-count{display:none}}
+
+/* === Premium furniture showroom refinement === */
+.furniture-panel *,
+.furniture-panel *::before,
+.furniture-panel *::after{
+  animation:none!important;
+  transition:none!important;
+}
+.furniture-panel button,
+.furniture-panel select,
+.furniture-panel .furniture-card,
+.furniture-panel .furniture-buy{
+  cursor:default!important;
+}
+
+.furniture-panel{
+  background:linear-gradient(180deg,#1c1915 0%,#151310 100%);
+  border-color:rgba(203,177,133,.34);
+  box-shadow:0 34px 100px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.03);
+}
+.furniture-header{
+  background:linear-gradient(180deg,#26211b 0%,#1b1814 100%);
+  border-bottom-color:#3d342a;
+}
+.furniture-title-wrap h1{
+  font-family:Baskerville,"Palatino Linotype","Book Antiqua",Georgia,serif;
+  font-weight:600;
+  letter-spacing:7px;
+  color:#f6ead7;
+  text-shadow:0 1px 0 rgba(255,255,255,.03),0 5px 22px rgba(0,0,0,.42);
+}
+.furniture-title-wrap span{
+  font-family:"Segoe UI",Arial,sans-serif;
+  color:#b6a185;
+  letter-spacing:1.55px;
+}
+
+.furniture-btn{
+  font-family:Baskerville,"Palatino Linotype","Book Antiqua",Georgia,serif;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.65px;
+  text-transform:uppercase;
+  background:linear-gradient(180deg,#2b2620,#24201b);
+  border-color:#514538;
+  color:#efe4d5;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.furniture-btn:hover{
+  background:linear-gradient(180deg,#312a23,#29231d);
+  border-color:#725f46;
+  color:#fff7ec;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 3px 10px rgba(0,0,0,.16);
+  transform:none!important;
+}
+.furniture-btn:active{transform:none!important;background:#29231d}
+.furniture-btn-primary{
+  background:linear-gradient(180deg,#8d704b,#74583a);
+  border-color:#a98b61;
+  color:#fff8ed;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.18);
+}
+.furniture-btn-primary:hover{
+  background:linear-gradient(180deg,#967851,#7c6040);
+  border-color:#b89a6e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 4px 12px rgba(0,0,0,.18);
+}
+
+.furniture-toolbar{
+  background:#181511;
+  border-bottom-color:#322b24;
+}
+.furniture-toolbar input,.furniture-toolbar select,.furniture-config-tools input,.furniture-price-row input{
+  background:#211d19;
+  border-color:#40362c;
+  color:#eee4d7;
+}
+.furniture-toolbar input:focus,.furniture-toolbar select:focus,.furniture-config-tools input:focus,.furniture-price-row input:focus{
+  border-color:#8a704f;
+  box-shadow:0 0 0 2px rgba(196,163,111,.07);
+  background:#25201b;
+}
+
+.furniture-grid{
+  background:radial-gradient(circle at 50% -10%,rgba(158,126,84,.075),transparent 42%),#16130f;
+  gap:16px;
+}
+.furniture-card{
+  background:linear-gradient(180deg,#27221d,#201c18);
+  border-color:#3b332a;
+  box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.018);
+}
+.furniture-card:hover{
+  transform:none!important;
+  border-color:#62513d;
+  background:linear-gradient(180deg,#2a241f,#221e19);
+  box-shadow:0 8px 20px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.furniture-thumb{
+  background:linear-gradient(145deg,#d7c3a5,#bba081);
+  border-bottom-color:#4a3d31;
+}
+.furniture-card-body{padding:14px 13px 13px}
+.furniture-name{
+  font-family:Baskerville,"Palatino Linotype","Book Antiqua",Georgia,serif;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.15px;
+  color:#f2e6d4;
+}
+.furniture-model{color:#8f8171}
+.furniture-price{
+  color:#c5b287;
+  font-family:"Segoe UI",Arial,sans-serif;
+  font-weight:750;
+  letter-spacing:.2px;
+}
+.furniture-buy{
+  height:38px;
+  margin-top:11px;
+  border:1px solid #8f7653;
+  border-radius:8px;
+  background:linear-gradient(180deg,#765a3d 0%,#60452f 100%);
+  color:#fff7eb;
+  font-family:Baskerville,"Palatino Linotype","Book Antiqua",Georgia,serif;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:1.75px;
+  text-transform:uppercase;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 3px 9px rgba(0,0,0,.18);
+}
+.furniture-buy:hover{
+  background:linear-gradient(180deg,#806246 0%,#684b34 100%);
+  border-color:#a48a64;
+  color:#fffaf2;
+  transform:none!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 3px 9px rgba(0,0,0,.18);
+}
+.furniture-buy:active{
+  transform:none!important;
+  background:linear-gradient(180deg,#70533a,#5d432f);
+}
+.furniture-buy:disabled{cursor:default!important}
+
+.furniture-modal{background:rgba(12,10,8,.86)}
+.furniture-modal-card{
+  background:#1a1713;
+  border-color:#5b4a36;
+  box-shadow:0 32px 92px rgba(0,0,0,.72);
+}
+.furniture-modal-head{background:#241f1a;border-bottom-color:#3c3229}
+.furniture-modal-head h2{
+  font-family:Baskerville,"Palatino Linotype","Book Antiqua",Georgia,serif;
+  color:#f2e5d2;
+  letter-spacing:2px;
+}
+.furniture-price-row:hover{background:#211d18}
+
+.furniture-grid::-webkit-scrollbar-thumb,.furniture-price-list::-webkit-scrollbar-thumb{background:#594a39}
+.furniture-grid::-webkit-scrollbar-thumb:hover,.furniture-price-list::-webkit-scrollbar-thumb:hover{background:#675541}

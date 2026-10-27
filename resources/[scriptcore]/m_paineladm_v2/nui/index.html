@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mage Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="app is-hidden" aria-hidden="true">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+
+        <section class="panel" aria-label="Painel administrativo">
+            <aside class="sidebar">
+                <div class="brand">
+                    <div class="brand-mark">
+                        <span class="brand-mark-glow"></span>
+                        <span>M</span>
+                    </div>
+                    <div class="brand-copy">
+                        <strong id="brandName">MAGE ADMIN</strong>
+                        <small id="brandVersion">v2.0.0</small>
+                    </div>
+                </div>
+
+                <div class="sidebar-label">NAVEGAÇÃO</div>
+                <nav id="navigation" class="navigation"></nav>
+
+                <div class="sidebar-spacer"></div>
+
+                <div class="admin-card">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-copy">
+                        <strong id="adminName">Administrador</strong>
+                        <span id="adminId">ID #0</span>
+                    </div>
+                    <span class="admin-status" title="Online"></span>
+                </div>
+            </aside>
+
+            <main class="main">
+                <header class="topbar">
+                    <div class="page-heading">
+                        <span id="pageEyebrow" class="eyebrow">ADMINISTRAÇÃO</span>
+                        <h1 id="pageTitle">Servidor</h1>
+                        <p id="pageDescription">Central de ações administrativas, organizada por categoria.</p>
+                    </div>
+
+                    <div class="top-actions">
+                        <button id="needsTopToggle" class="needs-top-toggle" type="button" data-toggle-needs data-next-state="false" aria-label="Fome e sede" style="display:none"></button>
+                        <button id="needsTopSettings" class="needs-top-settings" type="button" aria-label="Configurar fome e sede" title="Configurar velocidade e dano da fome e sede" style="display:none">
+                            <span class="needs-settings-icon"></span>
+                            <span class="needs-settings-copy"><small>FOME / SEDE</small><strong>CONFIGURAR</strong></span>
+                        </button>
+                        <div class="online-chip">
+                            <span class="pulse-dot"></span>
+                            <strong id="onlineCount">0</strong>
+                            <span>online</span>
+                        </div>
+                        <button class="icon-button" id="refreshButton" type="button" title="Atualizar jogadores"></button>
+                        <button class="icon-button close-button" id="closeButton" type="button" title="Fechar painel"></button>
+                    </div>
+                </header>
+
+                <div class="content-scroll">
+                    <section id="content" class="content"></section>
+                </div>
+            </main>
+        </section>
+
+        <div id="modalRoot" class="modal-root"></div>
+        <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+    </div>
+
+    <!-- Avisos administrativos em tela. Fica fora do #app para continuar
+         visível mesmo quando o painel administrativo estiver fechado. -->
+    <!-- Sistema público de chamados: funciona mesmo com o painel ADM fechado. -->
+    <div id="playerCallRoot" class="player-call-root" aria-hidden="true"></div>
+    <div id="sectorCallRoot" class="sector-call-root" aria-live="polite"></div>
+    <div id="sectorCallNoticeRoot" class="sector-call-notice-root" aria-live="polite"></div>
+    <div id="callEvaluationRoot" class="call-evaluation-root" aria-hidden="true"></div>
+
+    <!-- Escolha de benefícios VIP: fica fora do #app porque é exibida para o
+         jogador comum, sem abrir o painel administrativo. -->
+    <div id="vipChoiceRoot" class="vip-choice-root" aria-hidden="true"></div>
+    <div id="vipTestOverlay" class="vip-test-overlay" aria-hidden="true"></div>
+
+    <div id="adminScreenAlert" class="admin-screen-alert" aria-live="assertive" aria-hidden="true">
+        <div class="admin-screen-alert-kicker">
+            <span class="admin-screen-alert-kicker-dot"></span>
+            <span id="adminScreenAlertKind">AVISO DA ADMINISTRAÇÃO</span>
+        </div>
+        <div id="adminScreenAlertText" class="admin-screen-alert-text">Mensagem administrativa</div>
+        <div class="admin-screen-alert-timer-wrap">
+            <span class="admin-screen-alert-dot"></span>
+            <span id="adminScreenAlertTime" class="admin-screen-alert-time">00:08</span>
+        </div>
+    </div>
+
+
+    <div id="punishmentScreenAlert" class="admin-screen-alert punishment-screen-alert" aria-live="assertive" aria-hidden="true">
+        <div class="admin-screen-alert-kicker">
+            <span class="admin-screen-alert-kicker-dot"></span>
+            <span>VOCÊ ESTÁ DE CASTIGO!</span>
+        </div>
+        <div class="admin-screen-alert-text">Aguarde o tempo terminar.</div>
+        <div class="admin-screen-alert-timer-wrap">
+            <span class="admin-screen-alert-dot"></span>
+            <span id="punishmentScreenAlertTime" class="admin-screen-alert-time">00:00</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

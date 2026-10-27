@@ -1,0 +1,1 @@
+-- Blips agora são reconstruídos dinamicamente por client-side/00_skinshop_sync.lua

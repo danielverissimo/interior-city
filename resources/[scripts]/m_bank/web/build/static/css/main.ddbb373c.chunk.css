@@ -1,0 +1,933 @@
+@import url(https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Poppins";
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+.container .tablet {
+    width: 50vw;
+    height: 70vh;
+    background-color: rgba(242, 243, 247, .9137254901960784);
+    border-top-right-radius: 1vw;
+    border-bottom-right-radius: 1vw
+}
+
+@media (max-width:2560px) {
+    .container .tablet {
+        height: 90vh
+    }
+}
+
+.sidebar {
+    background-color: #131313;
+    width: 15vw;
+    height: 70vh;
+    border-top-left-radius: 1vw;
+    border-bottom-left-radius: 1vw
+}
+
+@media (max-width:2560px) {
+    .sidebar {
+        height: 90vh
+    }
+}
+
+.sidebar .top-sidebar img {
+    width: 7vw;
+    height: 7vw;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.sidebar .top-sidebar h1 {
+    color: #f1f1f1;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1vw;
+    font-weight: 500
+}
+
+.sidebar .top-sidebar img {
+    margin: 0 auto
+}
+
+.sidebar-btn {
+    height: 5vh;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 10vw
+}
+
+.sidebar-btn,
+.sidebar-btn a {
+    width: 15vw;
+    display: flex;
+    align-items: center
+}
+
+.sidebar-btn a {
+    background: transparent;
+    border: 0;
+    font-weight: 500;
+    color: hsla(0, 0%, 94.5%, .7411764705882353);
+    font-family: "Poppins";
+    height: 10vh;
+    font-size: 1vw;
+    text-align: left;
+    margin-left: 1.5vw;
+    margin-top: 1vw;
+    text-decoration: none;
+    padding-left: 1vw;
+    transition: margin .3s ease-in-out
+}
+
+.sidebar-btn a:hover {
+    margin-left: 5.5vw;
+    color: #f1f1f1;
+    border-color: #f1f1f1
+}
+
+.sidebar-btn a:focus {
+    margin-left: 5.5vw;
+    color: #c71313;
+    border-color: #c71313
+}
+
+.content-dashboard {
+    width: 50vw;
+    height: 30vw;
+    display: flex;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+.content-dashboard .content {
+    padding: 2vw;
+    position: relative
+}
+
+.content-dashboard .content .left .visao-geral {
+    width: 16vw
+}
+
+.content-dashboard .content .left .visao-geral .title {
+    font-size: 1.3vw;
+    font-weight: 500;
+    margin-bottom: 1vw
+}
+
+.content-dashboard .content .left .visao-geral .first {
+    display: flex;
+    justify-content: space-between
+}
+
+.content-dashboard .content .left .visao-geral .first h1 {
+    font-size: 1vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .left .visao-geral .first span {
+    font-size: 1vw;
+    font-weight: 700
+}
+
+.content-dashboard .content .left .visao-geral .second {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .5vw
+}
+
+.content-dashboard .content .left .visao-geral .second h2 {
+    font-size: 1vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .left .visao-geral .second span {
+    font-size: 1vw;
+    font-weight: 700
+}
+
+.content-dashboard .content .card-area {
+    margin-top: 1vw;
+    margin-bottom: 2vw
+}
+
+.content-dashboard .content .card-area h1 {
+    font-size: 1.2vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .card-area .card {
+    width: 18vw;
+    height: 18vh;
+    background: linear-gradient(245deg, rgba(19, 19, 19, .2627450980392157), rgba(34, 33, 33, .07450980392156863));
+    border-radius: .8vw;
+    margin-top: 1vw
+}
+
+@media(max-width:2560px) {
+    .content-dashboard .content .card-area .card {
+        height: 22vh
+    }
+}
+
+.content-dashboard .content .card-area .card .top {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 13.5vw
+}
+
+.content-dashboard .content .card-area .card .top img {
+    width: 3.5vw;
+    margin-top: 1.5vw
+}
+
+.content-dashboard .content .card-area .card .center {
+    margin-left: 1.2vw;
+    margin-top: 2vw;
+    width: 10vw
+}
+
+.content-dashboard .content .card-area .card .center h2 {
+    font-size: .8vw;
+    color: #777;
+    font-weight: 500
+}
+
+.content-dashboard .content .card-area .card .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+    width: 100%;
+    margin-top: .3vw
+}
+
+.content-dashboard .content .card-area .card .bottom h1 {
+    font-size: .8vw;
+    overflow: hidden;
+    width: 12vw;
+    margin-left: .95vw;
+    text-transform: uppercase;
+    height: 2vh;
+    color: #313131
+}
+
+.content-dashboard .content .card-area .card .bottom h2,
+.content-dashboard .content .card-area .card .bottom h3 {
+    font-size: .6vw;
+    color: #8c8b8b;
+    align-items: center;
+    margin-left: .3vw;
+    margin-top: .3vw
+}
+
+.content-dashboard .content .card-area .card .bottom h3 {
+    position: relative
+}
+
+.content-dashboard .content .card-area .card .bottom .content-dashboard .content .transactions-area {
+    margin-top: 4vw
+}
+
+.content-dashboard .content .transactions-area h1 {
+    font-size: 1.2vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .transactions-area .transactions {
+    max-height: 22vh;
+    overflow: auto;
+    width: 18vw
+}
+
+.content-dashboard .content .transactions-area .transaction {
+    display: flex;
+    margin-top: .3vw
+}
+
+.content-dashboard .content .transactions-area .transaction .left {
+    display: flex;
+    width: 10vw;
+    max-width: 10vw;
+    height: 2.3vw
+}
+
+.content-dashboard .content .transactions-area .transaction .left .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2vw;
+    height: 2vw;
+    background: linear-gradient(245deg, #131313, #222121);
+    border-radius: .6vw;
+    margin-top: .5vw
+}
+
+.content-dashboard .content .transactions-area .transaction .left .icon svg {
+    color: #f1f1f1;
+    font-size: 1.2vw
+}
+
+.content-dashboard .content .transactions-area .transaction .left .text {
+    margin-top: .4vw;
+    margin-left: .3vw
+}
+
+.content-dashboard .content .transactions-area .transaction .left .text h1 {
+    font-size: .8vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .transactions-area .transaction .left .text span {
+    color: #555;
+    font-size: .6vw;
+    font-weight: 500;
+    display: block
+}
+
+.content-dashboard .content .transactions-area .transaction .right {
+    margin-top: .6vw;
+    margin-right: .4vw;
+    text-align: right;
+    width: 8vw;
+    max-width: 8vw
+}
+
+.content-dashboard .content .transactions-area .transaction .right h1 {
+    font-size: .85vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .saldo {
+    position: absolute;
+    left: 25vw;
+    top: 4.8vw;
+    width: 100%;
+    margin-top: -3vw
+}
+
+.content-dashboard .content .saldo .graph .graph-donut {
+    text-align: center;
+    margin-top: 5vw
+}
+
+.content-dashboard .content .saldo .graph h1 {
+    font-size: 1.2vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .pix {
+    position: absolute;
+    left: 25vw;
+    top: 22.25vw;
+    width: 100%;
+    margin-top: 2.1vw
+}
+
+.content-dashboard .content .pix h1 {
+    font-size: 1.2vw;
+    font-weight: 500
+}
+
+.content-dashboard .content .pix p {
+    font-size: .9vw;
+    color: #555
+}
+
+.content-dashboard .content .pix .buttons {
+    width: 100%;
+    display: flex;
+    justify-content: left
+}
+
+.content-dashboard .content .pix .buttons button {
+    padding: .5vw 1.8vw;
+    width: 10vw;
+    max-width: 10vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    font-family: "Poppins";
+    display: block;
+    margin-right: .6vw;
+    margin-top: .8vw;
+    margin-bottom: .8vw;
+    cursor: pointer
+}
+
+.content-dashboard .content .pix .buttons button:hover {
+    background: #2c2c2c
+}
+
+.content-dashboard .content .codigo {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-left: .8vw
+}
+
+.content-dashboard .content .codigo label {
+    font-weight: 500;
+    color: #555;
+    font-size: 1vw;
+    margin-right: 1.4vw
+}
+
+.content-dashboard .content .codigo input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #f1f1f1;
+    padding: .5vw;
+    width: 10vw;
+    text-align: center;
+    margin-left: .8vw
+}
+
+.content-dashboard .content .codigo input::-webkit-input-placeholder {
+    color: #131313;
+    font-family: "Poppins"
+}
+
+.content-dashboard .content .codigo input:-ms-input-placeholder {
+    color: #131313;
+    font-family: "Poppins"
+}
+
+.content-dashboard .content .codigo input::placeholder {
+    color: #131313;
+    font-family: "Poppins"
+}
+
+.pix-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw
+}
+
+.pix-modal h1 {
+    font-size: 1.5vw;
+    font-family: "Poppins";
+    font-weight: 500
+}
+
+.pix-modal label {
+    display: block;
+    color: rgba(48, 48, 48, .987);
+    font-family: "Poppins";
+    font-size: .9vw;
+    margin-left: .5vw;
+    margin-bottom: .5vw
+}
+
+.pix-modal input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #131313;
+    padding: 1vw;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw
+}
+
+.pix-modal input:focus {
+    outline: none
+}
+
+.pix-modal button {
+    padding: .7vw 5vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    font-family: "Poppins";
+    display: block;
+    margin-top: 1vw;
+    cursor: pointer;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw;
+    font-size: 1vw
+}
+
+.pix-modal button:hover {
+    background: #2c2c2c
+}
+
+.pix-modal .pix-container {
+    background: #f1f1f1;
+    width: 40vw;
+    height: 25vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 1vw
+}
+
+::-webkit-scrollbar {
+    width: 3px;
+    height: 3px
+}
+
+::-webkit-scrollbar:hover {
+    width: 6px;
+    height: 3px
+}
+
+::-webkit-scrollbar-button {
+    width: 0;
+    height: 0
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2f3741;
+    border: 0 #fff
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: #515b68
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(242, 243, 247, .9137254901960784)
+}
+
+.content-depositar {
+    width: 100%;
+    height: 100%
+}
+
+.content-depositar .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 70vh
+}
+
+@media(max-width:2560px) {
+    .content-depositar .content {
+        height: 90vh
+    }
+}
+
+.content-depositar .content .title h1 {
+    font-size: 1.2vw;
+    font-weight: 500;
+    margin-right: 8.5vw;
+    margin-bottom: -.8vw
+}
+
+.content-depositar .content label {
+    display: block;
+    color: rgba(48, 48, 48, .987);
+    font-family: "Poppins";
+    font-size: .9vw;
+    margin-left: .5vw;
+    margin-bottom: .5vw
+}
+
+.content-depositar .content input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #131313;
+    padding: 1vw;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw
+}
+
+.content-depositar .content input:focus {
+    outline: none
+}
+
+.content-depositar .content .passaporte {
+    margin-top: .8vw
+}
+
+.content-depositar .content .quantia {
+    margin-top: 1vw
+}
+
+.content-depositar .content .button button {
+    padding: .7vw 5vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    font-family: "Poppins";
+    display: block;
+    margin-top: 1vw;
+    cursor: pointer;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw;
+    font-size: 1vw
+}
+
+.content-depositar .content .button button:hover {
+    background: #2c2c2c
+}
+
+.content-sacar {
+    width: 100%;
+    height: 100%
+}
+
+.content-sacar .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 70vh
+}
+
+@media(max-width:2560px) {
+    .content-sacar .content {
+        height: 90vh
+    }
+}
+
+.content-sacar .content .title h1 {
+    font-size: 1.2vw;
+    font-weight: 500;
+    margin-right: 10.5vw;
+    margin-bottom: -.8vw
+}
+
+.content-sacar .content label {
+    display: block;
+    color: rgba(48, 48, 48, .987);
+    font-family: "Poppins";
+    font-size: .9vw;
+    margin-left: .5vw;
+    margin-bottom: .5vw
+}
+
+.content-sacar .content input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #131313;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw;
+    padding: 1vw
+}
+
+.content-sacar .content input:focus {
+    outline: none
+}
+
+.content-sacar .content .passaporte {
+    margin-top: .8vw
+}
+
+.content-sacar .content .quantia {
+    margin-top: 1vw
+}
+
+.content-sacar .content .button button {
+    padding: .7vw 6vw;
+    max-width: 15vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    height: 3vw;
+    font-family: "Poppins";
+    display: block;
+    margin-top: 1vw;
+    cursor: pointer;
+    font-size: 1vw
+}
+
+.content-sacar .content .button button:hover {
+    background: #2c2c2c
+}
+
+.content-transferir {
+    width: 100%;
+    height: 100%
+}
+
+.content-transferir .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 70vh
+}
+
+@media(max-width:2560px) {
+    .content-transferir .content {
+        height: 90vh
+    }
+}
+
+.content-transferir .content .title h1 {
+    font-size: 1.2vw;
+    font-weight: 500;
+    margin-right: 8.5vw
+}
+
+.content-transferir .content label {
+    display: block;
+    color: rgba(48, 48, 48, .987);
+    font-family: "Poppins";
+    font-size: .9vw;
+    margin-left: .5vw
+}
+
+.content-transferir .content input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #131313;
+    padding: 1vw;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw
+}
+
+.content-transferir .content input:focus {
+    outline: none
+}
+
+.content-transferir .content .passaporte {
+    margin-top: .8vw
+}
+
+.content-transferir .content .quantia {
+    margin-top: 1vw
+}
+
+.content-transferir .content .button button {
+    padding: .7vw 5vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    font-family: "Poppins";
+    display: block;
+    margin-top: 1vw;
+    cursor: pointer;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw;
+    font-size: 1vw
+}
+
+.content-transferir .content .button button:hover {
+    background: #2c2c2c
+}
+
+.content-pix {
+    width: 100%;
+    height: 100%
+}
+
+.content-pix .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 70vh
+}
+
+@media(max-width:2560px) {
+    .content-pix .content {
+        height: 90vh
+    }
+}
+
+.content-pix .content .title h1 {
+    font-size: 1.2vw;
+    font-weight: 500;
+    margin-right: 8.5vw
+}
+
+.content-pix .content label {
+    display: block;
+    color: rgba(48, 48, 48, .987);
+    font-family: "Poppins";
+    font-size: .9vw;
+    margin-left: .5vw
+}
+
+.content-pix .content input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #131313;
+    padding: 1vw;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw
+}
+
+.content-pix .content input:focus {
+    outline: none
+}
+
+.content-pix .content .passaporte {
+    margin-top: .8vw
+}
+
+.content-pix .content .quantia {
+    margin-top: 1vw
+}
+
+.content-pix .content .button button {
+    padding: .7vw 5vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    font-family: "Poppins";
+    display: block;
+    margin-top: 1vw;
+    cursor: pointer;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw;
+    font-size: 1vw
+}
+
+.content-pix .content .button button:hover {
+    background: #2c2c2c
+}
+
+.content-multas {
+    width: 100%;
+    height: 100%
+}
+
+.content-multas .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 70vh
+}
+
+@media(max-width:2560px) {
+    .content-multas .content {
+        height: 90vh
+    }
+}
+
+.content-multas .content .title h1 {
+    font-size: 1.2vw;
+    font-weight: 500;
+    margin-right: 10.5vw;
+    margin-bottom: -.8vw
+}
+
+.content-multas .content label {
+    display: block;
+    color: rgba(48, 48, 48, .987);
+    font-family: "Poppins";
+    font-size: .9vw;
+    margin-left: .5vw;
+    margin-bottom: .5vw
+}
+
+.content-multas .content input {
+    background: rgba(85, 85, 85, .159);
+    border: 0;
+    border-radius: 3vw;
+    color: #131313;
+    width: 15vw;
+    max-width: 15vw;
+    height: 3vw;
+    padding: 1vw
+}
+
+.content-multas .content input:focus {
+    outline: none
+}
+
+.content-multas .content .passaporte {
+    margin-top: .8vw
+}
+
+.content-multas .content .quantia {
+    margin-top: 1vw
+}
+
+.content-multas .content .button button {
+    padding: .7vw 6vw;
+    max-width: 15vw;
+    border: 0;
+    background: #222121;
+    color: #f1f1f1;
+    border-radius: 2vw;
+    height: 3vw;
+    font-family: "Poppins";
+    display: block;
+    margin-top: 1vw;
+    cursor: pointer;
+    font-size: 1vw
+}
+
+.content-multas .content .button button:hover {
+    background: #2c2c2c
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100vh
+}
+
+*,
+body {
+    margin: 0
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0
+}
+
+#root {
+    height: 100%
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace
+}
+
+/*# sourceMappingURL=main.ddbb373c.chunk.css.map */

@@ -1,21 +1,78 @@
-# Interior City FXServer
+# Interior City — migração TocadoMago
 
-Copy `.env.example` to `.env` in this directory, then fill in fresh credentials. `start.bat` loads `.env` automatically. Variables already set in the Windows process environment take precedence over `.env`.
+Esta branch separa código e pacotes de assets da base fornecida. A base original não é alterada. O ambiente anterior permanece no checkout anterior; este checkout é independente para a migração e ainda não foi homologado como servidor de jogo.
 
-Configure these variables:
+As medições, verificações e pendências desta importação estão em [docs/SEPARACAO.md](docs/SEPARACAO.md).
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `CFX_SERVER_KEY` | Yes | Cfx.re server license key |
-| `MYSQL_CONNECTION_STRING` | Yes | Local Windows MariaDB URI; retain `multipleStatements=true` |
-| `STEAM_WEB_API_KEY` | No | Steam authentication identifiers |
-| `INTERIOR_CITY_WEBHOOK_LOGS` | No | Admin and vehicle event logs |
-| `INTERIOR_CITY_WEBHOOK_BUGS` | No | In-game bug reports |
+## Organização
 
-The optional webhook features are skipped when their variables are empty. The launcher expects `artifacts/FXServer.exe` two directories above this repository, matching the current project layout. It passes the values to FXServer as server-only convars; do not use `setr` or `sets` for these secrets. Command-line arguments may be visible to administrators of the host, so restrict access to the server process and its logs.
+| Caminho | Conteúdo |
+| --- | --- |
+| `resources/` | Lua, configurações, manifests e interfaces, incluindo metadados editáveis dos veículos/mapas |
+| `assets.lock.json` | Pacotes imutáveis e roster SHA-256 de cada arquivo de asset |
+| `database/schema.sql` | Estrutura extraída sem INSERTs, dados de jogadores ou comandos de remoção do banco |
+| `docs/import-redactions.json` | Localizações e contagens das remoções de credenciais, sem seus valores |
+| `docker/`, `compose*.yaml` | Infraestrutura Linux reaproveitada, com banco novo e volumes próprios |
+| `scripts/assets.py` | Inventário, envio, instalação e verificação dos pacotes privados |
 
-`config/keys.cfg` is no longer loaded. `.env` is ignored by Git; `.env.example` contains no credentials and is versioned. If starting FXServer without `start.bat`, provide the corresponding `+set` options through your deployment system before `+exec config/config.cfg`.
+Veículos, roupas, mapas, mídias e binários são distribuídos pelo armazenamento privado. `resources/` não é ignorado por completo: os scripts, manifests, `.meta`, XML de configuração e demais configurações permanecem no Git. XML de modelagem (como `*.yft.xml`) acompanha os assets. Os diretórios `build`/`dist` das NUIs não são excluídos genericamente, pois alguns recursos já são fornecidos compilados.
 
-The license key, Steam key, and Discord webhook URLs present in the old initial commit must be revoked and replaced in their respective provider consoles. A later commit that deletes those strings would still send the old secret in Git history; publish only the replacement root commit.
+O FXServer Windows, crashes, cache, estado de txAdmin/LevelDB, arquivos `.env` e `config/keys.cfg` não são importados. Webhooks, URIs MySQL e atribuições de credenciais identificadas foram esvaziados na cópia. As concessões administrativas ligadas a identidades do fornecedor no CFG também foram removidas. Isso não constitui auditoria de segurança de todos os recursos; a origem/licença dos componentes de terceiros ainda exige revisão antes de redistribuição ou execução.
 
-The Docker deployment generates its server-only convars from private Docker secret files and starts txAdmin using this repository's `server.cfg`. See [docs/URIEL_DOCKER.md](docs/URIEL_DOCKER.md) for deployment, Playit tunnels, backups, and rollback.
+## Instalar os assets
+
+Requisitos: Python 3.10+, SSH e acesso ao armazenamento privado, quando utilizado. Somente a biblioteca padrão é necessária. Copie `.assets-store.example.json` para `.assets-store.json` e configure seu destino privado; esse arquivo é ignorado pelo Git. Também é possível definir `ASSET_STORE` ou passar `--store`.
+
+```bash
+python3 scripts/assets.py sync --profile core
+python3 scripts/assets.py verify --profile core
+```
+
+`core` instala os assets dos recursos de scripts, interfaces e sistemas. `full` inclui também os grupos `[veiculos]`, `[roupas]` e `[mapas]`. Esses perfis selecionam arquivos para instalação; não comprovam que um conjunto parcial é jogável nem alteram a ordem dos `ensure` do fornecedor.
+
+```bash
+python3 scripts/assets.py sync --profile full
+python3 scripts/assets.py verify --profile full
+```
+
+O instalador verifica espaço físico, checksum do pacote e roster de seus membros antes de gravar. Recusa links, caminhos que escapem do destino, arquivos extras e assets locais modificados. Não remove arquivos automaticamente. Para trocar uma versão com remoções de assets, utilize um novo diretório de release/checkout, evitando sobras da versão anterior.
+
+O perfil completo exige espaço para os assets ausentes, um pacote temporário e 1 GiB de reserva. O Mac e o SSD estavam com pouco espaço na separação; não baixe `full` sem resolver essa capacidade. Montagem SMB deve servir para distribuição/gestão dos pacotes; o jogo deve usar uma cópia local quando for executado.
+
+## Atualizar os pacotes
+
+O comando de preparação destina-se a uma nova importação e não sobrescreve um catálogo existente:
+
+```bash
+python3 scripts/assets.py prepare --source /caminho/base-original --destination /caminho/checkout-novo
+python3 scripts/assets.py publish --source /caminho/base-original
+```
+
+Os pacotes são divididos por recurso em partes de aproximadamente 512 MiB sem compressão. O ID deriva do roster de caminhos, tamanhos e hashes; o transporte usa tar/gzip determinístico. O envio ao Uriel ocorre por streaming SSH, sem criar outra cópia integral no Mac. O servidor valida cada arquivo do pacote antes de concluir o armazenamento e devolve um recibo com SHA-256. Objetos concluídos são imutáveis; a publicação pode retomar pacotes já concluídos. Mantenha cópia independente do armazenamento do Uriel.
+
+## Docker e estado da migração
+
+A imagem utiliza o artefato Linux oficial com versão/checksum fixados. O Compose aponta apenas para `database/schema.sql`; as migrações da base anterior não se aplicam automaticamente aqui. O seed do fornecedor não foi executado e precisa ser revisto para separar dados necessários de dados privados. Não importe esse esquema no banco vivo da base anterior.
+
+O script de desenvolvimento usa um projeto Compose distinto, portas locais **30121/40121** e, no Mac, um perfil Colima próprio chamado `interior-city-tocado`. Não copia credenciais nem volumes do ambiente anterior.
+
+```bash
+./scripts/dev.sh init
+./scripts/dev.sh mac-start  # somente no Mac Apple Silicon
+./scripts/dev.sh set-license
+./scripts/dev.sh config
+./scripts/dev.sh up
+```
+
+Antes de `up`, instale/verifique os assets do perfil escolhido e revise a compatibilidade dos recursos, dependências, seeds e credenciais. A configuração preserva a ordem de recursos fornecida; nenhuma receita foi aplicada. A implantação no Uriel ainda não foi integrada ao fluxo de releases desta nova base. Não use o instalador da branch anterior sem adaptação.
+
+## Validação das ferramentas
+
+```bash
+python3 -m unittest discover -s tests -v
+bash -n scripts/dev.sh
+./scripts/dev.sh config
+git diff --check
+```
+
+Os testes cobrem separação, SQL sem dados, remoção de credenciais, arquivos originais preservados, hashes, pacote determinístico, rejeição de corrupção/alteração, links e caminhos inseguros. Validação de bytes não comprova execução do jogo, segurança dos scripts ou direitos de redistribuição.

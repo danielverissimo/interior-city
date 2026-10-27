@@ -1,0 +1,18 @@
+-- Cole este bloco dentro da tabela de itens em:
+-- inventory/config/shared.items.lua
+--
+-- IMPORTANTE: o novo nome do resource é "m_robbernpc".
+-- O fxmanifest mantém compatibilidade com o nome antigo m_trunkrobber, mas
+-- novas instalações devem apontar diretamente para m_robbernpc.
+-- NÃO adicione keep_item = true.
+
+["rastreador_carro"] = {
+    index = "rastreador_carro",
+    name = "Radar Veicular",
+    png = "rastreador_carro",
+    weight = 1.0,
+    type = "use",
+    func = function(user_id, source, item, slot, cb)
+        return exports["m_robbernpc"]:useRadarItem(user_id, source, item, slot, cb)
+    end
+},

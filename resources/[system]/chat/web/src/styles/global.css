@@ -1,0 +1,100 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  font-size: 17px;
+}
+
+#hexagono {
+  -webkit-mask-image: url('/icons/hexagono.svg');
+  mask-image: url('/icons/hexagono.svg');
+  mask-repeat: no-repeat;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+#progressAnimate {
+  animation: progress 10s;
+}
+
+#request span {
+  font-weight: 700 !important;
+  color: white !important;
+}
+
+
+@keyframes progress {
+  0% { stroke-dashoffset: 100.01 }
+  100% {  stroke-dashoffset: 0 }
+}
+
+
+@keyframes progressNotify {
+  0% { height: 0%;}
+  100% { height: 100% }
+}
+
+ .tt {
+  animation: progressNotify 10s ease;
+}
+
+.progressP span {
+  color: white;
+}
+
+.pulsate-bck {
+	-webkit-animation: pulsate-bck 0.5s ease-in-out infinite both;
+	animation: pulsate-bck 0.5s ease-in-out infinite both;
+}
+
+@keyframes pulsate-bck {
+  0% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(0.9);
+            transform: scale(0.9);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+
+
+@media (max-width: 1920px) {
+  #responsive {
+    zoom: 1;
+  }
+}
+
+@media (max-width: 800px) {
+  #responsive {
+    zoom: 0.50;
+  }
+}
+
+@media (max-width: 1100px) {
+  #responsive {
+    zoom: 0.80;
+  }
+}
+
+@media (max-width: 1366px) {
+  #responsive {
+    zoom: 0.80;
+  }
+}

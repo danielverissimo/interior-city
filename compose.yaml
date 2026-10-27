@@ -1,4 +1,4 @@
-name: interior-city
+name: interior-city-tocado
 
 services:
   db:
@@ -14,8 +14,7 @@ services:
       - db_app_password
     volumes:
       - db_data:/var/lib/mysql
-      - ${INTERIOR_CITY_RELEASE_PATH:-.}/Banco de Dados.sql:/docker-entrypoint-initdb.d/01-base.sql:ro
-      - ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/db/02-vrp-user-defaults.sql:/docker-entrypoint-initdb.d/02-vrp-user-defaults.sql:ro
+      - ${INTERIOR_CITY_RELEASE_PATH:-.}/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     networks:
       - backend
     mem_limit: 2g
@@ -31,7 +30,7 @@ services:
   fxserver:
     build:
       context: ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/fxserver
-    image: interior-city/fxserver:35245
+    image: interior-city/fxserver-tocado:35245
     restart: unless-stopped
     depends_on:
       db:
@@ -47,7 +46,7 @@ services:
       PLAYIT_HTTPS_HOST: ${PLAYIT_HTTPS_HOST:-}
       FIVEM_LISTING_ENABLED: ${FIVEM_LISTING_ENABLED:-false}
     ports:
-      - 127.0.0.1:40120:40120/tcp
+      - 127.0.0.1:${INTERIOR_CITY_TXADMIN_PORT:-40120}:40120/tcp
     secrets:
       - cfx_license
       - db_app_password

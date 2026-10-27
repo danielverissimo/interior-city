@@ -1,0 +1,232 @@
+{
+  "name": "Banco Central",
+  "settings": {
+    "safeMinimum": 0,
+    "safeMax": 0,
+    "solda": "c4",
+    "itemQtd": 2,
+    "furadeira": "furadeira",
+    "dinheiroSujo": "dinheirosujo",
+    "cops": 0,
+    "permCops": "perm.policia",
+    "minPegar": 2500,
+    "maxPegar": 5000,
+    "tempoReset": 1600,
+    "allowedBags": [
+      40,
+      41,
+      44,
+      45
+    ],
+    "drillSpawns": [
+      [
+        -568.79,
+        -1695.2,
+        19.11
+      ],
+      [
+        -569.32,
+        -1712.5,
+        22.36
+      ],
+      [
+        -541.16,
+        -1690.6,
+        18.96
+      ],
+      [
+        -521.73,
+        -1680.65,
+        18.36
+      ],
+      [
+        -480.52,
+        -1744.46,
+        17.65
+      ]
+    ],
+    "boxes": {
+      "Full": "prop_cash_crate_01",
+      "Half": "hei_prop_cash_crate_half_full",
+      "Empty": "hei_prop_cash_crate_empty"
+    }
+  },
+  "banks": [
+    {
+      "doors": [
+        {
+          "coords": [
+            257.22,
+            220.72,
+            106.28
+          ],
+          "object": "hei_v_ilev_bk_gate_pris",
+          "heading": -20.0,
+          "weldPosition": {
+            "coords": [
+              257.0,
+              219.76,
+              105.41
+            ],
+            "heading": 338.38
+          },
+          "time": 2,
+          "frozen": true
+        },
+        {
+          "coords": [
+            261.58,
+            222.05,
+            106.28
+          ],
+          "object": "hei_v_ilev_bk_gate2_pris",
+          "heading": -110.0,
+          "weldPosition": {
+            "coords": [
+              261.34,
+              221.91,
+              105.4
+            ],
+            "heading": 254.73
+          },
+          "time": 2,
+          "frozen": true
+        },
+        {
+          "coords": [
+            253.9,
+            225.23,
+            101.87
+          ],
+          "object": "v_ilev_bk_vaultdoor",
+          "heading": 160.0,
+          "openHeading": -20.0,
+          "hacking": true,
+          "time": 5,
+          "frozen": true
+        }
+      ],
+      "safes": [
+        {
+          "looted": false,
+          "coords": [
+            259.61,
+            214.12,
+            100.8
+          ],
+          "heading": 137.47,
+          "cam": {
+            "from": {
+              "x": 258.16,
+              "y": 215.5,
+              "z": 102.5,
+              "rx": -25.0,
+              "ry": 0.0,
+              "rz": 200.0,
+              "r": 0
+            },
+            "to": {
+              "x": 260.92,
+              "y": 214.7,
+              "z": 102.5,
+              "rx": -25.0,
+              "ry": 0.0,
+              "rz": 123.0,
+              "r": 0
+            }
+          }
+        },
+        {
+          "looted": false,
+          "coords": [
+            258.3,
+            214.54,
+            100.8
+          ],
+          "heading": 137.47,
+          "cam": {
+            "from": {
+              "x": 257.73,
+              "y": 215.5,
+              "z": 102.5,
+              "rx": -25.0,
+              "ry": 0.0,
+              "rz": 200.0,
+              "r": 0
+            },
+            "to": {
+              "x": 260.92,
+              "y": 214.7,
+              "z": 102.5,
+              "rx": -25.0,
+              "ry": 0.0,
+              "rz": 123.0,
+              "r": 0
+            }
+          }
+        },
+        {
+          "looted": false,
+          "coords": [
+            256.83,
+            215.12,
+            100.8
+          ],
+          "heading": 137.47,
+          "cam": {
+            "from": {
+              "x": 256.3,
+              "y": 216.4,
+              "z": 102.5,
+              "rx": -25.0,
+              "ry": 0.0,
+              "rz": 200.0,
+              "r": 0
+            },
+            "to": {
+              "x": 260.92,
+              "y": 214.7,
+              "z": 102.5,
+              "rx": -25.0,
+              "ry": 0.0,
+              "rz": 123.0,
+              "r": 0
+            }
+          }
+        }
+      ],
+      "money": {
+        "startMoney": 690000,
+        "amount": 720000,
+        "boxPosition": [
+          264.31,
+          213.77,
+          101.54
+        ],
+        "box": "prop_cash_crate_01",
+        "cam": {
+          "coords": {
+            "x": 265.85,
+            "y": 213.51,
+            "z": 103.0
+          },
+          "rotation": {
+            "rx": -35.0,
+            "ry": 0.0,
+            "rz": 70.0,
+            "r": 0
+          }
+        }
+      },
+      "hacking": {
+        "coords": [
+          264.74,
+          219.83,
+          100.8
+        ],
+        "heading": 286.41
+      },
+      "bankName": "Swedbank"
+    }
+  ]
+}

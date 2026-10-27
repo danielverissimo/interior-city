@@ -1,0 +1,89 @@
+::-webkit-scrollbar { width: 0; }
+::selection { background: transparent; color: #16ad76; }
+::-moz-selection { background: transparent; color: #16ad76; }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+body {
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+}
+
+* {
+	user-select: none;
+	box-sizing: border-box;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.target {
+	color: #fff;
+	width: 100vw;
+	height: 100vh;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	text-shadow: 1px 1px rgba(0,0,0,0.25);
+}
+
+.target-wrapper {
+	height: 400px;
+	position: absolute;
+	top: calc(50% - 15px);
+	left: calc(50% + 30px);
+}
+
+.target-eye {
+	color: #d6d9df;
+	font-size: 2.4vh;
+	text-shadow: 1px 1px rgba(0,0,0,0.25);
+}
+
+.target-label-wrapper {
+	float: left;
+	color: #d6d9df;
+	letter-spacing: 1px;
+	text-shadow: 1px 1px #333;
+}
+
+.target-label {
+	font-size: 13px;
+	list-style: none;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.target-label div {
+	position: relative;
+	display: flex;
+	font-size: 10px;
+	margin-top: 5px;
+	padding: 8px 15px;
+	border-radius: 5px;
+	align-items: center;
+	transition: all .2s;
+	text-transform: uppercase;
+	background: rgba(17, 17, 17, 0.7);
+	border: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.target-label div::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	width: 2px;
+	left: -1px;
+	opacity: .5;
+	height: 60%;
+	border-radius: 30px;
+	transform: translate(0,-50%);
+	background-color: #01d9ff;
+}
+
+.target-label div:hover {
+	background: rgba(17, 17, 17, 0.9);
+}
+
+.target-label div:hover::before {
+	opacity: 1;
+}

@@ -1,0 +1,245 @@
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: transparent !important;
+    pointer-events: none;
+}
+
+.prompt {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    transform: translate(-7px, -50%);
+    white-space: nowrap;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .42));
+}
+
+.prompt.visible {
+    display: flex;
+}
+
+.prompt-dot {
+    width: 29px;
+    height: 29px;
+    flex: 0 0 29px;
+    border-radius: 50%;
+    background: rgba(248, 248, 248, .98);
+    border: 1px solid rgba(50, 50, 50, .12);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, .45),
+        0 1px 2px rgba(0, 0, 0, .25);
+}
+
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.keycap {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+}
+
+.keycap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .96;
+}
+
+.keycap span {
+    position: relative;
+    z-index: 2;
+    margin-top: -1px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+    color: #f6f6f6;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .75);
+}
+
+#action-label {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Narrow', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: .45px;
+    line-height: 1;
+    color: #f4f4f4;
+    -webkit-text-stroke: 1px rgba(22, 22, 22, .88);
+    text-shadow:
+        1px 1px 0 rgba(0, 0, 0, .68),
+        0 2px 2px rgba(0, 0, 0, .55);
+}
+
+/* Aviso exibido ao ladrão quando o rastreador passa a transmitir sua posição. */
+.tracking-warning {
+    position: absolute;
+    top: 10.5%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 360px;
+    padding: 12px 18px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    opacity: 0;
+    visibility: hidden;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 45, 45, .52);
+    background: linear-gradient(180deg, rgba(20, 20, 20, .92), rgba(8, 8, 8, .88));
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .42), inset 0 -2px 0 rgba(255, 42, 42, .72);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+}
+
+.tracking-warning.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.tracking-title {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Narrow', sans-serif;
+    font-size: 23px;
+    letter-spacing: .8px;
+    line-height: 1;
+    color: #f5f5f5;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, .75);
+}
+
+.tracking-timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tracking-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff2d2d;
+    box-shadow: 0 0 9px rgba(255, 45, 45, .82);
+    animation: trackerPulse .7s ease-in-out infinite alternate;
+}
+
+.tracking-time {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 1.8px;
+    color: #ff4848;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+}
+
+@keyframes trackerPulse {
+    from { opacity: .45; transform: scale(.82); }
+    to { opacity: 1; transform: scale(1.12); }
+}
+
+
+/* Proposta de venda de drogas. Mantém a NUI sem foco de mouse: as teclas continuam no jogo. */
+.drug-offer {
+    position: absolute;
+    left: 50%;
+    bottom: 9.5%;
+    width: min(430px, 88vw);
+    transform: translate(-50%, 12px);
+    padding: 14px 16px 13px;
+    opacity: 0;
+    visibility: hidden;
+    border: 1px solid rgba(151, 92, 255, .44);
+    border-radius: 7px;
+    background:
+        linear-gradient(135deg, rgba(92, 42, 160, .20), transparent 55%),
+        linear-gradient(180deg, rgba(19, 18, 22, .95), rgba(8, 8, 10, .93));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .46), inset 0 -2px 0 rgba(129, 67, 235, .72);
+    transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+
+.drug-offer.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.drug-offer-kicker {
+    margin-bottom: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.65px;
+    color: #a876ff;
+}
+
+.drug-offer-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: #f5f5f7;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .55);
+}
+
+.drug-offer-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.drug-offer-action {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .45px;
+    color: rgba(255, 255, 255, .78);
+}
+
+.offer-key {
+    min-width: 24px;
+    height: 23px;
+    padding: 0 7px;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .09);
+    color: #fff;
+    font-size: 11px;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .25);
+}
+
+.drug-offer-action.confirm .offer-key {
+    border-color: rgba(141, 85, 244, .60);
+    background: rgba(126, 69, 225, .26);
+}
+
+.offer-key.wide {
+    min-width: 72px;
+}
+
+@media (max-width: 700px) {
+    .drug-offer { bottom: 8%; }
+    .drug-offer-actions { gap: 10px; }
+}

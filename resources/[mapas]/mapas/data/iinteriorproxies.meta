@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SInteriorOrderData>
+  <startFrom value="6600" />
+  	<!-- Mansºoes -->
+  <proxies>
+	<Item>malibu_mansion_mlo</Item>
+	<Item>lks_gldhs</Item>
+	<Item>designer_penthouse_garage_mlo</Item>
+	<Item>designer_penthouse_mlo</Item>
+	<Item>hei_hw1_blimp_interior_2_dlc_garage_high_neww_milo_</Item>
+	<Item>appart_mlo</Item>
+	<Item>vbh_mlo</Item>
+	<Item>slb2k11_villa_milo</Item>
+	<Item>int_italy2_milo_</Item>
+	<!-- Drogas NEW -->
+	<Item>int_stock2_milo_</Item>
+    <Item>int_stock3_milo_</Item>
+    <Item>int_stock4_milo_</Item>
+    <Item>int_stock5_milo_</Item>
+
+	<!-- Mapas -->
+	<Item>qnx_jud_milo_</Item>
+	<Item>int_mafc_milo_</Item>
+	<Item>int_vesp_01_1_milo_</Item>
+	<Item>int_vesp_01_2_milo_</Item>
+	<Item>int_vesp_1_1_milo_</Item>
+	<Item>int_vesp_1_2_milo_</Item>
+	<Item>int_vesp_02_1_milo_</Item>
+	<Item>int_vesp_02_2_milo_</Item>
+	<Item>int_vesp_03_1_milo_</Item>
+	<Item>int_vesp_3_1_milo_</Item>
+	<Item>int_vesp_3_2_milo_</Item>
+	<Item>int_vesp_4_2_milo_</Item>
+	<Item>1florholl_milo_</Item>
+    <Item>1florrooms2_milo_</Item>
+    <Item>4floorhollh_milo_</Item>
+    <Item>4floorrooms2h_milo_</Item>
+    <Item>5floorrooms1_milo_</Item>
+    <Item>5floorrooms2_milo_</Item>
+	<Item>int_vesp_5_2_milo_</Item>
+	<Item>int_vesp_big_lift_milo_</Item>
+	<Item>int_vesp_big_stair_milo_</Item>
+	<Item>int_vesp_slift_milo_</Item>
+	<Item>int_vesp_smole_stair_milo_</Item>
+	<Item>vesp_window_all</Item>
+	<Item>hei_cs1_16_interior_v_sheriff2_milo_</Item>
+	<Item>paleto_mlo</Item>
+	<Item>cs1_16_interior_v_sheriff2_milo_</Item>
+	<Item>biker_dlc_int_coca_milo</Item>
+	<Item>biker_dlc_int_lavagem</Item>
+	<Item>biker_dlc_int_ware02_milo_</Item>
+	<Item>biker_dlc_int_meta</Item>
+	<Item>int_nightclub_milo_</Item>
+	<Item>urgence_milo</Item>
+	<Item>room_milo</Item>
+	<Item>operation_floor</Item>
+	<Item>mz_carpack_milo</Item>
+	<Item>gabz_biker_milo_</Item>
+	<Item>lost_garage_milo_</Item>
+	<Item>bank_mlo</Item>
+	<Item>clothes_mlo</Item>
+	<Item>shop_mlo</Item>
+  </proxies>
+</SInteriorOrderData>

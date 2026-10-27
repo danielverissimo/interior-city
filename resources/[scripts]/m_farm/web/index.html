@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>pedrosilvx</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <img src="./assets/icons/icon.svg" alt="icon" class="icon">
+      <header>
+        <h1>
+          LISTA DE ROTAS
+          <div class="multiplier">3X</div>
+        </h1>
+        <div class="action">
+          <button onclick="app.handleBoostClick()">APLICAR</button>
+          <div class="coin">
+            <img src="http://177.54.148.31:4020/lotus/inventario_brasil/coin.png" />
+            <p id="coins">50x</p>
+          </div>
+        </div>
+      </header>
+      <main>
+        <div class="item">
+          <div class="content">
+            <div class="image">
+              <img src="http://177.54.148.31:4020/lotus/inventario_brasil/maconha.png" alt="">
+            </div>
+            <div class="text">
+              <div class="title">
+                <h3>DINHEIRO</h3>
+                <p>Escolha a região da rota para iniciar.</p>
+              </div>
+              <div class="buttons">
+                <button>SUL</button>
+                <button>NORTE</button>
+                <button>AÉREA</button>
+                <button>MARITIMA</button>
+              </div>
+            </div>
+          </div>
+          <button>INICIAR</button>
+        </div>
+      </main>
+    </div>
+    <script src="./script.js"></script>
+  </body>
+</html>

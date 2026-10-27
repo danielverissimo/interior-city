@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Venda de Drogas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main id="app" class="app" aria-hidden="true">
+        <section class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+            <header class="panel-head">
+                <div class="head-brand">
+                    <div class="skull-mark" aria-hidden="true">
+                        <img src="caveira.png" alt="">
+                    </div>
+                    <div class="head-copy">
+                        <span class="eyebrow">MERCADO CLANDESTINO</span>
+                        <h1 id="panelTitle">Venda de Drogas</h1>
+                        <p>Venda drogas pela cidade evitando ao máximo ser descoberto</p>
+                        <div id="reputationBadge" class="reputation-badge" style="--rep-color:#55d98b">
+                            <span>REPUTAÇÃO:</span>
+                            <strong id="reputationLabel">INTACTA</strong>
+                            <small id="reputationMeta">GANHOS 100%</small>
+                        </div>
+                    </div>
+                </div>
+                <button id="closeButton" class="icon-button" type="button" aria-label="Fechar">×</button>
+            </header>
+
+            <div class="risk-strip">
+                <span class="risk-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M12 2 1.7 20h20.6L12 2Zm1 13.5h-2v-2h2v2Zm0-4h-2v-4h2v4Z"/></svg>
+                </span>
+                <div>
+                    <strong>Atividade de risco</strong>
+                    <span>Compradores podem recusar a negociação e denunciar sua localização.</span>
+                </div>
+            </div>
+
+            <div id="drugGrid" class="drug-grid"></div>
+
+            <footer class="panel-foot">
+                <span><kbd>ESC</kbd> Fechar</span>
+                <span>A rota pode ser encerrada com <kbd>F7</kbd></span>
+            </footer>
+        </section>
+
+        <section id="confirmLayer" class="confirm-layer" aria-hidden="true">
+            <div class="confirm-box">
+                <span class="confirm-alert" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M12 2 1.7 20h20.6L12 2Zm1 13.5h-2v-2h2v2Zm0-4h-2v-4h2v4Z"/></svg>
+                </span>
+                <span class="eyebrow">CONFIRMAR ROTA</span>
+                <h2 id="confirmTitle">Iniciar venda</h2>
+                <p>Tem certeza que quer iniciar a venda de drogas? A polícia pode ficar sabendo!</p>
+
+                <div id="confirmProduct" class="confirm-product"></div>
+
+                <div class="confirm-actions">
+                    <button id="cancelConfirm" class="button button-ghost" type="button">Cancelar</button>
+                    <button id="acceptConfirm" class="button button-danger" type="button">Iniciar rota</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

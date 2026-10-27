@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TattooShopItemArray>
+  <TattooShopItems>
+	<!--Masculino-->
+	<Item>
+	  <id value="0"/>
+	  <cost value="0"/>
+	  <textLabel>TAT_CDA_000</textLabel>
+	  <collection>cda_overlays</collection>
+	  <preset>MP_Cda_Tat_000_M</preset>
+	  <zone>PDZ_TORSO</zone>
+	  <eFacing>TATTOO_BACK</eFacing>
+	  <updateGroup>BACK_FULL</updateGroup>
+	  <eFaction>TATTOO_MP_FM</eFaction>
+	  <lockHash />
+	</Item>
+	<Item>
+	  <id value="1"/>
+	  <cost value="0"/>
+	  <textLabel>TAT_CDA_001</textLabel>
+	  <collection>cda_overlays</collection>
+	  <preset>MP_Cda_Tat_001_M</preset>
+	  <zone>PDZ_LEFT_ARM</zone>
+	  <eFacing>TATTOO_FRONT</eFacing>
+	  <updateGroup>ARM_LEFT_UPPER_SLEEVE</updateGroup>
+	  <eFaction>TATTOO_MP_FM</eFaction>
+	  <lockHash />
+	</Item>
+	<!--Feminino-->
+	<Item>
+	  <id value="0"/>
+	  <cost value="0"/>
+	  <textLabel>TAT_CDA_000</textLabel>
+	  <collection>cda_overlays</collection>
+	  <preset>MP_Cda_Tat_000_F</preset>
+	  <zone>PDZ_TORSO</zone>
+	  <eFacing>TATTOO_BACK</eFacing>
+	  <updateGroup>BACK_FULL</updateGroup>
+	  <eFaction>TATTOO_MP_FM_F</eFaction>
+	  <lockHash />
+	</Item>	
+	<Item>
+	  <id value="1"/>
+	  <cost value="0"/>
+	  <textLabel>TAT_CDA_001</textLabel>
+	  <collection>cda_overlays</collection>
+	  <preset>MP_Cda_Tat_001_F</preset>
+	  <zone>PDZ_LEFT_ARM</zone>
+	  <eFacing>TATTOO_FRONT</eFacing>
+	  <updateGroup>ARM_LEFT_UPPER_SLEEVE</updateGroup>
+	  <eFaction>TATTOO_MP_FM_F</eFaction>
+	  <lockHash />
+	</Item>	
+  </TattooShopItems>
+</TattooShopItemArray>

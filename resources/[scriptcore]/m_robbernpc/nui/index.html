@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>m_robbernpc</title>
+</head>
+<body>
+    <div id="trunk-prompt" class="prompt">
+        <div class="prompt-dot"></div>
+        <div class="action-row">
+            <div class="keycap">
+                <img src="img/action.svg" alt="" />
+                <span id="key-label">N</span>
+            </div>
+            <span id="action-label">ARROMBAR</span>
+        </div>
+    </div>
+
+    <div id="drug-offer" class="drug-offer" aria-hidden="true">
+        <div class="drug-offer-kicker">NEGOCIAÇÃO</div>
+        <div id="drug-offer-text" class="drug-offer-text">Deseja vender?</div>
+        <div class="drug-offer-actions">
+            <div class="drug-offer-action confirm">
+                <span id="drug-confirm-key" class="offer-key">N</span>
+                <span>CONFIRMAR</span>
+            </div>
+            <div class="drug-offer-action cancel">
+                <span id="drug-cancel-key" class="offer-key wide">BACKSPACE</span>
+                <span>RECUSAR</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="tracking-warning" class="tracking-warning">
+        <div id="tracking-title" class="tracking-title">VOCÊ ESTÁ SENDO RASTREADO,FUJA!</div>
+        <div class="tracking-timer-wrap">
+            <span class="tracking-dot"></span>
+            <span id="tracking-time" class="tracking-time">01:30</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

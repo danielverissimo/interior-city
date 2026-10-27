@@ -1,0 +1,115 @@
+{
+    "token": "",
+    "client": {
+        "bankType": "nubank",
+        "uploadServer": "http://104.234.65.115/jester/index.php",
+        "allowUnsafeURL": true,
+        "videoServer": "ws://127.0.0.1:8080/",
+        "case": "s20",
+        "apps": {
+            "whatsapp": "http://104.234.65.115/smartphone/apps/whatsapp.jpg",
+            "tor": "http://104.234.65.115/smartphone/apps/tor.jpg",
+            "instagram": "http://104.234.65.115/smartphone/apps/instagram.jpg",
+            "twitter": "http://104.234.65.115/smartphone/apps/twitter.png",
+            "bank": "http://104.234.65.115/smartphone/apps/nubank.webp",      
+            "olx": "http://104.234.65.115/smartphone/apps/olx.png",    
+            "tinder": "http://104.234.65.115/smartphone/apps/tinder.webp",
+            "ifood": "http://104.234.65.115/smartphone/apps/olx.png",
+
+            "uber": "http://104.234.65.115/smartphone/apps/uber.webp",
+            "weazel": "http://104.234.65.115/smartphone/apps/weazel.webp",
+            "casino": "http://104.234.65.115/smartphone/apps/blaze.webp",
+            "calculator": "http://104.234.65.115/smartphone/apps/calculator.webp",
+            "notes": "http://104.234.65.115/smartphone/apps/notes.webp",
+
+            "settings": "http://104.234.65.115/smartphone/apps/settings.png",
+            "contacts": "http://104.234.65.115/smartphone/apps/phone.png",
+            "sms": "http://104.234.65.115/smartphone/apps/sms.webp",
+            "gallery": "http://104.234.65.115/smartphone/apps/photos.webp",
+            "phone": "http://104.234.65.115/smartphone/apps/phone.png",
+            "facetime": "http://104.234.65.115/smartphone/apps/facetime.webp"
+            
+            },
+            
+            "apps_android": {
+                "whatsapp": "http://104.234.65.115/smartphone/apps/whatsapp.jpg",
+                "tor": "http://104.234.65.115/smartphone/apps/tor.jpg",
+                "instagram": "http://104.234.65.115/smartphone/apps/instagram.jpg",
+                "twitter": "http://104.234.65.115/smartphone/apps/twitter.png",
+                "bank": "http://104.234.65.115/smartphone/apps/nubank.webp",      
+                "olx": "http://104.234.65.115/smartphone/apps/olx.png",    
+                "tinder": "http://104.234.65.115/smartphone/apps/tinder.webp",
+                "ifood": "http://104.234.65.115/smartphone/apps/olx.png",
+
+                "uber": "http://104.234.65.115/smartphone/apps/uber.webp",
+                "weazel": "http://104.234.65.115/smartphone/apps/weazel.webp",
+                "cassino": "http://104.234.65.115/smartphone/apps/blaze.webp",
+                "calculator": "http://104.234.65.115/smartphone/apps/calculator.webp",
+                "notes": "http://104.234.65.115/smartphone/apps/notes.webp",
+
+                "settings": "http://104.234.65.115/smartphone/apps/settings.png",
+                "contacts": "http://104.234.65.115/smartphone/apps/phone.png",
+                "sms": "http://104.234.65.115/smartphone/apps/sms.webp",
+                "gallery": "http://104.234.65.115/smartphone/apps/photos.webp",
+                "phone": "http://104.234.65.115/smartphone/apps/phone.png",
+                "facetime": "http://104.234.65.115/smartphone/apps/facetime.webp"
+              
+              },
+        "isAndroid": true,
+        "useGameClock": false,
+        "phone_template": "XXX-XXX",
+        "backgroundURL": "https://i.pinimg.com/originals/8b/36/36/8b3636db3c7a6a44cead68b84260dc59.jpg",
+        "db_driver": "oxmysql",
+        "disabledApps": [
+            "paypal",
+            "truco",
+            "yellowpages",
+            "minesweeper"
+        ]
+    },
+    "exclusive": {
+        "weazel": {
+            "tags": [
+                "Noticias"
+            ],
+            "permission": "administrador.permissao"
+        },
+        "casino": {
+            "maxBet": 100000
+        } 
+    },
+    "call_mode": "pma-voice",
+    "webhookURL": "",
+    "instagram_verify": "verificado.permissao",
+    "weazel_tags": "administrador.permissao",
+    "instagram_accounts": {
+        "*": 1,
+        "verificado.permissao": 2
+    },
+    "moderator": "administrador.permissao",
+    "item": "celular",
+    "services": [
+        {
+            "name": "Policia",
+            "number": "190",
+            "permission": "perm.militar"
+        },
+        {
+            "name": "Samu",
+            "number": "192",
+            "permission": "perm.unizk"
+        },
+        {
+            "name": "Mecânico",
+            "number": "0800-042",
+            "permission": "perm.mecanica"
+        },
+        {
+            "name": "Prefeitura",
+            "number": "0800-123",
+            "permission": "perm.ptr.staff"
+        }
+    ],
+    "base": "vrpex",
+    "channel": "stable"
+}

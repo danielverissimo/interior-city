@@ -1,0 +1,228 @@
+{
+  "name": "Roubo a Cofres",
+  "settings": {
+    "policePermission": "perm.policia",
+    "policeMinimum": 0,
+    "cooldownSeconds": 1800,
+    "searchTimerSeconds": 600,
+    "policeBlipMilliseconds": 200000,
+    "keycardItem": "keycard",
+    "keycardAmount": 1,
+    "rewardItem": "dinheirosujo",
+    "rewardMin": 10000,
+    "rewardMax": 20000,
+    "hackBlocks": 3,
+    "hackSeconds": 60,
+    "cancelDistance": 30.0,
+    "cashInteractDistance": 6.0,
+    "cashAnimationMilliseconds": 7500,
+    "webhook": "yourlink",
+    "dropItem": "keycard",
+    "dropAmount": 1,
+    "dropLifetimeSeconds": 3600,
+    "dropTimes": [
+      "20:30:00",
+      "02:00:00",
+      "16:30:00"
+    ],
+    "dropSpawns": [
+      [
+        265.11,
+        210.85,
+        110.29
+      ],
+      [
+        259.54,
+        205.54,
+        110.29
+      ],
+      [
+        1063.35,
+        -199.83,
+        71.76
+      ],
+      [
+        -733.81,
+        -2527.97,
+        13.95
+      ],
+      [
+        -1109.53,
+        -1690.99,
+        4.38
+      ],
+      [
+        -3109.03,
+        752.01,
+        24.71
+      ],
+      [
+        -687.62,
+        5758.55,
+        17.52
+      ],
+      [
+        -104.39,
+        6482.47,
+        32.89
+      ],
+      [
+        -177.65,
+        6419.44,
+        30.71
+      ],
+      [
+        1450.78,
+        6338.5,
+        24.42
+      ],
+      [
+        288.72,
+        -1282.45,
+        29.67
+      ],
+      [
+        -256.21,
+        -716.24,
+        33.52
+      ],
+      [
+        -537.69,
+        -854.41,
+        29.31
+      ],
+      [
+        -165.06,
+        234.73,
+        94.93
+      ],
+      [
+        -660.59,
+        -854.06,
+        24.49
+      ],
+      [
+        -712.99,
+        -818.91,
+        23.73
+      ]
+    ]
+  },
+  "banks": {
+    "Fleeca Bank Highway": {
+      "money": 250000,
+      "bankVault": {
+        "model": -63539571,
+        "x": -2958.53,
+        "y": 482.27,
+        "z": 15.835,
+        "hStart": 0.0,
+        "hEnd": -79.5
+      },
+      "startRobbing": {
+        "x": -2956.37,
+        "y": 482.0,
+        "z": 15.69,
+        "h": 357.97
+      },
+      "cashPile": {
+        "x": -2954.1,
+        "y": 484.38,
+        "z": 16.26,
+        "h": 86.88
+      }
+    },
+    "Fleeca Bank Center": {
+      "money": 250000,
+      "bankVault": {
+        "model": 2121050683,
+        "x": 148.025,
+        "y": -1044.36,
+        "z": 29.5,
+        "hStart": 249.84,
+        "hEnd": -183.599
+      },
+      "startRobbing": {
+        "x": 147.16,
+        "y": -1046.36,
+        "z": 29.36,
+        "h": 247.07
+      },
+      "cashPile": {
+        "x": 148.67,
+        "y": -1049.19,
+        "z": 29.93,
+        "h": 160.95
+      }
+    },
+    "Fleeca Bank Top": {
+      "money": 250000,
+      "bankVault": {
+        "model": 2121050683,
+        "x": -352.72,
+        "y": -53.56,
+        "z": 49.5,
+        "hStart": 249.84,
+        "hEnd": -183.59
+      },
+      "startRobbing": {
+        "x": -353.72,
+        "y": -55.49,
+        "z": 49.04,
+        "h": 252.82
+      },
+      "cashPile": {
+        "x": -352.0,
+        "y": -58.39,
+        "z": 49.6,
+        "h": 160.58
+      }
+    },
+    "Fleeca Bank Invader": {
+      "money": 250000,
+      "bankVault": {
+        "model": 2121050683,
+        "x": -104.81,
+        "y": 6473.64,
+        "z": 31.95,
+        "hStart": -63.16,
+        "hEnd": -170.16
+      },
+      "startRobbing": {
+        "x": -1210.38,
+        "y": -336.55,
+        "z": 37.79,
+        "h": 297.11
+      },
+      "cashPile": {
+        "x": -1207.2,
+        "y": -337.49,
+        "z": 38.61,
+        "h": 35.15
+      }
+    },
+    "Fleeca Bank Paleto": {
+      "money": 250000,
+      "bankVault": {
+        "model": -1185205679,
+        "x": -105.11,
+        "y": 6472.81,
+        "z": 31.63,
+        "hStart": 46.0,
+        "hEnd": 150.0
+      },
+      "startRobbing": {
+        "x": -105.11,
+        "y": 6471.57,
+        "z": 31.63,
+        "h": 51.64
+      },
+      "cashPile": {
+        "x": -104.68,
+        "y": 6477.29,
+        "z": 32.5,
+        "h": 35.15
+      }
+    }
+  }
+}

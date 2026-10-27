@@ -1,0 +1,36 @@
+# Use with scripts/dev.sh. This file keeps local data and credentials apart from Uriel.
+services:
+  fxserver:
+    platform: linux/amd64
+    build:
+      args:
+        INTERIOR_UID: ${IC_DEV_UID:-1000}
+        INTERIOR_GID: ${IC_DEV_GID:-1000}
+    environment:
+      PLAYIT_PUBLIC_ENDPOINT: ""
+      PLAYIT_HTTPS_HOST: ""
+      FIVEM_LISTING_ENABLED: "false"
+    ports:
+      - ${IC_DEV_GAME_BIND_IP:-127.0.0.1}:${IC_DEV_GAME_PORT:-30121}:30120/tcp
+      - ${IC_DEV_GAME_BIND_IP:-127.0.0.1}:${IC_DEV_GAME_PORT:-30121}:30120/udp
+    volumes:
+      - dev_server_data:/server-data
+      - dev_txdata:/txData
+      - dev_cache:/server-data/cache
+      - ./resources:/server-data/resources:ro
+      - ./config:/server-data/config:ro
+      - ./server.cfg:/server-data/server.cfg:ro
+      - ./logo.png:/server-data/logo.png:ro
+    tmpfs: !override
+      - /server-data/runtime:uid=${IC_DEV_UID:-1000},gid=${IC_DEV_GID:-1000},mode=0700
+      - /tmp:uid=${IC_DEV_UID:-1000},gid=${IC_DEV_GID:-1000},mode=1777
+
+  backup:
+    profiles: [backup]
+    volumes:
+      - dev_txdata:/txData:ro
+
+volumes:
+  dev_server_data:
+  dev_txdata:
+  dev_cache:

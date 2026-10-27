@@ -1,0 +1,272 @@
+{
+    "LiderVanilla": {
+        "coords": {
+            "y": -1304.530029296875,
+            "x": 108.7699966430664,
+            "z": 28.76000022888183
+        },
+        "max_weight": 5000,
+        "permission": "perm.lidervanilla"
+    },
+    "LiderRoxos": {
+        "coords": {
+            "y": -196.60000610351563,
+            "x": -2232.89990234375,
+            "z": 79.33000183105469
+        },
+        "max_weight": 5000,
+        "permission": "perm.liderroxos"
+    },
+    "Laranjas": {
+        "coords": {
+            "y": 1539.2099609375,
+            "x": 1418.72998046875,
+            "z": 110.91000366210938
+        },
+        "max_weight": 3000,
+        "permission": "perm.laranjas"
+    },
+    "LiderVermelhos": {
+        "coords": {
+            "y": -297.3399963378906,
+            "x": 1263.9000244140626,
+            "z": 84.58999633789063
+        },
+        "max_weight": 5000,
+        "permission": "perm.lidervermelhos"
+    },
+    "LiderBahamas": {
+        "coords": {
+            "y": -612.6799926757813,
+            "x": -1367.1199951171876,
+            "z": 30.31999969482422
+        },
+        "max_weight": 5000,
+        "permission": "perm.liderbahamas"
+    },
+    "Motoclube": {
+        "coords": {
+            "y": -131.5500030517578,
+            "x": 999.1599731445313,
+            "z": 74.05000305175781
+        },
+        "max_weight": 3000,
+        "permission": "perm.motoclube"
+    },
+    "Vermelhos": {
+        "coords": {
+            "y": -300.8900146484375,
+            "x": 1263.1600341796876,
+            "z": 81.69000244140625
+        },
+        "max_weight": 3000,
+        "permission": "perm.vermelhos"
+    },
+    "Vanilla": {
+        "coords": {
+            "y": -1296.8499755859376,
+            "x": 110.91000366210938,
+            "z": 29.27000045776367
+        },
+        "max_weight": 3000,
+        "permission": "perm.vanilla"
+    },
+    "Mansao_malibu": {
+        "coords": {
+            "y": 810.6300048828125,
+            "x": -3218.909912109375,
+            "z": 8.94999980926513
+        },
+        "max_weight": 10000,
+        "permission": "perm.malibu"
+    },
+    "Bahamas": {
+        "coords": {
+            "y": -628.7899780273438,
+            "x": -1395.8299560546876,
+            "z": 30.31999969482422
+        },
+        "max_weight": 3000,
+        "permission": "perm.bahamas"
+    },
+    "Cartel": {
+        "coords": {
+            "y": 1153.1300048828126,
+            "x": 1402.47998046875,
+            "z": 114.33000183105469
+        },
+        "max_weight": 3000,
+        "permission": "perm.cartel"
+    },
+    "SportRacer": {
+        "coords": {
+            "y": -948.8300170898438,
+            "x": 918.2000122070313,
+            "z": 44.25
+        },
+        "max_weight": 3000,
+        "permission": "perm.sportracer"
+    },
+    "Redline": {
+        "coords": {
+            "y": 3503.699951171875,
+            "x": 2737.7900390625,
+            "z": 55.25
+        },
+        "max_weight": 3000,
+        "permission": "perm.redline"
+    },
+    "Bunker": {
+        "coords": {
+            "y": 5794.02978515625,
+            "x": 1723.1300048828126,
+            "z": 43.68999862670898
+        },
+        "max_weight": 30000,
+        "permission": "perm.bunker"
+    },
+    "Mafia": {
+        "coords": {
+            "y": 2063.699951171875,
+            "x": -1880.8299560546876,
+            "z": 135.91000366210938
+        },
+        "max_weight": 3000,
+        "permission": "perm.mafia"
+    },
+    "LiderVerdes": {
+        "coords": {
+            "y": -789.4600219726563,
+            "x": 1364.81005859375,
+            "z": 71.76000213623047
+        },
+        "max_weight": 5000,
+        "permission": "perm.liderverdes"
+    },
+    "LiderMafia": {
+        "coords": {
+            "y": 2057.239990234375,
+            "x": -1871.050048828125,
+            "z": 135.4600067138672
+        },
+        "max_weight": 5000,
+        "permission": "perm.lidermafia"
+    },
+    "LSCustoms": {
+        "coords": {
+            "y": -90.70999908447266,
+            "x": -339.2799987792969,
+            "z": 39.0099983215332
+        },
+        "max_weight": 3000,
+        "permission": "perm.lscustoms"
+    },
+    "Roxos": {
+        "coords": {
+            "y": -198.4199981689453,
+            "x": -2240.659912109375,
+            "z": 79.33000183105469
+        },
+        "max_weight": 3000,
+        "permission": "perm.roxos"
+    },
+    "Verdes": {
+        "coords": {
+            "y": -740.030029296875,
+            "x": 1316.4200439453126,
+            "z": 66.2699966430664
+        },
+        "max_weight": 3000,
+        "permission": "perm.verdes"
+    },
+    "LiderLaranjas": {
+        "coords": {
+            "y": 1542.4100341796876,
+            "x": 1418.760009765625,
+            "z": 110.91000366210938
+        },
+        "max_weight": 5000,
+        "permission": "perm.liderlaranjas"
+    },
+    "Hospital": {
+        "coords": {
+            "y": -65.62999725341797,
+            "x": -2776.5,
+            "z": 18.11000061035156
+        },
+        "max_weight": 3000,
+        "permission": "perm.hospital"
+    },
+    "Franca": {
+        "coords": {
+            "y": 1744.0899658203126,
+            "x": -2363.7099609375,
+            "z": 215.47999572753907
+        },
+        "max_weight": 3000,
+        "permission": "perm.franca"
+    },
+    "LiderColombia": {
+        "coords": {
+            "y": 1619.1700439453126,
+            "x": -1400.3599853515626,
+            "z": 164.74000549316407
+        },
+        "max_weight": 5000,
+        "permission": "perm.lidercolombia"
+    },
+    "Colombia": {
+        "coords": {
+            "y": 1622.22998046875,
+            "x": -1398.2099609375,
+            "z": 161.39999389648438
+        },
+        "max_weight": 3000,
+        "permission": "perm.colombia"
+    },
+    "DPMilitar": {
+        "coords": {
+            "y": -990.7100219726563,
+            "x": 436.8299865722656,
+            "z": 30.68000030517578
+        },
+        "max_weight": 100000,
+        "permission": "perm.policia"
+    },
+    "Mansao_mansaovideo": {
+        "coords": {
+            "y": 1313.5999755859376,
+            "x": -2679.429931640625,
+            "z": 147.44000244140626
+        },
+        "max_weight": 5000,
+        "permission": "perm.mansaovideo"
+    },
+    "LiderFranca": {
+        "coords": {
+            "y": 1747.6800537109376,
+            "x": -2364.3798828125,
+            "z": 215.47999572753907
+        },
+        "max_weight": 5000,
+        "permission": "perm.liderfranca"
+    },
+    "LiderCartel": {
+        "coords": {
+            "y": 1134.68994140625,
+            "x": 1392.4100341796876,
+            "z": 109.73999786376953
+        },
+        "max_weight": 5000,
+        "permission": "perm.lidercartel"
+    },
+    "LiderMotoclube": {
+        "coords": {
+            "y": -92.98999786376953,
+            "x": 986.9199829101563,
+            "z": 74.8499984741211
+        },
+        "max_weight": 5000,
+        "permission": "perm.lidermotoclube"
+    }
+}

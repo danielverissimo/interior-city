@@ -1,0 +1,208 @@
+{
+    "version": 1,
+    "mansions": [
+        {
+            "iptuPaidUntil": 1790148225,
+            "doors": [
+                {
+                    "lock": true,
+                    "hash": 1901183774,
+                    "text": true,
+                    "z": 147.59339904785157,
+                    "isGate": false,
+                    "x": -2667.60205078125,
+                    "y": 1326.9599609375,
+                    "dist": 5
+                }
+            ],
+            "purchasedAt": 1788420225,
+            "name": "MansaoVideo",
+            "price": 1000000,
+            "purchaseCoords": {
+                "x": -2651.43,
+                "y": 1326.33,
+                "z": 146.63
+            },
+            "permission": "perm.mansaovideo",
+            "updatedAt": 1788420197,
+            "lastIptuPaidAt": 1788420225,
+            "maxResidents": 4,
+            "garage": {
+                "spawnCoords": [
+                    {
+                        "w": 266.67,
+                        "x": -2663.12,
+                        "y": 1309,
+                        "z": 147.12
+                    }
+                ],
+                "id": "Mansao_mansaovideo",
+                "coords": {
+                    "x": -2665.02,
+                    "y": 1313.12,
+                    "z": 147.45
+                },
+                "blipDistance": 5,
+                "enabled": true,
+                "type": "Publica"
+            },
+            "furniture": [
+                {
+                    "y": 1343.8026123046876,
+                    "z": 146.81996154785157,
+                    "model": "prop_office_desk_01",
+                    "x": -2661.614501953125,
+                    "createdAt": 1788420335,
+                    "id": "mansaovideo_1788420335_3201",
+                    "placedBy": 1,
+                    "name": "Mesa de Escritório",
+                    "paidPrice": 500,
+                    "itemId": "prop_office_desk_01",
+                    "heading": 4.03113689422607
+                },
+                {
+                    "y": 1343.9130859375,
+                    "z": 147.18099975585938,
+                    "model": "prop_monitor_01c",
+                    "x": -2661.74267578125,
+                    "createdAt": 1788420359,
+                    "id": "mansaovideo_1788420359_9051",
+                    "placedBy": 1,
+                    "name": "Monitor",
+                    "paidPrice": 500,
+                    "itemId": "prop_monitor_01c",
+                    "heading": 5.88425045013427
+                },
+                {
+                    "y": 1343.812255859375,
+                    "z": 147.18099975585938,
+                    "model": "prop_pc_02a",
+                    "x": -2661.044921875,
+                    "createdAt": 1788420367,
+                    "id": "mansaovideo_1788420367_2908",
+                    "placedBy": 1,
+                    "name": "Computador 02",
+                    "paidPrice": 500,
+                    "itemId": "prop_pc_02a",
+                    "heading": -9.51574954986572
+                },
+                {
+                    "y": 1343.570068359375,
+                    "z": 147.18099975585938,
+                    "model": "prop_keyboard_01a",
+                    "x": -2661.7998046875,
+                    "createdAt": 1788420379,
+                    "id": "mansaovideo_1788420379_1377",
+                    "placedBy": 1,
+                    "name": "Teclado",
+                    "paidPrice": 500,
+                    "itemId": "prop_keyboard_01a",
+                    "heading": 0.98425045013427
+                },
+                {
+                    "y": 1343.628173828125,
+                    "z": 147.18099975585938,
+                    "model": "prop_mouse_01a",
+                    "x": -2661.385498046875,
+                    "createdAt": 1788420386,
+                    "id": "mansaovideo_1788420386_9707",
+                    "placedBy": 1,
+                    "name": "Mouse",
+                    "paidPrice": 500,
+                    "itemId": "prop_mouse_01a",
+                    "heading": 26.88425045013426
+                },
+                {
+                    "y": 1344.859619140625,
+                    "z": 146.44496154785157,
+                    "model": "prop_fridge_01",
+                    "x": -2664.482177734375,
+                    "createdAt": 1788420517,
+                    "id": "mansaovideo_1788420517_0090",
+                    "placedBy": 1,
+                    "name": "Geladeira",
+                    "paidPrice": 500,
+                    "itemId": "prop_fridge_01",
+                    "heading": 6.17229957580567
+                }
+            ],
+            "members": [],
+            "id": "mansaovideo",
+            "createdAt": 1788420197,
+            "group": "MansaoVideo",
+            "chest": {
+                "coords": {
+                    "x": -2679.43,
+                    "y": 1313.6,
+                    "z": 147.44
+                },
+                "weight": 5000,
+                "enabled": true,
+                "name": "Mansao_mansaovideo"
+            },
+            "voucher": "valemansao1m",
+            "iptuValue": 25000,
+            "ownerId": 1
+        },
+        {
+            "group": "Malibu",
+            "doors": [
+                {
+                    "lock": true,
+                    "hash": 308207762,
+                    "text": true,
+                    "z": 9.07710456848144,
+                    "isGate": false,
+                    "x": -3217.282958984375,
+                    "y": 816.3267822265625,
+                    "dist": 5
+                }
+            ],
+            "members": [],
+            "createdAt": 1788423782,
+            "price": 10000000,
+            "purchaseCoords": {
+                "x": -3214.71,
+                "y": 815.36,
+                "z": 8.93
+            },
+            "permission": "perm.malibu",
+            "updatedAt": 1788423782,
+            "maxResidents": 5,
+            "garage": {
+                "spawnCoords": [
+                    {
+                        "w": 199.44,
+                        "x": -3202.62,
+                        "y": 817.39,
+                        "z": 8.93
+                    }
+                ],
+                "id": "Mansao_malibu",
+                "coords": {
+                    "x": -3201.66,
+                    "y": 820.61,
+                    "z": 8.93
+                },
+                "blipDistance": 5,
+                "enabled": true,
+                "type": "Publica"
+            },
+            "furniture": [],
+            "id": "malibu",
+            "name": "Malibu",
+            "iptuValue": 50000,
+            "voucher": "valemansao10m",
+            "chest": {
+                "coords": {
+                    "x": -3218.91,
+                    "y": 810.63,
+                    "z": 8.95
+                },
+                "weight": 10000,
+                "enabled": true,
+                "name": "Mansao_malibu"
+            }
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+M_HUD - INTEGRAÇÃO M_EVENTOS V23
+
+A lógica de ejeção por colisão agora respeita a Corrida de Kart do m_eventos.
+Quando m_eventosKartNoEject estiver ativo:
+- F/INPUT_VEH_EXIT é bloqueado;
+- a HUD não executa TaskLeaveVehicle ao detectar colisão;
+- o ped não pode ser arrastado/ejetado do veículo.
+
+Fora do evento, o cinto e a ejeção voltam ao comportamento original da HUD.

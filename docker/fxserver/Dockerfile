@@ -14,13 +14,16 @@ RUN curl -fsSL --retry 3 "$FXSERVER_ARTIFACT_URL" -o /tmp/fx.tar.xz \
 
 FROM debian:bookworm-slim
 
+ARG INTERIOR_UID=1000
+ARG INTERIOR_GID=1000
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
       bash ca-certificates libatomic1 libgcc-s1 libstdc++6 \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid 1000 interior \
-    && useradd --uid 1000 --gid 1000 --create-home --shell /usr/sbin/nologin interior \
-    && mkdir -p /server-data /txData \
-    && chown interior:interior /server-data /txData
+    && (getent group "$INTERIOR_GID" >/dev/null || groupadd --gid "$INTERIOR_GID" interior) \
+    && useradd --uid "$INTERIOR_UID" --gid "$INTERIOR_GID" --create-home --shell /usr/sbin/nologin interior \
+    && mkdir -p /server-data/cache /txData \
+    && chown "$INTERIOR_UID:$INTERIOR_GID" /server-data /server-data/cache /txData
 
 COPY --from=artifact /opt/fxserver /opt/fxserver
 COPY entrypoint.sh /usr/local/bin/interior-city-entrypoint

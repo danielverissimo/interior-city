@@ -1,0 +1,1 @@
+-- Blips gerenciados dinamicamente por 00_barbershop_sync.lua

@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sweetalert2.min.css">
+    <title> </title>
+</head>
+<body>
+    <div id="app">
+        <div class="box" v-if="show">
+            <span class="t_box">DEPARTAMENTO POLICIAL</span>
+            <button class="b_enc" v-if="in_ptr" @click="encerrar()">ENCERRAR PATRULHA</button>
+           <div class="ct_buttons sul" @click="confirm('sul',policia)">
+                <span class="overlay_nome">SUL</span>
+           </div>
+           <div class="ct_buttons norte" @click="confirm('norte',policia)">
+                <span class="overlay_nome">NORTE</span>
+           </div>
+           <div class="ct_ranking">
+            <span class="t_rk">RANKING</span>
+
+                <div class="box_rk">
+                    <div class="result_ranking"v-for="(p, index) in ranking":key="p.id">
+                    <span class="players">
+                        [{{ index + 1 }}] {{ p.nome }} {{ p.sobrenome }}
+                    </span>
+
+                    <span class="ptr_n">
+                        Pontos: {{ p.pontos }}
+                    </span>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script type="text/javascript" src="script.js"></script>
+</html>

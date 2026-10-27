@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Config Manager</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="hidden">
+    <div class="backdrop"></div>
+    <main class="shell">
+        <aside class="sidebar">
+            <div class="brand"><div class="mark">M</div><div><b>Config Manager</b><small>Administração da cidade</small></div></div>
+            <nav>
+                <button class="nav active" data-module="groups"><span>♟</span>Gerenciar Cargos</button>
+                <button class="nav" data-module="chests"><span>▣</span>Baús</button>
+                <button class="nav" data-module="craft"><span>⌘</span>Craft + Farm</button>
+                <button class="nav" data-module="garages"><span>◆</span>Garagens</button>
+                <button class="nav" data-module="mapmarkings"><span>⌖</span>Marcações Mapa</button>
+                <button class="nav" data-module="cloakroom"><span>♜</span>Blip Fardamento</button>
+                <button class="nav" data-module="shops"><span>◈</span>Lojas</button>
+                <button class="nav" data-module="clothing"><span>♙</span>Loja de Roupa</button>
+                <button class="nav" data-module="barbershop"><span>✂</span>Barbearia</button>
+                <button class="nav" data-module="tattoo"><span>✦</span>Estúdio Tattoo</button>
+                <button class="nav" data-module="desmanche"><span>⚒</span>Desmanche</button>
+                <button class="nav" data-module="safezone"><span>⬡</span>SafeZone</button>
+                <button class="nav" data-module="jobs"><span>▦</span>Empregos</button>
+                <button class="nav" data-module="robberies"><span>◉</span>Roubos</button>
+                <button class="nav" data-module="houses"><span>⌂</span>Casas</button>
+                <button class="nav" data-module="mansions"><span>⌂</span>Mansões</button>
+                <button class="nav" data-module="dealership"><span>▰</span>Concessionária</button>
+            </nav>
+            <div class="sidefoot"><div><i></i> Recursos conectados</div><small>ESC para fechar</small></div>
+        </aside>
+
+        <section class="content">
+            <header>
+                <div>
+                    <p class="eyebrow">CONFIGURAÇÕES</p>
+                    <h1 id="page-title">Gerenciar Baús</h1>
+                    <p id="page-sub">Crie e altere configurações sem editar código.</p>
+                </div>
+                <div class="topactions">
+                    <button id="refresh" class="btn ghost">↻ Atualizar</button>
+                    <button id="new" class="btn primary">＋ Novo baú</button>
+                    <button id="close" class="icon">×</button>
+                </div>
+            </header>
+
+            <div id="garage-tabs" class="tabs hidden">
+                <button class="tab active" data-tab="points">Pontos de garagem</button>
+                <button class="tab" data-tab="types">Tipos de garagem</button>
+            </div>
+
+            <section id="stats" class="stats"></section>
+
+            <div class="toolbar">
+                <div class="search">⌕<input id="search" placeholder="Buscar..."></div>
+                <select id="sort">
+                    <option value="name">Ordenar por nome</option>
+                </select>
+                <select id="group-filter" class="hidden">
+                    <option value="all">Todos</option>
+                </select>
+            </div>
+
+            <div class="tablewrap">
+                <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+                <div id="empty" class="empty hidden"><b>Nenhum cadastro encontrado</b><span>Crie um novo item ou ajuste sua busca.</span></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="overlay" class="overlay hidden"></div>
+    <aside id="drawer" class="drawer">
+        <div class="drawerhead">
+            <div><p class="eyebrow" id="drawer-kicker">NOVO CADASTRO</p><h2 id="drawer-title">Cadastrar</h2></div>
+            <button id="drawer-close" class="icon">×</button>
+        </div>
+        <div id="drawer-body"></div>
+    </aside>
+
+    <div id="confirm" class="modalwrap hidden">
+        <div class="modal">
+            <div class="danger">!</div>
+            <h3 id="confirm-title">Excluir cadastro?</h3>
+            <p id="confirm-text"></p>
+            <div class="modalactions">
+                <button id="confirm-cancel" class="btn ghost">Cancelar</button>
+                <button id="confirm-ok" class="btn dangerbtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="item-picker" class="modalwrap hidden">
+        <div class="itempicker">
+            <div class="pickerhead">
+                <div><p class="eyebrow">ITENS DO SERVIDOR</p><h3>Selecionar itens</h3><span>Marque os itens que farão parte desta loja.</span></div>
+                <button id="item-picker-close" class="icon" type="button">×</button>
+            </div>
+            <div class="pickersearch">⌕<input id="item-picker-search" placeholder="Buscar pelo nome ou index..."></div>
+            <div class="pickerbar"><span id="item-picker-count">0 itens selecionados</span><button id="item-picker-toggle" class="btn ghost mini" type="button">Selecionar visíveis</button></div>
+            <div id="item-picker-list" class="pickerlist"></div>
+            <div class="pickeractions">
+                <button id="item-picker-cancel" class="btn ghost" type="button">Cancelar</button>
+                <button id="item-picker-add" class="btn primary" type="button">Adicionar selecionados</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toasts" class="toasts"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
