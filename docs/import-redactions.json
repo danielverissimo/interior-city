@@ -131,12 +131,6 @@
       }
     },
     {
-      "path": "resources/[system]/oxmysql/dist/build.js",
-      "changes": {
-        "sensitive_assignment": 1
-      }
-    },
-    {
       "path": "resources/[vrp]/vrp/base.lua",
       "changes": {
         "webhook": 1

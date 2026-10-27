@@ -26076,7 +26076,7 @@ var parseUri = /* @__PURE__ */ __name((connectionString) => {
 }, "parseUri");
 var convertNamedPlaceholders;
 var connectionOptions = (() => {
-  const options = mysql_connection_string.includes("mysql://") ? parseUri(mysql_connection_string) : mysql_connection_string.replace(/(?:host(?:name)|ip|server|data\s?source|addr(?:ess)?)=/gi, "host=").replace(/(?:user\s?(?:id|name)?|uid)=/gi, "user=").replace(/(?:pwd|pass)=/gi, "password=""database=").split(";").reduce((connectionInfo, parameter) => {
+  const options = mysql_connection_string.includes("mysql://") ? parseUri(mysql_connection_string) : mysql_connection_string.replace(/(?:host(?:name)|ip|server|data\s?source|addr(?:ess)?)=/gi, "host=").replace(/(?:user\s?(?:id|name)?|uid)=/gi, "user=").replace(/(?:pwd|pass)=/gi, "password=").replace(/(?:db)=/gi, "database=").split(";").reduce((connectionInfo, parameter) => {
     const [key, value] = parameter.split("=");
     if (key)
       connectionInfo[key] = value;

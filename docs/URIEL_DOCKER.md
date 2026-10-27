@@ -12,7 +12,7 @@ Esta implementação pertence à branch `migration/tocado-mago`. A `master` ante
 | txAdmin | `127.0.0.1:40121` no host; 40120 dentro do contêiner |
 | Jogo | TCP/UDP 30120 dentro do contêiner; sem porta publicada no host |
 | Banco | MariaDB 10.11.19; volume próprio; usuário `vrp`; sem publicar 3306 |
-| Estado | `state/txData`, `state/cache`, `state/manifests` |
+| Estado | `state/txData`, `state/manifests`; cache gerado dentro de cada release |
 | Credenciais | `secrets/`, fora de releases e imagens |
 | Backups | `backups/`, neste host, com retenção de sete dias |
 | Assets | pacotes privados em `/srv/diskaux/interior-city-assets/tocado-mago` |
@@ -89,6 +89,8 @@ Quando já existe uma release, para os escritores e cria backup do banco e txDat
 
 O SQL `database/schema.sql` contém 204 definições de tabelas, sem dados importados. A inicialização acontece somente em volume novo. Seeds necessários, compatibilidade de SQL/recursos e criação do primeiro usuário ainda precisam de validação; nunca aplique o dump bruto do fornecedor no banco vivo anterior.
 
+A importação desativa a verificação de chaves estrangeiras somente na sessão do dump, pois a ordem fornecida não respeita as dependências entre tabelas, e restaura o valor anterior ao terminar. O healthcheck do banco verifica também a existência de todas as tabelas declaradas no esquema: uma inicialização parcial não pode liberar o FXServer. O cache fica no mesmo bind mount dos recursos no Uriel, permitindo hardlinks de streaming; ele é descartável e não acompanha uma troca de release.
+
 ## txAdmin e conexão de teste
 
 Abra o painel privado por SSH:
@@ -115,11 +117,13 @@ O dump tem checksum SHA-256 e gzip verificado. A restauração deve ser testada 
 
 | Classificação | Evidência |
 | --- | --- |
-| ENFORCED | Decisão do proprietário: não integrar na `master`, preservar o ambiente anterior, guardar credenciais fora do código |
+| ENFORCED | Decisão do proprietário: não integrar na `master`, guardar credenciais fora do código; na implantação posterior foi autorizada a retirada do ambiente/banco anteriores |
 | ESTABLISHED | `compose.yaml`, `docker/fxserver/Dockerfile` e `docker/backup/backup.sh`: contêineres, artefato Linux fixado e dumps já presentes na estrutura anterior |
 | EMERGING | `scripts/install-uriel-release.sh` (`compose_at`, `restore_old`), `scripts/release.py` (`extract`, `manifest`) e `scripts/configure-secrets.py` (`render`): fluxo adaptado à nova base, validado em testes isolados |
 | EXCEPTION | `resources/[vrp]/vrp_player/server.lua` já utiliza `+=`, extensão do CfxLua não aceita pelo `luac` padrão; não foi alterada para Lua convencional |
 
 Na preparação desta alteração passaram 34 testes, incluindo geração privada da configuração, rejeição de injeção, não serialização dos tokens do smartphone, ausência de leitura privada no cliente, normalização Unicode, validação do arquivo de release e simulações de backup/troca/rollback. Nas simulações, Docker e comandos privilegiados são substitutos locais: nenhum contêiner é iniciado. Também passaram sintaxe Bash, JavaScript do smartphone, configuração Compose e verificação dos 439 assets `core`. O `luac` padrão aprovou 21 dos 22 arquivos Lua alterados; o restante tem a extensão preexistente mencionada acima, também rejeitada no commit anterior.
 
-O detector não identificou Spring ou Angular. Não foram executados provisionamento/deploy reais, build nativo da imagem, importação do MariaDB, boot dos recursos, restauração real de backup ou conexão de jogador para esta versão. Não houve publicação no GitHub nem troca de branch principal. Esses são limites da validação, não etapas consideradas concluídas pelos testes das ferramentas.
+O detector não identificou Spring ou Angular. A seção acima registra a validação anterior à primeira implantação. O build nativo e a importação corrigida das 204 tabelas foram posteriormente testados em contêiner no Uriel; o healthcheck passou com o esquema completo e recusou uma tabela ausente. A retirada do ambiente anterior foi autorizada pelo proprietário. Não houve publicação no GitHub nem troca de branch principal. A conexão de jogador e a homologação dos sistemas da cidade continuam sendo verificações separadas do deploy.
+
+Na primeira execução nativa também foram corrigidos o parser JavaScript do oxmysql afetado por uma falsa detecção de credencial, a capitalização de `@vrp/lib/utils.lua` no rádio e referências a três arquivos ausentes do pacote. O `ensure m_eventos` ficou comentado porque esse recurso não foi fornecido. Não foram criadas implementações substitutas dessas dependências. O sanitizador agora preserva os literais legítimos do parser e sua sintaxe JavaScript faz parte dos testes.

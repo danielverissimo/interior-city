@@ -222,6 +222,11 @@ if (out.includes('private-fixture') || !out.includes('kept')) process.exit(2);
         result = subprocess.run(['node','-e',harness],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
+    @unittest.skipUnless(shutil.which('node'), 'Node interpreter not installed')
+    def test_oxmysql_bundle_has_valid_javascript_syntax(self):
+        result = subprocess.run(['node','--check',str(ROOT/'resources/[system]/oxmysql/dist/build.js')],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     @unittest.skipUnless(shutil.which('lua'), 'Lua interpreter not installed')
     def test_unconfigured_webhooks_do_not_make_http_requests(self):
         text = (ROOT/'resources/[vrp]/vrp/server-side/snnipets.lua').read_text()

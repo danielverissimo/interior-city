@@ -1,5 +1,8 @@
 -- Schema only: imported data and database deletion commands intentionally omitted.
 
+SET @IC_PREVIOUS_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
+SET FOREIGN_KEY_CHECKS = 0;
+
 CREATE TABLE IF NOT EXISTS `bench_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `item` varchar(50) NOT NULL DEFAULT '0',
@@ -2127,3 +2130,5 @@ CREATE TABLE IF NOT EXISTS `zo_attachs` (
   `attachs` text DEFAULT NULL,
   PRIMARY KEY (`user_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET FOREIGN_KEY_CHECKS = @IC_PREVIOUS_FOREIGN_KEY_CHECKS;

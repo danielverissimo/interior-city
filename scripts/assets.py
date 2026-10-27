@@ -31,7 +31,7 @@ ASSET_EXT = set('yft ytd ydr ydd ybn ymap ytyp ynv ycd awc rpf ypt ymt yld rel d
 CFX = re.compile(r'cfxk_[A-Za-z0-9_-]+')
 WEBHOOK = re.compile(r'https?://(?:(?:canary|ptb)\.)?discord(?:app)?\.com/api/webhooks/[^\s"\'<>`]+', re.I)
 MYSQL = re.compile(r'mysql://[^\s"\'<>`]+', re.I)
-SENSITIVE = re.compile(r'''(?i)((?:\b(?:password|passwd|api[_-]?key|secret[_-]?key|access[_-]?token|client[_-]?secret|auth[_-]?token|license[_-]?key|steam[_-]?key|bot[_-]?token|token)\b|["'](?:password|passwd|api_key|secret_key|access_token|client_secret|auth_token|license_key|steam_key|bot_token|token)["'])\s*[:=]\s*)(["'])([^"'\r\n]{6,})\2''')
+SENSITIVE = re.compile(r'''(?i)((?:(?<![\w"'`])\b(?:password|passwd|api[_-]?key|secret[_-]?key|access[_-]?token|client[_-]?secret|auth[_-]?token|license[_-]?key|steam[_-]?key|bot[_-]?token|token)\b|["'](?:password|passwd|api_key|secret_key|access_token|client_secret|auth_token|license_key|steam_key|bot_token|token)["'])\s*[:=]\s*)(["'])([^"'\r\n]{6,})\2''')
 
 
 def canonical(value):
@@ -119,7 +119,12 @@ def schema_only(text):
                 statement=statement.partition('\n')[2].lstrip()
         if re.match(r'(?is)^(?:CREATE\s+(?:TABLE|(?:UNIQUE\s+)?INDEX)|ALTER\s+TABLE)\b', statement):
             output.append(statement.rstrip(';')+';')
-    return '-- Schema only: imported data and database deletion commands intentionally omitted.\n\n'+'\n\n'.join(output)+'\n'
+    # Dump order is not dependency order. Disable FK checks only in this import
+    # session; the Compose mounts this file solely for an empty database volume.
+    return ('-- Schema only: imported data and database deletion commands intentionally omitted.\n\n'
+            'SET @IC_PREVIOUS_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;\n'
+            'SET FOREIGN_KEY_CHECKS = 0;\n\n'+'\n\n'.join(output)+
+            '\n\nSET FOREIGN_KEY_CHECKS = @IC_PREVIOUS_FOREIGN_KEY_CHECKS;\n')
 
 
 def sanitize(text, relative):

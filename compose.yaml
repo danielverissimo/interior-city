@@ -15,12 +15,13 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ${INTERIOR_CITY_RELEASE_PATH:-.}/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/db/healthcheck.sh:/usr/local/bin/interior-city-db-health:ro
     networks:
       - backend
     mem_limit: 2g
     cpus: "1.0"
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD", "bash", "/usr/local/bin/interior-city-db-health"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -57,7 +58,6 @@ services:
     volumes:
       - ${INTERIOR_CITY_RELEASE_PATH:-.}:/server-data
       - ./state/txData:/txData
-      - ./state/cache:/server-data/cache
     tmpfs:
       - /server-data/runtime:uid=1000,gid=1000,mode=0700
       - /tmp:uid=1000,gid=1000,mode=1777

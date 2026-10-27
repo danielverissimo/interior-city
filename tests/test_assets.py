@@ -49,9 +49,22 @@ class AssetTests(unittest.TestCase):
         clean,changes=a.sanitize('local hook="'+url+'"\npassword="not-a-real-password"','server.lua')
         self.assertNotIn(url,clean);self.assertNotIn('not-a-real-password',clean);self.assertTrue(changes)
 
+    def test_sanitization_preserves_connection_parser_string_literals(self):
+        code = 'const options = input.replace(/(?:pwd|pass)=/gi, "password=").replace(/(?:db)=/gi, "database=");'
+        clean, changes = a.sanitize(code, 'resources/oxmysql/dist/build.js')
+        self.assertEqual(clean, code)
+        self.assertFalse(changes)
+
     def test_sql_split_keeps_quoted_semicolon(self):
         sql="-- comment\nCREATE TABLE x(v TEXT DEFAULT 'a;b');\nINSERT INTO x VALUES('secret');"
         clean=a.schema_only(sql);self.assertIn("'a;b'",clean);self.assertNotIn("'secret'",clean)
+
+    def test_schema_import_scopes_foreign_key_override_to_its_session(self):
+        clean=a.schema_only('CREATE TABLE child(id INT); SET GLOBAL FOREIGN_KEY_CHECKS=0;')
+        self.assertIn('SET @IC_PREVIOUS_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;',clean)
+        self.assertLess(clean.index('SET FOREIGN_KEY_CHECKS = 0;'),clean.index('CREATE TABLE'))
+        self.assertTrue(clean.rstrip().endswith('SET FOREIGN_KEY_CHECKS = @IC_PREVIOUS_FOREIGN_KEY_CHECKS;'))
+        self.assertNotIn('SET GLOBAL',clean)
 
     def test_sql_comment_markers_inside_literals_are_preserved(self):
         sql="/* dump */\nCREATE TABLE x(v TEXT DEFAULT '/* keep */');"
