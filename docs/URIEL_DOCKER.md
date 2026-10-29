@@ -93,6 +93,15 @@ A importação desativa a verificação de chaves estrangeiras somente na sessã
 
 Os KVPs do FXServer (`db/`) ficam em `state/kvp`. A configuração mutável de rádios privados fica em `state/resources/radio/private_radios.json`, montada sobre o arquivo do recurso. Não copie esses dados de jogadores/configurações para o Git. O instalador aplica `state/compose.runtime.yaml` também à release anterior durante rollback, preservando os mesmos dados mesmo quando o Compose antigo ainda não declarava esses mounts. O perfil local usa volume KVP e arquivo de rádio próprios, inicializados por `scripts/dev.sh init`.
 
+No Uriel, `m_desmanche/config.json`, editável pelo Config Manager, fica em
+`state/resources/m_desmanche/config.json`, com modo 0600. Na primeira transição o
+instalador valida o JSON e captura a versão efetiva novamente depois de parar os
+escritores e antes do backup. Atualizações posteriores leem o mount real do contêiner
+para preservar o estado compartilhado, incluindo em rollback. O arquivo privado
+não entra no Git; a configuração padrão da release permanece intacta. O modo
+explícito de cutover aceita somente a divergência desse JSON conhecido e válido,
+sem liberar alterações nos scripts do recurso.
+
 Na primeira atualização de uma instalação que ainda guardava esses dados dentro da release, pare os escritores, arquive e migre `db/` e o JSON de rádios privados para `state/`. Restaure apenas o JSON padrão da release antiga depois de guardar sua configuração efetiva. O verificador passa a ignorar `db/` e `.replxx_history`, mas continua recusando qualquer mudança de código ou de configuração versionada não revisada. O backup `predeploy` das versões novas inclui também KVPs e configurações persistentes dos recursos; essa cópia precisa ocorrer com FXServer parado.
 
 ## txAdmin e conexão de teste

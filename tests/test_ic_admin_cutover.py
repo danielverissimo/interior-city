@@ -49,6 +49,18 @@ class CutoverTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text()),{'verified':True})
             self.assertFalse(path.with_suffix('.next').exists())
 
+    def test_only_known_mutable_dismantling_json_can_drift(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);old=root/'releases'/('a'*40);old.mkdir(parents=True)
+            (root/'state/manifests').mkdir(parents=True)
+            config=old/'resources/[scripts]/m_desmanche/config.json';config.parent.mkdir(parents=True)
+            config.write_text('{"settings":{},"desmanches":[]}')
+            r.manifest(old,root/'state/manifests'/('a'*40+'.json'))
+            config.write_text('{"settings":{},"desmanches":[{"name":"Edited in city"}]}')
+            with patch.object(c,'ensure_capacity'),contextlib.redirect_stdout(io.StringIO()):self.assertEqual(c.check_previous(root,old),['resources/[scripts]/m_desmanche/config.json'])
+            config.write_text('[]')
+            with self.assertRaises(c.CutoverError):c.check_previous(root,old)
+
     def test_boot_configuration_selects_new_provider_without_starting_legacy(self):
         cfg=(ROOT/'config/ic_admin.cfg').read_text();resources=(ROOT/'config/resources.cfg').read_text()
         self.assertIn('setr ic_admin_mode "active"',cfg)

@@ -84,6 +84,25 @@ for name in db_root_password db_app_password cfx_license steam_web_api webhook_l
   }
 done
 mkdir -p "$root/state/kvp" "$root/state/resources/radio" "$root/state/resources/vrp"
+mkdir -p "$root/state/resources/m_desmanche"
+desmanche_state="$root/state/resources/m_desmanche/config.json"
+[[ ! -L "$root/state/resources/m_desmanche" && ! -L "$desmanche_state" ]] || { echo 'Persistent dismantling configuration must not use symlinks.' >&2; exit 1; }
+desmanche_source="${old:-$release}/resources/[scripts]/m_desmanche/config.json"
+if [[ -n "$old" ]]; then
+  fxserver_id="$(docker ps -a --filter label=com.docker.compose.project=interior-city-tocado --filter label=com.docker.compose.service=fxserver -q)"
+  if [[ -n "$fxserver_id" ]]; then
+    mounted_config="$(docker inspect --format '{{range .Mounts}}{{if eq .Destination "/server-data/resources/[scripts]/m_desmanche/config.json"}}{{.Source}}{{end}}{{end}}' "$fxserver_id")"
+    [[ -z "$mounted_config" || "$mounted_config" == "$desmanche_state" ]] || { echo 'Unexpected dismantling configuration mount.' >&2; exit 1; }
+    if [[ -n "$mounted_config" ]]; then desmanche_source="$desmanche_state"; fi
+  fi
+fi
+preserve_desmanche() {
+  [[ -f "$desmanche_source" && ! -L "$desmanche_source" ]] || { echo 'Missing authoritative dismantling configuration.' >&2; return 1; }
+  python3 -c 'import json,sys; v=json.load(open(sys.argv[1])); assert isinstance(v,dict) and isinstance(v.get("settings"),dict) and isinstance(v.get("desmanches"),list)' "$desmanche_source"
+  if [[ "$desmanche_source" != "$desmanche_state" ]]; then cp "$desmanche_source" "$desmanche_state"; fi
+  chown 1000:1000 "$desmanche_state"; chmod 0600 "$desmanche_state"
+}
+preserve_desmanche
 [[ ! -L "$root/state/resources/vrp" ]] || { echo 'Persistent vRP groups must not use symlinks.' >&2; exit 1; }
 if [[ ! -f "$root/state/resources/radio/private_radios.json" ]]; then
   cp "$release/resources/[voip]/radio/private_radios.json" "$root/state/resources/radio/private_radios.json"
@@ -118,6 +137,8 @@ if [[ -n "$old" ]]; then
   # Stop writers for a consistent predeploy database/txAdmin snapshot.
   trap restore_old ERR
   compose_at "$old" --profile public --profile listing stop connect_proxy playit fxserver
+  # Refresh after stopping writers so the backup and both releases use the final edit.
+  preserve_desmanche
   # Refresh from the authoritative old release only after all writers stop.
   if [[ ! -e "$root/state/resources/vrp/groups.json" ]]; then
     cp "$groups_source" "$root/state/resources/vrp/groups.json"

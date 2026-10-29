@@ -102,3 +102,10 @@ A regra antiga falha nesse controle negativo. A versão corrigida passou, assim
 como as 15 áreas, resoluções 1280×720/1920×1080/3440×1440 e sete testes JavaScript.
 Esses testes são sintéticos; a entrada de um jogador no GTA após a atualização
 continua necessária para confirmar a resolução do incidente no cliente real.
+
+A preparação da atualização identificou uma edição efetiva em
+`m_desmanche/config.json`. O instalador foi ajustado para manter esse JSON no estado
+compartilhado, capturando a edição final com escritores parados e usando-a também
+no retorno de código. Testes simulados cobrem a captura final, preservação de mount
+existente e rejeição de formato inválido. A alteração efetiva da cidade não foi
+copiada para código, documentação ou Git.

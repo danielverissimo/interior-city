@@ -123,7 +123,7 @@ class DockerReleaseTests(unittest.TestCase):
         (release/'.replxx_history').write_text('runtime console history')
         self.assertEqual(set(r.inventory(release)), {'server.cfg'})
 
-    def simulated_deploy(self, fail=False, schema=False, schema_fail=False):
+    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False):
         """Exercise the installer in a temp root; Docker/privileged Linux commands are fakes."""
         base = self.root.resolve()/'deploy'; stage = self.root.resolve()/'stage'; stage.mkdir()
         store = self.root.resolve()/'store'; store.mkdir()
@@ -141,6 +141,8 @@ sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
         (source/'resources/[voip]/radio/private_radios.json').write_text('{}')
         (source/'resources/[vrp]/vrp/cfg').mkdir(parents=True)
         (source/'resources/[vrp]/vrp/cfg/groups.json').write_text('{"groups":[]}')
+        (source/'resources/[scripts]/m_desmanche').mkdir(parents=True)
+        (source/'resources/[scripts]/m_desmanche/config.json').write_text('{"settings":{},"desmanches":[]}')
         (source/'server.cfg').write_text('fixture configuration\n')
         archive = stage/'release.tar'
         with tarfile.open(archive,'w') as tar:
@@ -154,6 +156,10 @@ sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
         radio_state=base/'state/resources/radio/private_radios.json'
         radio_state.parent.mkdir(parents=True)
         radio_state.write_text('{"fixture_channel":777}')
+        desmanche_state=base/'state/resources/m_desmanche/config.json'
+        if persisted_desmanche:
+            desmanche_state.parent.mkdir(parents=True)
+            desmanche_state.write_text('{"settings":{"edited":true},"desmanches":[{"name":"fixture"}]}')
         r.manifest(old,base/'state/manifests'/(old_sha+'.json'))
         (base/'current').symlink_to(old)
         c.initialize(base/'secrets'); c.write_private(base/'secrets/cfx_license',self.license)
@@ -164,6 +170,11 @@ sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
             'stat': '#!/bin/sh\ncase "$3" in */secrets) echo root:700;; *) echo root:444;; esac\n',
             'docker': '#!'+os.sys.executable+'''\nimport json,os,sys
 with open(os.environ['FIXTURE_LOG'],'a') as out: out.write(json.dumps(sys.argv[1:])+'\\n')
+if os.environ.get('FIXTURE_DESMANCHE_MOUNT') and 'ps' in sys.argv:print('fixture-container')
+if os.environ.get('FIXTURE_DESMANCHE_MOUNT') and 'inspect' in sys.argv:print(os.environ['FIXTURE_DESMANCHE_MOUNT'])
+if 'stop' in sys.argv and not os.environ.get('FIXTURE_DESMANCHE_MOUNT'):
+    from pathlib import Path
+    Path(os.environ['FIXTURE_DESMANCHE_SOURCE']).write_text('{"settings":{"finalEdit":true},"desmanches":[]}')
 if os.environ.get('FIXTURE_FAIL_UP')=='1' and 'up' in sys.argv and any('/'+('b'*40)+'/' in x for x in sys.argv):sys.exit(1)
 ''',
             'mv': '#!'+os.sys.executable+'''\nimport os,sys,shutil
@@ -174,10 +185,14 @@ shutil.move(*args)
         }
         for name,script in commands.items(): p=binary/name; p.write_text(script); p.chmod(0o755)
         env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],FIXTURE_LOG=str(log),FIXTURE_FAIL_UP='1' if fail else '0',FIXTURE_SCHEMA_FAIL='1' if schema_fail else '0')
+        env.update(FIXTURE_DESMANCHE_MOUNT=str(desmanche_state) if persisted_desmanche else '',FIXTURE_DESMANCHE_SOURCE=str(old/'resources/[scripts]/m_desmanche/config.json'))
         args=['bash',str(stage/'install.sh'),new_sha,str(archive)]
         if schema: args.append('--ic-admin-schema')
         result=subprocess.run(args,capture_output=True,text=True,env=env)
         self.assertEqual(json.loads(radio_state.read_text()), {'fixture_channel':777})
+        expected={'settings':{'edited':True},'desmanches':[{'name':'fixture'}]} if persisted_desmanche else {'settings':{'finalEdit':True},'desmanches':[]}
+        self.assertEqual(json.loads(desmanche_state.read_text()),expected)
+        self.assertEqual(desmanche_state.stat().st_mode&0o777,0o600)
         events=[json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
         return result, (base/'current').resolve().name, events
 
@@ -190,6 +205,11 @@ shutil.move(*args)
         self.assertLess(backup,up)
         self.assertFalse(any('down' in e for e in events))
         self.assertFalse(any('schema-migration' in e for e in events))
+
+    def test_installer_preserves_already_mounted_configuration_instead_of_release_defaults(self):
+        result,current,events=self.simulated_deploy(persisted_desmanche=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(current,'b'*40)
 
     def test_explicit_admin_schema_runs_after_backup_before_start(self):
         result,current,events=self.simulated_deploy(schema=True)

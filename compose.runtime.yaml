@@ -6,3 +6,4 @@ services:
       - ./state/kvp:/server-data/db
       - ./state/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json
       - ./state/resources/vrp/groups.json:/server-data/resources/[vrp]/vrp/cfg/groups.json
+      - ./state/resources/m_desmanche/config.json:/server-data/resources/[scripts]/m_desmanche/config.json
