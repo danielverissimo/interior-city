@@ -5,8 +5,10 @@ No host database, volumes, published port or real credential is used.
 """
 import importlib.util
 import os
+import json
 from pathlib import Path
 import secrets
+import shutil
 import subprocess
 import tempfile
 import time
@@ -32,7 +34,11 @@ class ICAdminSQLTests(unittest.TestCase):
             time.sleep(0.5)
         else: raise RuntimeError('Disposable MariaDB readiness timeout')
         cls.command((ROOT/'database/schema.sql').read_text())
-        cls.command((ROOT/'database/ic_admin/001_initial.sql').read_text())
+        spec=importlib.util.spec_from_file_location('ic_migrate_setup',ROOT/'scripts/ic-admin-migrate.py')
+        cls.m=importlib.util.module_from_spec(spec);spec.loader.exec_module(cls.m)
+        class DB:
+            def query(self,sql): return cls.command(sql).stdout.strip()
+        cls.m.apply_schema(DB())
 
     @classmethod
     def cleanup(cls):
@@ -47,9 +53,73 @@ class ICAdminSQLTests(unittest.TestCase):
 
     def test_schema_is_additive_repeatable_and_has_all_base_tables(self):
         self.command((ROOT/'database/ic_admin/001_initial.sql').read_text())
-        self.assertEqual(self.command("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='vrp';").stdout.strip(),'210')
-        self.assertEqual(self.command('SELECT MAX(version) FROM ic_admin_schema;').stdout.strip(),'1')
+        self.assertEqual(self.command("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='vrp';").stdout.strip(),'213')
+        self.assertEqual(self.command('SELECT MAX(version) FROM ic_admin_schema;').stdout.strip(),'2')
         self.assertEqual(self.command("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='vrp' AND TABLE_NAME='mirtin_bans' AND COLUMN_NAME IN ('owner','staff');").stdout.strip(),'2')
+
+    def test_v1_promotion_is_repeatable_and_preserves_snapshots(self):
+        m=self.m
+        self.command('CREATE DATABASE ic_upgrade;')
+        parent=self
+        class DB:
+            def query(self,sql):return parent.command('USE ic_upgrade;'+sql).stdout.strip()
+        db=DB();db.query((ROOT/'database/schema.sql').read_text());db.query(m.SCHEMA.read_text())
+        calls={'nextId':77,'calls':[{'id':3,'requesterId':71001,'requesterSubject':'stable-a','acceptedBy':71002,'acceptedSubject':'stable-b','requesterName':'Snapshot','department':'staff','state':'finished','createdAt':10}], 'ratings':[{'callId':3,'staffId':71002,'staffSubject':'stable-b','stars':5,'message':'Fixture','createdAt':20}]}
+        vip={'assignments':[{'id':'upgrade-vip','userId':71001,'subjectKey':'stable-a','group':'vip_gold','state':'uncertain','assignedAt':1,'expiresAt':500,'claims':[]}]}
+        db.query("INSERT INTO ic_admin_documents VALUES ('calls',"+m.sql_text(json.dumps(calls))+",1),('vip_assignments',"+m.sql_text(json.dumps(vip))+",1);")
+        self.assertEqual(m.apply_schema(db)['schemaVersion'],2)
+        self.assertEqual(m.apply_schema(db)['schemaVersion'],2)
+        self.assertEqual(db.query('SELECT COUNT(*) FROM ic_admin_calls;'),'1')
+        self.assertEqual(db.query('SELECT COUNT(*) FROM ic_admin_ratings;'),'1')
+        self.assertEqual(db.query('SELECT subject_key,state FROM ic_admin_vip_assignments;'),'stable-a\tuncertain')
+        self.assertEqual(db.query("SELECT JSON_UNQUOTE(JSON_EXTRACT(payload,'$.requesterName')) FROM ic_admin_calls WHERE id=3;"),'Snapshot')
+        db.query("INSERT INTO ic_admin_calls(state,payload) VALUES('open','{}');")
+        self.assertEqual(db.query('SELECT MAX(id) FROM ic_admin_calls;'),'77')
+
+    def test_records_above_old_domain_cap_paginate_and_reject_stale_write(self):
+        payload=json.dumps({'message':'x'*50000})
+        values=','.join('('+str(30000+n)+",'open',"+self.m.sql_text(payload)+')' for n in range(1,106))
+        self.command('INSERT INTO ic_admin_calls(id,state,payload) VALUES '+values+';')
+        size=int(self.command('SELECT SUM(LENGTH(payload)) FROM ic_admin_calls WHERE id BETWEEN 30001 AND 30105;').stdout.strip())
+        self.assertGreater(size,4000000)
+        self.assertEqual(len(self.command('SELECT id FROM ic_admin_calls WHERE id BETWEEN 30001 AND 30105 ORDER BY id LIMIT 50 OFFSET 50;').stdout.splitlines()),50)
+        self.command("UPDATE ic_admin_calls SET state='accepted',revision=revision+1 WHERE id=30001 AND revision=1;")
+        self.assertEqual(self.command("UPDATE ic_admin_calls SET state='finished' WHERE id=30001 AND revision=1;SELECT ROW_COUNT();").stdout.strip(),'0')
+        self.assertEqual(self.command('SELECT state FROM ic_admin_calls WHERE id=30001;').stdout.strip(),'accepted')
+
+    @unittest.skipUnless(shutil.which('lua'),'Lua interpreter unavailable')
+    def test_actual_call_visibility_predicate_enforces_subject_and_department(self):
+        rows=[(40001,'other','staff','open',''),(40002,'other','staff','accepted','viewer'),(40003,'other','staff','accepted','other-staff'),(40004,'viewer','staff','finished','other-staff'),(40005,'other','police','open',''),(40006,'other','staff','finished','other-staff')]
+        values=','.join('('+str(key)+',10,'+','.join(self.m.sql_text(value) for value in (subject,department,state,actor))+",'{}')" for key,subject,department,state,actor in rows)
+        self.command('INSERT INTO ic_admin_calls(id,owner_id,subject_key,department,state,actor_subject,payload) VALUES '+values+';')
+        for scenario,expected in [('citizen',[40004]),('staff',[40001,40002,40004]),('history',[40001,40002,40003,40004,40006]),('police',[40004,40005]),('reused',[])]:
+            with self.subTest(scenario=scenario):
+                output=subprocess.run(['lua',str(ROOT/'tests/ic_admin_visibility.lua'),str(ROOT),scenario],check=True,capture_output=True,text=True).stdout.splitlines()
+                where=output[0]
+                for value in output[1:]:where=where.replace('?',self.m.sql_text(value),1)
+                actual=self.command('SELECT id FROM ic_admin_calls WHERE id BETWEEN 40001 AND 40006 AND ('+where+') ORDER BY id;').stdout.splitlines()
+                self.assertEqual(list(map(int,actual)),expected)
+
+    def test_reconciliation_selects_pending_claims_and_masks_operation_keys(self):
+        self.command("INSERT INTO ic_admin_operations(operation_key,actor_id,method,payload,state) VALUES('fixture-private-session',1,'vip.choose','{}','uncertain');")
+        value=self.command("SELECT SHA2(operation_key,256) FROM ic_admin_operations WHERE operation_key='fixture-private-session';").stdout.strip()
+        self.assertEqual(len(value),64);self.assertNotIn('fixture',value)
+        payload=json.dumps({'claims':[{'vehicle':'sultan','state':'uncertain'}]})
+        self.command("INSERT INTO ic_admin_vip_assignments(id,state,payload) VALUES('pending-claim','active',"+self.m.sql_text(payload)+');')
+        self.assertEqual(self.command("SELECT id FROM ic_admin_vip_assignments WHERE state IN ('applying','uncertain') OR JSON_SEARCH(payload,'one','uncertain',NULL,'$.claims[*].state') IS NOT NULL;").stdout.strip(),'pending-claim')
+
+    def test_orphan_legacy_history_does_not_attach_to_future_passport_owner(self):
+        self.command('CREATE DATABASE ic_orphan;');parent=self;m=self.m
+        class DB:
+            def query(self,sql):return parent.command('USE ic_orphan;'+sql).stdout.strip()
+        db=DB();db.query((ROOT/'database/schema.sql').read_text());m.apply_schema(db)
+        imported={'snapshotDigest':'orphan-fixture','documents':{'calls':{'nextId':2,'calls':[{'id':1,'requesterId':99999,'requesterName':'Legacy snapshot','department':'staff','message':'Archived','state':'finished','createdAt':10}],'ratings':[]}},'discipline':[{'id':1,'user_id':99999,'actor_id':0,'kind':'warning','reason':'Historical','starts_at':10,'ends_at':20,'state':'archived','return_state':None}],'privateDestinationsRequireConfiguration':0}
+        self.assertTrue(m.apply_import(db,imported)['verified'])
+        self.assertEqual(db.query('SELECT COUNT(*) FROM ic_admin_subjects WHERE user_id IS NULL;'),'1')
+        db.query("INSERT INTO vrp_users(id) VALUES (99999);INSERT INTO ic_admin_subjects(subject_key,user_id) VALUES ('new-owner',99999);")
+        self.assertEqual(db.query('SELECT subject_key FROM ic_admin_subjects WHERE user_id=99999;'),'new-owner')
+        self.assertNotEqual(db.query('SELECT subject_key FROM ic_admin_calls WHERE id=1;'),'new-owner')
+        self.assertNotEqual(db.query('SELECT subject_key FROM ic_admin_discipline WHERE id=1;'),'new-owner')
 
     def test_document_compare_and_swap_and_operation_unique_key(self):
         self.command("INSERT INTO ic_admin_documents VALUES ('sql-test','{}',1); UPDATE ic_admin_documents SET revision=revision+1 WHERE doc_key='sql-test' AND revision=1; UPDATE ic_admin_documents SET payload='stale' WHERE doc_key='sql-test' AND revision=1;")

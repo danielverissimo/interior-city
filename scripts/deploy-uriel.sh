@@ -5,6 +5,8 @@ mode="${1:---prepare}"
 [[ "$mode" == --prepare || "$mode" == --configure || "$mode" == --apply ]] || { echo 'Usage: deploy-uriel.sh --prepare|--configure|--apply [commit]' >&2; exit 2; }
 cd "$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 sha="$(git rev-parse --verify "${2:-HEAD}^{commit}")"
+migration_mode="${3:---no-schema}"
+[[ "$migration_mode" == --no-schema || "$migration_mode" == --ic-admin-schema || "$migration_mode" == --ic-admin-cutover ]] || { echo 'Unsupported migration mode.' >&2; exit 2; }
 [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || exit 2
 # An old master commit is not a valid migration release.
 for path in assets.lock.json scripts/release.py scripts/configure-secrets.py config/resource-secrets.schema.json; do
@@ -38,7 +40,12 @@ if [[ "$mode" == --configure ]]; then
   exit 0
 fi
 git show "$sha:scripts/install-uriel-release.sh" > "$tmp/install-release.sh"
+if [[ "$migration_mode" == --ic-admin-cutover ]]; then
+  git show "$sha:scripts/ic-admin-cutover.py" > "$tmp/ic-admin-cutover.py"
+  git show "$sha:scripts/ic-admin-migrate.py" > "$tmp/ic-admin-migrate.py"
+fi
 ssh "$host" "umask 077; mkdir '$staging'"
 scp "$tmp/release.tar" "$tmp/install-release.sh" "$tmp/release.py" "$host:$staging/"
-ssh -tt "$host" "sudo bash '$staging/install-release.sh' '$sha' \"\$HOME/$staging/release.tar\""
+if [[ "$migration_mode" == --ic-admin-cutover ]]; then scp "$tmp/ic-admin-cutover.py" "$tmp/ic-admin-migrate.py" "$host:$staging/"; fi
+ssh -tt "$host" "sudo bash '$staging/install-release.sh' '$sha' \"\$HOME/$staging/release.tar\" '$migration_mode'"
 ssh "$host" "rm -rf '$staging'"

@@ -5,6 +5,7 @@ local online,blocked,engineDrift,unknownOwner,opaque,transactionOkay=false,false
 local transactionCalls,statements,lockObserved=0,{},false
 local documents={vip_assignments={assignments={{id='claim',userId=42,state='active'}}},calls={calls={{id=1,requesterId=42,acceptedBy=12,state='finished'}},ratings={{staffId=42}}}}
 json={encode=function()return '{}'end}
+GetResourceState=function()return 'missing'end
 RegisterNetEvent=function()end
 AddEventHandler=function(n,fn)handlers[n]=fn end
 CancelEvent=function()end
@@ -33,13 +34,26 @@ I.Store.query=function(sql,params)
         return rows
     elseif sql:find('information_schema.TABLES',1,true)then
         local rows={}
-        for _,name in ipairs({'vrp_users','vrp_user_ids','ic_admin_subjects','ic_admin_discipline','ic_admin_documents','mirtin_bans','mirtin_bans_hwid','mirtin_bans_ip'})do rows[#rows+1]={TABLE_NAME=name,ENGINE=engineDrift and name=='vrp_user_ids' and 'MyISAM' or 'InnoDB'}end
+        for _,name in ipairs({'vrp_users','vrp_user_ids','ic_admin_subjects','ic_admin_discipline','ic_admin_documents','ic_admin_calls','ic_admin_ratings','ic_admin_vip_assignments','mirtin_bans','mirtin_bans_hwid','mirtin_bans_ip'})do rows[#rows+1]={TABLE_NAME=name,ENGINE=engineDrift and name=='vrp_user_ids' and 'MyISAM' or 'InnoDB'}end
         return rows
-    elseif sql:find('COUNT',1,true)then return {{n=1}}
+    elseif sql=='SELECT dkey,dvalue FROM vrp_srv_data' then return {{dkey='unknown',dvalue='opaque'}}
+    elseif sql:find('COUNT',1,true)then return {{n=params and params[1]==99 and 0 or 1}}
     end
     return {}
 end
 I.Store.transaction=function(queries)transactionCalls=transactionCalls+1;statements=queries;return transactionOkay end
+I.Records={
+    each=function(kind,where,params,fn)
+        assert(where:find('subject_key=?',1,true) and params[2]=='original-person','Maintenance must exclude previous owners of reused passports')
+        local rows=kind=='vip_assignments' and documents.vip_assignments.assignments or (kind=='calls' and documents.calls.calls or documents.calls.ratings)
+        for _,row in ipairs(rows)do fn(copy(row),1)end
+    end,
+    guarded=function(kind,row,rev,list)
+        list[#list+1]={query='INSERT INTO ic_admin_schema SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM ic_admin_'..kind..' WHERE revision=?)',values={rev}}
+        list[#list+1]={query='UPDATE ic_admin_'..kind..' SET payload=?',values={'{}'}}
+    end
+}
+dofile(root..'/resources/[scriptcore]/ic_admin/server/ownership.lua')
 dofile(root..'/resources/[scriptcore]/ic_admin/server/maintenance.lua')
 local ctx={source=1,userId=12,role='dono'}
 local function run(mode,p)
@@ -58,7 +72,7 @@ local guarded,ratingUpdate,coreUpdate=false,false,false
 for _,query in ipairs(statements)do
     if query.query:find('NOT EXISTS',1,true)then guarded=true end
     if query.query:find('UPDATE vrp_users',1,true)then coreUpdate=true end
-    if query.query:find('ic_admin_documents',1,true)then ratingUpdate=true end
+    if query.query:find('ic_admin_ratings',1,true)then ratingUpdate=true end
 end
 assert(guarded and coreUpdate and ratingUpdate,'document revisions and ownership not part of same transaction')
 assert(#exportsCalled==2 and exportsCalled[1]==42 and exportsCalled[2]==99,'passport caches not invalidated')

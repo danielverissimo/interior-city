@@ -101,6 +101,11 @@ local oldGet=I.Store.get
 I.Store.get=function(...) roles[20]='suporte';I.sessions[2]=nil;return oldGet(...)end
 assert(not pcall(I.effect,{source=2,userId=20,sessionId=token,permission='economy'}),'revocation during permission await accepted')
 roles[20]='admin';I.Store.get=oldGet;I.newSession(2,20)
+local fresh=I.newSession(2,20)
+I.register('test.slowRead',{permission='view_players',handler=function()users[2]=99;return {private='old actor data'}end})
+local late=request('late-read',{},'test.slowRead',2,fresh)
+assert(not late.ok and late.error.code=='SESSION_EXPIRED' and late.data==nil,'Late read leaked data to a reused source')
+users[2]=20
 local lockOkay=pcall(I.withLock,'failure',function()error('expected')end)
 assert(not lockOkay and I.locks.failure==nil,'failed lock leaked')
 print('IC Admin core: authorization, sessions, replay, uncertainty, privilege bypass and locks passed')

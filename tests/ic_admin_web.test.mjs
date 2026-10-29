@@ -73,3 +73,13 @@ test('closing a monitor while start is pending terminates the late server sessio
     assert.ok(calls.some(entry => entry.method === 'monitor.stop' && entry.payload.token === 'late-session'));
     delete globalThis.document;
 });
+
+
+test('geographic projection uses the atlas CRS and omits invalid/outside coordinates', async () => {
+    const {project}=await import('../resources/[scriptcore]/ic_admin/web/map.mjs');
+    assert.deepEqual(project(0,0),{x:117.3/256,y:172.8/256});
+    assert.ok(project(46,-899));
+    assert.equal(project(NaN,2),null);assert.equal(project(100000,100000),null);
+    const crs={centerX:128,centerY:128,scaleX:1,scaleY:1};
+    assert.deepEqual(project(64,64,crs),{x:.75,y:.25});
+});

@@ -1,14 +1,15 @@
 # IC Admin — implementação e operação
 
 O recurso `ic_admin` usa Lua/vRP e NUI própria para as quinze áreas do Mage Admin.
-O Config Manager continua separado. O modo padrão é `preview`: o novo painel pode
-ser inspecionado sem assumir os serviços compartilhados da cidade. O modo `active`
-é uma troca operacional posterior à homologação, com um único responsável por
-clima, chamados e entregas VIP. Consulte `config/ic_admin.cfg` e o bootstrap do
+O Config Manager continua separado. O modo entregue nesta revisão é `active`, após autorização explícita da troca.
+O instalador exige `--ic-admin-cutover` para essa configuração. O modo `preview`
+continua disponível para ambientes isolados, sem assumir os serviços compartilhados.
+Somente um provedor pode responder por clima, chamados e entregas VIP. Consulte `config/ic_admin.cfg` e o bootstrap do
 recurso para os requisitos de habilitação.
 
 Além do modo, `ic_admin_service_resource` seleciona o provedor consumido pela
-cidade. A configuração entregue mantém o provedor anterior durante a prévia.
+cidade. A configuração anterior `7f01bd5` manteve o provedor antigo durante a prévia.
+A revisão de troca seleciona `ic_admin` e retira o `ensure` do recurso anterior.
 Para assumir serviços, o IC Admin exige modo `active`, provedor `ic_admin` e
 recurso anterior configurado por `ic_admin_previous_resource` parado. Esse nome
 fica na configuração da transição; os módulos novos não chamam seu código.
@@ -59,10 +60,11 @@ captura de execução real.
 | Logs | Filtros, ator/alvo, destino privado, falha de Discord e retenção técnica de 90 dias. |
 
 A manutenção de passaporte usa um registro explícito de tabelas da vRP e do
-núcleo. Relacionamentos não reconhecidos com linhas para o alvo bloqueiam a
-operação. Armazenamentos opacos como `vrp_srv_data`, `trafico`,
-`mirtin_organization_members` e `mirtin_users_homes`, quando populados,
-também bloqueiam a manutenção até existir um adaptador de propriedade verificado.
+núcleo. Relacionamentos não reconhecidos com linhas para o alvo ou destino bloqueiam
+a operação. `server/ownership.lua` adapta formatos conhecidos de `vrp_srv_data`,
+`trafico`, `mirtin_organization_members` e `mirtin_users_homes` sem substituir
+substrings em documentos serializados. Os formatos e guardas da revisão 1.1 estão
+descritos adiante; um formato não reconhecido continua bloqueando a operação.
 Não há varredura destrutiva genérica por colunas chamadas `user_id`, nem garantia
 de apagar dados de um recurso cujo formato não foi mapeado. Essa recusa é um
 resultado esperado de segurança e deve ser coberta na homologação.
@@ -88,6 +90,15 @@ por data, ação, ator e alvo; a disciplina não acompanha a limpeza de 90 dias.
 `ic_admin_schema.version = 1` é gravado somente ao final do SQL. Como DDL no
 MariaDB causa commit implícito, uma falha parcial deve ser investigada e a
 migração idempotente reaplicada; não há promessa de rollback automático de DDL.
+
+A revisão 1.1 exige esquema **v2**. `002_records.sql` acrescenta tabelas próprias
+para chamados, avaliações e entregas VIP, com índices de identidade histórica,
+responsável, setor, estado e data. O comando `schema --apply --writers-stopped`
+aplica as duas DDLs, valida os formatos v1, promove os documentos antigos em uma
+transação e grava o marcador 2 nessa transação. O contador antigo de chamados é
+reservado antes da promoção. Os documentos v1 são preservados como cópia histórica;
+o runtime 1.1 usa os registros individuais. A importação legada e sua verificação
+também consultam os registros atuais e recusam sobrescrever alterações operacionais.
 
 O recurso verifica a versão; não cria tabelas automaticamente. A ferramenta usa
 Python padrão e o cliente `mariadb` que já existe no contêiner `db`. A senha é
@@ -194,7 +205,7 @@ divergência legítima: não restaure dados antigos para fazer a verificação p
 ## Homologação, troca e rollback
 
 Para instalar a prévia no Uriel, o instalador aceita um terceiro argumento
-explícito `--ic-admin-schema`. Ele aplica somente o esquema aditivo v1 depois
+explícito `--ic-admin-schema`. Ele aplica o esquema aditivo exigido pela release depois
 da parada dos escritores e do backup, antes de iniciar a release nova. Sem esse
 argumento, o deploy não executa migrações. Esse fluxo mantém `preview` e não
 importa dados do painel antigo nem seleciona os serviços novos. Falha na migração
@@ -259,7 +270,7 @@ Uriel. A validação SQL isolada não autoriza nem comprova essa troca.
 Uma modificação preexistente em `m_patrulha.sql` permanece fora deste
 trabalho e não deve ser revertida para obter um diff limpo.
 
-### Resultado da validação local desta implementação
+### Resultado da validação local da primeira implementação (1.0)
 
 A suíte padrão executou 74 casos: 68 passaram e seis SQL opt-in foram omitidos
 nessa execução. Os seis casos SQL foram executados separadamente e passaram no
@@ -276,8 +287,95 @@ As permissões herdadas `radio_manage`, `weather_manage`, `time_manage` e
 `ban_history` são respeitadas pelos nomes novos através de aliases explícitos;
 um bloqueio importado não volta a ser liberado pelo padrão de Admin.
 
-Chamados e entregas VIP usam documentos versionados com limite de 4 MB por domínio.
-Ao atingir esse limite, a gravação é recusada sem truncar históricos; acompanhar o
-tamanho antes de uso prolongado e migrar esses históricos para tabelas de eventos
-é uma limitação operacional desta versão. Operações/entregas incertas exigem
-conferência antes de qualquer correção manual; o painel não repete seus efeitos.
+### Revisão 1.1 — lacunas implementadas
+
+O [relatório de validação](IC_ADMIN_VALIDATION.md) reúne arquivos alterados,
+verificações executadas, limitações e etapas que continuam exigindo GTA real.
+
+| Classificação | Implementação e efeito |
+| --- | --- |
+| ENFORCED | `server/records.lua`: chamados, avaliações e entregas passam a registros com revisão; alterações concorrentes são recusadas por CAS. Não existe mais teto agregado de 4 MB nesses históricos. Cada registro tem limite de 1 MB. Configurações pequenas continuam em documentos limitados. |
+| ENFORCED | `server/calls.lua`, `server/vips.lua`: listas de 50 registros, filtros por estado e paginação no SQL. Ranking é agregado no banco (100 primeiros). Avaliações da página são consultadas em lote. Visibilidade usa a identidade histórica e o setor permitido. |
+| ENFORCED | `server/reconciliation.lua`: somente Dono/Developer conferem operações incertas e entregas VIP, com identificador digitado, motivo e evidência. A conferência altera somente o registro; nunca chama entrega de item, veículo ou grupo. |
+| ENFORCED | Conferir um veículo como não entregue libera outra escolha explícita. Confirmar itens exige jogador online, sujeito histórico correspondente, grupo ativo e expiração vRP comprovada. Arquivar entrega incerta não remove efeitos já aplicados; correções patrimoniais são ações distintas auditadas. |
+| ESTABLISHED | `server/ownership.lua`: guarda por comparação do valor original de documentos e moradores dentro da transação. Destinos ocupados, formatos desconhecidos, vínculos estrangeiros não mapeados e trabalhos ativos bloqueiam manutenção. |
+| EMERGING | `web/map.mjs`: atlas local, zoom, arraste, teclado, localização de jogador e marcadores atualizados sem remontar a tela. A projeção usa o CRS visível na referência; alinhamento em coordenadas reais precisa de homologação GTA. |
+| ESTABLISHED | `config/asset-aliases.json`, `scripts/assets.py`: mapa admitido no catálogo existente é identificado por hash e copiado para caminho próprio do IC Admin durante `assets sync`. Verificação recusa cópia modificada, origem fora do catálogo ou destino de código. Não há dependência do recurso antigo em execução nem download externo pela NUI. |
+| ENFORCED | `server/world.lua`: criação e renomeação de categorias propagam os nomes aos locais. Categoria ocupada só pode ser excluída com transferência explícita; locais não são apagados nessa operação. |
+| ENFORCED | `server/core.lua`: respostas de leitura também conferem identidade, cargo e sessão após as esperas, para não entregar dados a um `source` reutilizado. |
+
+Na interface, a conferência fica em **Logs → Abrir conferência** e em
+**VIPs → Conferir entregas pendentes**. O identificador das operações é um hash;
+o identificador interno com token de sessão não é enviado à NUI. Reiniciar o
+recurso transforma entregas/resgates em processamento em estado incerto; efeitos
+não são repetidos automaticamente. Resolver somente a operação de transporte não
+resolve o registro VIP, que exige conferência própria.
+
+Em **Locais → Categorias**, a equipe cria, renomeia e exclui categorias conforme
+as permissões existentes `add_location` e `remove_location`. Em manutenção de
+passaporte, **Pré-verificar vínculos** permite examinar contagens e bloqueios;
+a confirmação sempre executa a preparação novamente.
+
+Formatos de propriedade suportados e limites:
+
+- `trafico.user_id`: passaporte decimal simples; valores serializados desconhecidos
+  bloqueiam a preparação.
+- `mirtin_users_homes`: proprietário relacional e moradores como lista de passaportes
+  ou mapa de passaporte para booleano/nome. Objetos de moradores de outro formato
+  exigem adaptador. Recursos de casas ativos precisam ser pausados para esses vínculos.
+- `mirtin_organization_members`: `user_id` explícito e campos de identidade
+  `user_id`, `userId`, `passport` em `member_data`. Referências restantes não
+  reconhecidas são recusadas. O cache de membros é atualizado pelo export restrito
+  `m_orgs_v2:icAdminOwnershipCommitted`.
+- `vrp_srv_data`: chaves de porta-malas `chest:u<ID>veh_<modelo>` e
+  `wardrobe:<ID>`, ranking de craft por passaporte e detecção de trabalhos de craft
+  ativos. Ranking exige pausa do escritor `m_craft`. Namespaces globais conhecidos
+  de baús são preservados; namespaces não reconhecidos com referências ao alvo ou
+  destino bloqueiam manutenção.
+- O inventário bloqueia abertura de baús durante manutenção e exige baús fechados
+  na preparação; seu cache é invalidado após o commit. Falha de cache após commit
+  gera operação incerta para conferência, sem desfazer ou repetir SQL.
+
+A revisão 1.1 foi implementada localmente. A instalação no Uriel continua sendo a
+prévia `7f01bd5`, com esquema v1; não houve novo deploy nem importação de dados
+efetivos nesta revisão. Um retorno ao runtime 1.0 depois de promover o banco a v2
+faz seu guard recusar o IC Admin antigo. Não apagar o marcador 2 nem copiar os
+documentos históricos sobre registros atuais para forçar rollback. A cidade pode
+continuar com o provedor anterior durante a prévia; troca definitiva exige ensaio
+de retorno com código compatível e reconciliação dos dados.
+
+Validação GTA permanece pendente: dois clientes para WebRTC/fallback e chamados,
+alinhamento do atlas, ações reais de patrimônio, caches dos recursos e início da
+cidade com o provedor antigo desligado. Testes locais não comprovam essas etapas.
+
+
+### Troca operacional autorizada
+
+O proprietário autorizou migrar os dados efetivos e desativar o provedor antigo.
+O comando operacional é `scripts/deploy-uriel.sh --apply HEAD --ic-admin-cutover`.
+O instalador recusa iniciar a configuração ativa sem essa opção explícita.
+
+`scripts/ic-admin-cutover.py` verifica que os escritores pararam, valida o backup,
+conserva os JSONs originais em arquivo privado e sela o snapshot. Apenas divergência
+nos JSONs de estado conhecidos é aceita na release anterior; mudanças de código
+ou configuração continuam bloqueadas. Bytecode `release.cpython-*.pyc` gerado
+pela inspeção é classificado como cache, sem substituir o manifesto.
+
+Quando não existe JSON de clima, uma instância temporária do mesmo FXServer lê
+somente o namespace KVP anterior em uma cópia do RocksDB. O núcleo antigo não é
+executado nessa recuperação. A instância usa a licença já existente enquanto a
+cidade está parada, sem porta publicada, e é removida ao terminar. Estado de clima
+não reconhecido bloqueia a migração; ausência comprovada de persistência conserva
+os padrões configurados. O banco KVP original não é aberto nem alterado pela recuperação.
+
+O backup é restaurado em MariaDB descartável sem rede/portas, comparando contagens
+de todas as tabelas. Esquema e importação são ensaiados nesse banco e verificados
+antes de aplicar no efetivo. IDs de históricos sem cadastro atual ficam sem vínculo
+numérico em `ic_admin_subjects`, para não pertencerem a futuros donos do passaporte.
+
+Depois de iniciar os novos escritores, falha de validação exige correção ou
+reconciliação; não há restauração automática de dados antigos. Uma correção posterior
+com o provedor IC Admin já ativo conserva os registros novos e não reimporta JSONs
+legados. O relatório privado da troca informa contagens, digest, ensaio de restauração,
+versão do esquema e verificação de autoridade. O controlador disponibiliza somente
+um resumo sem credenciais ou registros pessoais.

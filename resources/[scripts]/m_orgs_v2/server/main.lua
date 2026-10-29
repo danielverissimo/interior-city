@@ -103,6 +103,19 @@ Organizations = {
     }
 }
 
+exports('icAdminOwnershipCommitted',function(id,newId)
+    if GetInvokingResource()~='ic_admin' then return false end
+    local member=Organizations.Members[id]
+    for _,members in pairs(Organizations.MembersList or {}) do
+        if members[id] then members[id]=nil;if newId then members[newId]=true end end
+    end
+    Organizations.Members[id]=nil
+    if member and newId then Organizations.Members[newId]=member end
+    if Organizations.timePlayed then Organizations.timePlayed[id]=nil end
+    if Organizations.hasOppenedOrg then Organizations.hasOppenedOrg[id]=nil end
+    return true
+end)
+
 BANK = {
     cooldown = {}
 }

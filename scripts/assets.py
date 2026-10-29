@@ -419,6 +419,45 @@ def selected(lock, profile):
     return [p for p in lock['packages'] if profile=='full' or p['profile']=='core']
 
 
+def asset_aliases(lock_path, lock, profile):
+    """Reuse already-admitted, hash-locked media under independent resource paths."""
+    config=Path(lock_path).parent/'config/asset-aliases.json'
+    if not config.exists(): return []
+    if config.is_symlink(): raise ValueError('Asset alias configuration cannot be a symlink')
+    aliases=json.loads(config.read_text())
+    if not isinstance(aliases,list): raise ValueError('Invalid asset aliases')
+    records=[f for package in selected(lock,profile) for f in package['files']]
+    destinations=set();result=[]
+    for entry in aliases:
+        path=str(safe_relative(entry['destination']))
+        if PurePosixPath(path).suffix.lower() not in {'.png','.jpg','.jpeg','.webp','.svg','.ogg','.wav','.mp3'}: raise ValueError('Aliases are restricted to media assets')
+        if not path.startswith('resources/') or path in destinations: raise ValueError('Invalid/duplicate alias destination')
+        destinations.add(path)
+        sources=[f for f in records if f['sha256']==entry['sha256'] and f['size']==entry['size']]
+        if not sources: raise ValueError('Asset alias must reference an admitted asset in this profile')
+        if any(f['path']==path for f in records): raise ValueError('Asset alias cannot replace a catalogue path')
+        result.append((sources[0],entry))
+    return result
+
+
+def install_aliases(lock_path,lock,destination,profile):
+    for source,alias in asset_aliases(lock_path,lock,profile):
+        src=target_path(destination,source['path']);out=target_path(destination,alias['destination'])
+        if not src.is_file() or file_hash(src)!=source['sha256']: raise ValueError('Alias source failed integrity check')
+        if out.exists():
+            if not out.is_file() or file_hash(out)!=alias['sha256']: raise ValueError('Modified asset alias requires explicit review')
+            continue
+        out.parent.mkdir(parents=True,exist_ok=True)
+        with tempfile.NamedTemporaryFile(dir=out.parent,delete=False) as stream:
+            temporary=Path(stream.name)
+            try:
+                with src.open('rb') as value: shutil.copyfileobj(value,stream,1024**2)
+                stream.flush()
+                if file_hash(temporary)!=alias['sha256']: raise ValueError('Alias copy failed integrity check')
+                os.chmod(temporary,0o644);os.replace(temporary,out)
+            finally:temporary.unlink(missing_ok=True)
+
+
 def verify(lock_path, destination, profile):
     lock=validate_lock(json.loads(Path(lock_path).read_text()));count=0
     for package in selected(lock,profile):
@@ -426,6 +465,10 @@ def verify(lock_path, destination, profile):
             out=target_path(destination,record['path'])
             if not out.is_file() or out.stat().st_size!=record['size'] or file_hash(out)!=record['sha256']:raise ValueError('Missing/modified asset: '+record['path'])
             count+=1
+    for _,alias in asset_aliases(lock_path,lock,profile):
+        out=target_path(destination,alias['destination'])
+        if not out.is_file() or out.stat().st_size!=alias['size'] or file_hash(out)!=alias['sha256']: raise ValueError('Missing/modified asset alias')
+        count+=1
     print(f'Verified {count} installed asset files ({profile})')
 
 
@@ -459,6 +502,7 @@ def sync(lock_path, destination, profile, store):
                 verify_archive(tmp,package,destination)
             finally:tmp.unlink(missing_ok=True)
         print(f'Installed package {index}/{len(packages)}',flush=True)
+    install_aliases(lock_path,lock,destination,profile)
     verify(lock_path,destination,profile)
     save_json(destination/'.assets-state.json',{'lock_sha256':file_hash(lock_path),'profile':profile})
 

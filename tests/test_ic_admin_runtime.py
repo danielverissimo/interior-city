@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ICAdminRuntimeTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('lua'), 'Lua interpreter unavailable')
     def test_lua_behavior_harnesses(self):
-        for name in ('ic_admin_core.lua','ic_admin_services.lua','ic_admin_monitor.lua','ic_admin_maintenance.lua','ic_admin_discipline.lua','ic_admin_inventory.lua'):
+        for name in ('ic_admin_core.lua','ic_admin_records.lua','ic_admin_services.lua','ic_admin_monitor.lua','ic_admin_ownership.lua','ic_admin_maintenance.lua','ic_admin_discipline.lua','ic_admin_inventory.lua'):
             with self.subTest(harness=name):
                 result=subprocess.run(['lua',str(ROOT/'tests'/name),str(ROOT)],text=True,capture_output=True)
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)

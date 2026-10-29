@@ -1,10 +1,12 @@
 import { createTransport, escapeHtml as h, rowsOf, isAllowed } from './transport.mjs';
 import { createMonitor } from './monitor.mjs';
+import { createMap } from './map.mjs';
+const atlas=createMap();
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const rpc = createTransport({ resource: typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'ic_admin' });
-const state = { page: 'server', bootstrap: null, data: null, selected: null, sequence: 0, modalCleanup: null };
+const state = { page: 'server', bootstrap: null, data: null, selected: null, sequence: 0, modalCleanup: null, filters:{calls:{page:1,state:''},vips:{page:1,state:''}}, reviewData:null };
 const money = value => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const date = value => value ? new Date(typeof value === 'number' && value < 1e12 ? value * 1000 : value).toLocaleString('pt-BR') : '—';
 const nav = [
@@ -81,15 +83,16 @@ function updateShell() {
 
 async function loadPage() {
     const serial = ++state.sequence;
-    updateShell(); $('#content').innerHTML = '<div class="loading">Carregando dados da cidade...</div>';
+    atlas.destroy();updateShell(); $('#content').innerHTML = '<div class="loading">Carregando dados da cidade...</div>';
     try {
         let data;
         if (state.page === 'server') data = can('view_players') ? await call('players.list') : { players: [], stats: state.bootstrap.stats || {} };
-        else if (state.page === 'players' || state.page === 'map') data = await call('players.list');
+        else if (state.page === 'players') data = await call('players.list');
+        else if (state.page === 'map') data = await call('map.players');
         else if (state.page === 'warnings') data = await call('warnings.list', {});
-        else if (state.page === 'calls') data = await call('calls.list', {});
+        else if (state.page === 'calls') data = await call('calls.list', state.filters.calls);
         else if (['items', 'weapons', 'vehicles', 'groups'].includes(state.page)) data = await call('catalog.get');
-        else if (state.page === 'vips') data = await call('vip.list');
+        else if (state.page === 'vips') data = await call('vip.list',state.filters.vips);
         else if (state.page === 'radio') data = await call('radio.list');
         else if (state.page === 'locations') data = await call('locations.list');
         else if (state.page === 'climate') data = await call('world.get');
@@ -108,6 +111,10 @@ function actionCards(keys = actions.map(x => x.key)) {
     const descriptions = {wladd:'Autorize a entrada do passaporte na cidade.',wlrem:'Retire a autorização de acesso à cidade.',ban:'Bloqueie o acesso do jogador, registrando o motivo.',unban:'Remova o bloqueio de acesso de um passaporte.',send_adm:'Envie uma mensagem para todos os jogadores.',godall:'Reanime todos os jogadores conectados.',tpway:'Vá para a marcação atual do seu mapa.',tpcds:'Informe a posição para onde deseja ir.',clear_allveh:'Agende a remoção de veículos sem ocupantes.',clear_props:'Remova objetos próximos do seu personagem.',spawn_veh:'Crie um veículo próximo do seu personagem.',give_veh:'Adicione um veículo à garagem do jogador.',rem_veh:'Retire um veículo da garagem do jogador.',fix:'Repare seu veículo atual ou o mais próximo.',tuning:'Aplique melhorias ao veículo atual.',hash:'Consulte o modelo e o hash do veículo.',dv:'Remova o veículo atual ou o mais próximo.'};
     return `<div class="cards">${keys.map(key => actionById.get(key)).filter(x => x && can(x.permission)).map(x => `<article class="card" data-search="${h(x.title.toLowerCase())}"><h3>${h(x.title)}</h3><p>${h(descriptions[x.key] || 'Selecione o jogador e confira os dados da ação.')}</p>${btn('Abrir ação', `data-action="${x.key}"`, x.dangerous ? 'danger' : '')}</article>`).join('')}</div>`;
 }
+
+const stateLabels={open:'Abertos',accepted:'Em atendimento',finished:'Concluídos',cancelled:'Cancelados',active:'Ativos',expired:'Expirados',uncertain:'Conferência',applying:'Em processamento',archived:'Arquivados'};
+function stateFilter(domain,values){return `<label class="toolbar">Estado <select class="input" data-state-filter="${domain}"><option value="">Todos</option>${values.map(value=>`<option value="${value}" ${state.filters[domain].state===value?'selected':''}>${h(stateLabels[value])}</option>`).join('')}</select></label>`;}
+function pagination(domain,total=0,page=1,size=50){page=Number(page)||1;return `<div class="pagination">${page>1?btn('Anterior',`data-domain="${domain}" data-page="${page-1}"`):''}<span>Página ${page} · ${Number(total)||0} registros</span>${page*size<Number(total)?btn('Próxima',`data-domain="${domain}" data-page="${page+1}"`):''}</div>`;}
 
 function renderPage() {
     const data = state.data || {};
@@ -136,35 +143,34 @@ function renderPage() {
         html = heading('Advertências', 'A disciplina permanece no histórico após a manutenção de ID.', can('warning') ? btn('Aplicar advertência', 'data-command="warning"', 'primary') : '') + toolbar() + table(['Alvo', 'Motivo', 'Início / término', 'Estado', 'Ação'], list.map(w => row([`#${h(w.user_id || w.targetId || w.id)} ${h(w.name || w.target_name || '')}`, h(w.reason || w.motivo || ''), `${date(w.starts_at || w.createdAt)}<span class="sub">${date(w.ends_at || w.expiresAt)}</span>`, h(w.state || w.status || 'histórico'), can('delete_warning') ? btn('Arquivar', `data-warning-archive="${h(w.id)}"`, 'danger small') : '—'], `${w.user_id || w.targetId} ${w.reason}`)));
     } else if (page === 'map') {
         const players = rowsOf(data, 'players');
-        html = `<div class="map">${players.filter(p => p.coords || p.position).map(p => {
-            const c = p.coords || p.position; const x = Array.isArray(c) ? c[0] : c.x; const y = Array.isArray(c) ? c[1] : c.y;
-            return `<button class="map-marker" data-player="${Number(p.id)}" data-map-x="${Number(x)}" data-map-y="${Number(y)}">#${h(p.id)} ${h(p.name)}</button>`;
-        }).join('')}<span class="map-axes">Visualização de coordenadas GTA · clique no jogador para abrir o perfil</span></div>${heading('Jogadores no mapa')}${table(['Jogador', 'Posição', 'Ações'], players.map(p => row([`#${h(p.id)} ${h(p.name)}`, h(JSON.stringify(p.coords || p.position || 'Indisponível')), `${btn('Perfil', `data-player="${Number(p.id)}"`)} ${can('map_screen') ? btn('Ver tela', `data-monitor="${Number(p.id)}"`) : ''}`], `${p.id} ${p.name}`)))}`;
+        html = `<div id="city-atlas"></div>${heading('Jogadores no mapa')}${table(['Jogador', 'Posição', 'Ações'], players.map(p => row([`#${h(p.id)} ${h(p.name)}`, h(JSON.stringify(p.coords || p.position || 'Indisponível')), `${btn('Perfil', `data-player="${Number(p.id)}"`)} ${can('map_screen') ? btn('Ver tela', `data-monitor="${Number(p.id)}"`) : ''}`], `${p.id} ${p.name}`)))}`;
     } else if (page === 'calls') {
         const calls = rowsOf(data, 'calls');
         html = heading('Atendimentos', 'O aceite é exclusivo: somente uma pessoa assume cada chamado.', btn('Novo chamado', 'data-command="call"', 'primary')) + toolbar() + table(['Chamado', 'Solicitante', 'Setor / estado', 'Mensagem', 'Ação'], calls.map(c => row([`#${h(c.id)}`, `#${h(c.requesterId)} ${h(c.requesterName)}`, `${h(c.department)}<span class="sub">${h(c.state)}</span>`, h(c.message), c.canAccept === true ? btn('Atender', `data-call-accept="${h(c.id)}"`, 'primary small') : c.canFinish === true ? btn('Finalizar', `data-call-finish="${h(c.id)}"`, 'small') : c.canRate === true ? btn('Avaliar', `data-call-rate="${h(c.id)}"`, 'small') : '—'], `${c.id} ${c.requesterName} ${c.message} ${c.state}`)));
+        html += pagination('calls',data.total,data.page,50)+stateFilter('calls',['open','accepted','finished','cancelled']);
         html += heading('Ranking da equipe') + table(['Staff', 'Concluídos', 'Média'], rowsOf(data, 'ranking').map(r => row([h(r.name || r.acceptedName || r.staffId || r.id), h(r.total || r.count || r.finished || 0), h(r.average || r.stars || '—')])));
         html += heading('Avaliações') + table(['Chamado', 'Nota', 'Comentário'], rowsOf(data, 'ratings').map(r => row([h(r.callId), `${h(r.stars)} / 5`, h(r.message)])));
     } else if (page === 'vips') {
         html = heading('Pacotes VIP', 'Validade de 30 dias. Um pacote ativo não pode ser entregue novamente.', can('create_vip') ? btn('Criar pacote', 'data-command="vip-new"', 'primary') : '') + toolbar() + `<div class="cards">${rowsOf(data, 'packages', 'vips').map(v => `<article class="card" data-search="${h(`${v.title} ${v.group}`.toLowerCase())}"><h3>☆ ${h(v.title || v.group)}</h3><p>${h(v.group)}<br>${money(v.salary)} de salário · +${Number(v.garageSlots || 0)} vagas<br>${(v.items || []).length} itens · ${Number(v.vehicleChoices || 0)} escolha(s) de veículo</p><div class="actions">${can('assign_vip') ? btn('Entregar', `data-vip-assign="${h(v.group)}"`, 'primary') : ''}${can('edit_vip') ? btn('Editar', `data-vip-edit="${h(v.group)}"`) : ''}${can('delete_vip') ? btn('Excluir', `data-vip-delete="${h(v.group)}"`, 'danger') : ''}</div></article>`).join('')}</div>`;
         html += heading('Entregas e resgates') + table(['Jogador', 'Pacote', 'Estado', 'Expiração'], rowsOf(data, 'assignments').map(v => row([`#${h(v.userId || v.targetId)}`, h(v.group), h(v.state || v.status), date(v.expiresAt)])));
+        html += pagination('vips',data.totalAssignments,data.page,50)+stateFilter('vips',['active','expired','uncertain','applying','archived']);
+        if(can('reconciliation_manage'))html += btn('Conferir entregas pendentes','data-command="reconciliation"');
     } else if (page === 'radio') {
         html = heading('Rádios privadas', 'Configurações sincronizadas pelo recurso de rádio.', can('radio_save') ? btn('Nova frequência', 'data-command="radio-new"', 'primary') : '') + toolbar() + table(['Nome', 'Frequência', 'Permissões', 'Estado', 'Ações'], rowsOf(data, 'radios').map(r => row([h(r.name), h(r.channel), h((r.permissions || []).join(', ')), r.enabled ? '<span class="pill green">Ativa</span>' : 'Desativada', `${can('radio_save') ? btn('Editar', `data-radio-edit="${r.id}"`) : ''} ${can('radio_delete') ? btn('Excluir', `data-radio-delete="${r.id}"`, 'danger') : ''}`], `${r.name} ${r.channel}`)));
     } else if (page === 'locations') {
-        html = heading('Locais administrativos', 'Coordenadas capturadas dentro do jogo ou informadas manualmente.', can('add_location') ? btn('Novo local', 'data-command="location-new"', 'primary') : '') + toolbar() + table(['Nome', 'Categoria', 'Coordenadas', 'Ações'], rowsOf(data, 'locations').map(l => row([h(l.name), h(l.category), `${Number(l.x).toFixed(2)}, ${Number(l.y).toFixed(2)}, ${Number(l.z).toFixed(2)}`, `${btn('Ir até', `data-location-tp="${h(l.id)}"`)} ${can('add_location') ? btn('Editar', `data-location-edit="${h(l.id)}"`) : ''} ${can('remove_location') ? btn('Excluir', `data-location-delete="${h(l.id)}"`, 'danger') : ''}`], `${l.name} ${l.category}`)));
+        html = btn('Categorias','data-command="categories"')+heading('Locais administrativos', 'Coordenadas capturadas dentro do jogo ou informadas manualmente.', can('add_location') ? btn('Novo local', 'data-command="location-new"', 'primary') : '') + toolbar() + table(['Nome', 'Categoria', 'Coordenadas', 'Ações'], rowsOf(data, 'locations').map(l => row([h(l.name), h(l.category), `${Number(l.x).toFixed(2)}, ${Number(l.y).toFixed(2)}, ${Number(l.z).toFixed(2)}`, `${btn('Ir até', `data-location-tp="${h(l.id)}"`)} ${can('add_location') ? btn('Editar', `data-location-edit="${h(l.id)}"`) : ''} ${can('remove_location') ? btn('Excluir', `data-location-delete="${h(l.id)}"`, 'danger') : ''}`], `${l.name} ${l.category}`)));
     } else if (page === 'climate') {
         html = `<div class="metrics">${metric('CLIMA ATUAL', data.weather || 'CLEAR')}${metric('HORÁRIO', `${String(data.hour ?? 12).padStart(2, '0')}:${String(data.minute ?? 0).padStart(2, '0')}`)}${metric('RELÓGIO', data.freezeTime ? 'Congelado' : 'Em andamento')}</div><article class="card"><h3>Clima e horário</h3><p>As alterações afetam todos os jogadores e permanecem após restart.</p>${btn('Configurar ambiente', 'data-command="climate"', 'primary')}</article>`;
     } else if (page === 'logs') {
         const a = data.audit || {};
+        html = '';
         html = `<div class="metrics">${metric('RETENÇÃO TÉCNICA', '90 dias')}${metric('REGISTROS', a.total ?? rowsOf(a, 'entries').length)}</div><form id="audit-filter" class="toolbar"><input class="input" name="action" placeholder="Ação"><input class="input" name="actorId" type="number" min="1" placeholder="Staff ID"><input class="input" name="targetId" type="number" min="1" placeholder="Alvo ID"><button class="button">Filtrar</button></form>` + table(['Data', 'Ação', 'Administrador', 'Alvo', 'Detalhes'], rowsOf(a, 'entries').map(e => row([date(e.created_at || e.createdAt), h(e.action), `#${h(e.actor_id || e.actorId || '—')} ${h(e.actor_name || '')}`, `#${h(e.target_id || e.targetId || '—')} ${h(e.target_name || '')}`, btn('Consultar', `data-audit-detail="${h(e.id)}"`)])));
         html += `<div class="actions">${a.page > 1 ? btn('Anterior', `data-audit-page="${a.page - 1}"`) : ''}${Number(a.total) > Number(a.page || 1) * 50 ? btn('Próxima', `data-audit-page="${Number(a.page || 1) + 1}"`) : ''}</div>`;
+        if(can('reconciliation_manage'))html += heading('Operações pendentes de conferência','A conferência registra o resultado; nenhum benefício é repetido.',btn('Abrir conferência','data-command="reconciliation"'));
         html += heading('Notificações no Discord', 'URLs cadastradas na configuração privada do servidor.') + (can('logs_manage') ? btn('Associar categoria a destino', 'data-command="audit-route"') : '') + table(['Destino', 'Configuração'], rowsOf(data.destinations, 'destinations').map(d => row([h(d.label || d.id), d.configured ? '<span class="pill green">Configurado</span>' : 'Não configurado'])));
     }
     $('#content').innerHTML = html || empty('Nenhuma função disponível', 'As permissões desta área podem ter sido revogadas.');
-    $$('[data-map-x]').forEach(marker => {
-        marker.style.left = `${Math.max(3, Math.min(97, (Number(marker.dataset.mapX) + 4000) / 8500 * 100))}%`;
-        marker.style.top = `${Math.max(5, Math.min(95, (8000 - Number(marker.dataset.mapY)) / 12000 * 100))}%`;
-    });
+    if(page==='map')atlas.mount($('#city-atlas'),rowsOf(data,'players'));
 }
 
 let previousFocus = null;
@@ -196,6 +202,13 @@ function form(title, method, fields, defaults = {}, options = {}) {
     modal(title, `<form id="operation-form" data-method="${h(method)}"><div class="modal-body">${options.warning ? `<div class="warning">${h(options.warning)}</div>` : ''}<div class="form-grid">${fields.map(f => fieldHtml(f, defaults)).join('')}</div>${options.capture ? `<div class="actions">${btn('Usar minha posição', 'data-capture-position')}</div>` : ''}</div><div class="modal-foot">${btn('Cancelar', 'data-modal-close')}<button class="button ${options.dangerous ? 'danger' : 'primary'}" type="submit">${h(options.submit || 'Confirmar')}</button></div></form>`, options);
     $('#operation-form')._fields = fields;
     $('#operation-form')._defaults = defaults;
+    if(method.startsWith('maintenance.')){
+        const check=document.createElement('button');check.type='button';check.className='button';check.textContent='Pré-verificar vínculos';
+        const result=document.createElement('div');result.className='preflight-result';result.setAttribute('aria-live','polite');
+        check.onclick=async()=>{check.disabled=true;try{const payload=valuesOf($('#operation-form'));const data=await call('maintenance.inspect',{...payload,mode:method.split('.')[1]});result.textContent=data.message+'\n'+data.footprint.map(row=>`${row.table}: ${row.count} registro(s)`).join('\n');}catch(error){result.textContent=error.message;}finally{check.disabled=false;}};
+        $('#operation-form .modal-body').append(check,result);
+    }
+
 }
 
 function showAction(key, defaults = {}) {
@@ -233,6 +246,9 @@ async function command(name, element) {
     else if (name === 'identity') form('Editar identidade', 'identity.update', [targetField,{name:'field',label:'Campo',type:'select',options:[['nome','Nome'],['sobrenome','Sobrenome'],['idade','Idade'],['telefone','Telefone'],['registro','RG']]},{name:'value',label:'Novo valor',required:true},reason()],{targetId:target});
     else if (name === 'wipe' || name === 'changeId') form(name === 'wipe' ? 'Limpar cadastro e patrimônio' : 'Trocar passaporte', `maintenance.${name}`, [targetField,...(name==='changeId'?[{name:'newId',label:'Novo passaporte',type:'number',min:1,required:true}]:[]),{name:'confirmId',label:'Digite novamente o passaporte atual',type:'number',min:1,required:true},reason()], {targetId:target}, {dangerous:true,warning:'O alvo deve estar desconectado. A operação exige validação de todos os vínculos; a disciplina e a auditoria são preservadas. A limpeza será recusada se houver ban ativo.'});
     else if (name === 'call') form('Criar chamado', 'calls.create', [{name:'department',label:'Setor',type:'select',options:[['staff','Staff'],['police','Polícia'],['mechanic','Mecânica'],['hospital','Hospital']]},{name:'message',label:'Solicitação',type:'textarea',required:true,maxLength:500}], {}, {submit:'Enviar chamado'});
+    else if (name === 'reconciliation') await showReconciliation();
+    else if (name === 'categories') showCategories();
+    else if (name === 'category-new') categoryForm();
     else if (name === 'location-new') locationForm();
     else if (name === 'radio-new') radioForm();
     else if (name === 'vip-new') await vipForm();
@@ -244,6 +260,29 @@ async function command(name, element) {
         const data=state.data.destinations || {};
         form('Destino da categoria','audit.update',[{name:'category',label:'Categoria / chave de log',required:true},{name:'destination',label:'Destino privado',type:'select',options:[['','Envio desativado'],...rowsOf(data,'destinations').filter(d=>d.configured).map(d=>[d.id,d.label||d.id])]}]);
     }
+}
+
+function showCategories(){
+    const data=state.data||{};
+    modal('Categorias de locais',`<div class="modal-body">${can('add_location')?btn('Nova categoria','data-command="category-new"','primary'):''}${table(['Categoria','Locais','Ações'],rowsOf(data,'categories').map(name=>row([h(name),String(rowsOf(data,'locations').filter(row=>row.category===name).length),`${can('add_location')?btn('Renomear',`data-category-edit="${h(name)}"`):''} ${can('remove_location')?btn('Excluir',`data-category-delete="${h(name)}"`,'danger'):''}`])))}</div>`);
+}
+function categoryForm(original=''){
+    form(original?'Renomear categoria':'Criar categoria','locations.categorySave',[{name:'name',label:'Nome da categoria',required:true,maxLength:80},reason()],{original,name:original},{warning:original?'Todos os locais da categoria serão atualizados.':''});
+}
+async function showReconciliation(page=1){
+    const data=await call('reconciliation.list',{page});state.reviewData=data;
+    modal('Conferência administrativa',`<div class="modal-body"><p>Confira os efeitos no inventário, na garagem e nos grupos. Registrar o resultado não repete a operação.</p>${heading('Operações incertas')}${table(['Registro','Administrador','Método','Ação'],rowsOf(data,'operations').map(row=>rowHtmlReview(row)))}${heading('Entregas e resgates VIP')}${table(['Entrega','Jogador','Estado','Ação'],rowsOf(data,'assignments').map(entry=>row([h(entry.id),`#${h(entry.userId)}`,h(entry.state),btn('Conferir',`data-review-vip="${h(entry.id)}"`)])))}${pagination('reconciliation',Math.max(Number(data.total)||0,Number(data.totalAssignments)||0),data.page,50)}</div>`,{wide:true});
+}
+function rowHtmlReview(entry){return row([`<small>${h(entry.id)}</small>`,`#${h(entry.actor_id)}`,h(entry.method),btn('Conferir',`data-review-operation="${h(entry.id)}"`)]);}
+function reviewForm(kind,id){
+    const entry=rowsOf(state.reviewData,kind==='vip'?'assignments':'operations').find(row=>String(row.id)===id);if(!entry)return;
+    const options=kind==='operation'?[['applied','Efeito confirmado como aplicado'],['failed','Falha confirmada sem efeito']]:[];
+    if(kind==='vip'){
+        if(['uncertain','applying'].includes(entry.state))options.push(['items_applied','Cargo e todos os itens confirmados'],['archive','Arquivar entrega; corrigir efeitos manualmente']);
+        (entry.claims||[]).forEach((claim,index)=>{if(['uncertain','applying'].includes(claim.state))options.push([`claim_applied:${index+1}`,`${claim.vehicle}: entrega confirmada`],[`claim_not_applied:${index+1}`,`${claim.vehicle}: ausência de entrega confirmada`]);});
+    }
+    form('Registrar conferência','reconciliation.resolve',[{name:'outcome',label:'Resultado confirmado',type:'select',options,required:true},{name:'evidence',label:'Evidência: estado observado antes/depois',type:'textarea',required:true,maxLength:1000,full:true},reason(),{name:'confirmId',label:`Digite o identificador: ${id}`,required:true,maxLength:96}],{kind,id},{dangerous:true,warning:'Não conclua sem conferir os efeitos. Confirmar ausência de um veículo libera outra escolha para esse resgate.'});
+    const details=document.createElement('pre');details.className='json-preview';details.textContent=JSON.stringify(entry,null,2);$('#operation-form .modal-body').prepend(details);
 }
 
 function locationForm(value={}) {
@@ -288,9 +327,9 @@ async function showPermissions() {
     $('#modal-layer')._permissions=data;
 }
 
-async function showPublicCalls() {
-    const data=await call('calls.list',{});
-    modal('Atendimentos',`<div class="modal-body"><p class="muted small-text">Consulte suas solicitações e os chamados do seu setor.</p>${table(['Chamado','Setor / estado','Mensagem','Ação'],rowsOf(data,'calls').map(c=>row([`#${h(c.id)}`,`${h(c.department)} · ${h(c.state)}`,h(c.message),c.canAccept===true?btn('Atender',`data-call-accept="${h(c.id)}"`):c.canFinish===true?btn('Finalizar',`data-call-finish="${h(c.id)}"`):c.canRate===true?btn('Avaliar',`data-call-rate="${h(c.id)}"`):'—'])))}</div>`,{wide:true});
+async function showPublicCalls(page=1) {
+    const data=await call('calls.list',{page});
+    modal('Atendimentos',`<div class="modal-body"><p class="muted small-text">Consulte suas solicitações e os chamados do seu setor.</p>${table(['Chamado','Setor / estado','Mensagem','Ação'],rowsOf(data,'calls').map(c=>row([`#${h(c.id)}`,`${h(c.department)} · ${h(c.state)}`,h(c.message),c.canAccept===true?btn('Atender',`data-call-accept="${h(c.id)}"`):c.canFinish===true?btn('Finalizar',`data-call-finish="${h(c.id)}"`):c.canRate===true?btn('Avaliar',`data-call-rate="${h(c.id)}"`):'—'])))}${pagination('publicCalls',data.total,data.page,50)}</div>`,{wide:true});
 }
 
 const monitor = createMonitor({ call, post: async (endpoint,payload) => {
@@ -308,7 +347,12 @@ document.addEventListener('click', async event => {
     try {
         if(button.matches('[data-nav]')){closeModal();state.page=button.dataset.nav;state.selected=null;await loadPage();}
         else if(button.matches('[data-modal-close]')){if($('#app').hidden)await closePanel();else closeModal();}
-        else if(button.matches('[data-player]'))await showPlayer(button.dataset.player);
+        else if(button.matches('[data-page]')){const domain=button.dataset.domain,page=Number(button.dataset.page);if(domain==='reconciliation')await showReconciliation(page);else if(domain==='publicCalls')await showPublicCalls(page);else{state.filters[domain].page=page;await loadPage();}}
+        else if(button.matches('[data-review-vip]'))reviewForm('vip',button.dataset.reviewVip);
+        else if(button.matches('[data-review-operation]'))reviewForm('operation',button.dataset.reviewOperation);
+        else if(button.matches('[data-category-edit]'))categoryForm(button.dataset.categoryEdit);
+        else if(button.matches('[data-category-delete]')){const name=button.dataset.categoryDelete;form('Excluir categoria','locations.categoryDelete',[{name:'destination',label:'Transferir locais para',type:'select',options:[['','Sem transferência (categoria vazia)'],...rowsOf(state.data,'categories').filter(value=>value!==name)]},{name:'confirmCategory',label:`Digite a categoria: ${name}`,required:true},reason()],{name},{dangerous:true,warning:'Locais existentes serão preservados na categoria de destino.'});}
+        else if(button.matches('[data-player]')){if(state.page==='map'&&!can('view_players')){const player=rowsOf(state.data,'players').find(row=>Number(row.id)===Number(button.dataset.player));if(player){state.selected=player;modal(`#${player.id} · ${player.name}`,`<div class="modal-body">${actionCards(['god','tpto','tptome','freeze','unfreeze'])}${can('map_screen')?btn('Ver tela',`data-monitor="${player.id}"`):''}</div>`);}}else await showPlayer(button.dataset.player);}
         else if(button.matches('[data-action]'))showAction(button.dataset.action,{targetId:Number(button.dataset.target)||state.selected?.id});
         else if(button.matches('[data-command]'))await command(button.dataset.command,button);
         else if(button.matches('[data-item]'))await command('item',button);
@@ -376,10 +420,12 @@ document.addEventListener('submit',async event=>{
         try{
             const method=formElement.dataset.method;const data=valuesOf(formElement);
             if(method==='action.execute'&&data.action==='tpcds')data.coords={x:data.x,y:data.y,z:data.z};
+            if(method==='reconciliation.resolve'&&data.outcome.includes(':')){const [outcome,index]=data.outcome.split(':');data.outcome=outcome;data.claimIndex=Number(index);}
             const result=await call(method,data);
             if(method==='players.lookup'){showIdentityLookup(result);return;}
             closeModal();toast('Operação concluída.');
-            if(method==='permissions.update'){state.bootstrap.permissions=await call('permissions.get');await showPermissions();}
+            if(method==='reconciliation.resolve'){await showReconciliation();}
+            else if(method==='permissions.update'){state.bootstrap.permissions=await call('permissions.get');await showPermissions();}
             else if(!$('#app').hidden)await loadPage();
             else if(method==='calls.create'){await closePanel();}
         }catch(error){toast(error.message,true);if(submit.isConnected)submit.disabled=false;}
@@ -408,7 +454,7 @@ document.addEventListener('keydown',event=>{
         else if(!event.shiftKey&&document.activeElement===list.at(-1)){event.preventDefault();list[0].focus();}
     }
 });
-async function closePanel(){closeModal();$('#app').hidden=true;$('#vip-choice').hidden=true;await call('ui.close').catch(()=>{});}
+async function closePanel(){atlas.destroy();closeModal();$('#app').hidden=true;$('#vip-choice').hidden=true;await call('ui.close').catch(()=>{});}
 $('#close').onclick=closePanel;$('#refresh').onclick=loadPage;$('#permissions').onclick=()=>showPermissions().catch(e=>toast(e.message,true));
 $('#public-call-dismiss').onclick=()=>{$('#public-call').hidden=true;};
 let currentCall=null;
@@ -421,7 +467,7 @@ window.addEventListener('message',async event=>{
         state.page=visibleNav()[0]?.[0]||'server';$('#app').hidden=false;
         if(!visibleNav().length){updateShell();$('#content').innerHTML=empty('Sem funções liberadas','Solicite ao Dono ou Developer a configuração do seu cargo.');return;}
         await loadPage();
-    }else if(message.type==='close'){closeModal();monitor.stop();$('#app').hidden=true;$('#vip-choice').hidden=true;}
+    }else if(message.type==='close'){atlas.destroy();closeModal();monitor.stop();$('#app').hidden=true;$('#vip-choice').hidden=true;}
     else if(message.type==='publicCallsList'){
         try{await showPublicCalls();}catch(error){toast(error.message,true);}
     }else if(message.type==='publicCalls'){
@@ -441,4 +487,6 @@ window.addEventListener('message',async event=>{
     }else if(message.type==='monitorMessage')monitor.message(data);
     else if(message.type==='environment'&&state.page==='climate'&&!$('#app').hidden){state.data=data;renderPage();}
 });
-setInterval(()=>{if(!$('#app').hidden&&state.page==='map'&&$('#modal-layer').hidden)loadPage();},5000);
+document.addEventListener('change',async event=>{const domain=event.target.dataset.stateFilter;if(!domain)return;state.filters[domain]={page:1,state:event.target.value};await loadPage();});
+let refreshingMap=false;
+setInterval(async()=>{if(refreshingMap||$('#app').hidden||state.page!=='map'||!$('#modal-layer').hidden)return;refreshingMap=true;const serial=state.sequence;try{const data=await call('map.players');if(serial===state.sequence&&state.page==='map'){state.data=data;atlas.setPlayers(rowsOf(data,'players'));}}catch(error){toast(error.message,true);}finally{refreshingMap=false;}},5000);

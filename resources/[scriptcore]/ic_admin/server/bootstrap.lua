@@ -14,6 +14,11 @@ end
 I.register('bootstrap',{handler=function(ctx)return bootstrap(ctx,false) end})
 I.register('player.bootstrap',{public=true,handler=function(ctx)return bootstrap(ctx,true) end})
 I.register('players.list',{permission='view_players',handler=function()return {players=I.onlinePlayers(),stats={players=#GetPlayers()}} end})
+I.register('map.players',{permission='view_map',handler=function()
+    local players={}
+    for _,row in ipairs(I.onlinePlayers()) do players[#players+1]={id=row.id,name=row.name,coords=row.coords} end
+    return {players=players}
+end})
 I.definitions.inspect_inventory={key='inspect_inventory',label='Inspecionar inventário'}
 I.register('players.snapshot',{permission='view_players',handler=function(ctx,p)
     local snapshot=I.snapshot(p.targetId)
@@ -57,6 +62,9 @@ MySQL.ready(function()
         ic_admin_audit={'id','action','actor_id','actor_name','target_id','target_name','payload','created_at'},
         ic_admin_subjects={'subject_key','user_id'},ic_admin_discipline={'id','subject_key','user_id','actor_id','kind','reason','starts_at','ends_at','state','return_state'},
         mirtin_bans={'user_id','owner','staff'}}
+    for _,name in ipairs({'ic_admin_calls','ic_admin_ratings','ic_admin_vip_assignments'}) do
+        required[name]={'id','owner_id','subject_key','actor_id','actor_subject','state','department','created_at','expires_at','payload','revision'}
+    end
     local checked,valid=pcall(function()
         local columns=I.Store.query("SELECT TABLE_NAME,COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()")
         local engines=I.Store.query("SELECT TABLE_NAME,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE()")
@@ -75,6 +83,9 @@ MySQL.ready(function()
     I.ready=true
     print(('^2[ic_admin]^7 Banco pronto. Modo: %s. Homologação GTA ainda é necessária.'):format(GetConvar('ic_admin_mode','preview')))
     TriggerEvent('ic_admin:ready')
+    local previous=GetConvar('ic_admin_previous_resource','')
+    print('[ic_admin:operational] '..json.encode({schemaVersion=I.Config.schemaVersion,mode=GetConvar('ic_admin_mode','preview'),
+        active=I.active(),provider=GetConvar('ic_admin_service_resource',''),legacyState=previous~='' and GetResourceState(previous) or 'absent'}))
 end)
 CreateThread(function()
     while true do

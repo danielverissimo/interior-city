@@ -26,13 +26,17 @@ class DatabaseFixture:
         self.discipline_ids = set()
         self.subjects = {}
         self.writes = 0
+        self.records={table:{} for table in m.RECORD_TABLES.values()}
 
     def query(self, sql):
         if 'information_schema.TABLES' in sql:
             return '\n'.join(table + '\tInnoDB' for table in set(m.REQUIRED_TABLES) | {'mirtin_bans', 'mirtin_bans_hwid', 'mirtin_bans_ip'})
         if 'information_schema.COLUMNS' in sql:
             return '\n'.join(table + '\t' + col for table, cols in {**m.REQUIRED_TABLES, 'mirtin_bans': {'owner', 'staff'}}.items() for col in cols)
-        if 'MAX(version)' in sql: return '1'
+        if 'MAX(version)' in sql: return '2'
+        if sql.startswith('SELECT id,HEX(payload) FROM ic_admin_'):
+            table=sql.split(' FROM ')[1].split()[0]
+            return '\n'.join(str(key)+'\t'+m.canonical(value).encode().hex() for key,value in self.records[table].items())
         if sql.startswith('SELECT user_id,subject_key'):
             return '\n'.join(str(uid) + '\t' + key for uid, key in self.subjects.items())
         if 'SELECT doc_key,HEX(payload)' in sql:
@@ -43,12 +47,14 @@ class DatabaseFixture:
             return str(len(ids & self.discipline_ids))
         if sql.startswith('START TRANSACTION'):
             self.writes += 1
-            for key, uid in re.findall(r'ic_admin_subjects\(subject_key,user_id\) VALUES \(CONVERT\(0x([0-9a-f]+) USING utf8mb4\),(\d+)\)', sql):
+            for key, uid in re.findall(r'ic_admin_subjects\(subject_key,user_id\) VALUES \(CONVERT\(0x([0-9a-f]+) USING utf8mb4\),\(SELECT id FROM vrp_users WHERE id=(\d+)\)\)', sql):
                 self.subjects.setdefault(int(uid), bytes.fromhex(key).decode())
             for match in re.finditer(r'ic_admin_documents\(doc_key,payload,revision\) VALUES \((CONVERT\(0x[0-9a-f]+ USING utf8mb4\)|\'migration:legacy\'),CONVERT\(0x([0-9a-f]+) USING utf8mb4\),1\)', sql):
                 raw_key = match[1]
                 key = 'migration:legacy' if raw_key.startswith("'") else bytes.fromhex(re.search(r'0x([0-9a-f]+)', raw_key)[1]).decode()
                 self.documents[key] = json.loads(bytes.fromhex(match[2]).decode())
+            for table,identifier,payload in re.findall(r'INSERT INTO (ic_admin_calls|ic_admin_ratings|ic_admin_vip_assignments) \(id,[^;]+?VALUES \(CONVERT\(0x([0-9a-f]+) USING utf8mb4\),[^;]*?,CONVERT\(0x([0-9a-f]+) USING utf8mb4\),1\)',sql):
+                self.records[table][bytes.fromhex(identifier).decode()]=json.loads(bytes.fromhex(payload).decode())
             self.discipline_ids.update(int(value) for value in re.findall(r'ic_admin_discipline\(id,.*?VALUES \((\d+),', sql))
             return ''
         raise AssertionError('Unexpected SQL fixture operation')
@@ -207,6 +213,12 @@ class ICAdminMigrationTests(unittest.TestCase):
         self.assertIn('snapshotDigest', report)
         self.assertEqual(before, {p.name: p.read_bytes() for p in self.snapshot.iterdir()})
 
+    def test_v2_record_promotion_refuses_unknown_states_and_orphan_ratings(self):
+        call={'id':1,'requesterId':12,'requesterSubject':'stable','department':'staff','state':'unknown','createdAt':1}
+        with self.assertRaises(m.MigrationError):m.record_statements({'calls':{'calls':[call]}})
+        with self.assertRaises(m.MigrationError):m.record_statements({'calls':{'ratings':[{'callId':9,'stars':5}]}})
+        with self.assertRaises(m.MigrationError):m.record_statements({'calls':{'calls':[{}]}})
+
     def test_sql_encodes_values_and_not_sql_fragments(self):
         encoded = m.sql_text("fixture'); DROP TABLE example; --")
         self.assertNotIn('DROP', encoded)
@@ -217,7 +229,9 @@ class ICAdminMigrationTests(unittest.TestCase):
         self.assertNotRegex(schema.upper(), r'\b(DROP|DELETE|TRUNCATE)\s')
         self.assertIn('ADD COLUMN IF NOT EXISTS owner', schema)
         self.assertIn('ADD COLUMN IF NOT EXISTS staff', schema)
-        self.assertEqual(schema.count('ENGINE=InnoDB'), len(m.REQUIRED_TABLES))
+        self.assertEqual(schema.count('ENGINE=InnoDB'),6)
+        self.assertIn('CREATE TABLE IF NOT EXISTS ic_admin_ratings LIKE ic_admin_calls',m.RECORD_SCHEMA.read_text())
+        self.assertEqual(len(m.REQUIRED_TABLES),9)
 
     def test_schema_verification_refuses_nontransactional_required_table(self):
         db = DatabaseFixture()

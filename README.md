@@ -91,12 +91,16 @@ O novo recurso está implementado em `resources/[scriptcore]/ic_admin`, com as
 15 áreas, serviços próprios, importador e testes. Consulte
 [implementação, contratos e operação](docs/IC_ADMIN.md).
 
-A configuração entregue inicia em **preview**: `/icadmin` (F10) permite a
-homologação após preparar o esquema em banco isolado. Mutações e serviços globais
-continuam bloqueados até a troca operacional explícita. O provedor anterior
-permanece selecionado; nenhum deploy ou migração do banco efetivo foi executado.
-A independência completa e o vídeo entre dois jogadores exigem homologação GTA
-com o painel antigo parado antes da troca no Uriel.
+A configuração desta revisão seleciona **IC Admin ativo** como provedor único,
+com `/icadmin` (F10), `/padm` e Insert. O painel antigo não recebe `ensure`.
+A ativação exige o instalador explícito `--ic-admin-cutover`: backup com escritores
+parados, snapshot privado, restauração/importação em banco isolado, importação no
+banco efetivo e verificação do runtime. A migração não renova VIPs nem repete
+benefícios. Os arquivos antigos permanecem para rollback.
+
+A release anterior `7f01bd5` foi instalada como prévia; os registros operacionais
+em `state/` comprovam o resultado de cada troca posterior. Testes locais e
+healthchecks não substituem homologação GTA com dois clientes.
 
 ## Validação das ferramentas
 

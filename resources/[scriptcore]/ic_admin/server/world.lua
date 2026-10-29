@@ -76,6 +76,44 @@ I.register('world.update',{permission='view_climate',mutating=true,handler=funct
 end})
 
 I.register('locations.list',{permission='view_locations',handler=function() return locations() end})
+I.register('locations.categorySave',{permission='add_location',mutating=true,handler=function(ctx,p)
+    local name=I.text(p.name,80,true,'Categoria');local original=I.text(p.original or '',80,false,'Categoria original')
+    I.text(p.reason,500,true,'Motivo')
+    return I.withLock('locations',function()
+        local doc,rev=locations();local index
+        for k,value in ipairs(doc.categories) do
+            if value==name and name~=original then I.fail('CONFLICT','Categoria já existente.') end
+            if value==original then index=k end
+        end
+        if original~='' and not index then I.fail('NOT_FOUND','Categoria não encontrada.') end
+        if index then
+            doc.categories[index]=name
+            for _,entry in ipairs(doc.locations) do if entry.category==original then entry.category=name end end
+        else
+            if #doc.categories>=500 then I.fail('LIMIT','Limite de categorias atingido.') end
+            doc.categories[#doc.categories+1]=name
+        end
+        I.effect(ctx)
+        if not I.Store.put('locations',doc,rev) then I.fail('CONFLICT','Categorias alteradas; atualize.') end
+        return doc
+    end)
+end})
+I.register('locations.categoryDelete',{permission='remove_location',mutating=true,handler=function(ctx,p)
+    local name=I.text(p.name,80,true,'Categoria');local destination=I.text(p.destination or '',80,false,'Destino')
+    I.text(p.reason,500,true,'Motivo')
+    if p.confirmCategory~=name then I.fail('CONFIRMATION_REQUIRED','Digite a categoria para confirmar.') end
+    return I.withLock('locations',function()
+        local doc,rev=locations();local index,validDestination
+        for k,value in ipairs(doc.categories) do if value==name then index=k end;if value==destination and value~=name then validDestination=true end end
+        if not index then I.fail('NOT_FOUND','Categoria não encontrada.') end
+        local count=0;for _,entry in ipairs(doc.locations) do if entry.category==name then count=count+1 end end
+        if count>0 and not validDestination then I.fail('CATEGORY_IN_USE','Escolha outra categoria para receber os locais.') end
+        for _,entry in ipairs(doc.locations) do if entry.category==name then entry.category=destination end end
+        table.remove(doc.categories,index);I.effect(ctx)
+        if not I.Store.put('locations',doc,rev) then I.fail('CONFLICT','Categorias alteradas; atualize.') end
+        return {locations=doc.locations,categories=doc.categories,moved=count}
+    end)
+end})
 I.register('locations.save',{permission='add_location',mutating=true,handler=function(ctx,p)
     local xyz=position(p)
     local name=I.text(p.name,80,true,'Nome'); local category=I.text(p.category or 'Geral',80,true,'Categoria')

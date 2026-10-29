@@ -21,12 +21,12 @@ try {
     process.exit(2);
 }
 await mkdir(output, { recursive: true });
-const types = { '.html':'text/html', '.mjs':'text/javascript', '.css':'text/css' };
+const types = { '.html':'text/html', '.mjs':'text/javascript', '.css':'text/css', '.png':'image/png' };
 const server = createServer(async (request, response) => {
     const name = new URL(request.url, 'http://localhost').pathname;
     if (name === '/favicon.ico') { response.writeHead(204); response.end(); return; }
     const file = name === '/' ? 'index.html' : name.slice(1);
-    if (!['index.html','style.css','app.mjs','transport.mjs','monitor.mjs'].includes(file)) { response.writeHead(404); response.end(); return; }
+    if (!['index.html','style.css','app.mjs','transport.mjs','monitor.mjs','map.mjs','assets/map.png'].includes(file)) { response.writeHead(404); response.end(); return; }
     try { response.writeHead(200, { 'Content-Type':types[extname(file)] || 'text/plain' }); response.end(await readFile(join(webRoot,file))); }
     catch { response.writeHead(500); response.end(); }
 });
@@ -58,6 +58,8 @@ try {
             'audit.list': {entries:[{id:1,created_at:'2026-10-28T00:00:00Z',action:'ban',actor_id:1,target_id:2,payload:{reason:'Teste'}}],total:1,page:1},
             'audit.destinations': {destinations:[{id:'staff',label:'Equipe',configured:true}],routes:{}}
         };
+        window.testFixtures['reconciliation.list']={operations:[{id:'a'.repeat(64),actor_id:1,method:'vip.assign',state:'uncertain',payload:{targetId:2}}],assignments:[{id:'review-test',userId:2,group:'vip_teste',state:'uncertain',claims:[]}],total:1,totalAssignments:1,page:1};
+        window.testFixtures['map.players']=window.testFixtures['players.list'];
         window.testFixtures['players.lookup'] = window.testFixtures['players.snapshot'];
         const nativeFetch = window.fetch;
         window.fetch = async (url, options) => {
@@ -71,7 +73,7 @@ try {
         };
         window.openFixture = () => {
             const allowedActions = {};
-            for (const key of ['view_server','view_players','view_warnings','view_map','view_calls','view_groups','view_identity_editor','view_items','view_weapons','view_vips','view_vehicles','view_radio','view_locations','view_climate','view_logs','wladd','wlrem','ban','unban','send_adm','godall','tpway','tpcds','clear_allveh','clear_props','needs_manage','create_vip','edit_vip','assign_vip','delete_vip','give_item','spawn_self_item','spawn_weapon','inspect_inventory','map_screen','warning','radio_save','radio_delete','add_location','remove_location','teleport_location','logs_manage','catch_rg','ban_history_view']) allowedActions[key] = true;
+            for (const key of ['view_server','view_players','view_warnings','view_map','view_calls','view_groups','view_identity_editor','view_items','view_weapons','view_vips','view_vehicles','view_radio','view_locations','view_climate','view_logs','wladd','wlrem','ban','unban','send_adm','godall','tpway','tpcds','clear_allveh','clear_props','needs_manage','create_vip','edit_vip','assign_vip','delete_vip','give_item','spawn_self_item','spawn_weapon','inspect_inventory','map_screen','warning','radio_save','radio_delete','add_location','remove_location','teleport_location','logs_manage','catch_rg','ban_history_view','reconciliation_manage']) allowedActions[key] = true;
             window.postMessage({type:'open',payload:{admin:{id:1,name:'Equipe Interior City',role:'dono'},permissions:{allowedActions,canManage:true},players:window.testFixtures['players.list'].players,stats:{players:2},mode:'preview'}},'*');
         };
     });
@@ -140,6 +142,30 @@ try {
     const vip = await page.evaluate(() => window.testRequests.find(r=>r.method==='vip.save'));
     assert.deepEqual(vip.payload.items,[{item:'water',amount:5}]);
     assert.deepEqual(vip.payload.vehicles,[{spawn:'sultan',name:'Sultan'}]);
+    // The map loads locally; zoom, keyboard and marker selection survive refresh.
+    await page.locator('[data-nav=map]').click();
+    await page.waitForFunction(()=>document.querySelector('.atlas-image')?.naturalWidth>0);
+    await page.locator('[data-map-in]').click();
+    assert.equal(await page.locator('[data-map-scale]').textContent(),'140%');
+    await page.locator('.atlas').focus();await page.keyboard.press('Home');
+    assert.equal(await page.locator('[data-map-scale]').textContent(),'100%');
+    await page.locator('.atlas-player[data-player="2"]').click();
+    await page.waitForSelector('#modal-title');await page.locator('[data-modal-close]').click();
+    await page.screenshot({path:join(output,'ic-admin-map.png')});
+    // Categories submit the original category and reason, without deleting locations.
+    await page.locator('[data-nav=locations]').click();await page.locator('[data-command=categories]').click();
+    await page.locator('[data-category-edit="Cidade"]').click();await page.locator('[name=name]').fill('Centro');await page.locator('[name=reason]').fill('Organizar locais');
+    await page.locator('#operation-form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('#modal-layer').hidden);
+    const category=await page.evaluate(()=>window.testRequests.find(r=>r.method==='locations.categorySave'));
+    assert.deepEqual(category.payload,{original:'Cidade',name:'Centro',reason:'Organizar locais'});
+    // Manual reconciliation requires the record confirmation and evidence.
+    await page.locator('[data-nav=vips]').click();await page.locator('[data-command=reconciliation]').click();
+    await page.locator('[data-review-vip="review-test"]').click();
+    await page.locator('[name=outcome]').selectOption('archive');await page.locator('[name=evidence]').fill('Conferência de inventário e grupo');await page.locator('[name=reason]').fill('Arquivar após conferência');await page.locator('[name=confirmId]').fill('review-test');
+    await page.locator('#operation-form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('#modal-title').textContent==='Conferência administrativa');
+    const review=await page.evaluate(()=>window.testRequests.find(r=>r.method==='reconciliation.resolve'));
+    assert.equal(review.payload.kind,'vip');assert.equal(review.payload.id,'review-test');assert.equal(review.payload.outcome,'archive');
+    await page.locator('[data-modal-close]').click();
     // A refused read must yield a visible error, not silently render stale data.
     await page.evaluate(() => { window.failNextMethod='radio.list'; });
     await page.locator('[data-nav=radio]').click();

@@ -17,6 +17,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / 'database/ic_admin/001_initial.sql'
+RECORD_SCHEMA = ROOT / 'database/ic_admin/002_records.sql'
+RECORD_TABLES = {'calls':'ic_admin_calls','ratings':'ic_admin_ratings','vip_assignments':'ic_admin_vip_assignments'}
 FILES = ('panel_permissions.json', 'vip_packages.json', 'vip_assignments.json',
          'locations.json', 'location_categories.json', 'calls_data.json',
          'ban_history.json', 'warnings_data.json', 'environment_state.json', 'vehicles.json')
@@ -28,6 +30,8 @@ REQUIRED_TABLES = {
     'ic_admin_subjects': {'subject_key', 'user_id', 'created_at'},
     'ic_admin_discipline': {'id', 'subject_key', 'user_id', 'actor_id', 'kind', 'reason', 'starts_at', 'ends_at', 'state', 'return_state'},
 }
+
+REQUIRED_TABLES.update({table: {'id','owner_id','subject_key','actor_id','actor_subject','state','department','created_at','expires_at','payload','revision'} for table in RECORD_TABLES.values()})
 
 
 class MigrationError(ValueError):
@@ -351,10 +355,10 @@ class Database:
     def query(self, sql):
         result = subprocess.run(self.command, input=sql, text=True, capture_output=True, cwd=ROOT)
         if result.returncode: raise MigrationError('Database command failed; query values and database diagnostics were suppressed')
-        return result.stdout.strip()
+        return result.stdout.rstrip('\r\n')
 
 
-def verify_schema(db):
+def verify_schema(db, version=2):
     rows = db.query("SELECT TABLE_NAME,COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND (TABLE_NAME LIKE 'ic_admin_%' OR TABLE_NAME='mirtin_bans');")
     found = {}
     for line in rows.splitlines():
@@ -370,25 +374,92 @@ def verify_schema(db):
         if len(parts) == 2: engines[parts[0]] = parts[1]
     if any(engines.get(table) != 'InnoDB' for table in transactional):
         raise MigrationError('Required migration tables must use InnoDB; explicit engine reconciliation is required')
-    if db.query('SELECT MAX(version) FROM ic_admin_schema;') != '1': raise MigrationError('Unsupported IC Admin schema version')
-    return {'schemaVersion': 1, 'tablesVerified': len(REQUIRED_TABLES)}
+    if db.query('SELECT MAX(version) FROM ic_admin_schema;') != str(version): raise MigrationError('Unsupported IC Admin schema version')
+    return {'schemaVersion': version, 'tablesVerified': len(REQUIRED_TABLES)}
 
 
-def read_documents(db, keys):
+def read_documents(db, keys, records=True):
     rows = db.query('SELECT doc_key,HEX(payload) FROM ic_admin_documents WHERE doc_key IN (' + ','.join(sql_text(k) for k in keys) + ');')
     found = {}
     for line in rows.splitlines():
         key, raw = line.split('\t', 1)
         try: found[key] = json.loads(bytes.fromhex(raw).decode())
         except (ValueError, UnicodeError): raise MigrationError('Existing document is not valid JSON') from None
+    if records:
+        for key in ('calls','vip_assignments'):
+            if key not in keys: continue
+            domains=('calls','ratings') if key=='calls' else ('vip_assignments',)
+            data={}
+            for domain in domains:
+                values=[]
+                for line in db.query('SELECT id,HEX(payload) FROM '+RECORD_TABLES[domain]+' ORDER BY id;').splitlines():
+                    identifier,raw=line.split('\t',1)
+                    value=json.loads(bytes.fromhex(raw).decode())
+                    if domain=='ratings': value.pop('id',None)
+                    else: value.setdefault('id',int(identifier) if domain=='calls' else identifier)
+                    values.append(value)
+                data['assignments' if domain=='vip_assignments' else domain]=values
+            if key=='calls': data['nextId']=max((found.get(key) or {}).get('nextId',1),max((row['id'] for row in data['calls']),default=0)+1)
+            if key in found or any(data.get(name) for name in ('calls','ratings','assignments')): found[key]=data
     return found
+
+
+def record_statements(docs, update=False):
+    statements=[]
+    calls=array(obj(docs.get('calls',{}),'calls').get('calls',[]),'calls')
+    for row in calls: integer(obj(row,'call').get('id'),1,9007199254740991)
+    by_call={row['id']:row for row in calls}
+    if len(by_call)!=len(calls): raise MigrationError('Duplicate existing call identity')
+    for domain,values in (('calls',calls),('ratings',docs.get('calls',{}).get('ratings',[])),('vip_assignments',docs.get('vip_assignments',{}).get('assignments',[]))):
+        for row in array(values,'administrative records'):
+            obj(row,'administrative record')
+            if len(canonical(row).encode())>1000000: raise MigrationError('Administrative record exceeds row bound')
+            identifier=row.get('id',row.get('callId'))
+            if domain in ('calls','ratings'): integer(identifier,1,9007199254740991)
+            else: text(str(identifier),96)
+            if domain=='calls':
+                if row.get('state') not in {'open','accepted','finished','cancelled'} or row.get('department') not in {'staff','police','mechanic','hospital'}: raise MigrationError('Invalid existing call state or department')
+                integer(row.get('requesterId'),1);text(row.get('requesterSubject'),96)
+            if domain=='vip_assignments':
+                if row.get('state') not in {'active','expired','archived','uncertain','applying'}: raise MigrationError('Invalid existing VIP state')
+                integer(row.get('userId'),1);text(row.get('subjectKey'),96);text(row.get('group'),80)
+            if domain=='ratings':
+                if row.get('callId') not in by_call: raise MigrationError('Existing rating has no call')
+                integer(row.get('stars'),1,5)
+            if domain=='calls': metadata=(row['requesterId'],row.get('requesterSubject',''),row.get('acceptedBy',0),row.get('acceptedSubject',''),row['state'],row['department'],row.get('createdAt',0),0)
+            elif domain=='ratings':
+                call=by_call.get(row['callId'],{})
+                row=dict(row,requesterId=call.get('requesterId',0),requesterSubject=call.get('requesterSubject',''))
+                metadata=(call.get('requesterId',0),call.get('requesterSubject',''),row.get('staffId',0),row.get('staffSubject',''),'rated','staff',row.get('createdAt',0),0)
+            else: metadata=(row['userId'],row.get('subjectKey',''),row.get('actorId',0),'',row['state'],row['group'],row.get('assignedAt',0),row.get('expiresAt',0))
+            identifier=row.get('id',row.get('callId'))
+            fields='id,owner_id,subject_key,actor_id,actor_subject,state,department,created_at,expires_at,payload,revision'
+            values=[sql_text(str(identifier))]+[str(v) if isinstance(v,int) else sql_text(v) for v in metadata]+[sql_text(canonical(row)),'1']
+            suffix=' ON DUPLICATE KEY UPDATE '+','.join(f'{field}=VALUES({field})' for field in fields.split(',')[1:-1])+',revision=revision+1' if update else ''
+            statements.append('INSERT INTO '+RECORD_TABLES[domain]+' ('+fields+') VALUES ('+','.join(values)+')'+suffix+';')
+    return statements
+
+
+def apply_schema(db):
+    db.query(SCHEMA.read_text())
+    db.query(RECORD_SCHEMA.read_text())
+    version=db.query('SELECT MAX(version) FROM ic_admin_schema;')
+    if version=='1':
+        verify_schema(db,version=1)
+        legacy=read_documents(db,['calls','vip_assignments'],records=False)
+        # Promotion is all-or-nothing. Existing divergent record IDs abort without overwriting.
+        statements=record_statements(legacy)
+        next_id=legacy.get('calls',{}).get('nextId',1)
+        db.query('ALTER TABLE ic_admin_calls AUTO_INCREMENT='+str(integer(next_id,1))+';')
+        db.query('\n'.join(['START TRANSACTION;']+statements+['INSERT INTO ic_admin_schema(version) VALUES (2);','COMMIT;']))
+    return verify_schema(db)
 
 
 def read_discipline(db, records):
     if not records: return {}
     ids = ','.join(str(row['id']) for row in records)
     sql = ('SELECT id,user_id,actor_id,kind,HEX(reason),starts_at,IFNULL(ends_at,\'\'),state,'
-           'HEX(IFNULL(return_state,\'\')) FROM ic_admin_discipline WHERE id IN (' + ids + ');')
+           'IFNULL(HEX(return_state),\'NULL\') FROM ic_admin_discipline WHERE id IN (' + ids + ');')
     found = {}
     for line in db.query(sql).splitlines():
         columns = line.split('\t')
@@ -397,7 +468,7 @@ def read_discipline(db, records):
         try:
             found[int(key)] = {'id': int(key), 'user_id': int(uid), 'actor_id': int(actor), 'kind': kind,
                 'reason': bytes.fromhex(reason).decode(), 'starts_at': int(start), 'ends_at': int(end) if end else None,
-                'state': state, 'return_state': json.loads(bytes.fromhex(restore).decode()) if restore else None}
+                'state': state, 'return_state': json.loads(bytes.fromhex(restore).decode()) if restore and restore!='NULL' else None}
         except (ValueError, UnicodeError): raise MigrationError('Historical record verification failed') from None
     return found
 
@@ -427,9 +498,13 @@ def bind_subjects(db, imported):
         call['requesterSubject'] = mapping[call['requesterId']]
         if call.get('acceptedBy'): call['acceptedSubject'] = mapping[call['acceptedBy']]
         by_call[call['id']] = call
+    assignments.sort(key=lambda row:str(row['id']))
+    calls.sort(key=lambda row:row['id'])
+    docs.get('calls', {}).get('ratings', []).sort(key=lambda row:row['callId'])
     for rating in docs.get('calls', {}).get('ratings', []):
         call = by_call.get(rating['callId'], {})
         if call.get('acceptedSubject'): rating['staffSubject'] = call['acceptedSubject']
+        rating['requesterId']=call.get('requesterId',0);rating['requesterSubject']=call.get('requesterSubject','')
     return imported, mapping
 
 
@@ -460,14 +535,15 @@ def apply_import(db, imported, replace_imported=False, verify=False):
             raise MigrationError('Historical record identity collision; reconciliation required')
     statements = ['START TRANSACTION;']
     for uid, subject in sorted(subjects.items()):
-        statements.append('INSERT IGNORE INTO ic_admin_subjects(subject_key,user_id) VALUES (' + sql_text(subject) + ',' + str(uid) + ');')
+        statements.append('INSERT IGNORE INTO ic_admin_subjects(subject_key,user_id) VALUES (' + sql_text(subject) + ',(SELECT id FROM vrp_users WHERE id=' + str(uid) + '));')
     for key, value in docs.items():
         statements.append('INSERT INTO ic_admin_documents(doc_key,payload,revision) VALUES (' + sql_text(key) + ',' + sql_text(canonical(value)) + ',1) ON DUPLICATE KEY UPDATE revision=revision+IF(payload<>VALUES(payload),1,0),payload=VALUES(payload);')
     for row in records:
-        values = [str(row['id']), '(SELECT subject_key FROM ic_admin_subjects WHERE user_id=' + str(row['user_id']) + ')', str(row['user_id']), str(row['actor_id']), sql_text(row['kind']), sql_text(row['reason']), str(row['starts_at']), str(row['ends_at']) if row['ends_at'] else 'NULL', sql_text(row['state']), sql_text(canonical(row['return_state'])) if row['return_state'] else 'NULL']
+        values = [str(row['id']), sql_text(subjects[row['user_id']]), str(row['user_id']), str(row['actor_id']), sql_text(row['kind']), sql_text(row['reason']), str(row['starts_at']), str(row['ends_at']) if row['ends_at'] else 'NULL', sql_text(row['state']), sql_text(canonical(row['return_state'])) if row['return_state'] else 'NULL']
         statements.append('INSERT IGNORE INTO ic_admin_discipline(id,subject_key,user_id,actor_id,kind,reason,starts_at,ends_at,state,return_state) VALUES (' + ','.join(values) + ');')
     metadata = {'snapshotDigest': imported['snapshotDigest'], 'documentHashes': expected, 'disciplineCount': len(records)}
     statements.append('INSERT INTO ic_admin_documents(doc_key,payload,revision) VALUES (\'migration:legacy\',' + sql_text(canonical(metadata)) + ',1) ON DUPLICATE KEY UPDATE payload=VALUES(payload),revision=revision+1;')
+    statements.extend(record_statements(docs,update=True))
     statements.append('COMMIT;')
     db.query('\n'.join(statements))
     return apply_import(db, imported, verify=True)
@@ -490,10 +566,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.command == 'snapshot': report = seal_snapshot(args.source, args.output, args.groups, args.writers_stopped)
     elif args.command == 'schema':
-        report = {'schemaVersion': 1, 'tables': sorted(REQUIRED_TABLES), 'additiveBanColumns': ['owner', 'staff']}
+        report = {'schemaVersion': 2, 'tables': sorted(REQUIRED_TABLES), 'additiveBanColumns': ['owner', 'staff']}
         if args.apply:
             if not args.writers_stopped: raise MigrationError('Apply requires explicit --writers-stopped attestation')
-            db = Database(args); db.query(SCHEMA.read_text()); report = verify_schema(db)
+            db = Database(args); report = apply_schema(db)
         elif args.verify: report = verify_schema(Database(args))
     else:
         imported = build_import(args.snapshot)

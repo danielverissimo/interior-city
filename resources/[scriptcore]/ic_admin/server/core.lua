@@ -178,7 +178,18 @@ function I.dispatch(source,request)
         end
         return response
     end)
-    if ok then return result end
+    if ok then
+        -- Reads also yield at SQL boundaries. Never deliver an old actor's data to
+        -- a reused source or to a session revoked while the query was running.
+        if ctx then
+            local session=I.sessions[source]
+            local token=(type(result.data)=='table' and result.data.sessionId) or ctx.sessionId
+            if I.vRP.getUserId(source)~=ctx.userId or I.role(ctx.userId)~=ctx.role or not session or session.id~=token or session.userId~=ctx.userId then
+                return {requestId=requestId,ok=false,error={code='SESSION_EXPIRED',message='Sessão encerrada durante a operação. Consulte o resultado ao reabrir o painel.'}}
+            end
+        end
+        return result
+    end
     local typed=type(result)=='table' and result.icAdmin
     local response={requestId=type(requestId)=='string' and requestId:sub(1,96) or '',ok=false,error={code=typed and result.code or 'INTERNAL_ERROR',message=typed and result.message or 'Erro interno. Consulte a auditoria operacional.'}}
     if opKey then

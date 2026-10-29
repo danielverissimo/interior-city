@@ -1,9 +1,9 @@
 ICAdminConfig = {
-    schemaVersion = 1,
-    brand = { name = 'IC ADMIN', subtitle = 'Interior City', version = '1.0.0' },
+    schemaVersion = 2,
+    brand = { name = 'IC ADMIN', subtitle = 'Interior City', version = '1.1.0' },
     ranks = { dono = 100, developer = 90, admin = 80, moderador = 60, suporte = 40 },
     roles = { 'dono', 'developer', 'admin', 'moderador', 'suporte' },
-    ownerOnly = { ['permissions_manage'] = true, ['maintenance.wipe'] = true, ['maintenance.changeId'] = true },
+    ownerOnly = { ['permissions_manage'] = true, ['maintenance.wipe'] = true, ['maintenance.changeId'] = true, reconciliation_manage=true },
     permissionAliases = {radio_save='radio_manage',radio_delete='radio_manage',set_weather='weather_manage',set_time='time_manage',ban_history_view='ban_history'},
     requestTimeoutMs = 20000, sessionSeconds = 1200, maxPayloadBytes = 65536,
     readRate = 10, mutationRate = 2, auditRetentionDays = 90,

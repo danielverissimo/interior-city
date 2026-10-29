@@ -2,10 +2,8 @@ local I=ICAdmin
 local testSessions={}
 local forbidden={['developer.permissao']=true,['admin.permissao']=true,['moderador.permissao']=true,['suporte.permissao']=true,['perm.ptr.staff']=true}
 local function packages() return I.Store.get('vip_packages',{packages={}}) end
-local function assignments() return I.Store.get('vip_assignments',{assignments={}}) end
-local function saveAssignments(doc,rev)
-    if not I.Store.put('vip_assignments',doc,rev) then I.fail('CONFLICT','Benefícios alterados; atualize a tela.') end
-end
+local R=I.Records
+local function saveAssignment(value,rev) return R.save('vip_assignments',value,rev) end
 local function groupDefinition(name)
     local groups=I.vRP.getGroups() or {}; return groups[name]
 end
@@ -43,26 +41,24 @@ local function packagePayload(p)
     if #out.vehicles>0 and out.vehicleChoices<1 then I.fail('INVALID','Defina ao menos uma escolha de veículo.') end
     return out
 end
-local function listFor(userId,includeAll)
+local function listFor(userId,includeAll,p)
     local doc=packages(); local values={}
     for _,value in pairs(doc.packages or {}) do values[#values+1]=value end
     table.sort(values,function(a,b)return tostring(a.title)<tostring(b.title) end)
-    local data=assignments(); local own={}; local subject=I.subject(userId)
-    for _,value in ipairs(data.assignments or {}) do
-        if includeAll or (value.userId==userId and value.subjectKey==subject and value.state=='active' and (tonumber(value.expiresAt) or 0)>os.time()) then
-            local row=I.copy(value)
-            if row.state=='active' and (tonumber(row.expiresAt) or 0)<=os.time() then row.state='expired' end
-            own[#own+1]=row
-        end
+    local page=I.int(p and p.page or 1,1,100000,'Página')
+    local where,params=nil,{}
+    if not includeAll then
+        where="subject_key=? AND state='active' AND expires_at>?";params={I.subject(userId),os.time()}
+    elseif p and p.state and p.state~='' then
+        if not ({active=true,expired=true,applying=true,uncertain=true,archived=true})[p.state] then I.fail('INVALID','Estado inválido.') end
+        if p.state=='expired' then where="state='active' AND expires_at<=?";params={os.time()}
+        else where='state=?';params={p.state} end
     end
-    table.sort(own,function(a,b)return (tonumber(a.assignedAt) or 0)>(tonumber(b.assignedAt) or 0) end)
-    local total=#own
-    while #own>100 do table.remove(own) end
-    return {packages=values,assignments=own,totalAssignments=total}
+    local own,total=R.list('vip_assignments',where,params,page,50)
+    for _,row in ipairs(own) do if row.state=='active' and row.expiresAt<=os.time() then row.state='expired' end end
+    return {packages=values,assignments=own,totalAssignments=total,page=page,pageSize=50}
 end
-local function findAssignment(doc,id)
-    for _,value in ipairs(doc.assignments or {}) do if tostring(value.id)==id then return value end end
-end
+local function findAssignment(_,id) return R.get('vip_assignments',id) end
 local function remaining(value)
     local count=0
     for _,claim in ipairs(value.claims or {}) do if claim.state=='applied' or claim.state=='applying' or claim.state=='uncertain' then count=count+1 end end
@@ -72,13 +68,13 @@ local function playerChoice(value)
     return {assignmentId=value.id,group=value.group,vehicles=value.vehicles or {},remaining=remaining(value),expiresAt=value.expiresAt}
 end
 local function requireAssignment(ctx,p)
-    local doc,rev=assignments(); local value=findAssignment(doc,I.text(tostring(p.assignmentId or ''),96,true,'Entrega'))
+    local value,rev=R.get('vip_assignments',I.text(tostring(p.assignmentId or ''),96,true,'Entrega'))
     if not value or value.userId~=ctx.userId or value.subjectKey~=I.subject(ctx.userId) then I.fail('FORBIDDEN','Entrega não encontrada para este jogador.') end
     I.target(ctx.userId,true)
     if value.state~='active' or (tonumber(value.expiresAt) or 0)<=os.time() or not I.vRP.hasGroup(ctx.userId,value.group) then
         I.fail('EXPIRED','Benefício expirado ou indisponível.')
     end
-    return doc,rev,value
+    return nil,rev,value
 end
 local function selectedVehicle(value,p)
     local wanted=I.Adapter.validVehicle(p.vehicle)
@@ -86,7 +82,7 @@ local function selectedVehicle(value,p)
     I.fail('INVALID','Veículo não pertence a esta entrega.')
 end
 
-I.register('vip.list',{permission='view_vips',handler=function(ctx) return listFor(ctx.userId,true) end})
+I.register('vip.list',{permission='view_vips',handler=function(ctx,p) return listFor(ctx.userId,true,p) end})
 I.register('vip.mine',{public=true,handler=function(ctx)
     local choices={}
     for _,row in ipairs(listFor(ctx.userId).assignments) do if remaining(row)>0 then choices[#choices+1]=playerChoice(row) end end
@@ -128,34 +124,32 @@ I.register('vip.assign',{permission='assign_vip',mutating=true,online=true,handl
         if I.vRP.hasGroup(userId,group) then
             I.fail('VIP_ACTIVE','Este VIP já está ativo. A entrega não será repetida.')
         end
-        local doc,rev=assignments(); doc.assignments=doc.assignments or {}; local subject=I.subject(userId)
-        for _,value in ipairs(doc.assignments) do
-            if value.userId==userId and value.subjectKey==subject and value.group==group and (value.state=='uncertain' or value.state=='applying'
-                or (value.state=='active' and (tonumber(value.expiresAt) or 0)>os.time())) then I.fail('VIP_ACTIVE','Entrega ativa ou pendente de conferência.') end
-        end
+        local subject=I.subject(userId)
+        local existing=R.list('vip_assignments',"subject_key=? AND department=? AND (state IN ('applying','uncertain') OR (state='active' AND expires_at>?))",{subject,group,os.time()},1,1)
+        if #existing>0 then I.fail('VIP_ACTIVE','Entrega ativa ou pendente de conferência.') end
         local value={id=('%d-%x-%x'):format(userId,os.time(),math.random(1,0x7fffffff)),userId=userId,group=group,
             subjectKey=subject,assignedAt=os.time(),expiresAt=0,state='applying',itemsState='pending',claims={},
             items=I.copy(package.items or {}),vehicles=I.copy(package.vehicles or {}),vehicleChoices=package.vehicleChoices or 0,
             garageSlots=package.garageSlots or 0,actorId=ctx.userId,reason=reason}
-        doc.assignments[#doc.assignments+1]=value; saveAssignments(doc,rev)
+        saveAssignment(value,0)
         local ok,err=pcall(function()
             I.target(userId,true); I.effect(ctx)
             if I.vRP.addUserGroup(userId,group)~=true then I.fail('GROUP_FAILED','Não foi possível atribuir o cargo VIP.') end
             value.expiresAt=tonumber(I.vRP.getUserGroupExpiration(userId,group)) or 0
             if value.expiresAt<=os.time() then I.fail('EXPIRATION_FAILED','Expiração VIP não foi confirmada.') end
-            local latest,currentRev=assignments(); local persisted=findAssignment(latest,value.id)
-            persisted.expiresAt=value.expiresAt; persisted.itemsState='applying'; saveAssignments(latest,currentRev)
+            local persisted,currentRev=R.get('vip_assignments',value.id)
+            persisted.expiresAt=value.expiresAt; persisted.itemsState='applying'; saveAssignment(persisted,currentRev)
             for _,item in ipairs(value.items) do
                 I.target(userId,true); I.effect(ctx)
                 if I.Adapter.giveItem(userId,item.item,item.amount)~=true then I.fail('DELIVERY_FAILED','Entrega de itens incompleta; solicite conferência.') end
             end
-            local final,finalRev=assignments(); local row=findAssignment(final,value.id)
-            row.state='active'; row.itemsState='applied'; row.expiresAt=value.expiresAt; saveAssignments(final,finalRev)
+            local row,finalRev=R.get('vip_assignments',value.id)
+            row.state='active'; row.itemsState='applied'; row.expiresAt=value.expiresAt; saveAssignment(row,finalRev)
             value=row
         end)
         if not ok then
-            local failed,failedRev=assignments(); local row=findAssignment(failed,value.id)
-            if row then row.state='uncertain';row.itemsState='uncertain';saveAssignments(failed,failedRev) end
+            local row,failedRev=R.get('vip_assignments',value.id)
+            if row then row.state='uncertain';row.itemsState='uncertain';saveAssignment(row,failedRev) end
             if type(err)=='table' then error(err,0) end
             I.fail('DELIVERY_UNCERTAIN','Entrega pendente de conferência. Não repita o pacote.')
         end
@@ -169,13 +163,13 @@ I.register('vip.choose',{public=true,mutating=true,handler=function(ctx,p)
         local doc,rev,value=requireAssignment(ctx,p)
         if remaining(value)<1 then I.fail('CLAIMED','Todas as escolhas já foram utilizadas ou estão em conferência.') end
         local vehicle=selectedVehicle(value,p); value.claims=value.claims or {}
-        for _,claim in ipairs(value.claims) do if claim.vehicle==vehicle then I.fail('CLAIMED','Este veículo já foi escolhido.') end end
-        value.claims[#value.claims+1]={vehicle=vehicle,state='applying',at=os.time()}; saveAssignments(doc,rev)
+        for _,claim in ipairs(value.claims) do if claim.vehicle==vehicle and claim.state~='not_applied' then I.fail('CLAIMED','Este veículo já foi escolhido.') end end
+        value.claims[#value.claims+1]={vehicle=vehicle,state='applying',at=os.time()}; saveAssignment(value,rev)
         I.target(ctx.userId,true); I.effect(ctx)
         local ok,result=pcall(I.Adapter.giveVehicle,ctx.userId,vehicle)
-        local final,finalRev=assignments(); local row=findAssignment(final,value.id)
+        local row,finalRev=R.get('vip_assignments',value.id)
         local claim=row.claims[#row.claims]
-        claim.state=ok and result==true and 'applied' or 'uncertain'; saveAssignments(final,finalRev)
+        claim.state=ok and result==true and 'applied' or 'uncertain'; saveAssignment(row,finalRev)
         if claim.state~='applied' then I.fail('DELIVERY_UNCERTAIN','Entrega do veículo pendente de conferência. Não repita a escolha.') end
         TriggerClientEvent('ic_admin:vipChoice',ctx.source,playerChoice(row))
         return {assignment=playerChoice(row),vehicle=vehicle}
@@ -188,14 +182,14 @@ I.register('vip.delete',{permission='delete_vip',mutating=true,handler=function(
         local doc,rev=packages(); if not (doc.packages or {})[group] then I.fail('NOT_FOUND','Pacote não encontrado.') end
         permittedGroup(group)
         return I.withLock('vip_assignments',function()
-            local data,dataRev=assignments()
             I.effect(ctx)
             local ok,message=exports['vrp']:removeManagedGroup(group)
             if not ok then I.fail('GROUP_DELETE_FAILED',message or 'Não foi possível excluir o cargo.') end
             doc.packages[group]=nil
             if not I.Store.put('vip_packages',doc,rev) then I.fail('RECONCILE','Cargo removido; pacote precisa de conferência.') end
-            for _,row in ipairs(data.assignments or {}) do if row.group==group and row.state=='active' then row.state='archived';row.archivedAt=os.time() end end
-            saveAssignments(data,dataRev)
+            R.each('vip_assignments',"department=? AND state='active'",{group},function(row,revision)
+                row.state='archived';row.archivedAt=os.time();saveAssignment(row,revision)
+            end)
             return listFor(ctx.userId,true)
         end)
     end)
@@ -251,8 +245,8 @@ AddEventHandler('onResourceStop',function(name)
 end)
 AddEventHandler('vRP:playerSpawn',function(userId,playerSource)
     if not I.active() then return end
-    local doc=assignments()
-    for _,row in ipairs(doc.assignments or {}) do
+    local rows=R.list('vip_assignments',"subject_key=? AND state='active' AND expires_at>?",{I.subject(userId),os.time()},1,100)
+    for _,row in ipairs(rows) do
         if row.userId==userId and row.subjectKey==I.subject(userId) and row.state=='active' and row.expiresAt>os.time() and remaining(row)>0 then
             if tonumber(I.vRP.getUserId(playerSource))==tonumber(userId) then TriggerClientEvent('ic_admin:vipChoice',playerSource,playerChoice(row)) end; break
         end
@@ -266,3 +260,11 @@ CreateThread(function()
 end)
 
 I.Vips={remaining=remaining,findAssignment=findAssignment,packagePayload=packagePayload}
+AddEventHandler('ic_admin:ready',function()
+    -- Restart never replays benefits, including a crash between delivery and commit.
+    I.Records.each('vip_assignments',"state='applying' OR JSON_SEARCH(payload,'one','applying',NULL,'$.claims[*].state') IS NOT NULL",{},function(row,rev)
+        if row.state=='applying' then row.state='uncertain';row.itemsState='uncertain' end
+        for _,claim in ipairs(row.claims or {}) do if claim.state=='applying' then claim.state='uncertain' end end
+        saveAssignment(row,rev)
+    end)
+end)

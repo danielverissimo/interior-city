@@ -3,8 +3,8 @@ set -Eeuo pipefail
 umask 077
 sha="${1:-}"; archive="${2:-}"
 schema_mode="${3:---no-schema}"
-[[ $# -le 3 && ( "$schema_mode" == --no-schema || "$schema_mode" == --ic-admin-schema ) ]] || {
-  echo 'Optional third argument: --ic-admin-schema (explicit additive migration).' >&2; exit 2;
+[[ $# -le 3 && ( "$schema_mode" == --no-schema || "$schema_mode" == --ic-admin-schema || "$schema_mode" == --ic-admin-cutover ) ]] || {
+  echo 'Optional third argument: --ic-admin-schema or --ic-admin-cutover.' >&2; exit 2;
 }
 [[ "$(id -u)" -eq 0 && "$sha" =~ ^[0-9a-f]{40}$ && -f "$archive" ]] || {
   echo 'Run as root with commit SHA and staged code archive.' >&2; exit 2;
@@ -46,7 +46,12 @@ old=''
 if [[ -L "$root/current" ]]; then
   old="$(readlink -f "$root/current")"
   [[ "$old" =~ ^$root/releases/[0-9a-f]{40}$ ]] || { echo 'Invalid current release link.' >&2; exit 1; }
-  python3 "$helper" manifest "$old" "$root/state/manifests/${old##*/}.json" --check
+  if [[ "$schema_mode" == --ic-admin-cutover ]]; then
+    # Only the explicit operational migrator can approve mutable legacy JSON drift.
+    python3 -B "$(dirname "${BASH_SOURCE[0]}")/ic-admin-cutover.py" check-previous --root "$root" --previous "$old"
+  else
+    python3 "$helper" manifest "$old" "$root/state/manifests/${old##*/}.json" --check
+  fi
 elif [[ -e "$root/current" ]]; then
   echo 'Current release must be a managed symlink.' >&2; exit 1
 fi
@@ -67,6 +72,9 @@ else
   python3 "$helper" manifest "$release" "$root/state/manifests/$sha.json" --check
   python3 "$release/scripts/configure-secrets.py" --directory "$root/secrets" check
   python3 "$release/scripts/assets.py" verify --profile "$profile" --lock "$release/assets.lock.json" --destination "$release"
+fi
+if [[ -f "$release/config/ic_admin.cfg" ]] && rg_mode="$(sed -n 's/^setr ic_admin_mode "\([^"]*\)"/\1/p' "$release/config/ic_admin.cfg")" && [[ "$rg_mode" == active && "$schema_mode" != --ic-admin-cutover ]]; then
+  echo 'Active IC Admin requires explicit --ic-admin-cutover migration/forward-fix verification.' >&2; exit 1
 fi
 for name in db_root_password db_app_password cfx_license steam_web_api webhook_logs webhook_bugs playit_agent_key resource_convars; do
   [[ -f "$root/secrets/$name" && ! -L "$root/secrets/$name" && "$(stat -c '%U:%a' "$root/secrets/$name")" == root:444 ]] || {
@@ -130,7 +138,15 @@ if [[ "$schema_mode" == --ic-admin-schema ]]; then
     --project-name interior-city-tocado --project-directory "$root" \
     --compose-file "$release/compose.yaml" schema --apply --writers-stopped
 fi
+if [[ "$schema_mode" == --ic-admin-cutover ]]; then
+  python3 -B "$release/scripts/ic-admin-cutover.py" prepare --root "$root" --previous "$old" --release "$release"
+fi
 ln -sfn "releases/$sha" "$root/current.next"; mv -Tf "$root/current.next" "$root/current"
 compose_at "$release" up -d --force-recreate --remove-orphans --wait --wait-timeout 180
+if [[ "$schema_mode" == --ic-admin-cutover ]]; then
+  # Do not automatically restore code over new operational data after starting writers.
+  trap - ERR
+  python3 -B "$release/scripts/ic-admin-cutover.py" verify-runtime --root "$root" --release "$release"
+fi
 trap - ERR
 printf 'Installed %s; previous release: %s. Validate game resources and a real player separately.\n' "$sha" "${old:-none}"

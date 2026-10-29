@@ -147,5 +147,24 @@ class AssetTests(unittest.TestCase):
         self.assertFalse(list(self.code.rglob('.asset-part-*')))
         self.assertFalse((self.code/'resources/[scripts]/example/stream/model.ydr').exists())
 
+    def test_hash_alias_installs_independent_media_and_refuses_modified_copy(self):
+        lock=self.prepare();self.publish()
+        source=lock['packages'][0]['files'][0]
+        aliases=[{'sha256':source['sha256'],'size':source['size'],'destination':'resources/ic_admin/web/assets/map.png'}]
+        config=self.code/'config/asset-aliases.json';config.parent.mkdir(exist_ok=True);config.write_text(json.dumps(aliases))
+        with contextlib.redirect_stdout(io.StringIO()):a.sync(self.code/'assets.lock.json',self.code,'full',str(self.store))
+        dest=self.code/aliases[0]['destination']
+        self.assertEqual(a.file_hash(dest),source['sha256'])
+        dest.write_bytes(b'modified')
+        with self.assertRaises(ValueError):a.install_aliases(self.code/'assets.lock.json',lock,self.code,'full')
+
+    def test_alias_requires_admitted_hash_and_rejects_code_destination(self):
+        lock=self.prepare();source=lock['packages'][0]['files'][0]
+        config=self.code/'config/asset-aliases.json';config.parent.mkdir(exist_ok=True)
+        config.write_text(json.dumps([{'sha256':'0'*64,'size':1,'destination':'resources/ic_admin/map.png'}]))
+        with self.assertRaises(ValueError):a.asset_aliases(self.code/'assets.lock.json',lock,'full')
+        config.write_text(json.dumps([{'sha256':source['sha256'],'size':source['size'],'destination':'resources/ic_admin/server.lua'}]))
+        with self.assertRaises(ValueError):a.asset_aliases(self.code/'assets.lock.json',lock,'full')
+
 
 if __name__=='__main__':unittest.main()

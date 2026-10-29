@@ -231,6 +231,19 @@ end)
 
 local CACHED_HASHS = {}
 local ITEMS_CACHE <const> = {}
+-- IC Admin invokes these only while its global maintenance gate is held.
+exports('icAdminOwnershipReady',function()
+    if GetInvokingResource()~='ic_admin' then return false end
+    return next(ChestUtils.chests or {})==nil and next(ChestUtils.users or {})==nil
+end)
+exports('icAdminOwnershipCommitted',function()
+    if GetInvokingResource()~='ic_admin' then return false end
+    if next(ChestUtils.chests or {}) or next(ChestUtils.users or {}) then return false end
+    for key in pairs(ITEMS_CACHE) do ITEMS_CACHE[key]=nil end
+    for key in pairs(CACHED_HASHS) do CACHED_HASHS[key]=nil end
+    return true
+end)
+
 local USERS_BYPASS_VEHICLE = {}
 
 
@@ -395,6 +408,10 @@ end)
 ---@param chest_name string | nil
 ---@return table<string, table | number> | false
 function API.requireChest(type, network_id, chest_name)
+    if GetResourceState('ic_admin')=='started' and exports['ic_admin']:isUserInMaintenance(0) then
+        TriggerClientEvent('Notify',source,'negado','Manutenção de patrimônio em andamento. Tente novamente em instantes.',5000)
+        return
+    end
     local source = source
     local user_id = vRP.getUserId(source)
     if incomingRequests[user_id] then
