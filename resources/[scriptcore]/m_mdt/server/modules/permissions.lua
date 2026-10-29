@@ -1,7 +1,7 @@
 local permissionsCache = {}
 local organizationImagesCache = {}
 
-local DEFAULT_IMAGE_URL = 'https://cdn.discordapp.com/attachments/995209318448238682/1451355574976385124/Logo_Roxa_Sem_Fundo_2.png?ex=6945dfb5&is=69448e35&hm=e612debe4085434dfcacb1c4e1a9c367bd4f5f8fe076b405db48b5cd908f6f9d&'
+local DEFAULT_IMAGE_URL = 'https://cfx-nui-m_mdt/web/build/branding/logo.png'
 
 ---@param organization string
 ---@return string

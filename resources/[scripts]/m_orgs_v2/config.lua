@@ -5,7 +5,7 @@ Config.Main = {
     cmdAdm = 'painelfacadm', -- Comando para abrir Painel ADM
     createAutomaticOrganizations = true,
     storeUrl = '', -- Link da Sua Loja
-    serverLogo = "https://cdn.discordapp.com/attachments/995209318448238682/1441893036530339882/Logo_TocadoMago_Delux_Azul.png?ex=696b4cc8&is=6969fb48&hm=a4d86a5ad3073b94f2f404a47e7fa09cc04462822219e11a93bfd42a3ed93cf0&",
+    serverLogo = "https://cfx-nui-m_orgs_v2/ui/build/branding/logo.png",
     blackList = 0,
     ImgLink = 'http://104.234.65.115/images/',
     clearChestLogs = 7 -- Dias para manter os logs de baú

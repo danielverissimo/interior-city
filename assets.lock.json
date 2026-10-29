@@ -67398,11 +67398,11 @@
       }
     },
     {
-      "id": "b0e7268542f92ca96d455f6f9a116e41c97cd773a98762f591b2efa701a581d7",
+      "id": "bade17b76481bb384ed4437e22c5ae7a7c7c56142b2cdf03deff6d4187275ce9",
       "resource": "resources/[scriptcore]/bm_module",
       "part": 0,
       "profile": "core",
-      "bytes": 730991,
+      "bytes": 714367,
       "files": [
         {
           "path": "resources/[scriptcore]/bm_module/scripts/orgs.zip",
@@ -67411,8 +67411,8 @@
         },
         {
           "path": "resources/[scriptcore]/bm_module/scripts/registration/nui/images/logo.png",
-          "size": 39358,
-          "sha256": "348af7d6f1e947c624553fd99952853e0f30222539cb151ad17c49e24bb3197d"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/bm_module/scripts/vehvender/nui/images/background.png",
@@ -67436,9 +67436,9 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/b0e7268542f92ca96d455f6f9a116e41c97cd773a98762f591b2efa701a581d7.tar.gz",
-        "sha256": "6f9e0799b88a18957f68e67417b64d4b39a0d0dcc4dca01e4e01562869487974",
-        "size": 722536
+        "object": "tocado-mago/objects/bade17b76481bb384ed4437e22c5ae7a7c7c56142b2cdf03deff6d4187275ce9.tar.gz",
+        "sha256": "f2412bb0a4342ad6f1063046733c6d7ea499b48e52f9ffbc4343834d7734a930",
+        "size": 706026
       }
     },
     {
@@ -67564,11 +67564,11 @@
       }
     },
     {
-      "id": "546f4dae13d7480d97e57a2d340c0217d942042399df40406c059e9f6701e8d2",
+      "id": "f3ddb48f50acd4214859e89a5345a2d746f1c81fe326b0d637cd3ef1674bc247",
       "resource": "resources/[scriptcore]/m_barbershop",
       "part": 0,
       "profile": "core",
-      "bytes": 17423113,
+      "bytes": 17147771,
       "files": [
         {
           "path": "resources/[scriptcore]/m_barbershop/web-side/build/assets/background-B38L31P-.png",
@@ -67582,8 +67582,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_barbershop/web-side/build/assets/logo.1221fdf2.png",
-          "size": 298076,
-          "sha256": "8b4783f2da1ade679cb5b7c56e371745c01a772d7993a815978186eda531d8a9"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/m_barbershop/web-side/build/assets/rotate-Bd7YUqnb.png",
@@ -67622,9 +67622,9 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/546f4dae13d7480d97e57a2d340c0217d942042399df40406c059e9f6701e8d2.tar.gz",
-        "sha256": "dd833cf4be4aadc713d7e2729c31ecaa304bb06f0173f858f2c0360d3d1e53c1",
-        "size": 16921956
+        "object": "tocado-mago/objects/f3ddb48f50acd4214859e89a5345a2d746f1c81fe326b0d637cd3ef1674bc247.tar.gz",
+        "sha256": "5b76532c3c773de0a1ed18468ad061e68c278964df241da164652c5610104064",
+        "size": 16655960
       }
     },
     {
@@ -67815,11 +67815,11 @@
       }
     },
     {
-      "id": "aa84c3baa69e4a992f70a5c05d88e859c7f37fa8aac933e7ba333f1fc83bb88c",
+      "id": "babcfd61cd246c20f3eddabfff1f596a9ba5693998516f5c4c627f60461e5e82",
       "resource": "resources/[scriptcore]/m_hud",
       "part": 0,
       "profile": "core",
-      "bytes": 5552424,
+      "bytes": 4827910,
       "files": [
         {
           "path": "resources/[scriptcore]/m_hud/stream/circleminimap.ytd",
@@ -67853,8 +67853,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_hud/web/build/assets/logo-D8JhG3_9.png",
-          "size": 298076,
-          "sha256": "8b4783f2da1ade679cb5b7c56e371745c01a772d7993a815978186eda531d8a9"
+          "size": 110172,
+          "sha256": "dd03642e2ba0c9100d177dd90235bbecfbe58ef55744772cd633e36f89afdd61"
         },
         {
           "path": "resources/[scriptcore]/m_hud/web/build/icons/fireman.png",
@@ -67963,8 +67963,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_hud/web/build/images/logo.png",
-          "size": 57700,
-          "sha256": "59ab84d51f3a0e40b6d32ec7ccece3be2180217277c7404a42023342059bed14"
+          "size": 110172,
+          "sha256": "dd03642e2ba0c9100d177dd90235bbecfbe58ef55744772cd633e36f89afdd61"
         },
         {
           "path": "resources/[scriptcore]/m_hud/web/build/images/makapoints.png",
@@ -68088,8 +68088,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_hud/web/public/images/logo.png",
-          "size": 699254,
-          "sha256": "0e45a920e18cdc2047ddec857bb56536930cff05be8709ebada3069e16eee757"
+          "size": 110172,
+          "sha256": "dd03642e2ba0c9100d177dd90235bbecfbe58ef55744772cd633e36f89afdd61"
         },
         {
           "path": "resources/[scriptcore]/m_hud/web/public/images/makapoints.png",
@@ -68123,36 +68123,36 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/aa84c3baa69e4a992f70a5c05d88e859c7f37fa8aac933e7ba333f1fc83bb88c.tar.gz",
-        "sha256": "1b26b0b314ae19264cc445cb9e57e751ce7941cc00385b020c58d4e5ed598b8d",
-        "size": 4913881
+        "object": "tocado-mago/objects/babcfd61cd246c20f3eddabfff1f596a9ba5693998516f5c4c627f60461e5e82.tar.gz",
+        "sha256": "f3497902b1547c266e71009e49bc6b3d583276415a7bc2097fc6d2c1f47bb7b6",
+        "size": 4279579
       }
     },
     {
-      "id": "733d9d3f20e3b337cd79eb9567e00c8dd7eb5c86eee7b38daa5e34e719352fc5",
+      "id": "c26e1c9b61660cf7ba596f3200a85ef3da7a2c6044423401c8b245f8ffedeaa8",
       "resource": "resources/[scriptcore]/m_identity",
       "part": 0,
       "profile": "core",
-      "bytes": 1065902,
+      "bytes": 22734,
       "files": [
         {
           "path": "resources/[scriptcore]/m_identity/web/assets/logo.png",
-          "size": 1065902,
-          "sha256": "5263ded526dfe389367d42341c13e36eab1cf4a7c5b8ffcaa1d6008ffef61048"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/733d9d3f20e3b337cd79eb9567e00c8dd7eb5c86eee7b38daa5e34e719352fc5.tar.gz",
-        "sha256": "0a461ea629beece58a2d47978facdcbae418413fc586f2f18135af9c86f0ad80",
-        "size": 1040951
+        "object": "tocado-mago/objects/c26e1c9b61660cf7ba596f3200a85ef3da7a2c6044423401c8b245f8ffedeaa8.tar.gz",
+        "sha256": "8893421510c5da48ae3d2feedaa5d3f6cfcc07029cc77f8f228301e189cc0548",
+        "size": 23036
       }
     },
     {
-      "id": "ec5f1e519301455d7daa0c9e8276390e32034de6aeebc6731ebccb6842ee12ea",
+      "id": "d7aabe3017f41320958abae717bf623d82af12abf675923560e69a36a8eab92f",
       "resource": "resources/[scriptcore]/m_mdt",
       "part": 0,
       "profile": "core",
-      "bytes": 1072418,
+      "bytes": 1064876,
       "files": [
         {
           "path": "resources/[scriptcore]/m_mdt/web/README.md",
@@ -68166,8 +68166,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_mdt/web/src/assets/logo.png",
-          "size": 30276,
-          "sha256": "136eb58d75079aa1418755b4d89d9fc1d75b511cfb7841a4da2564ef68ddbe3d"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/m_mdt/web/src/assets/mockup.png",
@@ -68176,9 +68176,9 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/ec5f1e519301455d7daa0c9e8276390e32034de6aeebc6731ebccb6842ee12ea.tar.gz",
-        "sha256": "cb3b3644358c650419a6e6e38931510a946acb678f93a6993e417fb95a86e66c",
-        "size": 1025496
+        "object": "tocado-mago/objects/d7aabe3017f41320958abae717bf623d82af12abf675923560e69a36a8eab92f.tar.gz",
+        "sha256": "d7c9a39cd87c527a1ab241c9e0d0c0e49ac38e80a23772fedcbe459250f3dcf6",
+        "size": 1018001
       }
     },
     {
@@ -68761,11 +68761,11 @@
       }
     },
     {
-      "id": "f14f5939b5824222405cf876b7e16030d6016a7629d9b5e0bdeeed5b0e0a4e61",
+      "id": "d778179d72c46ca99a415a15872138e19bcce576a364ac8bbc117d4249936233",
       "resource": "resources/[scriptcore]/m_skinshop",
       "part": 0,
       "profile": "core",
-      "bytes": 17389468,
+      "bytes": 17114126,
       "files": [
         {
           "path": "resources/[scriptcore]/m_skinshop/web-side/build/assets/background-B38L31P-.png",
@@ -68779,8 +68779,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_skinshop/web-side/build/assets/logo.1221fdf2.png",
-          "size": 298076,
-          "sha256": "8b4783f2da1ade679cb5b7c56e371745c01a772d7993a815978186eda531d8a9"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/m_skinshop/web-side/build/assets/rotate-Bd7YUqnb.png",
@@ -68814,9 +68814,9 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/f14f5939b5824222405cf876b7e16030d6016a7629d9b5e0bdeeed5b0e0a4e61.tar.gz",
-        "sha256": "00b17bd11eef0b5965aac5b001bca65ed5416c59bad0e17d08f315a209e21627",
-        "size": 16888372
+        "object": "tocado-mago/objects/d778179d72c46ca99a415a15872138e19bcce576a364ac8bbc117d4249936233.tar.gz",
+        "sha256": "b45880e7cbed4bb0eaea63862804a2e63b60ec49761aadee52ee1a08459b3b35",
+        "size": 16622514
       }
     },
     {
@@ -68969,11 +68969,11 @@
       }
     },
     {
-      "id": "1a42ec798c7f801e8336256df796b3c94785a70eac1cc31ccef80dd520a481cf",
+      "id": "517bbbd7ee284d35ef85619f981d074e1bb0f3ab8db2de666a4547b9dc7fd0c8",
       "resource": "resources/[scriptcore]/m_survival",
       "part": 0,
       "profile": "core",
-      "bytes": 2157916,
+      "bytes": 2171503,
       "files": [
         {
           "path": "resources/[scriptcore]/m_survival/web/assets/images/background.webp",
@@ -68986,9 +68986,9 @@
           "sha256": "1ebdfb9eaf740dfb5e335ac6443f39669f65cdb24bf55f42c9709504b2314a9b"
         },
         {
-          "path": "resources/[scriptcore]/m_survival/web/assets/images/logo.webp",
-          "size": 9147,
-          "sha256": "ec6d1cdb8fbc4f018ab94a8eeb0c45b5b9d97b72639521748daa4c8f468004e7"
+          "path": "resources/[scriptcore]/m_survival/web/assets/images/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/m_survival/web/assets/images/north.png",
@@ -69022,17 +69022,17 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/1a42ec798c7f801e8336256df796b3c94785a70eac1cc31ccef80dd520a481cf.tar.gz",
-        "sha256": "30bfaa987d733ab205e25e541e94b4fb595ed85357ddc2d5bdd5659bcf13c9e7",
-        "size": 2082796
+        "object": "tocado-mago/objects/517bbbd7ee284d35ef85619f981d074e1bb0f3ab8db2de666a4547b9dc7fd0c8.tar.gz",
+        "sha256": "ae4af877143202a0370fec54c4cba95c82c9dc231f9f068fc38f9c5f76d1beab",
+        "size": 2096843
       }
     },
     {
-      "id": "0e02a99de6cec2c056e5f263361d2cc35dd0e6f6410f15d412fb311740852a66",
+      "id": "5d803ec633710bec341fd73aa0a5dfab6bdde412f8400cc0f0c96b273cebc24f",
       "resource": "resources/[scriptcore]/m_tattoos",
       "part": 0,
       "profile": "core",
-      "bytes": 16732098,
+      "bytes": 16658276,
       "files": [
         {
           "path": "resources/[scriptcore]/m_tattoos/web/build/assets/background-B38L31P-.png",
@@ -69046,8 +69046,8 @@
         },
         {
           "path": "resources/[scriptcore]/m_tattoos/web/build/assets/logo-D8JhG3_9.png",
-          "size": 110143,
-          "sha256": "fa4df0a3a59ef935a543c4d7f96c565e74c0f9c695ccc4536e99117ac364191a"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/m_tattoos/web/build/assets/rotate-BWSZOC_j.png",
@@ -69090,9 +69090,9 @@
           "sha256": "6d70b2f0ae9aea5c44c5d9a8fb15bd1269291d53211ee02b4b136827064a96bd"
         },
         {
-          "path": "resources/[scriptcore]/m_tattoos/web/build/images/logo.webp",
-          "size": 9147,
-          "sha256": "ec6d1cdb8fbc4f018ab94a8eeb0c45b5b9d97b72639521748daa4c8f468004e7"
+          "path": "resources/[scriptcore]/m_tattoos/web/build/images/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scriptcore]/m_tattoos/web/build/images/title.webp",
@@ -69101,9 +69101,9 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/0e02a99de6cec2c056e5f263361d2cc35dd0e6f6410f15d412fb311740852a66.tar.gz",
-        "sha256": "cd176ebb5b659ac41b375e12f4c1c8e7be33ba3006112cc3a4331a2f381095cd",
-        "size": 16149371
+        "object": "tocado-mago/objects/5d803ec633710bec341fd73aa0a5dfab6bdde412f8400cc0f0c96b273cebc24f.tar.gz",
+        "sha256": "7b30eb67ad0cfccde7e46583c93eb46f01aa68ac8fc6a20bf94b8eaaeaac82de",
+        "size": 16079274
       }
     },
     {
@@ -69218,11 +69218,11 @@
       }
     },
     {
-      "id": "d16d8337c3f2765c7403530096b20a3088136fd01b0b4038359a53666a725c0a",
+      "id": "27282f6f5a23f973f17407b8a80a9d8375819b3cea13ac1549c8787fd1f257e2",
       "resource": "resources/[scripts]/m_craft",
       "part": 0,
       "profile": "core",
-      "bytes": 4539712,
+      "bytes": 4264370,
       "files": [
         {
           "path": "resources/[scripts]/m_craft/web/build/assets/background-s7B5V8F3.png",
@@ -69231,8 +69231,8 @@
         },
         {
           "path": "resources/[scripts]/m_craft/web/build/assets/logo-2KEw83bQ.png",
-          "size": 298076,
-          "sha256": "8b4783f2da1ade679cb5b7c56e371745c01a772d7993a815978186eda531d8a9"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scripts]/m_craft/web/build/images/top1.png",
@@ -69251,17 +69251,17 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/d16d8337c3f2765c7403530096b20a3088136fd01b0b4038359a53666a725c0a.tar.gz",
-        "sha256": "7456ff421b18ca2b6a17bf982c1e915b3406eb9b74f78d1f4a8d08fe8fdca4a8",
-        "size": 4355167
+        "object": "tocado-mago/objects/27282f6f5a23f973f17407b8a80a9d8375819b3cea13ac1549c8787fd1f257e2.tar.gz",
+        "sha256": "4ea4d26e4f393d7504279d0eccb2eaac01a02f8a67ad90810a1bda26051c15a0",
+        "size": 4089041
       }
     },
     {
-      "id": "1f57d4d8273a66d1b352654f40c7a45e684d313ce04e37a9fc9b1c15fec7778a",
+      "id": "757dc9bbe2b645a4f4459df60f964f758540830eb730e7e5bcd54e176a3bd609",
       "resource": "resources/[scripts]/m_dealership",
       "part": 0,
       "profile": "core",
-      "bytes": 8221876,
+      "bytes": 8290538,
       "files": [
         {
           "path": "resources/[scripts]/m_dealership/web/build/assets/default_vehicle-ByjzUefh.webp",
@@ -69275,8 +69275,8 @@
         },
         {
           "path": "resources/[scripts]/m_dealership/web/build/assets/logo.6fbd8253.png",
-          "size": 5505,
-          "sha256": "b43b9222404a073865001c72a13cce7459a463e7247abc05c3090b0e2df60a7b"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scripts]/m_dealership/web/build/background.png",
@@ -69290,8 +69290,8 @@
         },
         {
           "path": "resources/[scripts]/m_dealership/web/build/logo.png",
-          "size": 5505,
-          "sha256": "b43b9222404a073865001c72a13cce7459a463e7247abc05c3090b0e2df60a7b"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scripts]/m_dealership/web/build/vehicle.png",
@@ -69310,8 +69310,8 @@
         },
         {
           "path": "resources/[scripts]/m_dealership/web/public/logo.png",
-          "size": 5648,
-          "sha256": "6fbd8253592a3760ec1bf86832ecf5cfa26d7541fe90122711a9dd753c902137"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scripts]/m_dealership/web/public/vehicle.png",
@@ -69325,14 +69325,14 @@
         },
         {
           "path": "resources/[scripts]/m_dealership/web/src/assets/logo.png",
-          "size": 5616,
-          "sha256": "5c8b580395b39b01452da79611833467dfa8e4047e001f83722e2f1ef8c1405a"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/1f57d4d8273a66d1b352654f40c7a45e684d313ce04e37a9fc9b1c15fec7778a.tar.gz",
-        "sha256": "28e38ba9338903c87271b45c4a6f142df08500109445ed9de489ea8ef22318c9",
-        "size": 7896050
+        "object": "tocado-mago/objects/757dc9bbe2b645a4f4459df60f964f758540830eb730e7e5bcd54e176a3bd609.tar.gz",
+        "sha256": "4762d7d9cd811a9a8d04e81bd35030763bd236e0fa7a8989716a2812ce69666d",
+        "size": 7965101
       }
     },
     {
@@ -69457,11 +69457,11 @@
       }
     },
     {
-      "id": "e811f71b90d2648f8b5f940aa7f7c2441705bef4ebe1d261d6688b59c1ecabb5",
+      "id": "bedb6546f5618f226dc24c7278e8da6dac46fd25e1dc4ef0b34eeebe3246ea43",
       "resource": "resources/[scripts]/m_ponto",
       "part": 0,
       "profile": "core",
-      "bytes": 21247,
+      "bytes": 30257,
       "files": [
         {
           "path": "resources/[scripts]/m_ponto/web/README.md",
@@ -69470,8 +69470,8 @@
         },
         {
           "path": "resources/[scripts]/m_ponto/web/src/assets/logo.png",
-          "size": 13724,
-          "sha256": "611769d00865ebb434a85c67d9cea153b45180833c093d103de9cdc3f3b9d142"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         },
         {
           "path": "resources/[scripts]/m_ponto/web/src/assets/radio.png",
@@ -69485,9 +69485,9 @@
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/e811f71b90d2648f8b5f940aa7f7c2441705bef4ebe1d261d6688b59c1ecabb5.tar.gz",
-        "sha256": "3366418fe719c4d48044446dd06c33980965679503cf0ec9a498f91606245037",
-        "size": 21512
+        "object": "tocado-mago/objects/bedb6546f5618f226dc24c7278e8da6dac46fd25e1dc4ef0b34eeebe3246ea43.tar.gz",
+        "sha256": "5b65d9eca40744ed2c3309e456a582640f2de5644e1194731c703f964d38e78b",
+        "size": 30546
       }
     },
     {
@@ -82998,11 +82998,11 @@
       }
     },
     {
-      "id": "9f09176abd6d4cb92e86aebcbd171c1eb35fc9431039056ba0205047f3b380f5",
+      "id": "d228e2ccbb4f838aa61ae12537651a783080a68c522c9159db5d74473bbb98fb",
       "resource": "resources/[vrp]/vrp_creator",
       "part": 0,
       "profile": "core",
-      "bytes": 6612704,
+      "bytes": 6302732,
       "files": [
         {
           "path": "resources/[vrp]/vrp_creator/character-nui/assets/images/backgroud1.png",
@@ -83041,14 +83041,14 @@
         },
         {
           "path": "resources/[vrp]/vrp_creator/character-nui/assets/images/logo.png",
-          "size": 332706,
-          "sha256": "e7b54ea21034cf60e734204c7497961589d2b22974d038498079711dd84d95f5"
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
         }
       ],
       "archive": {
-        "object": "tocado-mago/objects/9f09176abd6d4cb92e86aebcbd171c1eb35fc9431039056ba0205047f3b380f5.tar.gz",
-        "sha256": "ca6d25666f4afa92b1f750a33b634c9bee5cbcf4dec1ed8fff9fb585b8af3bfc",
-        "size": 6522545
+        "object": "tocado-mago/objects/d228e2ccbb4f838aa61ae12537651a783080a68c522c9159db5d74473bbb98fb.tar.gz",
+        "sha256": "6676eae40fc38c96f82cf77efae287435cbec672e7b8a68b6b9ed9a466951c0a",
+        "size": 6223158
       }
     },
     {
@@ -83375,13 +83375,252 @@
         "sha256": "59d62415337d6eaf37d5aeb0851eb029a5de90f0e25f117721e99057171c660b",
         "size": 11875161
       }
+    },
+    {
+      "id": "004de7ceedf0b206da9cdb1bd77b8c7d1d49674422a0f41e9fc9784148cf7c1d",
+      "resource": "resources/[scriptcore]/ic_admin",
+      "part": 0,
+      "profile": "core",
+      "bytes": 22734,
+      "files": [
+        {
+          "path": "resources/[scriptcore]/ic_admin/web/assets/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/004de7ceedf0b206da9cdb1bd77b8c7d1d49674422a0f41e9fc9784148cf7c1d.tar.gz",
+        "sha256": "4148f81d7b590025a22c1bdce2be6edad30891d7b7d55d52a6c4dc473d3cfabf",
+        "size": 23034
+      }
+    },
+    {
+      "id": "a093a64359ab5b8a08abe4b8a858146669e2347c82cddc47c438e0fe6b4a2cb8",
+      "resource": "resources/[scriptcore]/ic_loading",
+      "part": 0,
+      "profile": "core",
+      "bytes": 4058572,
+      "files": [
+        {
+          "path": "resources/[scriptcore]/ic_loading/web/assets/interior-city-intro-v2.webm",
+          "size": 4035838,
+          "sha256": "60994a8839e89796659fc71f144e61624ecd8a3201be67c60b75a572e5fe125c"
+        },
+        {
+          "path": "resources/[scriptcore]/ic_loading/web/assets/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/a093a64359ab5b8a08abe4b8a858146669e2347c82cddc47c438e0fe6b4a2cb8.tar.gz",
+        "sha256": "7b778f314f931867b6c77586c9476cd15ac60636fb38cce1f380336eea66070c",
+        "size": 4059913
+      }
+    },
+    {
+      "id": "afa63439eb3acb47f27732ff16fe4cf279f04df4e3f0ceceb7b8b3eaf7b16f22",
+      "resource": "resources/[scriptcore]/m_barbershop",
+      "part": 1,
+      "profile": "core",
+      "bytes": 45468,
+      "files": [
+        {
+          "path": "resources/[scriptcore]/m_barbershop/web-side/build/assets/logo-B_nunvZp.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        },
+        {
+          "path": "resources/[scriptcore]/m_barbershop/web-side/build/assets/logo.fd1e7354.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/afa63439eb3acb47f27732ff16fe4cf279f04df4e3f0ceceb7b8b3eaf7b16f22.tar.gz",
+        "sha256": "37e35c82f6e5595190c9690a3bc02009cce8c780291dda4b396ae86ce8ae8c9c",
+        "size": 23313
+      }
+    },
+    {
+      "id": "d2c96ef43fba0c053d44bbe61f45641caee4ca81243ae2a5d3c305f5a42898ed",
+      "resource": "resources/[scriptcore]/m_mdt",
+      "part": 1,
+      "profile": "core",
+      "bytes": 22734,
+      "files": [
+        {
+          "path": "resources/[scriptcore]/m_mdt/web/build/branding/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/d2c96ef43fba0c053d44bbe61f45641caee4ca81243ae2a5d3c305f5a42898ed.tar.gz",
+        "sha256": "5c39d5762e7de489b51704242dbc99cb5c60c2fb226eda47fabc915e4b4ebc1c",
+        "size": 23039
+      }
+    },
+    {
+      "id": "b751eb433761666a837195161706024cd806f4e56d811fac0386e46bb0d5dfc9",
+      "resource": "resources/[scriptcore]/m_skinshop",
+      "part": 1,
+      "profile": "core",
+      "bytes": 45468,
+      "files": [
+        {
+          "path": "resources/[scriptcore]/m_skinshop/web-side/build/assets/logo-B_nunvZp.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        },
+        {
+          "path": "resources/[scriptcore]/m_skinshop/web-side/build/assets/logo.fd1e7354.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/b751eb433761666a837195161706024cd806f4e56d811fac0386e46bb0d5dfc9.tar.gz",
+        "sha256": "15bc221f5f96849ead74de6dbd43242d8e7c76146316e15454fc981f97527a3d",
+        "size": 23313
+      }
+    },
+    {
+      "id": "08b43a90095a0469653fffe2ffa02e88589303f9348aa1a65c6cfac0bec40deb",
+      "resource": "resources/[scriptcore]/m_tattoos",
+      "part": 1,
+      "profile": "core",
+      "bytes": 45468,
+      "files": [
+        {
+          "path": "resources/[scriptcore]/m_tattoos/web/build/assets/logo-2KEw83bQ.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        },
+        {
+          "path": "resources/[scriptcore]/m_tattoos/web/build/assets/logo-B_nunvZp.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/08b43a90095a0469653fffe2ffa02e88589303f9348aa1a65c6cfac0bec40deb.tar.gz",
+        "sha256": "67e3ddc65c1f740618d35b0affb5143feec5b5f67239b49361ee2114dbc8bdcb",
+        "size": 23306
+      }
+    },
+    {
+      "id": "e927799a1dd3e51bc8176e812d37508cf0f6e71875f0969fa8f01c76d6cb3ec1",
+      "resource": "resources/[scripts]/m_box",
+      "part": 1,
+      "profile": "core",
+      "bytes": 22734,
+      "files": [
+        {
+          "path": "resources/[scripts]/m_box/web/assets/logo-CI-ukmxD.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/e927799a1dd3e51bc8176e812d37508cf0f6e71875f0969fa8f01c76d6cb3ec1.tar.gz",
+        "sha256": "43ed7bbedab035de963ee16de0079e65e7c05005e7b124b78b932e4b13a95493",
+        "size": 23037
+      }
+    },
+    {
+      "id": "7db0064ff8982e7a2661c545d51eccef024bd709a740fba2c58884551a30e82e",
+      "resource": "resources/[scripts]/m_dealership",
+      "part": 1,
+      "profile": "core",
+      "bytes": 45468,
+      "files": [
+        {
+          "path": "resources/[scripts]/m_dealership/web/build/assets/logo-CkGNlvqx.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        },
+        {
+          "path": "resources/[scripts]/m_dealership/web/build/assets/logo.75d897c0.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/7db0064ff8982e7a2661c545d51eccef024bd709a740fba2c58884551a30e82e.tar.gz",
+        "sha256": "7ccd71f9e244e4651b6ee65dac66fb6329ddaa3d68657cc53df2a54c7390d576",
+        "size": 23305
+      }
+    },
+    {
+      "id": "0a2ffb7e58fe4e79a8a7f6e157001e080a17b912723616ecd3fb416ecef730f4",
+      "resource": "resources/[scripts]/m_orgs_v2",
+      "part": 1,
+      "profile": "core",
+      "bytes": 22734,
+      "files": [
+        {
+          "path": "resources/[scripts]/m_orgs_v2/ui/build/branding/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/0a2ffb7e58fe4e79a8a7f6e157001e080a17b912723616ecd3fb416ecef730f4.tar.gz",
+        "sha256": "73e7d2de3a170100c15553e5cb1366234e11bdab94c0c57c4ec6ae64e3f6ee16",
+        "size": 23037
+      }
+    },
+    {
+      "id": "ecababf6eed4ecc651dd75fa5afc789b10cc5645c56bfe89e7b3cf0b7b5cc8e8",
+      "resource": "resources/[scripts]/m_ponto",
+      "part": 1,
+      "profile": "core",
+      "bytes": 45468,
+      "files": [
+        {
+          "path": "resources/[scripts]/m_ponto/web/build/assets/logo-D_vQDfn9.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        },
+        {
+          "path": "resources/[scripts]/m_ponto/web/build/assets/logo.611769d0.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/ecababf6eed4ecc651dd75fa5afc789b10cc5645c56bfe89e7b3cf0b7b5cc8e8.tar.gz",
+        "sha256": "7be96d2811d39da0029a4d6f319484d0790b79e5c207743208870e9e76f0fc5d",
+        "size": 23306
+      }
+    },
+    {
+      "id": "35552ef6f6b57c5b82c4ed117e42ef00214f2832580ac7bdcfcb6fe98e296b6d",
+      "resource": "resources/[vrp]/vrp",
+      "part": 2,
+      "profile": "core",
+      "bytes": 22734,
+      "files": [
+        {
+          "path": "resources/[vrp]/vrp/branding/logo.png",
+          "size": 22734,
+          "sha256": "084390faed9da78e93535ea3bf9240afe433815e70513291a87248a141c20c46"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/35552ef6f6b57c5b82c4ed117e42ef00214f2832580ac7bdcfcb6fe98e296b6d.tar.gz",
+        "sha256": "8c3f9f8b93be425d73726ec2c4647890ebaf31824cf09e18b7426365aa2a5935",
+        "size": 23019
+      }
     }
   ],
   "stats": {
     "resources": 89,
     "code_files": 3289,
     "code_bytes": 69391079,
-    "asset_files": 16436,
-    "asset_bytes": 14305351016
+    "asset_files": 16453,
+    "asset_bytes": 14306840189
   }
 }

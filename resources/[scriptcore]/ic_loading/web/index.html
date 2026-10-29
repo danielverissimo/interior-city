@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; object-src 'none'">
+  <title>Interior City</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <video id="intro" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="assets/interior-city-intro-v2.webm" type='video/webm; codecs="vp9,opus"'>
+  </video>
+  <div class="fallback" aria-hidden="true"><img src="assets/logo.png" alt=""></div>
+  <header><img src="assets/logo.png" alt="Logo da Interior City"><span>INTERIOR CITY</span><button id="sound" type="button" aria-pressed="false">Ativar som</button></header>
+  <footer>
+    <div class="status"><span>Conectando à Interior City</span><span id="percentage">0%</span></div>
+    <div id="progress" class="progress" role="progressbar" aria-label="Carregamento da cidade" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="bar"></div></div>
+  </footer>
+  <script src="loading.js"></script>
+</body>
+</html>

@@ -31,7 +31,7 @@ const server = createServer(async (request, response) => {
     }
     if (name === '/favicon.ico') { response.writeHead(204); response.end(); return; }
     const file = name === '/' ? 'index.html' : name.slice(1);
-    if (!['index.html','style.css','app.mjs','transport.mjs','monitor.mjs','map.mjs','assets/map.png'].includes(file)) { response.writeHead(404); response.end(); return; }
+    if (!['index.html','style.css','app.mjs','transport.mjs','monitor.mjs','map.mjs','assets/map.png','assets/logo.png'].includes(file)) { response.writeHead(404); response.end(); return; }
     try { response.writeHead(200, { 'Content-Type':types[extname(file)] || 'text/plain' }); response.end(await readFile(join(webRoot,file))); }
     catch { response.writeHead(500); response.end(); }
 });

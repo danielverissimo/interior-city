@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.svg";
+import logo from "../assets/logo.png";
 
 const categories = [
   { id: "esportivos", label: "ESPORTIVOS" },
