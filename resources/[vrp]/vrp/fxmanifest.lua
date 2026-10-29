@@ -35,7 +35,8 @@ files {
 	'loading/css/**',
     'loading/fonts/**',
     'loading/icons/**',
-    'loading/js/**'
+	'loading/js/**',
+	'loading/intro/**'
 }
 
 loadscreen "loading/index.html"   

@@ -82979,6 +82979,25 @@
       }
     },
     {
+      "id": "cffe45bd21867aa4e5bcd1e234ad0f149ae10a85fb802ba72b1111ed0c4af5d5",
+      "resource": "resources/[vrp]/vrp",
+      "part": 1,
+      "profile": "core",
+      "bytes": 5712766,
+      "files": [
+        {
+          "path": "resources/[vrp]/vrp/loading/intro/intro.mp4",
+          "size": 5712766,
+          "sha256": "05646602567a938aa0f961fd1fd78551171ecc0849799002e617280b04869733"
+        }
+      ],
+      "archive": {
+        "object": "tocado-mago/objects/cffe45bd21867aa4e5bcd1e234ad0f149ae10a85fb802ba72b1111ed0c4af5d5.tar.gz",
+        "sha256": "efeb7979f5d7d7a0849a7849fd397b375118de0caa21063b9317ecaf9789da03",
+        "size": 5701040
+      }
+    },
+    {
       "id": "9f09176abd6d4cb92e86aebcbd171c1eb35fc9431039056ba0205047f3b380f5",
       "resource": "resources/[vrp]/vrp_creator",
       "part": 0,
@@ -83362,7 +83381,7 @@
     "resources": 89,
     "code_files": 3289,
     "code_bytes": 69391079,
-    "asset_files": 16435,
-    "asset_bytes": 14299638250
+    "asset_files": 16436,
+    "asset_bytes": 14305351016
   }
 }
