@@ -24,6 +24,11 @@ await mkdir(output, { recursive: true });
 const types = { '.html':'text/html', '.mjs':'text/javascript', '.css':'text/css', '.png':'image/png' };
 const server = createServer(async (request, response) => {
     const name = new URL(request.url, 'http://localhost').pathname;
+    if (name === '/nui-host') {
+        response.writeHead(200, { 'Content-Type':'text/html' });
+        response.end('<!doctype html><html style="background:rgb(20,180,100)"><body style="margin:0"><iframe id="nui" style="position:fixed;inset:0;width:100%;height:100%;border:0" src="/index.html"></iframe></body></html>');
+        return;
+    }
     if (name === '/favicon.ico') { response.writeHead(204); response.end(); return; }
     const file = name === '/' ? 'index.html' : name.slice(1);
     if (!['index.html','style.css','app.mjs','transport.mjs','monitor.mjs','map.mjs','assets/map.png'].includes(file)) { response.writeHead(404); response.end(); return; }
@@ -40,7 +45,36 @@ const errors = [];
 const page = await browser.newPage({ viewport:{width:1920,height:1080} });
 page.on('pageerror', error => errors.push(error.message));
 const pages = ['server','players','warnings','map','calls','groups','identity','items','weapons','vips','vehicles','radio','locations','climate','logs'];
+const transparency = [];
 try {
+    // A top-level screenshot misses Chromium's opaque canvas when an embedded NUI
+    // forces a different color scheme. Compare actual composited pixels to the scene.
+    const embedded = await browser.newPage({viewport:{width:1280,height:720},colorScheme:'light'});
+    try {
+        embedded.on('pageerror', error => errors.push(error.message));
+        await embedded.addInitScript(() => {
+            const nativeFetch=window.fetch;
+            window.fetch=(url,options)=>String(url).startsWith('https://ic_admin/')
+                ? Promise.resolve({json:async()=>({ok:true,data:{}})}) : nativeFetch(url,options);
+        });
+        await embedded.goto(`http://127.0.0.1:${server.address().port}/nui-host`);
+        const frame=embedded.frames().find(value=>value!==embedded.mainFrame());
+        await frame.waitForFunction(()=>document.querySelector('#close')?.onclick!=null);
+        await embedded.locator('#nui').evaluate(el=>el.style.visibility='hidden');
+        const scene=await embedded.screenshot({path:join(output,'nui-scene.png')});
+        await embedded.locator('#nui').evaluate(el=>el.style.visibility='visible');
+        assert.deepEqual(await embedded.screenshot({path:join(output,'nui-closed.png')}),scene,'closed NUI must preserve the underlying scene');
+        transparency.push('initially closed frame preserves scene pixels');
+        await frame.evaluate(()=>window.postMessage({type:'open',payload:{permissions:{allowedActions:{}},stats:{players:0}}},'*'));
+        await frame.waitForSelector('#app');
+        assert.notDeepEqual(await embedded.screenshot(),scene,'opened panel must be visible');
+        assert.equal(await frame.locator('.shell').evaluate(el=>getComputedStyle(el).colorScheme),'dark');
+        transparency.push('opened panel remains visible with dark controls');
+        await frame.locator('#close').click();
+        await frame.waitForSelector('#app',{state:'hidden'});
+        assert.deepEqual(await embedded.screenshot({path:join(output,'nui-after-close.png')}),scene,'closing NUI must restore scene pixels');
+        transparency.push('closing frame restores scene pixels');
+    } finally { await embedded.close(); }
     await page.addInitScript(() => {
         window.testRequests = [];
         window.testFixtures = {
@@ -189,7 +223,7 @@ try {
         await page.screenshot({path:filename});screenshots.push(filename);
     }
     assert.deepEqual(errors,[],'browser runtime errors');
-    const report={synthetic:true,gta:false,checks,banPayload:ban.payload,lookupPayload:lookup.payload,weaponPayload:weapon.payload,vipPayload:vip.payload,browserErrors:errors,screenshots};
+    const report={synthetic:true,gta:false,checks,transparency,banPayload:ban.payload,lookupPayload:lookup.payload,weaponPayload:weapon.payload,vipPayload:vip.payload,browserErrors:errors,screenshots};
     await writeFile(join(output,'report.json'),JSON.stringify(report,null,2)+'\n');
     console.log(JSON.stringify(report,null,2));
 } finally {

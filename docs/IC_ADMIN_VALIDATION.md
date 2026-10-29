@@ -81,3 +81,24 @@ e vídeo com dois clientes permanece pendente. O relatório completo com digest 
 limitações está em `../state/update-4720106.md` (registro operacional local ignorado
 pelo Git). Os ajustes posteriores de ferramentas de verificação/importação não
 alteraram os scripts do jogo da release ativa nem exigiram outro reinício.
+
+## Correção de tela preta na entrada — 29/10/2026
+
+O painel fechado forçava `color-scheme: dark` na raiz da NUI. Em uma página
+embutida cujo esquema difere do hospedeiro, Chromium pinta o canvas opaco mesmo
+com `html,body { background:transparent }`, comportamento previsto pela
+[especificação CSS Color Adjustment](https://www.w3.org/TR/css-color-adjust-1/#color-scheme-effect).
+O defeito foi reproduzido em Chromium: a tela da NUI fechada ficou inteiramente
+escura sobre uma cena de teste. Isso independe da etapa de spawn do jogador.
+
+`web/style.css` agora mantém o esquema da raiz em `normal` e aplica `dark`
+somente às superfícies visíveis do painel, modais e escolhas VIP. Não há alteração
+no fluxo Lua de entrada, permissões, dados migrados ou esquema SQL nesta correção.
+
+`tests/ic_admin_browser.mjs` passou a carregar a NUI real num iframe sobre uma cena
+colorida e comparar screenshots: início fechado e fechamento após abrir devem
+preservar exatamente os pixels da cena; o painel aberto precisa continuar visível.
+A regra antiga falha nesse controle negativo. A versão corrigida passou, assim
+como as 15 áreas, resoluções 1280×720/1920×1080/3440×1440 e sete testes JavaScript.
+Esses testes são sintéticos; a entrada de um jogador no GTA após a atualização
+continua necessária para confirmar a resolução do incidente no cliente real.
