@@ -21,6 +21,44 @@ def stopped_writers():
     container=containers().get('fxserver')
     if not container or run(['docker','inspect','--format','{{.State.Running}}',container])!='false':raise CutoverError('Legacy writers must be stopped')
     return container
+def deduplicate_locked_assets(current,older,lock):
+    assets=load(Path(__file__).with_name('assets.py'),'asset_reuse') if Path(__file__).with_name('assets.py').exists() else load(current/'scripts/assets.py','asset_reuse')
+    reused=0;size=0
+    for package in lock['packages']:
+        for record in package['files']:
+            source=assets.target_path(current,record['path']);target=assets.target_path(older,record['path'])
+            if not source.is_file() or not target.is_file():continue
+            a,b=source.stat(),target.stat()
+            if a.st_dev!=b.st_dev or a.st_ino==b.st_ino or a.st_size!=record['size'] or b.st_size!=record['size']:continue
+            if assets.file_hash(source)!=record['sha256'] or assets.file_hash(target)!=record['sha256']:continue
+            temporary=target.with_name('.ic-admin-dedup-'+secrets.token_hex(6))
+            try:os.link(source,temporary);os.replace(temporary,target)
+            finally:temporary.unlink(missing_ok=True)
+            reused+=1;size+=b.st_size
+    return reused,size
+def ensure_capacity(root,current):
+    minimum=3*1024**3
+    if shutil.disk_usage(root).free>=minimum:return
+    lock_path=current/'assets.lock.json'
+    if not lock_path.is_file():raise CutoverError('Insufficient disk space and no immutable catalogue for safe reuse')
+    lock=json.loads(lock_path.read_text());digest=hashlib.sha256(lock_path.read_bytes()).hexdigest()
+    running=run(['docker','ps','-q']).splitlines();mounted=[]
+    if running:
+        for container in json.loads(run(['docker','inspect',*running])):
+            mounted.extend(Path(mount['Source']).resolve() for mount in container.get('Mounts',[]) if mount.get('Source'))
+    reused=0;logical=0;cleared=0
+    for older in sorted((root/'releases').iterdir()):
+        if not re.fullmatch('[a-f0-9]{40}',older.name) or older.is_symlink() or older.resolve()==current.resolve():continue
+        if any(path==older or older in path.parents for path in mounted):continue
+        old_lock=older/'assets.lock.json'
+        if not old_lock.is_file() or hashlib.sha256(old_lock.read_bytes()).hexdigest()!=digest:continue
+        count,size=deduplicate_locked_assets(current,older,lock);reused+=count;logical+=size
+        cache=older/'cache'
+        if count and cache.is_dir() and not cache.is_symlink():shutil.rmtree(cache);cleared+=1
+        if shutil.disk_usage(root).free>=minimum:break
+    free=shutil.disk_usage(root).free
+    print(json.dumps({'migrationStorageReuse':{'immutableFiles':reused,'logicalDuplicateBytes':logical,'inactiveCachesRebuiltLater':cleared,'freeBytes':free}}),flush=True)
+    if free<minimum:raise CutoverError('Insufficient disk space after verified immutable reuse; no player data or backups removed')
 def check_previous(root,previous):
     helper=load(Path(__file__).with_name('release.py'),'release_helper')
     previous=previous.resolve();expected=json.loads((root/'state/manifests'/(previous.name+'.json')).read_text())
@@ -33,6 +71,7 @@ def check_previous(root,previous):
     caches={key for key in drift if re.fullmatch(r'scripts/__pycache__/release\.cpython-\d+\.pyc',key) and key not in expected}
     if set(drift)-allowed-caches:raise CutoverError('Release validation failed: immutable code/configuration drift requires review')
     print(json.dumps({'previousRelease':previous.name,'reviewedMutableFiles':[p for p in drift if p in allowed],'generatedCacheFiles':len(caches)}))
+    ensure_capacity(root,previous)
     return drift
 class EphemeralDB:
     def __init__(self,name):self.name=name

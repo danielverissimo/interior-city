@@ -379,3 +379,9 @@ com o provedor IC Admin já ativo conserva os registros novos e não reimporta J
 legados. O relatório privado da troca informa contagens, digest, ensaio de restauração,
 versão do esquema e verificação de autoridade. O controlador disponibiliza somente
 um resumo sem credenciais ou registros pessoais.
+
+Se o disco não comportar a reserva operacional, a preparação pode deduplicar por
+hardlink somente assets idênticos e verificados de releases inativas com o mesmo
+catálogo. Diretórios de cache regeneráveis dessas releases podem ser removidos.
+Releases montadas por contêineres ativos, código, configurações, estado de jogadores
+e backups não são removidos nem substituídos. A reserva mínima não é reduzida.

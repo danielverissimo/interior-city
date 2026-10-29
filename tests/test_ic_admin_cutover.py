@@ -1,5 +1,6 @@
 """Operational guards with temporary files; no remote host or production database."""
 import contextlib,importlib.util,io,json,tempfile,unittest
+from unittest.mock import patch
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def load(name,path):
@@ -16,10 +17,30 @@ class CutoverTests(unittest.TestCase):
             r.manifest(old,root/'state/manifests'/('a'*40+'.json'))
             data.write_text('[{"name":"Changed by runtime"}]')
             cache=old/'scripts/__pycache__/release.cpython-314.pyc';cache.parent.mkdir(parents=True);cache.write_bytes(b'generated')
-            with contextlib.redirect_stdout(io.StringIO()):result=c.check_previous(root,old)
+            with patch.object(c,'ensure_capacity'),contextlib.redirect_stdout(io.StringIO()):result=c.check_previous(root,old)
             self.assertEqual(len(result),2)
             (old/'server.cfg').write_text('unexpected code/configuration drift')
             with self.assertRaises(c.CutoverError):c.check_previous(root,old)
+
+    def test_deduplication_preserves_code_state_and_modified_assets(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as directory:
+            current=Path(directory)/'current';older=Path(directory)/'older';current.mkdir();older.mkdir()
+            for root in (current,older):
+                (root/'model.ydr').write_bytes(b'locked asset');(root/'server.lua').write_text('code untouched');(root/'player.json').write_text('state untouched')
+            lock={'packages':[{'files':[{'path':'model.ydr','size':12,'sha256':hashlib.sha256(b'locked asset').hexdigest()}]}]}
+            from unittest.mock import patch
+            original=c.load
+            with patch.object(c,'load',side_effect=lambda path,name:original(ROOT/'scripts/assets.py',name) if name=='asset_reuse' else original(path,name)):
+                count,size=c.deduplicate_locked_assets(current,older,lock)
+            self.assertEqual((count,size),(1,12))
+            self.assertEqual((current/'model.ydr').stat().st_ino,(older/'model.ydr').stat().st_ino)
+            self.assertEqual((older/'server.lua').read_text(),'code untouched')
+            self.assertEqual((older/'player.json').read_text(),'state untouched')
+            (older/'model.ydr').unlink();(older/'model.ydr').write_bytes(b'owner modification')
+            with patch.object(c,'load',side_effect=lambda path,name:original(ROOT/'scripts/assets.py',name) if name=='asset_reuse' else original(path,name)):
+                self.assertEqual(c.deduplicate_locked_assets(current,older,lock),(0,0))
+            self.assertEqual((older/'model.ydr').read_bytes(),b'owner modification')
 
     def test_reports_are_private_and_atomic(self):
         with tempfile.TemporaryDirectory() as directory:
