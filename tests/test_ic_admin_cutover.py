@@ -79,3 +79,37 @@ class CutoverTests(unittest.TestCase):
         self.assertEqual(c.normalize_environment({'values':{'weather':'CLEAR','hour':8,'freezeTime':1}}),{'weather':'CLEAR','hour':8,'freezeTime':True})
         with self.assertRaises(c.CutoverError):c.normalize_environment({'values':{'time':800}})
         with self.assertRaises(c.CutoverError):c.normalize_environment({'values':{},'unsupported':1})
+
+    def test_kvp_settings_recover_permissions_even_when_environment_json_exists(self):
+        with tempfile.TemporaryDirectory() as directory:
+            captured=Path(directory)
+            (captured/'panel_permissions.json').write_text('')
+            environment={'weather':'RAIN','hour':17,'rotating':True}
+            (captured/'environment_state.json').write_text(json.dumps(environment))
+            permissions={'view_server':{'admin':False,'moderador':True,'suporte':False}}
+            result=c.merge_legacy_kvp({'keyCount':3,'values':{
+                'panel_permissions':json.dumps(permissions),'logs_config':'{"webhooks":[]}',
+                'environment_state':json.dumps(environment)}},captured)
+            self.assertEqual(json.loads((captured/'panel_permissions.json').read_text()),permissions)
+            self.assertEqual(json.loads((captured/'logs_config.json').read_text()),{'webhooks':[]})
+            self.assertEqual(result['permissionRecords'],1)
+            self.assertEqual(result['namespaceKeys'],3)
+            self.assertEqual((captured/'panel_permissions.json').stat().st_mode&0o777,0o600)
+
+    def test_kvp_conflicts_and_unknown_records_block_before_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            captured=Path(directory);path=captured/'panel_permissions.json'
+            path.write_text('{"view_server":{"admin":true}}')
+            before=path.read_bytes()
+            with self.assertRaises(c.CutoverError):c.merge_legacy_kvp({'values':{'panel_permissions':'{"view_server":{"admin":false}}','logs_config':'{"webhooks":[]}'}},captured)
+            self.assertEqual(path.read_bytes(),before)
+            self.assertFalse((captured/'logs_config.json').exists())
+            with self.assertRaises(c.CutoverError):c.merge_legacy_kvp({'values':{},'unsupported':1},captured)
+            with self.assertRaises(c.CutoverError):c.merge_legacy_kvp({'values':{'panel_permissions':'[]'}},captured)
+
+    def test_equivalent_permission_wrappers_do_not_conflict(self):
+        with tempfile.TemporaryDirectory() as directory:
+            captured=Path(directory);permissions={'view_server':{'admin':True}}
+            (captured/'panel_permissions.json').write_text(json.dumps({'actions':permissions}))
+            c.merge_legacy_kvp({'values':{'panel_permissions':json.dumps(permissions)}},captured)
+            self.assertEqual(json.loads((captured/'panel_permissions.json').read_text()),permissions)

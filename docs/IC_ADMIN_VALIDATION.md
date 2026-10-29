@@ -64,14 +64,17 @@ Spring/Angular, pois o detector não encontrou essa família no projeto.
 
 Em 29/10/2026 foram verificados backup, snapshot selado, restauração/importação em
 MariaDB isolado, importação efetiva e runtime. Contagens: 3 pacotes VIP, 89 locais,
-16 categorias, 6 chamados e 6 avaliações; 173 grupos preservados. Arquivos de
-permissões/entregas/advertências vazios receberam apenas os padrões previstos.
-Clima recuperado de KVP. Nenhum VIP renovado ou benefício reentregue pela migração.
+16 categorias, 6 chamados e 6 avaliações; 173 grupos preservados. Entregas e
+advertências estavam vazias. A inspeção complementar do KVP recuperou a matriz de
+76 permissões, persistida com auditoria sem mudar os acessos efetivos; destinos de
+webhook estavam vazios. Clima recuperado de KVP. Nenhum VIP renovado ou benefício
+reentregue pela migração.
 
-A suíte atual tem 93 casos: 82 passaram na execução padrão e 11 SQL opt-in ficaram
+A suíte atual tem 96 casos: 85 passaram na execução padrão e 11 SQL opt-in ficaram
 omitidos nela; os 11 SQL passaram separadamente. Foram acrescentados guardas de
 capacidade, deduplicação de assets imutáveis, prontidão assíncrona, históricos de
-IDs órfãos, reserva do contador importado e alias de clima `rotating`.
+IDs órfãos, reserva do contador importado, alias de clima `rotating` e reconciliação
+de permissões/destinos KVP com JSON, recusando conflitos e registros desconhecidos.
 
 O runtime e a abertura do painel foram confirmados. A homologação de ações críticas
 e vídeo com dois clientes permanece pendente. O relatório completo com digest e

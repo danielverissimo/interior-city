@@ -112,28 +112,30 @@ def rehearse(root,work,backup,source_counts,migration,imported):
     finally:
         subprocess.run(['docker','rm','-f',name],capture_output=True);env.unlink(missing_ok=True)
 
-def recover_environment(root,previous,work):
+def recover_legacy_kvp(root,previous,work):
     """Read only the old resource namespace on a copied RocksDB using the same FXServer."""
+    stopped_writers()
     probe=work/'kvp-probe';resource=probe/'resources/m_paineladm_v2';resource.mkdir(parents=True)
     if any(path.is_symlink() for path in (root/'state/kvp').rglob('*')):raise CutoverError('KVP snapshot must not contain symlinks')
     shutil.copytree(root/'state/kvp',probe/'db')
     (resource/'fxmanifest.lua').write_text("fx_version 'cerulean'\ngame 'gta5'\nserver_script 'read.lua'\n")
     (resource/'read.lua').write_text('''CreateThread(function()
-    local values={};local handle=StartFindKvp('');local count=0;local unsupported=0
+    local values={};local handle=StartFindKvp('');local count=0;local unsupported=0;local credentials=0
     if handle and handle~=-1 then
         while true do local key=FindKvp(handle);if not key then break end;count=count+1
             local lower=key:lower()
-            if (lower:find('weather',1,true) or lower:find('climate',1,true) or lower:find('environment',1,true) or lower:find('clima',1,true) or lower:find('time',1,true) or lower:find('hora',1,true) or lower:find('rotation',1,true))
-                and not lower:find('token',1,true) and not lower:find('secret',1,true) then
+            if lower:find('token',1,true) or lower:find('secret',1,true) or lower:find('license',1,true) or lower:find('auth',1,true) then
+                credentials=credentials+1
+            elseif lower:find('weather',1,true) or lower:find('climate',1,true) or lower:find('environment',1,true) or lower:find('clima',1,true) or lower:find('time',1,true) or lower:find('hora',1,true) or lower:find('rotation',1,true) or lower:find('permission',1,true) or lower:find('logs_config',1,true) then
                 local ok,value=pcall(GetResourceKvpString,key)
                 if not ok then ok,value=pcall(GetResourceKvpFloat,key) end
                 if not ok then ok,value=pcall(GetResourceKvpInt,key) end
                 if ok and value~=nil then values[key]=value else unsupported=unsupported+1 end
-            end
+            else unsupported=unsupported+1 end
         end
         EndFindKvp(handle)
     end
-    SaveResourceFile(GetCurrentResourceName(),'result.json',json.encode({keyCount=count,values=values,unsupported=unsupported}),-1)
+    SaveResourceFile(GetCurrentResourceName(),'result.json',json.encode({keyCount=count,values=values,unsupported=unsupported,credentialsSkipped=credentials}),-1)
     print('[ic_admin_import] KVP namespace inspected without running the legacy core.')
 end)
 ''')
@@ -154,8 +156,7 @@ end)
             time.sleep(1)
         else:raise CutoverError('KVP recovery did not complete; legacy state was preserved')
         value=json.loads((resource/'result.json').read_text())
-        recovered=normalize_environment(value)
-        return recovered,{'namespaceKeys':value['keyCount'],'environmentRecords':1 if recovered else 0}
+        return value
     finally:subprocess.run(['docker','rm','-f',name],capture_output=True)
 
 def normalize_environment(value):
@@ -177,6 +178,36 @@ def normalize_environment(value):
     if value['values'] and not candidates:raise CutoverError('Persisted climate KVP format needs an explicit converter')
     if len({json.dumps(item,sort_keys=True) for item in candidates})>1:raise CutoverError('Conflicting climate KVP states require reconciliation')
     return candidates[0] if candidates else None
+
+def merge_legacy_kvp(value,captured):
+    """Reconcile operational KVP with JSON before sealing; private destinations stay private."""
+    if value.get('unsupported'):raise CutoverError('Unknown legacy KVP records require an explicit converter')
+    climate={};settings={}
+    for key,raw in value.get('values',{}).items():
+        lower=key.lower()
+        filename='panel_permissions.json' if 'permission' in lower else 'logs_config.json' if 'logs_config' in lower else None
+        if not filename:
+            climate[key]=raw;continue
+        try:document=json.loads(raw) if isinstance(raw,str) else raw
+        except ValueError:raise CutoverError('Invalid legacy KVP settings JSON') from None
+        if not isinstance(document,dict):raise CutoverError('Unknown legacy KVP settings structure')
+        if filename in settings and settings[filename]!=document:raise CutoverError('Conflicting legacy KVP settings require reconciliation')
+        settings[filename]=document
+    environment=normalize_environment({'values':climate})
+    if environment is not None:settings['environment_state.json']=environment
+    for name,document in settings.items():
+        target=captured/name
+        existing=json.loads(target.read_text()) if target.exists() and target.read_bytes().strip() else {}
+        # Permissions have several documented equivalent wrappers.
+        def comparable(item):
+            if name=='panel_permissions.json' and isinstance(item,dict):
+                return item.get('actions',item.get('functions',item.get('access',item)))
+            return item
+        if existing and comparable(existing)!=comparable(document):raise CutoverError('Legacy JSON and KVP disagree; explicit reconciliation required')
+    for name,document in settings.items():write(captured/name,document)
+    return {'namespaceKeys':value.get('keyCount',len(value.get('values',{}))),
+        'environmentRecords':int(environment is not None),'permissionRecords':int('panel_permissions.json' in settings),
+        'logRecords':int('logs_config.json' in settings),'credentialsSkipped':value.get('credentialsSkipped',0)}
 
 def prepare(root,previous,release):
     stopped_writers()
@@ -214,11 +245,9 @@ def prepare(root,previous,release):
             archive.add(file,arcname=file.name,recursive=False)
     captured=work/'captured';captured.mkdir(mode=0o700)
     for name in migration.FILES:shutil.copyfile(source/name,captured/name)
-    climate={}
-    if not (captured/'environment_state.json').read_bytes().strip():
-        recovered,climate=recover_environment(root,previous,work)
-        if recovered:(captured/'environment_state.json').write_text(json.dumps(recovered))
-        else:climate['initialization']='No persisted environment found; configured defaults retained'
+    if (source/'logs_config.json').is_file():shutil.copyfile(source/'logs_config.json',captured/'logs_config.json')
+    # The old panel can persist permissions and destinations in KVP even when JSON is empty.
+    climate=merge_legacy_kvp(recover_legacy_kvp(root,previous,work),captured)
     snapshot=work/'snapshot'
     capture=migration.seal_snapshot(captured,snapshot,root/'state/resources/vrp/groups.json',True)
     imported=migration.build_import(snapshot)

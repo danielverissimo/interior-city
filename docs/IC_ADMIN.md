@@ -156,7 +156,7 @@ python3 scripts/ic-admin-migrate.py import --snapshot "$IC_ADMIN_SNAPSHOT" --dry
 O snapshot é privado (diretório 0700, arquivos 0600), contém inventário e
 SHA-256, e é validado integralmente antes de ser criado. Devem estar parados todos
 os escritores dos arquivos capturados. Não copie um KVP/LevelDB vivo esperando
-consistência. Se o estado de clima existir somente em KVP, obtenha a representação
+consistência. Se clima, permissões ou destinos existirem somente em KVP, obtenha a representação
 JSON autoritativa numa sessão controlada antes de selar; a ferramenta não deduz
 estado de bytes opacos.
 
@@ -339,7 +339,8 @@ Formatos de propriedade suportados e limites:
 A revisão 1.1 foi implantada no Uriel após autorização operacional, na release
 `4720106`, com esquema v2, dados efetivos importados e recurso antigo parado.
 Foram migrados 3 pacotes VIP, 89 locais, 16 categorias, 6 chamados e 6 avaliações;
-173 grupos foram preservados. Clima foi recuperado de KVP. O proprietário confirmou
+173 grupos foram preservados. Clima e 76 permissões foram recuperados de KVP;
+a matriz preserva os acessos efetivos e não havia destinos de webhook. O proprietário confirmou
 a abertura de `/icadmin` no GTA. O relatório operacional está em `state/update-4720106.md`. Um retorno ao runtime 1.0 depois de promover o banco a v2
 faz seu guard recusar o IC Admin antigo. Não apagar o marcador 2 nem copiar os
 documentos históricos sobre registros atuais para forçar rollback. A cidade pode
@@ -363,12 +364,15 @@ nos JSONs de estado conhecidos é aceita na release anterior; mudanças de códi
 ou configuração continuam bloqueadas. Bytecode `release.cpython-*.pyc` gerado
 pela inspeção é classificado como cache, sem substituir o manifesto.
 
-Quando não existe JSON de clima, uma instância temporária do mesmo FXServer lê
+Antes do primeiro snapshot, uma instância temporária do mesmo FXServer lê
 somente o namespace KVP anterior em uma cópia do RocksDB. O núcleo antigo não é
 executado nessa recuperação. A instância usa a licença já existente enquanto a
-cidade está parada, sem porta publicada, e é removida ao terminar. Estado de clima
-não reconhecido bloqueia a migração; ausência comprovada de persistência conserva
-os padrões configurados. O banco KVP original não é aberto nem alterado pela recuperação.
+cidade está parada, sem porta publicada, e é removida ao terminar. Clima, permissões
+e destinos são confrontados com os JSONs; divergências ou KVP operacional desconhecido
+bloqueiam a migração. Credenciais identificadas pelo nome da chave são ignoradas;
+URLs de destinos permanecem na captura privada e não entram no snapshot portátil.
+Ausência comprovada de persistência conserva os padrões configurados. O banco KVP
+original não é aberto nem alterado pela recuperação.
 
 O backup é restaurado em MariaDB descartável sem rede/portas, comparando contagens
 de todas as tabelas. Esquema e importação são ensaiados nesse banco e verificados
