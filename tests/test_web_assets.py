@@ -1,5 +1,7 @@
 import importlib.util
 import json
+import shutil
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
@@ -58,6 +60,79 @@ class WebAssetsTests(unittest.TestCase):
         self.destination.symlink_to(self.source, target_is_directory=True)
         with self.assertRaises(ValueError):
             web.import_media(self.source, self.destination)
+
+    def test_case_aliases_preserve_uppercase_sources_and_allow_reimport(self):
+        uppercase = self.source / 'images/WEAPON_PISTOL_MK2.png'
+        uppercase.write_bytes(b'fixture-weapon')
+        web.import_media(self.source, self.destination)
+        before = (self.destination / 'images/WEAPON_PISTOL_MK2.png').read_bytes()
+        result = web.add_case_aliases(self.destination)
+        self.assertEqual((self.destination / 'images/weapon_pistol_mk2.png').read_bytes(), before)
+        self.assertEqual((self.destination / 'images/WEAPON_PISTOL_MK2.png').read_bytes(), before)
+        self.assertEqual(web.add_case_aliases(self.destination)['aliasesAdded'], 0)
+        self.assertIn(result['aliasesAdded'], (0, 1))
+        web.verify_media(self.destination)
+        web.import_media(self.source, self.destination)
+        web.verify_media(self.destination)
+
+    def test_different_images_with_case_collision_are_rejected(self):
+        # This check works on both case-sensitive and case-insensitive hosts.
+        web.import_media(self.source, self.destination)
+        manifest = self.destination.with_name('www.manifest.json')
+        actual = web.inventory(self.destination)
+        actual['images/ITEM.png'] = {'size': 1, 'sha256': '0' * 64}
+        manifest.write_text(json.dumps({'format': 1, 'files': actual}))
+        with self.assertRaises(ValueError):
+            web.add_case_aliases(self.destination)
+
+    def test_supplied_icon_is_hash_verified_and_survives_reimport(self):
+        web.import_media(self.source, self.destination)
+        icon = self.root / 'weapon_raypistol.png'
+        icon.write_bytes(b'fixture-supplied-icon')
+        expected = web.digest(icon)
+        self.assertEqual(web.include_image(icon, self.destination, icon.name, expected)['imagesAdded'], 1)
+        self.assertEqual(web.include_image(icon, self.destination, icon.name, expected)['imagesAdded'], 0)
+        web.add_case_aliases(self.destination)
+        web.import_media(self.source, self.destination)
+        web.verify_media(self.destination)
+        self.assertEqual((self.destination / 'images/weapon_raypistol.png').read_bytes(), icon.read_bytes())
+        document = json.loads(self.destination.with_name('www.manifest.json').read_text())
+        self.assertIn('images/weapon_raypistol.png', document['supplements'])
+
+    def test_supplement_rejects_wrong_hash_and_path_escape(self):
+        web.import_media(self.source, self.destination)
+        icon = self.root / 'fixture.png'
+        icon.write_bytes(b'fixture')
+        with self.assertRaises(ValueError):
+            web.include_image(icon, self.destination, icon.name, '0' * 64)
+        with self.assertRaises(ValueError):
+            web.include_image(icon, self.destination, '../fixture.png', web.digest(icon))
+
+    @unittest.skipUnless(shutil.which('node'), 'Node interpreter not installed')
+    def test_inventory_honors_png_field_and_avoids_cached_missing_image_url(self):
+        main = ROOT / 'resources/[scriptcore]/inventory/web/main.js'
+        inventory = ROOT / 'resources/[scriptcore]/inventory/web/modules/Inventory.js'
+        harness = r'''
+const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
+const window = {imageUrl:'https://city.example.invalid/images/'};
+const main = fs.readFileSync(process.argv[1], 'utf8');
+const helper = main.split('\n').find(line => line.startsWith('window.inventoryImageUrl ='));
+vm.runInNewContext(helper, {window, encodeURIComponent});
+assert.equal(window.inventoryImageUrl('weapon_pistol_mk2'), 'https://city.example.invalid/images/weapon_pistol_mk2.png?v=20261029-2');
+assert.ok(window.inventoryImageUrl('a b').includes('/a%20b.png?'));
+const source = fs.readFileSync(process.argv[2], 'utf8');
+const context = {window};
+const start = source.indexOf('class Inventory ');
+vm.runInNewContext(source.slice(start, source.indexOf('\n}\n', start) + 2) + '\nthis.InventoryClass = Inventory;', context);
+const item = {item:'inventory-key',png:'AMMO_SPECIALCARBINE_MK2',weight:0.05,name:'M-G3',amount:1257};
+for (const method of ['allDiv','onlyItems']) {
+ const html=context.InventoryClass.prototype.getItemHtml.call({formatWeight:()=> '0.1kg'},item,'left',1,method);
+ assert.ok(html.includes('/images/AMMO_SPECIALCARBINE_MK2.png?v=20261029-2'));
+ assert.ok(!html.includes('/images/inventory-key.png'));
+}
+'''
+        result = subprocess.run(['node', '-e', harness, str(main), str(inventory)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_render_handles_json_lua_and_bundles_without_touching_custom_cdn(self):
         web.import_media(self.source, self.destination)

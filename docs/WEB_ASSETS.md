@@ -145,3 +145,48 @@ A evidência privada fica em
 `state/web-assets-verification-25e0ce7c714c4cd764ff9ef57bca321f28715ebb.json`
 no Uriel. A conferência visual das interfaces em um cliente GTA/FiveM continua
 pendente; a verificação HTTP não substitui essa etapa.
+
+## Correção dos ícones do inventário
+
+A captura de um cliente mostrou que confirmar a hospedagem de uma imagem de
+amostra não cobria os nomes efetivamente pedidos pelo inventário. O pacote do
+XAMPP contém `WEAPON_PISTOL_MK2.png`, por exemplo, enquanto a interface pede
+`weapon_pistol_mk2.png`. No Linux esses são caminhos diferentes. O primeiro
+deploy não havia tratado essa incompatibilidade.
+
+`scripts/web-assets.py aliases --destination state/www` preserva os nomes
+originais e acrescenta hardlinks com nomes em minúsculas em filesystems que
+distinguem maiúsculas e minúsculas. O conteúdo é verificado antes/depois, o
+manifesto anterior fica guardado fora da raiz pública e a operação é idempotente.
+Em um filesystem que já resolve ambos os nomes, não cria entradas redundantes.
+O instalador executa essa preparação no Uriel antes de configurar as URLs.
+
+Foram acrescentados 934 nomes compatíveis no Uriel. A RayPistol não estava no
+antigo `htdocs/images`; sua imagem foi encontrada entre os assets já fornecidos
+em `resources/[scriptcore]/m_paineladm_v2/nui/imgs/weapons/weapon_raypistol.png`.
+Ela foi incluída com o SHA-256 do catálogo `assets.lock.json`, sem substituir
+arquivos existentes. O comando `include` registra suplementos no manifesto,
+preservados em reimportações. O total passou a 3.693 caminhos de mídia, contando
+os aliases e esse ícone adicional; os hardlinks não duplicam os bytes das imagens.
+
+As respostas 404 anteriores também traziam `Cache-Control: max-age=3600`.
+`docker/caddy/assets.caddy` passa a reservar esse cache para 2xx/304 e a devolver
+`no-store` nos erros de mídia. O inventário centraliza suas URLs em
+`window.inventoryImageUrl`, respeita o campo `png` e usa a versão
+`v=20261029-2` para que o cliente deixe de reutilizar os 404 anteriores. Isso cobre
+slots, seleção, atalhos, HUD e armas equipadas.
+
+Arquivos da correção: `scripts/web-assets.py`, `scripts/install-uriel-release.sh`,
+`docker/caddy/assets.caddy`, `resources/[scriptcore]/inventory/web/main.js`,
+`resources/[scriptcore]/inventory/web/modules/Inventory.js`,
+`resources/[scriptcore]/inventory/web/modules/Weapons.js`,
+`tests/test_web_assets.py`, `tests/test_web_assets_http.py` e este documento.
+A alteração em `m_patrulha.sql` e o trabalho separado em `ic_config` ficam fora
+da correção e da implantação.
+
+A suíte Python local passou, com os testes optativos de banco e o teste HTTP
+local pulados. O Docker local deixou de responder; o teste HTTP foi executado
+em um contêiner temporário isolado no Uriel, onde passou, incluindo imagens,
+requisições parciais, cache 200/304 e ausência de cache nos 404. Também passaram
+os testes da função de URL e do HTML dos slots usando Node, mais a sintaxe dos
+três arquivos JavaScript alterados.

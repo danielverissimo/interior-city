@@ -66,6 +66,10 @@ class WebAssetsHTTPTests(unittest.TestCase):
                 self.assertEqual(response[2], image)
                 self.assertEqual(response[1]['Access-Control-Allow-Origin'], '*')
                 self.assertEqual(response[1]['X-Content-Type-Options'], 'nosniff')
+                self.assertEqual(response[1]['Cache-Control'], 'public, max-age=3600')
+                unchanged = request('/images/item.png', headers={'If-None-Match': response[1]['Etag']})
+                self.assertEqual(unchanged[0], 304)
+                self.assertEqual(unchanged[1]['Cache-Control'], 'public, max-age=3600')
                 self.assertEqual(request('/vrp_images/car.png')[2], image)
                 self.assertEqual(request('/images/item.png', 'HEAD')[2], b'')
                 status, headers, body = request('/loading/video.mp4', headers={'Range': 'bytes=0-6'})
@@ -77,6 +81,8 @@ class WebAssetsHTTPTests(unittest.TestCase):
                 # The game upstream is absent in this isolated test: 502 proves fallback.
                 self.assertEqual(request('/info.json')[0], 502)
                 self.assertEqual(request('/images/item.png', 'POST')[0], 404)
+                missing = request('/images/missing.png')
+                self.assertEqual(missing[1].get('Cache-Control'), 'no-store')
             finally:
                 subprocess.run(['docker', 'rm', '-f', name], capture_output=True, timeout=15)
 

@@ -56,7 +56,7 @@ class Weapons {
 					weaponConfig.name = globalThis.Config[weaponName].name;
 				}
 				const weaponElement = $(`
-					<div class="weapon" style="background-image: url('${window.imageUrl}/${weaponName}.png');"></div>
+					<div class="weapon" style="background-image: url('${window.inventoryImageUrl(weaponName)}');"></div>
 				`);
 				$(".weapons-list").append(weaponElement);
 			}

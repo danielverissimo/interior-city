@@ -71,6 +71,9 @@ if [[ ! -e "$release" ]]; then
   # Render code only in the isolated candidate, before sealing its pristine manifest.
   # Never touch the previous release or URLs intentionally pointing at another CDN.
   if [[ -f "$incoming/scripts/web-assets.py" ]]; then
+    if [[ -f "$root/state/www.manifest.json" ]]; then
+      python3 "$incoming/scripts/web-assets.py" aliases --destination "$root/state/www"
+    fi
     python3 "$incoming/scripts/web-assets.py" configure --release "$incoming" \
       --base-url "$asset_origin" --media "$root/state/www"
   fi
@@ -83,6 +86,9 @@ else
   python3 "$release/scripts/configure-secrets.py" --directory "$root/secrets" check
   python3 "$release/scripts/assets.py" verify --profile "$profile" --lock "$release/assets.lock.json" --destination "$release"
   if [[ -f "$release/scripts/web-assets.py" ]]; then
+    if [[ -f "$root/state/www.manifest.json" ]]; then
+      python3 "$release/scripts/web-assets.py" aliases --destination "$root/state/www"
+    fi
     python3 "$release/scripts/web-assets.py" configure --release "$release" \
       --base-url "$asset_origin" --media "$root/state/www"
   fi

@@ -80,8 +80,21 @@ def import_media(source, destination):
         raise ValueError('Manifest must not be a symlink')
     destination.mkdir(parents=True, exist_ok=True)
     existing = inventory(destination)
-    if set(existing) - set(planned):
+    document = json.loads(manifest.read_text()) if manifest.exists() else {'format': 1}
+    if document.get('supplements'):
+        verify_media(destination)
+        for relative, metadata in document['supplements'].items():
+            if relative not in existing or existing[relative]['sha256'] != metadata['sha256']:
+                raise ValueError('Supplemental media no longer match their record')
+            planned.setdefault(relative, destination / relative)
+    compatible = dict(planned)
+    for relative, path in planned.items():
+        compatible.setdefault(relative.lower(), path)
+    if set(existing) - set(compatible):
         raise ValueError('Destination contains files outside this import')
+    # Preserve aliases already prepared on Linux when repeating the source import.
+    for relative in set(existing) - set(planned):
+        planned[relative] = compatible[relative]
     records = {}
     for relative, path in planned.items():
         record = {'size': path.stat().st_size, 'sha256': digest(path)}
@@ -100,7 +113,8 @@ def import_media(source, destination):
         folder.chmod(0o755)
     if inventory(destination) != records:
         raise ValueError('Media verification failed after import')
-    manifest.write_text(json.dumps({'format': 1, 'files': records}, indent=2, sort_keys=True) + '\n')
+    document['files'] = records
+    manifest.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n')
     manifest.chmod(0o600)
     return {'files': len(records), 'bytes': sum(r['size'] for r in records.values()), 'excluded': skipped}
 
@@ -114,6 +128,96 @@ def verify_media(destination):
     if expected.get('format') != 1 or not expected.get('files') or inventory(destination) != expected['files']:
         raise ValueError('Static media do not match their manifest')
     return {'verified': len(expected['files'])}
+
+
+def add_case_aliases(destination):
+    """Keep supplied names and add lowercase hardlinks on case-sensitive hosts."""
+    destination = real_directory(destination)
+    verify_media(destination)
+    manifest = destination.with_name(destination.name + '.manifest.json')
+    document = json.loads(manifest.read_text())
+    records = document['files']
+    planned = []
+    for relative, record in sorted(records.items()):
+        lowercase = relative.lower()
+        if lowercase == relative:
+            continue
+        if lowercase in records:
+            if records[lowercase] != record:
+                raise ValueError('Case aliases would conflict with different media')
+            continue
+        source, target = destination / relative, destination / lowercase
+        if target.exists():
+            if target.samefile(source):
+                continue  # The host filesystem already resolves names without case.
+            raise ValueError('Refusing to replace an existing case alias')
+        planned.append((source, target, lowercase, record))
+    if not planned:
+        return {'aliasesAdded': 0, 'files': len(records)}
+    backup = manifest.with_name(manifest.stem + '.before-aliases-' + digest(manifest)[:12] + '.json')
+    if not backup.exists():
+        with backup.open('xb') as output:
+            output.write(manifest.read_bytes())
+        backup.chmod(0o600)
+    created = []
+    try:
+        for source, target, relative, record in planned:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            os.link(source, target)
+            created.append(target)
+            records[relative] = record
+        if inventory(destination) != records:
+            raise ValueError('Case alias integrity verification failed')
+        temporary = manifest.with_name(manifest.name + '.next')
+        with temporary.open('x') as output:
+            json.dump(document, output, indent=2, sort_keys=True)
+            output.write('\n')
+        temporary.chmod(0o600)
+        temporary.replace(manifest)
+    except BaseException:
+        for target in reversed(created):
+            target.unlink()
+        raise
+    return {'aliasesAdded': len(created), 'files': len(records)}
+
+
+def include_image(source, destination, name, expected_hash):
+    """Add a supplied, hash-verified image without replacing existing media."""
+    source, destination = real_directory(source), real_directory(destination)
+    if (Path(name).name != name or name.startswith('.') or '\\' in name
+            or Path(name).suffix.lower() not in MEDIA['images']
+            or not re.fullmatch('[0-9a-f]{64}', expected_hash)
+            or not source.is_file() or digest(source) != expected_hash):
+        raise ValueError('Use a supplied image with its verified SHA-256 and a plain filename')
+    verify_media(destination)
+    manifest = destination.with_name(destination.name + '.manifest.json')
+    document = json.loads(manifest.read_text())
+    relative = 'images/' + name
+    record = {'size': source.stat().st_size, 'sha256': expected_hash}
+    if relative in document['files']:
+        if document['files'][relative] != record:
+            raise ValueError('Refusing to replace different existing media')
+        return {'imagesAdded': 0, 'files': len(document['files'])}
+    target = destination / relative
+    with source.open('rb') as src, target.open('xb') as dst:
+        shutil.copyfileobj(src, dst, 1024 * 1024)
+    target.chmod(0o644)
+    if digest(target) != expected_hash:
+        target.unlink()
+        raise ValueError('Supplement changed during copy')
+    document['files'][relative] = record
+    document.setdefault('supplements', {})[relative] = {'sourceName': source.name, 'sha256': expected_hash}
+    temporary = manifest.with_name(manifest.name + '.next')
+    try:
+        with temporary.open('x') as output:
+            json.dump(document, output, indent=2, sort_keys=True)
+            output.write('\n')
+        temporary.chmod(0o600)
+        temporary.replace(manifest)
+    except BaseException:
+        target.unlink()
+        raise
+    return {'imagesAdded': 1, 'files': len(document['files'])}
 
 
 def base_url(value):
@@ -174,6 +278,10 @@ def main():
     sub = parser.add_subparsers(dest='command', required=True)
     p = sub.add_parser('import'); p.add_argument('--source', required=True); p.add_argument('--destination', required=True)
     p = sub.add_parser('verify'); p.add_argument('--destination', required=True)
+    p = sub.add_parser('aliases'); p.add_argument('--destination', required=True)
+    p = sub.add_parser('include'); p.add_argument('--source', required=True)
+    p.add_argument('--destination', required=True); p.add_argument('--name', required=True)
+    p.add_argument('--sha256', required=True)
     p = sub.add_parser('configure'); p.add_argument('--release', required=True)
     p.add_argument('--base-url', default=''); p.add_argument('--media')
     args = parser.parse_args()
@@ -181,6 +289,10 @@ def main():
         result = import_media(args.source, args.destination)
     elif args.command == 'verify':
         result = verify_media(args.destination)
+    elif args.command == 'aliases':
+        result = add_case_aliases(args.destination)
+    elif args.command == 'include':
+        result = include_image(args.source, args.destination, args.name, args.sha256)
     else:
         result = configure_release(args.release, args.base_url, args.media)
     print(json.dumps(result, sort_keys=True))
