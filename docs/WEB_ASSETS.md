@@ -190,3 +190,19 @@ em um contêiner temporário isolado no Uriel, onde passou, incluindo imagens,
 requisições parciais, cache 200/304 e ausência de cache nos 404. Também passaram
 os testes da função de URL e do HTML dos slots usando Node, mais a sintaxe dos
 três arquivos JavaScript alterados.
+
+A release corretiva `09bc3d714202b9c9e003b7ebf455a02abf12e613` foi instalada
+no Uriel com backup prévio, continuidade do IC Admin e reinício validado. O
+teste público passou para os seis arquivos da captura: `weapon_pistol_mk2`,
+`weapon_assaultrifle`, `ammo_specialcarbine_mk2`, `weapon_specialcarbine_mk2`,
+`weapon_flaregun` e `weapon_raypistol`, todos com HTTP 200, MIME `image/png` e
+SHA-256 correto. Um arquivo inexistente retornou 404 com `Cache-Control: no-store`.
+A função de URL versionada está na release efetiva e o endpoint do jogo respondeu.
+FXServer, banco e Playit ficaram saudáveis; Caddy e backup ficaram em execução.
+
+A evidência privada é
+`state/web-assets-inventory-verification-09bc3d714202b9c9e003b7ebf455a02abf12e613.json`
+no Uriel, com cópia local em `state/web-assets-case-fix/verification.json`.
+Os seis PNGs também foram decodificados pelo utilitário de imagens do macOS.
+O teste visual dentro do GTA continua dependente de reconectar o cliente e
+abrir o inventário; não foi executado automaticamente. Não houve push.
