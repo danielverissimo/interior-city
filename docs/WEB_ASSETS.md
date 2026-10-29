@@ -121,3 +121,27 @@ Arquivos de implementação alterados/adicionados: `.env.example`, `compose.yaml
 `scripts/install-uriel-release.sh`. Testes: `tests/test_docker_release.py`,
 `tests/test_web_assets.py` e `tests/test_web_assets_http.py`. Documentação:
 `README.md`, `docs/URIEL_DOCKER.md` e este arquivo.
+
+## Ativação no Uriel em 29/10/2026
+
+A release `25e0ce7c714c4cd764ff9ef57bca321f28715ebb` foi implantada pelo
+instalador existente, com backup prévio e verificação operacional do IC Admin.
+A verificação continuou a migração existente sem reimportar o JSON legado.
+Não houve push para o Git remoto. A alteração local preexistente em
+`m_patrulha.sql` ficou fora do commit e da implantação.
+
+As 2.758 mídias foram instaladas em
+`/opt/uriel/interior-city-tocado/state/www` e conferidas contra o manifesto.
+O Caddy monta esse destino em modo somente leitura. A configuração usou o
+domínio HTTPS já existente, sem registrar o endereço no código.
+
+A verificação pública confirmou HTTP 200, CORS e SHA-256 do conteúdo em
+`images`, `vrp_images` e `loading`; PHP e arquivo inexistente retornaram 404.
+O proxy de `/info.json` respondeu com o IC Admin ativo. Os 19 consumidores
+transformados ficaram sem referências antigas de imagens locais.
+
+FXServer, MariaDB e Playit ficaram `healthy`; Caddy e backup ficaram em execução.
+A evidência privada fica em
+`state/web-assets-verification-25e0ce7c714c4cd764ff9ef57bca321f28715ebb.json`
+no Uriel. A conferência visual das interfaces em um cliente GTA/FiveM continua
+pendente; a verificação HTTP não substitui essa etapa.
