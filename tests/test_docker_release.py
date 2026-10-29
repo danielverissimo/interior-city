@@ -123,18 +123,24 @@ class DockerReleaseTests(unittest.TestCase):
         (release/'.replxx_history').write_text('runtime console history')
         self.assertEqual(set(r.inventory(release)), {'server.cfg'})
 
-    def simulated_deploy(self, fail=False):
+    def simulated_deploy(self, fail=False, schema=False, schema_fail=False):
         """Exercise the installer in a temp root; Docker/privileged Linux commands are fakes."""
         base = self.root.resolve()/'deploy'; stage = self.root.resolve()/'stage'; stage.mkdir()
         store = self.root.resolve()/'store'; store.mkdir()
         source = self.root.resolve()/'code'; (source/'scripts').mkdir(parents=True); (source/'config').mkdir()
         for file in ('assets.py','configure-secrets.py'): shutil.copyfile(ROOT/'scripts'/file,source/'scripts'/file)
+        (source/'scripts/ic-admin-migrate.py').write_text('''import json,os,sys
+with open(os.environ['FIXTURE_LOG'],'a') as out: out.write(json.dumps(['schema-migration']+sys.argv[1:])+'\\n')
+sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
+''')
         (source/'config/resource-secrets.schema.json').write_text('{}')
         (source/'assets.lock.json').write_text(json.dumps({'format':1,'project':a.PROJECT,'packages':[]}))
         (source/'compose.yaml').write_text('services: {}\n')
         shutil.copyfile(ROOT/'compose.runtime.yaml',source/'compose.runtime.yaml')
         (source/'resources/[voip]/radio').mkdir(parents=True)
         (source/'resources/[voip]/radio/private_radios.json').write_text('{}')
+        (source/'resources/[vrp]/vrp/cfg').mkdir(parents=True)
+        (source/'resources/[vrp]/vrp/cfg/groups.json').write_text('{"groups":[]}')
         (source/'server.cfg').write_text('fixture configuration\n')
         archive = stage/'release.tar'
         with tarfile.open(archive,'w') as tar:
@@ -167,8 +173,10 @@ shutil.move(*args)
 ''',
         }
         for name,script in commands.items(): p=binary/name; p.write_text(script); p.chmod(0o755)
-        env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],FIXTURE_LOG=str(log),FIXTURE_FAIL_UP='1' if fail else '0')
-        result=subprocess.run(['bash',str(stage/'install.sh'),new_sha,str(archive)],capture_output=True,text=True,env=env)
+        env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],FIXTURE_LOG=str(log),FIXTURE_FAIL_UP='1' if fail else '0',FIXTURE_SCHEMA_FAIL='1' if schema_fail else '0')
+        args=['bash',str(stage/'install.sh'),new_sha,str(archive)]
+        if schema: args.append('--ic-admin-schema')
+        result=subprocess.run(args,capture_output=True,text=True,env=env)
         self.assertEqual(json.loads(radio_state.read_text()), {'fixture_channel':777})
         events=[json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
         return result, (base/'current').resolve().name, events
@@ -181,6 +189,25 @@ shutil.move(*args)
         up=next(i for i,e in enumerate(events) if 'up' in e)
         self.assertLess(backup,up)
         self.assertFalse(any('down' in e for e in events))
+        self.assertFalse(any('schema-migration' in e for e in events))
+
+    def test_explicit_admin_schema_runs_after_backup_before_start(self):
+        result,current,events=self.simulated_deploy(schema=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(current,'b'*40)
+        stop=next(i for i,e in enumerate(events) if 'stop' in e)
+        backup=next(i for i,e in enumerate(events) if 'predeploy' in e)
+        schema=next(i for i,e in enumerate(events) if 'schema-migration' in e)
+        up=next(i for i,e in enumerate(events) if 'up' in e)
+        self.assertLess(stop,backup);self.assertLess(backup,schema);self.assertLess(schema,up)
+        self.assertIn('--writers-stopped',events[schema])
+
+    def test_admin_schema_failure_restores_previous_code(self):
+        result,current,events=self.simulated_deploy(schema=True,schema_fail=True)
+        self.assertNotEqual(result.returncode,0)
+        self.assertEqual(current,'a'*40)
+        self.assertIn('Database was not rolled back',result.stderr)
+        self.assertEqual(sum('up' in e for e in events),1)
 
     def test_installer_restores_previous_code_when_start_fails(self):
         result,current,events=self.simulated_deploy(fail=True)

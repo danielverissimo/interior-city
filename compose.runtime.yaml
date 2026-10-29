@@ -5,3 +5,4 @@ services:
     volumes:
       - ./state/kvp:/server-data/db
       - ./state/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json
+      - ./state/resources/vrp/groups.json:/server-data/resources/[vrp]/vrp/cfg/groups.json

@@ -1,0 +1,41 @@
+ICAdminConfig = {
+    schemaVersion = 1,
+    brand = { name = 'IC ADMIN', subtitle = 'Interior City', version = '1.0.0' },
+    ranks = { dono = 100, developer = 90, admin = 80, moderador = 60, suporte = 40 },
+    roles = { 'dono', 'developer', 'admin', 'moderador', 'suporte' },
+    ownerOnly = { ['permissions_manage'] = true, ['maintenance.wipe'] = true, ['maintenance.changeId'] = true },
+    permissionAliases = {radio_save='radio_manage',radio_delete='radio_manage',set_weather='weather_manage',set_time='time_manage',ban_history_view='ban_history'},
+    requestTimeoutMs = 20000, sessionSeconds = 1200, maxPayloadBytes = 65536,
+    readRate = 10, mutationRate = 2, auditRetentionDays = 90,
+    cleanupDelay = 60, propRadius = 2000,
+    departments = {
+        staff = { label = 'Staff', permissions = { 'perm.ptr.staff' } },
+        police = { label = 'Polícia', permissions = { 'perm.policia', 'perm.countpolicia' } },
+        mechanic = { label = 'Mecânica', permissions = { 'perm.mecanica' } },
+        hospital = { label = 'Hospital', permissions = { 'perm.unizk' } }
+    },
+    weather = { default = 'CLEAR', minuteOfDay = 720, timeFrozen = false, weatherFrozen = true,
+        advanceMinutes = 2, advanceEveryMs = 10000, rotationMinutes = 5,
+        types = { 'CLEAR','EXTRASUNNY','CLOUDS','OVERCAST','RAIN','CLEARING','THUNDER','SMOG','FOGGY','NEUTRAL','SNOW','BLIZZARD','SNOWLIGHT','XMAS','HALLOWEEN' } },
+    monitor = { width = 960, height = 540, fps = 12, bitrate = 1200000,
+        maxSessions = 2, timeoutMs = 12000, relayFps = 8, relayQuality = 0.65,
+        maxFrameBytes = 900000, bandwidth = 2500000,
+        iceServers = { { urls = 'stun:stun.l.google.com:19302' } } },
+    tabs = {
+        {id='server',label='Servidor',permission='view_server'},
+        {id='players',label='Jogadores',permission='view_players'},
+        {id='warnings',label='Advertências',permission='view_warnings'},
+        {id='map',label='Mapa',permission='view_map'},
+        {id='calls',label='Chamados',permission='view_calls'},
+        {id='groups',label='Setagem',permission='view_groups'},
+        {id='identity',label='Alterar RG',permission='view_identity_editor'},
+        {id='items',label='Itens',permission='view_items'},
+        {id='weapons',label='Armas',permission='view_weapons'},
+        {id='vips',label='VIPs',permission='view_vips'},
+        {id='vehicles',label='Veículos',permission='view_vehicles'},
+        {id='radio',label='Rádio',permission='view_radio'},
+        {id='locations',label='Locais',permission='view_locations'},
+        {id='climate',label='Clima',permission='view_climate'},
+        {id='logs',label='Logs',permission='view_logs'}
+    }
+}

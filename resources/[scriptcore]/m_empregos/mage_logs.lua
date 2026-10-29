@@ -1,9 +1,9 @@
 -- ==========================================================================
 -- MAGE ADMIN - AUDITORIA DOS EMPREGOS
--- Integração server-side com m_paineladm_v2 sem expor webhooks aos clients.
+-- Integração server-side com IC Admin sem expor webhooks aos clients.
 -- ==========================================================================
 
-local MAGE_PANEL_RESOURCE = "m_paineladm_v2"
+local MAGE_PANEL_RESOURCE = GetConvar("ic_admin_service_resource", "ic_admin")
 local MAGE_LOG_QUEUE_LIMIT = 300
 local mageEmpregosLogQueue = {}
 

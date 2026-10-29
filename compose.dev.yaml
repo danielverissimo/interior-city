@@ -20,6 +20,7 @@ services:
       - dev_kvp:/server-data/db
       - ./state/dev/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json
       - ./resources:/server-data/resources:ro
+      - ./state/dev/resources/vrp/groups.json:/server-data/resources/[vrp]/vrp/cfg/groups.json
       - ./config:/server-data/config:ro
       - ./server.cfg:/server-data/server.cfg:ro
       - ./logo.png:/server-data/logo.png:ro

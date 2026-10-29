@@ -366,3 +366,10 @@ AddEventHandler("playerDropped", function(reason)
         cache['getMultas'][user_id] = nil
     end
 end)
+
+-- Somente o adaptador server-side da vRP chama esta invalidação na manutenção.
+function vRP.icAdminClearMoneyCache(userId)
+    cache['getBankMoney'][userId] = nil
+    cache['getMakapoints'][userId] = nil
+    cache['getMultas'][userId] = nil
+end

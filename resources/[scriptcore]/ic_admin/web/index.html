@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self'; style-src 'self'; img-src 'self' https: data: blob:; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; base-uri 'none'">
+  <title>IC Admin — Interior City</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" hidden>
+    <section class="shell" aria-label="Administração da Interior City">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">IC</span><div><b>IC ADMIN</b><small>INTERIOR CITY</small></div></div>
+        <span class="nav-label">ADMINISTRAÇÃO</span><nav id="navigation" aria-label="Áreas do painel"></nav>
+        <footer class="staff"><span class="online-dot"></span><div><b id="staff-name">Equipe</b><small id="staff-role"></small></div></footer>
+      </aside>
+      <main class="main">
+        <header><div><span class="eyebrow" id="eyebrow">INTERIOR CITY</span><h1 id="title">Servidor</h1><p id="description"></p></div><div class="header-actions"><span class="online-count" id="online-count">0 online</span><button id="refresh" class="button" title="Atualizar esta área" aria-label="Atualizar esta área">↻</button><button id="permissions" class="button" hidden>Permissões</button><button id="close" class="button danger" title="Fechar painel" aria-label="Fechar painel">✕</button></div></header>
+        <div class="content-wrap"><section id="content" aria-live="polite"></section></div>
+        <footer class="bottom-bar"><span id="status">Conectado à cidade</span><span>F10 · abrir / ESC · fechar</span></footer>
+      </main>
+    </section>
+  </div>
+  <div id="modal-layer" hidden></div>
+  <div id="toast-layer" aria-live="polite"></div>
+  <div id="notice-layer" hidden><small id="notice-kind"></small><strong id="notice-message"></strong></div>
+  <div id="punishment" hidden><b>ADVERTÊNCIA EM CUMPRIMENTO</b><span id="punishment-clock"></span></div>
+  <div id="public-call" hidden><b id="public-call-title"></b><p id="public-call-message"></p><button id="public-call-accept" class="button primary">Atender</button><button id="public-call-dismiss" class="button">Fechar</button></div>
+  <div id="vip-choice" hidden></div>
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>

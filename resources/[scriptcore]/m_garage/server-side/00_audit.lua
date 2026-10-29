@@ -8,7 +8,7 @@
 
 GarageAudit = GarageAudit or {}
 
-local MAGE_LOG_RESOURCE = "m_paineladm_v2"
+local MAGE_LOG_RESOURCE = GetConvar("ic_admin_service_resource", "ic_admin")
 local MAGE_LOG_QUEUE_LIMIT = 250
 local mageGarageLogQueue = {}
 

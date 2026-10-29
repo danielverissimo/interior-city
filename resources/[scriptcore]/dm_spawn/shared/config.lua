@@ -37,7 +37,7 @@ Config.Orgs_Spawns = {
 -- por eles, portanto não depende de ordem rígida de start.
 Config.MansionsResource = "m_mansions"
 Config.MansionsDataFile = "mansions.json"
-Config.AdminPanelResource = "m_paineladm_v2"
+Config.AdminPanelResource = "ic_admin"
 Config.AdminPanelLocationsFile = "locations.json"
 
 -- Moradores convidados também podem usar "Sua Casa". O dono sempre tem

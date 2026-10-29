@@ -11792,7 +11792,7 @@ function SendWebhookMessage(webhook,message)
 	end
 end
 
--- /arma removido: o spawn de armas agora é feito pelo m_paineladm_v2,
+-- /arma removido: o spawn de armas agora é feito pelo IC Admin,
 -- entregando WEAPON_ + AMMO_ como itens compatíveis com o inventário atual.
 
 AdminAudit.RegisterCommand('hash',function(source,args,rawCommand)

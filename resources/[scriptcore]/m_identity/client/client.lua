@@ -24,8 +24,8 @@ end)
 -- O Painel ADM v2.63 publica este evento assim que Nome, Sobrenome, Idade,
 -- Telefone ou RG são alterados. Se a identidade estiver aberta, ela é
 -- redesenhada imediatamente, sem precisar fechar/abrir e sem relogar.
-RegisterNetEvent("m_paineladm_v2:identityLiveUpdated")
-AddEventHandler("m_paineladm_v2:identityLiveUpdated", function(payload)
+RegisterNetEvent(GetConvar("ic_admin_service_resource", "ic_admin") .. ":identityLiveUpdated")
+AddEventHandler(GetConvar("ic_admin_service_resource", "ic_admin") .. ":identityLiveUpdated", function(payload)
 	refreshIdentity()
 end)
 

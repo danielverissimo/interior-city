@@ -11,13 +11,13 @@ local usersActive = {}
 local MEDIC_CALL_MESSAGE = "Paciente desmaiado solicitou médico."
 
 local function painelAdminOnline()
-    return GetResourceState("m_paineladm_v2") == "started"
+    return GetResourceState(GetConvar("ic_admin_service_resource", "ic_admin")) == "started"
 end
 
 local function cancelPendingMedicCall(playerSource, reason)
     if not painelAdminOnline() then return end
     pcall(function()
-        exports["m_paineladm_v2"]:cancelSectorCall(playerSource, "hospital", reason or "Paciente não precisa mais de atendimento.")
+        exports[GetConvar("ic_admin_service_resource", "ic_admin")]:cancelSectorCall(playerSource, "hospital", reason or "Paciente não precisa mais de atendimento.")
     end)
 end
 
@@ -44,14 +44,14 @@ function src.requestMedicCall()
     end
 
     local ok, response = pcall(function()
-        return exports["m_paineladm_v2"]:createSectorCall(playerSource, "hospital", MEDIC_CALL_MESSAGE, {
+        return exports[GetConvar("ic_admin_service_resource", "ic_admin")]:createSectorCall(playerSource, "hospital", MEDIC_CALL_MESSAGE, {
             origin = "m_survival",
             silentRequester = true
         })
     end)
 
     if not ok then
-        print(("^1[m_survival] Falha ao criar chamado médico no m_paineladm_v2: %s^7"):format(tostring(response)))
+        print(("^1[m_survival] Falha ao criar chamado médico no IC Admin: %s^7"):format(tostring(response)))
         return { ok = false, message = "Não foi possível enviar o chamado médico." }
     end
 
@@ -120,7 +120,7 @@ local function sendPainelDeathLog(victimId, killerId, motivo, victimCoords, kill
     end
 
     local ok, err = pcall(function()
-        exports["m_paineladm_v2"]:sendLog("survival_death", {
+        exports[GetConvar("ic_admin_service_resource", "ic_admin")]:sendLog("survival_death", {
             actorId = tonumber(victimId),
             actorLabel = "VÍTIMA",
             targetId = (tonumber(killerId) and tonumber(killerId) > 0) and tonumber(killerId) or nil,
@@ -211,7 +211,7 @@ function src.receberMorte(source, motivo, ksource)
         
         sendToDiscord(cfg.weebhook, corpoWebHook)
 
-        -- Log central configurável pela aba Logs do m_paineladm_v2.
+        -- Log central configurável pela aba Logs do IC Admin.
         sendPainelDeathLog(user_id, kuser_id, motivo, coords, kcoords)
         
         exports["vrp_admin"]:generateLog({

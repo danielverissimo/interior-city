@@ -125,50 +125,21 @@ end
 
 local vipSlotsSourceWarned = false
 
-local function getStoredPanelVipGarageSlots(user_id)
-    local raw = LoadResourceFile("m_paineladm_v2", "vip_packages.json")
-    if type(raw) ~= "string" or raw == "" then return nil end
-
-    local ok, decoded = pcall(json.decode, raw)
-    if not ok or type(decoded) ~= "table" or type(decoded.packages) ~= "table" then
-        return nil
-    end
-
-    local total = 0
-    for groupName, package in pairs(decoded.packages) do
-        if type(package) == "table" and vRP.hasGroup(user_id, tostring(groupName)) then
-            total = total + math.max(0, math.floor(tonumber(package.garageSlots) or 0))
-        end
-    end
-
-    return total
-end
-
--- Fonte única das vagas VIP: o pacote criado/editado no m_paineladm_v2.
--- Com o painel ligado usamos o export em memória; se ele estiver reiniciando,
--- lemos o vip_packages.json diretamente. Assim a concessionária nunca depende
--- da antiga tabela de maxCars por permissão e não existe risco de somar duas vezes.
+-- Uma única fonte: o provider selecionado na configuração operacional.
 local function getPanelVipGarageSlots(user_id)
-    if GetResourceState("m_paineladm_v2") == "started" then
+    local provider = GetConvar("ic_admin_service_resource", "ic_admin")
+    if GetResourceState(provider) == "started" then
         local ok, slots = pcall(function()
-            return exports["m_paineladm_v2"]:getVipGarageSlotsForUser(user_id)
+            return exports[provider]:getVipGarageSlotsForUser(user_id)
         end)
-
-        if ok then
+        if ok and type(slots) == "number" then
             vipSlotsSourceWarned = false
-            return math.max(0, math.floor(tonumber(slots) or 0))
+            return math.max(0, math.floor(slots))
         end
     end
-
-    local storedSlots = getStoredPanelVipGarageSlots(user_id)
-    if storedSlots ~= nil then
-        vipSlotsSourceWarned = false
-        return storedSlots
-    end
-
     if not vipSlotsSourceWarned then
         vipSlotsSourceWarned = true
-        print("^3[m_dealership]^7 Não foi possível consultar vip_packages.json do m_paineladm_v2; aplicando somente as 5 vagas padrão até a integração ficar disponível.")
+        print("^3[m_dealership]^7 Provider de vagas VIP indisponível; mantendo somente as vagas padrão.")
     end
     return 0
 end

@@ -85,6 +85,19 @@ ssh -L 40121:127.0.0.1:40121 danyelsanches@100.124.79.57
 
 Acesse `http://127.0.0.1:40121`, entre no txAdmin, abra **Console** e execute as duas linhas acima, uma de cada vez, na mesma ordem. É necessário ter permissão de escrita no console. O comando `ensure` inicia um recurso parado ou reinicia um recurso já iniciado; portanto, os painéis podem ficar brevemente indisponíveis. Consulte também [txAdmin e conexão de teste](docs/URIEL_DOCKER.md#txadmin-e-conexão-de-teste) e os [comandos oficiais da Cfx](https://docs.fivem.net/docs/server-manual/server-commands/).
 
+## IC Admin próprio
+
+O novo recurso está implementado em `resources/[scriptcore]/ic_admin`, com as
+15 áreas, serviços próprios, importador e testes. Consulte
+[implementação, contratos e operação](docs/IC_ADMIN.md).
+
+A configuração entregue inicia em **preview**: `/icadmin` (F10) permite a
+homologação após preparar o esquema em banco isolado. Mutações e serviços globais
+continuam bloqueados até a troca operacional explícita. O provedor anterior
+permanece selecionado; nenhum deploy ou migração do banco efetivo foi executado.
+A independência completa e o vídeo entre dois jogadores exigem homologação GTA
+com o painel antigo parado antes da troca no Uriel.
+
 ## Validação das ferramentas
 
 ```bash

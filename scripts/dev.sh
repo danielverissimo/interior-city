@@ -112,11 +112,17 @@ init() {
   chmod 0700 secrets
   chmod 0444 secrets/*
   python3 scripts/configure-secrets.py init
-  install -d -m 0700 state/dev/resources/radio
+  install -d -m 0700 state/dev/resources/radio state/dev/resources/vrp
+  [[ ! -L state/dev/resources/vrp && ! -L state/dev/resources/vrp/groups.json ]] || { echo 'Persistent vRP groups must not use symlinks.' >&2; exit 1; }
   if [[ ! -f state/dev/resources/radio/private_radios.json ]]; then
     cp 'resources/[voip]/radio/private_radios.json' state/dev/resources/radio/private_radios.json
     chmod 0600 state/dev/resources/radio/private_radios.json
   fi
+  if [[ ! -f state/dev/resources/vrp/groups.json ]]; then
+    cp 'resources/[vrp]/vrp/cfg/groups.json' state/dev/resources/vrp/groups.json
+    chmod 0600 state/dev/resources/vrp/groups.json
+  fi
+  python3 -c 'import json,sys; v=json.load(open(sys.argv[1])); assert isinstance(v,dict) and isinstance(v.get("groups"),list)' state/dev/resources/vrp/groups.json
   require_checkout
   printf 'Local project %s initialized. Set its Cfx license with scripts/dev.sh set-license.\n' "$project"
 }

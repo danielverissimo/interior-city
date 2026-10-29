@@ -503,6 +503,36 @@ function vRP.removeBanIp(user_id)
 end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- IC Admin: operações server-side autenticadas atualizam caches após commit SQL.
+exports('icAdminRefreshBanCaches', function()
+    if GetInvokingResource() ~= 'ic_admin' then return false end
+    hwid.list = {}
+    Ips.list = {}
+    hwid:createCache()
+    Ips:CreateCache()
+    return true
+end)
+exports('icAdminForgetUser', function(userId)
+    if GetInvokingResource() ~= 'ic_admin' then return false end
+    userId = tonumber(userId)
+    if not userId or vRP.getUserSource(userId) then return false end
+    vRP.user_tables[userId] = nil
+    vRP.user_tmp_tables[userId] = nil
+    vRP.user_appareance[userId] = nil
+    identifier.cache[userId] = nil
+    vRP.rusers[userId] = nil
+    for key, id in pairs(vRP.users) do if tonumber(id) == userId then vRP.users[key] = nil end end
+    for key, id in pairs(vRP.tempSource) do if tonumber(id) == userId then vRP.tempSource[key] = nil end end
+    for key, id in pairs(vRP.user_through_src) do if tonumber(id) == userId then vRP.user_through_src[key] = nil end end
+    local rows = vRP.query('vRP/getAllIdentifiers', {})
+    for _, row in ipairs(rows or {}) do
+        if tonumber(row.user_id) == userId then identifier:set(row.identifier, userId) end
+    end
+    if type(vRP.icAdminClearMoneyCache) == 'function' then vRP.icAdminClearMoneyCache(userId) end
+    vRP.updateIdentity(userId)
+    return true
+end)
+
 -- QUEUE
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local ConfigQUEUE = {
@@ -617,7 +647,7 @@ end)
 -- A vRP não possui dependência obrigatória do painel para evitar ciclo entre resources.
 -- Quando o Mage Admin ainda não iniciou/reiniciou, as logs ficam em uma fila curta em memória
 -- e são reenviadas assim que o export server-side voltar a ficar disponível.
-local MAGE_ADMIN_LOG_RESOURCE = "m_paineladm_v2"
+local MAGE_ADMIN_LOG_RESOURCE = GetConvar("ic_admin_service_resource", "ic_admin")
 local MAGE_ADMIN_LOG_QUEUE_MAX = 250
 local mageAdminLogQueue = {}
 local mageConnectionAudit = {}
@@ -938,6 +968,13 @@ AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
 		deferrals.done("[TocadoMagoDelux] Ocorreu um problema de identificação.")
 		return
 	end
+    if GetResourceState('ic_admin') == 'started' then
+        local ok, locked = pcall(function() return exports['ic_admin']:isUserInMaintenance(user_id) end)
+        if ok and locked then
+            deferrals.done('Manutenção administrativa em andamento. Reconecte em instantes.')
+            return
+        end
+    end
 	connectionAudit.userId = user_id
 
 	if ConfigQUEUE.active then
@@ -964,6 +1001,13 @@ AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
 		return
 	end
 
+    if GetResourceState('ic_admin') == 'started' then
+        local ok, locked = pcall(function() return exports['ic_admin']:isUserInMaintenance(user_id) end)
+        if ok and locked then
+            deferrals.done('Manutenção administrativa em andamento. Reconecte em instantes.')
+            return
+        end
+    end
 	local plySource = vRP.user_sources[user_id]
 	if plySource then
 		DropPlayer(plySource, "Alguem se conectou em sua conta")

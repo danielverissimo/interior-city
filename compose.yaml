@@ -60,6 +60,7 @@ services:
       - ./state/txData:/txData
       - ./state/kvp:/server-data/db
       - ./state/resources/radio/private_radios.json:/server-data/resources/[voip]/radio/private_radios.json
+      - ./state/resources/vrp/groups.json:/server-data/resources/[vrp]/vrp/cfg/groups.json
     tmpfs:
       - /server-data/runtime:uid=1000,gid=1000,mode=0700
       - /tmp:uid=1000,gid=1000,mode=1777

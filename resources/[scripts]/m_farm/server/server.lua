@@ -12,7 +12,7 @@ ClientAPI = Tunnel.getInterface(GetCurrentResourceName())
 -- ============================================================================
 -- Não existe dependência obrigatória no fxmanifest: se o painel estiver reiniciando,
 -- as ocorrências ficam em uma fila curta e são reenviadas quando o export voltar.
-local MAGE_LOG_RESOURCE <const> = 'm_paineladm_v2'
+local MAGE_LOG_RESOURCE <const> = GetConvar("ic_admin_service_resource", "ic_admin")
 local MAGE_LOG_QUEUE_LIMIT <const> = 250
 local mageLogQueue = {}
 

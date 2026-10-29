@@ -65,14 +65,14 @@ function vRP.updateIdentity(user_id)
 	return false
 end
 
--- Atualização em tempo real. O m_paineladm_v2 dispara este hook após o UPDATE
+-- Atualização em tempo real. O IC Admin dispara este hook após o UPDATE
 -- no banco; a próxima chamada de getUserIdentity já recarrega os dados novos.
 AddEventHandler("identity:atualizar", function(user_id)
 	vRP.updateIdentity(user_id)
 end)
 
 -- Hook adicional do painel para compatibilidade direta.
-AddEventHandler("m_paineladm_v2:identityUpdated", function(user_id)
+AddEventHandler("ic_admin:identityUpdated", function(user_id)
 	vRP.updateIdentity(user_id)
 end)
 

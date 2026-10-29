@@ -3,12 +3,12 @@
 -- ============================================================================
 -- Camada única de auditoria para comandos administrativos do vrp_admin.
 -- Não altera as permissões nem a lógica dos comandos: apenas registra o uso
--- por staff/console e envia para o catálogo central do m_paineladm_v2.
+-- por staff/console e envia para o catálogo central do IC Admin.
 -- ============================================================================
 
 AdminAudit = AdminAudit or {}
 
-local PANEL_RESOURCE <const> = "m_paineladm_v2"
+local PANEL_RESOURCE <const> = GetConvar("ic_admin_service_resource", "ic_admin")
 local MAX_PENDING <const> = 400
 local FLUSH_INTERVAL <const> = 10000
 local pendingLogs = {}

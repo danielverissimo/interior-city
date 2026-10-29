@@ -2,6 +2,10 @@
 set -Eeuo pipefail
 umask 077
 sha="${1:-}"; archive="${2:-}"
+schema_mode="${3:---no-schema}"
+[[ $# -le 3 && ( "$schema_mode" == --no-schema || "$schema_mode" == --ic-admin-schema ) ]] || {
+  echo 'Optional third argument: --ic-admin-schema (explicit additive migration).' >&2; exit 2;
+}
 [[ "$(id -u)" -eq 0 && "$sha" =~ ^[0-9a-f]{40}$ && -f "$archive" ]] || {
   echo 'Run as root with commit SHA and staged code archive.' >&2; exit 2;
 }
@@ -69,10 +73,18 @@ for name in db_root_password db_app_password cfx_license steam_web_api webhook_l
     echo "Invalid private file ownership/mode: $name" >&2; exit 1;
   }
 done
-mkdir -p "$root/state/kvp" "$root/state/resources/radio"
+mkdir -p "$root/state/kvp" "$root/state/resources/radio" "$root/state/resources/vrp"
+[[ ! -L "$root/state/resources/vrp" ]] || { echo 'Persistent vRP groups must not use symlinks.' >&2; exit 1; }
 if [[ ! -f "$root/state/resources/radio/private_radios.json" ]]; then
   cp "$release/resources/[voip]/radio/private_radios.json" "$root/state/resources/radio/private_radios.json"
 fi
+groups_source="${old:-$release}/resources/[vrp]/vrp/cfg/groups.json"
+if [[ -e "$root/state/resources/vrp/groups.json" ]]; then
+  [[ -f "$root/state/resources/vrp/groups.json" && ! -L "$root/state/resources/vrp/groups.json" ]] || { echo 'Invalid persistent vRP groups file.' >&2; exit 1; }
+  groups_source="$root/state/resources/vrp/groups.json"
+fi
+[[ -f "$groups_source" && ! -L "$groups_source" ]] || { echo 'Existing vRP groups must be preserved before deployment.' >&2; exit 1; }
+python3 -c 'import json,sys; v=json.load(open(sys.argv[1])); assert isinstance(v,dict) and isinstance(v.get("groups"),list)' "$groups_source"
 chown -R 1000:1000 "$root/state/kvp" "$root/state/resources"
 chmod 0600 "$root/state/resources/radio/private_radios.json"
 install -m 0600 "$release/compose.runtime.yaml" "$root/state/compose.runtime.yaml"
@@ -96,9 +108,28 @@ if [[ -n "$old" ]]; then
   # Stop writers for a consistent predeploy database/txAdmin snapshot.
   trap restore_old ERR
   compose_at "$old" --profile public --profile listing stop connect_proxy playit fxserver
+  # Refresh from the authoritative old release only after all writers stop.
+  if [[ ! -e "$root/state/resources/vrp/groups.json" ]]; then
+    cp "$groups_source" "$root/state/resources/vrp/groups.json"
+    chown 1000:1000 "$root/state/resources/vrp/groups.json"
+    chmod 0600 "$root/state/resources/vrp/groups.json"
+  fi
   compose_at "$old" run --rm --no-deps backup predeploy
 fi
+if [[ ! -e "$root/state/resources/vrp/groups.json" ]]; then
+  cp "$groups_source" "$root/state/resources/vrp/groups.json"
+  chown 1000:1000 "$root/state/resources/vrp/groups.json"
+fi
+chmod 0600 "$root/state/resources/vrp/groups.json"
+python3 -c 'import json,sys; v=json.load(open(sys.argv[1])); assert isinstance(v,dict) and isinstance(v.get("groups"),list)' "$root/state/resources/vrp/groups.json"
 trap restore_old ERR
+if [[ "$schema_mode" == --ic-admin-schema ]]; then
+  # Explicit opt-in only, after the old writers stop and their backup succeeds.
+  # DDL is additive and is deliberately NOT undone by a code rollback.
+  python3 "$release/scripts/ic-admin-migrate.py" --env-file "$root/.env" \
+    --project-name interior-city-tocado --project-directory "$root" \
+    --compose-file "$release/compose.yaml" schema --apply --writers-stopped
+fi
 ln -sfn "releases/$sha" "$root/current.next"; mv -Tf "$root/current.next" "$root/current"
 compose_at "$release" up -d --force-recreate --remove-orphans --wait --wait-timeout 180
 trap - ERR
