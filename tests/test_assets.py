@@ -166,5 +166,25 @@ class AssetTests(unittest.TestCase):
         config.write_text(json.dumps([{'sha256':source['sha256'],'size':source['size'],'destination':'resources/ic_admin/server.lua'}]))
         with self.assertRaises(ValueError):a.asset_aliases(self.code/'assets.lock.json',lock,'full')
 
+    def test_release_reuses_only_hash_verified_immutable_assets(self):
+        lock=self.prepare();self.publish()
+        with contextlib.redirect_stdout(io.StringIO()):a.sync(self.code/'assets.lock.json',self.code,'full',str(self.store))
+        candidate=self.root/'candidate';candidate.mkdir()
+        with contextlib.redirect_stdout(io.StringIO()):a.sync(self.code/'assets.lock.json',candidate,'full',str(self.root/'unavailable-store'),reuse_from=self.code)
+        path=lock['packages'][0]['files'][0]['path']
+        self.assertEqual((candidate/path).stat().st_ino,(self.code/path).stat().st_ino)
+        self.assertEqual((candidate/path).read_bytes(),(self.code/path).read_bytes())
+        self.assertFalse((candidate/'resources/[scripts]/example/server.lua').exists())
+
+    def test_modified_previous_asset_is_not_reused_or_overwritten(self):
+        lock=self.prepare();self.publish()
+        with contextlib.redirect_stdout(io.StringIO()):a.sync(self.code/'assets.lock.json',self.code,'full',str(self.store))
+        path=lock['packages'][0]['files'][0]['path'];(self.code/path).write_bytes(b'changed by owner')
+        candidate=self.root/'candidate';candidate.mkdir()
+        with contextlib.redirect_stdout(io.StringIO()):a.sync(self.code/'assets.lock.json',candidate,'full',str(self.store),reuse_from=self.code)
+        self.assertNotEqual((candidate/path).stat().st_ino,(self.code/path).stat().st_ino)
+        self.assertEqual((self.code/path).read_bytes(),b'changed by owner')
+        self.assertEqual(a.file_hash(candidate/path),lock['packages'][0]['files'][0]['sha256'])
+
 
 if __name__=='__main__':unittest.main()

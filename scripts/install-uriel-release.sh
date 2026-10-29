@@ -61,8 +61,10 @@ if [[ ! -e "$release" ]]; then
   trap 'rm -rf "$incoming"' EXIT
   python3 "$helper" extract "$archive" "$incoming"
   python3 "$incoming/scripts/configure-secrets.py" --directory "$root/secrets" check
+  reuse_assets=()
+  if [[ -n "$old" ]]; then reuse_assets=(--reuse-from "$old"); fi
   python3 "$incoming/scripts/assets.py" sync --store "$store" --profile "$profile" \
-    --lock "$incoming/assets.lock.json" --destination "$incoming"
+    --lock "$incoming/assets.lock.json" --destination "$incoming" ${reuse_assets[@]+"${reuse_assets[@]}"}
   python3 "$incoming/scripts/assets.py" verify --profile "$profile" --lock "$incoming/assets.lock.json" --destination "$incoming"
   python3 "$helper" manifest "$incoming" "$root/state/manifests/$sha.json"
   chown -R 1000:1000 "$incoming"

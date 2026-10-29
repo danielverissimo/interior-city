@@ -472,19 +472,32 @@ def verify(lock_path, destination, profile):
     print(f'Verified {count} installed asset files ({profile})')
 
 
-def sync(lock_path, destination, profile, store):
+def sync(lock_path, destination, profile, store, reuse_from=None):
     lock=validate_lock(json.loads(Path(lock_path).read_text()));packages=selected(lock,profile);destination=Path(destination).resolve()
     host,root=parse_store(store)
-    missing=0
+    missing=0;links=[];needed=[]
+    previous=Path(reuse_from).resolve() if reuse_from else None
+    if previous==destination:raise ValueError('Asset reuse requires a distinct previous release')
     for package in packages:
         if not package['archive']['sha256']:raise ValueError('Package has not been published')
+        needs_archive=False
         for record in package['files']:
             out=target_path(destination,record['path'])
             if out.exists():
                 if file_hash(out)!=record['sha256']:raise ValueError('Modified asset requires explicit review; not overwritten')
-            else:missing+=record['size']
-    reserve=max((p['archive']['size'] or 0 for p in packages),default=0)+1024**3
-    if shutil.disk_usage(destination).free<missing+reserve:raise ValueError('Not enough physical free space for profile, temporary archive and 1 GiB reserve')
+            else:
+                source=target_path(previous,record['path']) if previous else None
+                if source and source.is_file() and source.stat().st_dev==destination.stat().st_dev and source.stat().st_size==record['size'] and file_hash(source)==record['sha256']:
+                    links.append((source,out))
+                else:missing+=record['size'];needs_archive=True
+        if needs_archive:needed.append(package)
+    reserve=max((p['archive']['size'] or 0 for p in needed),default=0)+1024**3
+    available=shutil.disk_usage(destination).free
+    print(f'Asset migration capacity: free={available} required={missing+reserve} reused_files={len(links)}',flush=True)
+    if available<missing+reserve:raise ValueError('Not enough physical free space for profile, temporary archive and 1 GiB reserve')
+    # Only catalogue-locked immutable assets are shared; code and mutable JSON never enter this path.
+    for source,out in links:
+        out.parent.mkdir(parents=True,exist_ok=True);os.link(source,out)
     tempdir=destination/'.assets-cache';tempdir.mkdir(exist_ok=True)
     for index,package in enumerate(packages,1):
         if all(target_path(destination,f['path']).is_file() for f in package['files']):continue
@@ -519,11 +532,12 @@ def main():
             local_config=Path('.assets-store.json')
             configured=json.loads(local_config.read_text()).get('store') if local_config.exists() else None
             p.add_argument('--store',default=os.environ.get('ASSET_STORE') or configured)
+        if command=='sync':p.add_argument('--reuse-from',help='Reuse verified immutable assets on the same filesystem by hardlink')
     args=parser.parse_args()
     if args.command=='prepare':prepare(args.source,args.destination)
     elif args.command=='publish':publish(args.lock,args.source,args.store)
     elif args.command=='seal':seal_catalog(args.lock,args.store)
-    elif args.command=='sync':sync(args.lock,args.destination,args.profile,args.store)
+    elif args.command=='sync':sync(args.lock,args.destination,args.profile,args.store,args.reuse_from)
     else:verify(args.lock,args.destination,args.profile)
 
 

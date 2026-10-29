@@ -39,7 +39,10 @@ python3 scripts/assets.py verify --profile full
 
 O instalador verifica espaço físico, checksum do pacote e roster de seus membros antes de gravar. Recusa links, caminhos que escapem do destino, arquivos extras e assets locais modificados. Não remove arquivos automaticamente. Para trocar uma versão com remoções de assets, utilize um novo diretório de release/checkout, evitando sobras da versão anterior.
 
-O perfil completo exige espaço para os assets ausentes, um pacote temporário e 1 GiB de reserva. O Mac e o SSD estavam com pouco espaço na separação; não baixe `full` sem resolver essa capacidade. Montagem SMB deve servir para distribuição/gestão dos pacotes; o jogo deve usar uma cópia local quando for executado.
+O perfil completo exige espaço para os assets ausentes, o maior pacote temporário necessário e 1 GiB de reserva.
+O instalador reaproveita por hardlink apenas assets imutáveis com hash confirmado da
+release anterior no mesmo filesystem; código e configurações mutáveis não são compartilhados.
+Esses assets devem ser substituídos por novos pacotes, nunca editados no lugar. O Mac e o SSD estavam com pouco espaço na separação; não baixe `full` sem resolver essa capacidade. Montagem SMB deve servir para distribuição/gestão dos pacotes; o jogo deve usar uma cópia local quando for executado.
 
 ## Atualizar os pacotes
 
