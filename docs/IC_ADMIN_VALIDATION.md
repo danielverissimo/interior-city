@@ -45,13 +45,13 @@ evidência de cliente GTA, WebRTC real ou funcionamento dos natives.
 - Casas com recursos ativos e ranking do craft com escritor ativo exigem pausa;
   baús devem estar fechados. Pré-verificação não substitui a preparação na confirmação.
 - Falha de cache depois do commit exige conferência; SQL aplicado não é repetido.
-- A migração de esquema exige backup e escritores parados. Não executada no banco
-  efetivo nesta revisão. A versão 1.0 recusa esquema v2; rollback de código precisa
+- A migração de esquema exige backup e escritores parados. Foi executada no Uriel
+  após restauração do backup em banco isolado e comparação de 218 tabelas. A versão 1.0 recusa esquema v2; rollback de código precisa
   respeitar essa incompatibilidade e a reconciliação dos dados.
 - Permanecem pendentes: teste real de dois clientes para chamados/vídeo/fallback,
   alinhamento do atlas, patrimônio/caches, snapshot efetivo, restauração de backup
   e cidade funcionando com o painel antigo desligado.
-- Nenhum novo deploy nesta revisão. O Uriel permanece na prévia `7f01bd5`.
+- Troca autorizada concluída no Uriel, release `4720106`, esquema v2 e provedor IC Admin ativo; o recurso antigo está parado. O proprietário confirmou a abertura de `/icadmin`.
 - Alterações externas ao trabalho em `logo.png` e
   `resources/[scripts]/m_patrulha/m_patrulha.sql` foram preservadas.
 
@@ -59,3 +59,22 @@ As escolhas de formatos suportados, a execução em homologação e a compatibil
 dos recursos com caches são EMERGING. A recusa de formatos não reconhecidos e as
 permissões são ENFORCED no servidor. Não há conflito arquitetural pendente com
 Spring/Angular, pois o detector não encontrou essa família no projeto.
+
+## Evidência operacional posterior
+
+Em 29/10/2026 foram verificados backup, snapshot selado, restauração/importação em
+MariaDB isolado, importação efetiva e runtime. Contagens: 3 pacotes VIP, 89 locais,
+16 categorias, 6 chamados e 6 avaliações; 173 grupos preservados. Arquivos de
+permissões/entregas/advertências vazios receberam apenas os padrões previstos.
+Clima recuperado de KVP. Nenhum VIP renovado ou benefício reentregue pela migração.
+
+A suíte atual tem 93 casos: 82 passaram na execução padrão e 11 SQL opt-in ficaram
+omitidos nela; os 11 SQL passaram separadamente. Foram acrescentados guardas de
+capacidade, deduplicação de assets imutáveis, prontidão assíncrona, históricos de
+IDs órfãos, reserva do contador importado e alias de clima `rotating`.
+
+O runtime e a abertura do painel foram confirmados. A homologação de ações críticas
+e vídeo com dois clientes permanece pendente. O relatório completo com digest e
+limitações está em `../state/update-4720106.md` (registro operacional local ignorado
+pelo Git). Os ajustes posteriores de ferramentas de verificação/importação não
+alteraram os scripts do jogo da release ativa nem exigiram outro reinício.

@@ -57,6 +57,22 @@ class CutoverTests(unittest.TestCase):
         self.assertIn('ensure mg_config_panel',resources)
         self.assertIn('ensure ic_admin',resources)
 
+    def test_runtime_verification_waits_for_database_readiness(self):
+        from types import SimpleNamespace
+        import json
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);release=root/'releases'/('a'*40);release.mkdir(parents=True);(root/'state').mkdir()
+            report=root/'state'/('ic-admin-cutover-'+release.name+'.json');report.write_text('{}')
+            info={'resources':['ic_admin','mg_config_panel','vrp','inventory']}
+            class Response(io.StringIO):
+                def __enter__(self):return self
+                def __exit__(self,*args):self.close()
+            ready={'active':True,'schemaVersion':2,'provider':'ic_admin','legacyState':'stopped','mode':'active'}
+            with patch.object(c,'containers',return_value={'fxserver':'fake'}),patch.object(c,'run',return_value=json.dumps([{'NetworkSettings':{'Networks':{'test':{'IPAddress':'127.0.0.1'}}}}])),patch.object(c.urllib.request,'urlopen',side_effect=lambda *args,**kwargs:Response(json.dumps(info))),patch.object(c,'operational_marker',side_effect=[None,ready]) as probe,patch.object(c.time,'sleep'),contextlib.redirect_stdout(io.StringIO()):
+                c.verify_runtime(root,release)
+            self.assertEqual(probe.call_count,2)
+            self.assertTrue(json.loads(report.read_text())['runtimeVerified'])
+
     def test_environment_recovery_preserves_recognized_state_and_refuses_unknown_units(self):
         self.assertIsNone(c.normalize_environment({'values':{}}))
         self.assertEqual(c.normalize_environment({'values':{'environment_state':'{"weather":"RAIN","hour":17,"freezeTime":true}'}})['hour'],17)

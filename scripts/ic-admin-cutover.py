@@ -239,9 +239,21 @@ def prepare(root,previous,release):
     write(root/'state'/('ic-admin-cutover-'+release.name+'.json'),report)
     print(json.dumps({'importVerified':True,'schemaVersion':2,'counts':report['counts'],'backupRehearsal':rehearsal}))
 
+def operational_marker(container):
+    # Container logs belong to this boot; a shared txAdmin log can contain stale readiness.
+    result=subprocess.run(['docker','logs','--tail','4000',container],capture_output=True,text=True)
+    marker=None
+    for line in (result.stdout+'\n'+result.stderr).splitlines():
+        line=re.sub(r'\x1b\[[0-9;]*m','',line)
+        match=re.search(r'\[ic_admin:operational\]\s*(\{.*\})',line)
+        if match:
+            try:marker=json.loads(match[1])
+            except ValueError:continue
+    return marker
+
 def verify_runtime(root,release):
     path=root/'state'/('ic-admin-cutover-'+release.name+'.json');report=json.loads(path.read_text())
-    deadline=time.monotonic()+150;info=None
+    deadline=time.monotonic()+150;info=None;marker=None
     while time.monotonic()<deadline:
         fx=containers().get('fxserver')
         if fx:
@@ -252,29 +264,17 @@ def verify_runtime(root,release):
                     with urllib.request.urlopen('http://'+net['IPAddress']+':30120/info.json',timeout=3) as response:info=json.load(response)
                     break
                 except Exception:pass
-        if info and 'ic_admin' in info.get('resources',[]):break
+            if info and 'ic_admin' in info.get('resources',[]):
+                marker=operational_marker(fx)
+                if marker and marker.get('active') is True and marker.get('schemaVersion')==2 and marker.get('provider')=='ic_admin':break
         time.sleep(2)
     if not info:raise CutoverError('Game endpoint did not become ready; inspect private runtime logs')
     resources=info.get('resources',[])
     if 'ic_admin' not in resources or 'mg_config_panel' not in resources or 'm_paineladm_v2' in resources:raise CutoverError('Runtime resource authority verification failed')
-    marker=None
-    for log in sorted((root/'state/txData').rglob('*.log'),key=lambda p:p.stat().st_mtime,reverse=True)[:12]:
-        for line in reversed(log.read_text(errors='replace').splitlines()[-3000:]):
-            if '[ic_admin:operational]' not in line:continue
-            match=re.search(r'\[ic_admin:operational\]\s*(\{.*\})',line)
-            if match:
-                try:marker=json.loads(match[1])
-                except ValueError:continue
-                break
-        if marker:break
-    if not marker:
-        logs=run(['docker','logs','--tail','2000',containers()['fxserver']])
-        for line in logs.splitlines():
-            match=re.search(r'\[ic_admin:operational\]\s*(\{.*\})',line)
-            if match:marker=json.loads(match[1])
     if not marker or marker.get('active') is not True or marker.get('provider')!='ic_admin' or marker.get('schemaVersion')!=2:raise CutoverError('IC Admin database/authority readiness marker missing or inactive')
     report.update(runtimeVerified=True,runtime=marker,configManagerStarted=True,legacyStopped=True)
     write(path,report);print(json.dumps({'runtimeVerified':True,'legacyStopped':True,'runtime':marker}))
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('mode',choices=['check-previous','prepare','verify-runtime'])
     parser.add_argument('--root',type=Path,required=True);parser.add_argument('--previous',type=Path);parser.add_argument('--release',type=Path)

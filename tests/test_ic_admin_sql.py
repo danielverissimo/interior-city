@@ -113,9 +113,10 @@ class ICAdminSQLTests(unittest.TestCase):
         class DB:
             def query(self,sql):return parent.command('USE ic_orphan;'+sql).stdout.strip()
         db=DB();db.query((ROOT/'database/schema.sql').read_text());m.apply_schema(db)
-        imported={'snapshotDigest':'orphan-fixture','documents':{'calls':{'nextId':2,'calls':[{'id':1,'requesterId':99999,'requesterName':'Legacy snapshot','department':'staff','message':'Archived','state':'finished','createdAt':10}],'ratings':[]}},'discipline':[{'id':1,'user_id':99999,'actor_id':0,'kind':'warning','reason':'Historical','starts_at':10,'ends_at':20,'state':'archived','return_state':None}],'privateDestinationsRequireConfiguration':0}
+        imported={'snapshotDigest':'orphan-fixture','documents':{'calls':{'nextId':25,'calls':[{'id':1,'requesterId':99999,'requesterName':'Legacy snapshot','department':'staff','message':'Archived','state':'finished','createdAt':10}],'ratings':[]}},'discipline':[{'id':1,'user_id':99999,'actor_id':0,'kind':'warning','reason':'Historical','starts_at':10,'ends_at':20,'state':'archived','return_state':None}],'privateDestinationsRequireConfiguration':0}
         self.assertTrue(m.apply_import(db,imported)['verified'])
         self.assertEqual(db.query('SELECT COUNT(*) FROM ic_admin_subjects WHERE user_id IS NULL;'),'1')
+        self.assertEqual(db.query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA='ic_orphan' AND TABLE_NAME='ic_admin_calls';"),'25')
         db.query("INSERT INTO vrp_users(id) VALUES (99999);INSERT INTO ic_admin_subjects(subject_key,user_id) VALUES ('new-owner',99999);")
         self.assertEqual(db.query('SELECT subject_key FROM ic_admin_subjects WHERE user_id=99999;'),'new-owner')
         self.assertNotEqual(db.query('SELECT subject_key FROM ic_admin_calls WHERE id=1;'),'new-owner')

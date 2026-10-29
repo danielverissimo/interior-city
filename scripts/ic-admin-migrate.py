@@ -301,7 +301,7 @@ def build_import(snapshot):
         docs['climate'] = {'weather': weather, 'hour': integer(first(climate, 'hour', 'currentHour'), 0, 23),
             'minute': integer(first(climate, 'minute', 'currentMinute', default=0), 0, 59),
             'freezeWeather': boolean(first(climate, 'freezeWeather', 'weatherFrozen', default=True)),
-            'freezeTime': boolean(first(climate, 'freezeTime', 'timeFrozen', default=False)), 'rotation': boolean(climate.get('rotation', False))}
+            'freezeTime': boolean(first(climate, 'freezeTime', 'timeFrozen', default=False)), 'rotation': boolean(first(climate, 'rotation', 'rotating', default=False))}
 
     vehicles = read_json(snapshot / 'vehicles.json', [])
     if vehicles: docs['legacy_vehicle_catalog'] = vehicles
@@ -533,6 +533,10 @@ def apply_import(db, imported, replace_imported=False, verify=False):
     for row in records:
         if row['id'] in history and history[row['id']] != row:
             raise MigrationError('Historical record identity collision; reconciliation required')
+    if 'calls' in docs:
+        desired=integer(docs['calls'].get('nextId',1),1,9007199254740991)
+        current=int(db.query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='ic_admin_calls';") or '1')
+        if desired>current: db.query('ALTER TABLE ic_admin_calls AUTO_INCREMENT='+str(desired)+';')
     statements = ['START TRANSACTION;']
     for uid, subject in sorted(subjects.items()):
         statements.append('INSERT IGNORE INTO ic_admin_subjects(subject_key,user_id) VALUES (' + sql_text(subject) + ',(SELECT id FROM vrp_users WHERE id=' + str(uid) + '));')

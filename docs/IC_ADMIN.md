@@ -336,9 +336,11 @@ Formatos de propriedade suportados e limites:
   na preparação; seu cache é invalidado após o commit. Falha de cache após commit
   gera operação incerta para conferência, sem desfazer ou repetir SQL.
 
-A revisão 1.1 foi implementada localmente. A instalação no Uriel continua sendo a
-prévia `7f01bd5`, com esquema v1; não houve novo deploy nem importação de dados
-efetivos nesta revisão. Um retorno ao runtime 1.0 depois de promover o banco a v2
+A revisão 1.1 foi implantada no Uriel após autorização operacional, na release
+`4720106`, com esquema v2, dados efetivos importados e recurso antigo parado.
+Foram migrados 3 pacotes VIP, 89 locais, 16 categorias, 6 chamados e 6 avaliações;
+173 grupos foram preservados. Clima foi recuperado de KVP. O proprietário confirmou
+a abertura de `/icadmin` no GTA. O relatório operacional está em `state/update-4720106.md`. Um retorno ao runtime 1.0 depois de promover o banco a v2
 faz seu guard recusar o IC Admin antigo. Não apagar o marcador 2 nem copiar os
 documentos históricos sobre registros atuais para forçar rollback. A cidade pode
 continuar com o provedor anterior durante a prévia; troca definitiva exige ensaio

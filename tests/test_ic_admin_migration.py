@@ -29,6 +29,8 @@ class DatabaseFixture:
         self.records={table:{} for table in m.RECORD_TABLES.values()}
 
     def query(self, sql):
+        if sql.startswith('SELECT AUTO_INCREMENT'):return '1'
+        if sql.startswith('ALTER TABLE ic_admin_calls AUTO_INCREMENT='):return ''
         if 'information_schema.TABLES' in sql:
             return '\n'.join(table + '\tInnoDB' for table in set(m.REQUIRED_TABLES) | {'mirtin_bans', 'mirtin_bans_hwid', 'mirtin_bans_ip'})
         if 'information_schema.COLUMNS' in sql:
@@ -149,6 +151,11 @@ class ICAdminMigrationTests(unittest.TestCase):
     def test_unknown_nonempty_history_is_not_silently_discarded(self):
         self.write('warnings_data.json', {'unknownFormat': [{'userId': 12}]})
         with self.assertRaises(m.MigrationError): self.seal()
+
+    def test_legacy_rotating_flag_is_preserved(self):
+        self.write('environment_state.json',{'weather':'RAIN','hour':17,'rotating':True,'timeFrozen':True,'weatherFrozen':False})
+        self.seal();climate=m.build_import(self.snapshot)['documents']['climate']
+        self.assertTrue(climate['rotation']);self.assertTrue(climate['freezeTime']);self.assertFalse(climate['freezeWeather'])
 
     def test_string_boolean_climate_is_rejected(self):
         self.write('environment_state.json', {'weather': 'CLEAR', 'hour': 12, 'freezeTime': 'false'})
