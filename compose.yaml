@@ -117,6 +117,8 @@ services:
       CADDY_DOMAIN: ${PLAYIT_HTTPS_HOST:-}
     volumes:
       - ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${INTERIOR_CITY_RELEASE_PATH:-.}/docker/caddy/assets.caddy:/etc/caddy/assets.caddy:ro
+      - ./state/www:/srv/www:ro
       - caddy_data:/data
     cap_drop:
       - ALL

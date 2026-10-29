@@ -26,6 +26,8 @@ profile="$(setting IC_ASSET_PROFILE)"; store="$(setting ASSET_STORE)"
 [[ "$store" == /srv/diskaux/interior-city-assets ]] || { echo 'Unexpected private asset store.' >&2; exit 1; }
 [[ "$(setting FIVEM_LISTING_ENABLED)" == false ]] || { echo 'Public listing requires a separately reviewed change.' >&2; exit 1; }
 endpoint="$(setting PLAYIT_PUBLIC_ENDPOINT)"; https_host="$(setting PLAYIT_HTTPS_HOST)"
+asset_origin="$(setting IC_ASSETS_BASE_URL)"
+if [[ -z "$asset_origin" && -n "$https_host" ]]; then asset_origin="https://$https_host"; fi
 profiles=()
 if [[ -n "$endpoint" || -n "$https_host" ]]; then
   [[ "$endpoint" =~ ^[0-9.]+:[0-9]+$ && "$https_host" =~ ^[A-Za-z0-9.-]+$ ]] || { echo 'Configure both Playit endpoints together.' >&2; exit 1; }
@@ -66,6 +68,12 @@ if [[ ! -e "$release" ]]; then
   python3 "$incoming/scripts/assets.py" sync --store "$store" --profile "$profile" \
     --lock "$incoming/assets.lock.json" --destination "$incoming" ${reuse_assets[@]+"${reuse_assets[@]}"}
   python3 "$incoming/scripts/assets.py" verify --profile "$profile" --lock "$incoming/assets.lock.json" --destination "$incoming"
+  # Render code only in the isolated candidate, before sealing its pristine manifest.
+  # Never touch the previous release or URLs intentionally pointing at another CDN.
+  if [[ -f "$incoming/scripts/web-assets.py" ]]; then
+    python3 "$incoming/scripts/web-assets.py" configure --release "$incoming" \
+      --base-url "$asset_origin" --media "$root/state/www"
+  fi
   python3 "$helper" manifest "$incoming" "$root/state/manifests/$sha.json"
   chown -R 1000:1000 "$incoming"
   mv "$incoming" "$release"
@@ -74,6 +82,10 @@ else
   python3 "$helper" manifest "$release" "$root/state/manifests/$sha.json" --check
   python3 "$release/scripts/configure-secrets.py" --directory "$root/secrets" check
   python3 "$release/scripts/assets.py" verify --profile "$profile" --lock "$release/assets.lock.json" --destination "$release"
+  if [[ -f "$release/scripts/web-assets.py" ]]; then
+    python3 "$release/scripts/web-assets.py" configure --release "$release" \
+      --base-url "$asset_origin" --media "$root/state/www"
+  fi
 fi
 if [[ -f "$release/config/ic_admin.cfg" ]] && rg_mode="$(sed -n 's/^setr ic_admin_mode "\([^"]*\)"/\1/p' "$release/config/ic_admin.cfg")" && [[ "$rg_mode" == active && "$schema_mode" != --ic-admin-cutover ]]; then
   echo 'Active IC Admin requires explicit --ic-admin-cutover migration/forward-fix verification.' >&2; exit 1

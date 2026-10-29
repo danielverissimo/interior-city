@@ -3,5 +3,8 @@
 }
 
 {$CADDY_DOMAIN} {
-    reverse_proxy 127.0.0.1:30120
+    import /etc/caddy/assets.caddy
+    handle {
+        reverse_proxy 127.0.0.1:30120
+    }
 }

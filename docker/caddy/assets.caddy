@@ -1,0 +1,18 @@
+# Only static media are exposed; PHP applications and directory browsing are excluded.
+@asset_path path /images/* /vrp_images/* /loading/*
+handle @asset_path {
+    @media {
+        method GET HEAD
+        path_regexp media (?i)\.(png|jpg|jpeg|webp|gif|ico|mp3|mp4|ogg|wav|webm)$
+    }
+    handle @media {
+        root * /srv/www
+        header Access-Control-Allow-Origin "*"
+        header X-Content-Type-Options nosniff
+        header Cache-Control "public, max-age=3600"
+        file_server
+    }
+    handle {
+        respond 404
+    }
+}

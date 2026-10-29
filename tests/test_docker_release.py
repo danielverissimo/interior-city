@@ -22,6 +22,7 @@ def module(name, filename):
 c = module('configuration', 'configure-secrets.py')
 r = module('release', 'release.py')
 a = module('asset_normalization', 'assets.py')
+w = module('web_assets', 'web-assets.py')
 
 
 class DockerReleaseTests(unittest.TestCase):
@@ -123,12 +124,12 @@ class DockerReleaseTests(unittest.TestCase):
         (release/'.replxx_history').write_text('runtime console history')
         self.assertEqual(set(r.inventory(release)), {'server.cfg'})
 
-    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False):
+    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False, web_assets=False):
         """Exercise the installer in a temp root; Docker/privileged Linux commands are fakes."""
         base = self.root.resolve()/'deploy'; stage = self.root.resolve()/'stage'; stage.mkdir()
         store = self.root.resolve()/'store'; store.mkdir()
         source = self.root.resolve()/'code'; (source/'scripts').mkdir(parents=True); (source/'config').mkdir()
-        for file in ('assets.py','configure-secrets.py'): shutil.copyfile(ROOT/'scripts'/file,source/'scripts'/file)
+        for file in ('assets.py','configure-secrets.py','web-assets.py'): shutil.copyfile(ROOT/'scripts'/file,source/'scripts'/file)
         (source/'scripts/ic-admin-migrate.py').write_text('''import json,os,sys
 with open(os.environ['FIXTURE_LOG'],'a') as out: out.write(json.dumps(['schema-migration']+sys.argv[1:])+'\\n')
 sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
@@ -144,6 +145,9 @@ sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
         (source/'resources/[scripts]/m_desmanche').mkdir(parents=True)
         (source/'resources/[scripts]/m_desmanche/config.json').write_text('{"settings":{},"desmanches":[]}')
         (source/'server.cfg').write_text('fixture configuration\n')
+        if web_assets:
+            (source/'resources/inventory').mkdir()
+            (source/'resources/inventory/main.js').write_text('const image="http://127.0.0.1/images/item.png";')
         archive = stage/'release.tar'
         with tarfile.open(archive,'w') as tar:
             for child in source.iterdir(): tar.add(child,arcname=child.name)
@@ -164,6 +168,12 @@ sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
         (base/'current').symlink_to(old)
         c.initialize(base/'secrets'); c.write_private(base/'secrets/cfx_license',self.license)
         (base/'.env').write_text('COMPOSE_PROJECT_NAME=interior-city-tocado\nINTERIOR_CITY_RELEASE_PATH='+str(base)+'/current\nFIVEM_LISTING_ENABLED=false\nIC_ASSET_PROFILE=core\nASSET_STORE='+str(store)+'\n')
+        if web_assets:
+            media_source = self.root.resolve()/'media-source'
+            for group in w.MEDIA: (media_source/group).mkdir(parents=True)
+            (media_source/'images/item.png').write_bytes(b'fixture-image')
+            w.import_media(media_source, base/'state/www')
+            with (base/'.env').open('a') as out: out.write('IC_ASSETS_BASE_URL=https://city.example.invalid\n')
         binary = self.root/'bin'; binary.mkdir(); log = self.root/'docker.log'
         commands = {
             'id':'#!/bin/sh\necho 0\n', 'chown':'#!/bin/sh\nexit 0\n', 'flock':'#!/bin/sh\nexit 0\n',
@@ -205,6 +215,16 @@ shutil.move(*args)
         self.assertLess(backup,up)
         self.assertFalse(any('down' in e for e in events))
         self.assertFalse(any('schema-migration' in e for e in events))
+
+    def test_installer_renders_media_urls_before_sealing_the_release(self):
+        result,current,events=self.simulated_deploy(web_assets=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        base=self.root.resolve()/'deploy'
+        release=base/'releases'/current
+        self.assertIn('https://city.example.invalid/images/item.png', (release/'resources/inventory/main.js').read_text())
+        self.assertIn('127.0.0.1', (base/'releases'/('a'*40)/'resources/inventory/main.js').read_text())
+        r.manifest(release,base/'state/manifests'/(current+'.json'),True)
+        w.verify_media(base/'state/www')
 
     def test_installer_preserves_already_mounted_configuration_instead_of_release_defaults(self):
         result,current,events=self.simulated_deploy(persisted_desmanche=True)

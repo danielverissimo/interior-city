@@ -16,6 +16,7 @@ Esta implementação pertence à branch `master`, promovida de `migration/tocado
 | Credenciais | `secrets/`, fora de releases e imagens |
 | Backups | `backups/`, neste host, com retenção de sete dias |
 | Assets | pacotes privados em `/srv/diskaux/interior-city-assets/tocado-mago` |
+| Mídias web do antigo XAMPP | `state/www`, com manifesto separado em `state/www.manifest.json`; [importação e URLs](WEB_ASSETS.md) |
 
 O Compose contém FXServer Linux/txAdmin, MariaDB, backup e os serviços opcionais Playit e Caddy. O artefato FXServer e o agente Playit têm versão/checksum fixados nos Dockerfiles. Os contêineres não recebem Docker socket, GPU nem binários Windows. O jogo permanece fora da listagem pública.
 

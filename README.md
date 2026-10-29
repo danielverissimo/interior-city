@@ -6,6 +6,10 @@ As medições, verificações e pendências desta importação estão em [docs/S
 
 O fluxo Docker, as chaves privadas e o deploy da nova base estão em [docs/URIEL_DOCKER.md](docs/URIEL_DOCKER.md). A substituição local da branch principal não altera o GitHub nem a versão em execução no Uriel. A homologação com jogadores e dos sistemas da cidade continua sendo uma etapa separada da validação de infraestrutura.
 
+As imagens antes servidas pelo XAMPP usam a pasta persistente `state/www` e o
+Caddy existente. Consulte [imagens e mídias sem XAMPP](docs/WEB_ASSETS.md) para
+importação, configuração das URLs e ativação em uma nova release.
+
 ## Organização
 
 | Caminho | Conteúdo |
