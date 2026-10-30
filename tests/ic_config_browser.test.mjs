@@ -11,7 +11,7 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
     const root = new URL('../resources/[scriptcore]/ic_config/web/', import.meta.url);
     const server = createServer(async (req, res) => {
         const path = req.url.split('?')[0] === '/' ? 'index.html' : req.url.split('?')[0].slice(1);
-        if (!['index.html', 'style.css', 'mansions.css', 'app.mjs', 'model.mjs', 'transport.mjs', 'mansions.mjs'].includes(path)) { res.writeHead(404).end(); return; }
+        if (!['index.html', 'style.css', 'mansions.css', 'craft.css', 'forms.css', 'app.mjs', 'model.mjs', 'transport.mjs', 'mansions.mjs', 'craft.mjs', 'forms.mjs', 'form-schema.mjs', 'catalog-picker.mjs'].includes(path)) { res.writeHead(404).end(); return; }
         res.setHeader('Content-Type', path.endsWith('.mjs') ? 'text/javascript' : path.endsWith('.css') ? 'text/css' : 'text/html');
         res.end(await readFile(new URL(path, root)));
     });
@@ -93,7 +93,7 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
         await page.locator('#cancel-edit').click();
         await page.locator('#navigation button[data-area="safezone"]').click();
         await page.locator('#create').click();
-        await page.getByLabel('Nome', { exact: true }).fill('Captured zone');
+        await page.getByLabel('Nome da zona segura', { exact: true }).fill('Captured zone');
         await clickRpc(page.getByRole('button', { name: 'Desenhar polígono no jogo' }), 'startSafeZonePolygon');
         const polygon = requests.findLast(request => request.method === 'startSafeZonePolygon');
         await page.evaluate(target => {
@@ -101,9 +101,9 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
             window.postMessage({ action: 'captureResult', kind: 'polygon', target, cancelled: false, data: { coords: [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 2 }], minZ: 20, maxZ: 24 } }, '*');
             window.postMessage({ action: 'resume' }, '*');
         }, polygon.payload.target);
-        await page.waitForFunction(() => document.querySelector('#editor').open && document.querySelector('#fields textarea').value.includes('minZ'));
-        const zones = JSON.parse(await page.getByLabel('Polígonos', { exact: true }).inputValue());
-        assert.equal(zones.length, 1); assert.equal(zones[0].coords.length, 3); assert.equal(zones[0].minZ, 20);
+        await page.getByRole('group', { name: 'Vértice 3', exact: true }).waitFor();
+        assert.equal(await page.getByLabel('Altura mínima (minZ)', { exact: true }).inputValue(), '20');
+        assert.equal(await page.locator('#fields textarea').count(), 0);
         await page.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
         await page.locator('#editor').waitFor({ state: 'hidden' });
         assert.equal(requests.find(request => request.method === 'createSafeZone').payload.zones.length, 1);

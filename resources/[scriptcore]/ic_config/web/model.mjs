@@ -43,7 +43,7 @@ export const VIEWS = [
         initial: () => ({ bench: { name: '', craftPermission: '', armazemPermission: '', coords: [], craftItems: [], armazemItems: [], farmRewardType: '' }, farm: { enabled: false, rewardType: '', routeType: '', permissions: [], rewards: [] } }),
         toEditor: (bench, all) => { const route = (all.farm?.Routes || []).find(item => item.rewardType === bench.farmRewardType) || {}; return { bench, farm: { enabled: !!bench.farmRewardType, rewardType: bench.farmRewardType || '', routeType: bench.farmRouteType || route.routeType || '', permissions: bench.farmPermissions || route.permissions || [], rewards: all.farm?.Rewards?.[bench.farmRewardType] || [] } }; },
         pack: (payload, row) => ({ originalName: row?.name || '', ...payload }), deletePayload: row => ({ name: row.name }),
-        note: 'Receitas, materiais, pontos e recompensas são editados em listas JSON. O farm vinculado permanece explícito no formulário.' }),
+        note: 'Edite os pontos e o farm vinculado no formulário. Em Editar receitas, escolha produtos e materiais pelo catálogo da cidade.' }),
     view('garages', 'garages', 'Pontos de garagem', 'getGarages', { create: 'createGarage', update: 'updateGarage', remove: 'deleteGarage',
         initial: () => ({ id: '', type: '', permiss: '', blipDistance: 5, coords: xyz(), spawnCoords: [] }),
         pack: (data, row) => ({ ...data, originalId: row?.id }), deletePayload: row => ({ id: row.id }) }),
@@ -54,17 +54,17 @@ export const VIEWS = [
     view('cloakroom', 'cloakroom', 'Fardamentos', 'getCloakrooms', { create: 'saveCloakroom', update: 'saveCloakroom', remove: 'deleteCloakroom',
         initial: () => ({ name: '', permission: '', coords: xyz(), uniforms: [] }), pack: (room, row) => ({ originalName: row?.name || '', room }), deletePayload: row => ({ name: row.name }) }),
     view('shops', 'shops', 'Lojas', 'getShops', { create: 'createShop', update: 'updateShop', remove: 'deleteShop',
-        initial: () => ({ name: '', data: { mode: '', perm: '', onlyWalletPayment: false, items: {}, coords: [], blip: { enabled: false, text: '', index: 52, color: 0, scale: 0.5 } } }),
+        initial: () => ({ name: '', data: { mode: 'buy', perm: '', onlyWalletPayment: false, items: {}, coords: [], blip: { enabled: false, text: '', index: 52, color: 0, scale: 0.5 } } }),
         pack: (data, row) => ({ ...data, originalName: row?.name }), deletePayload: row => ({ name: row.name }) }),
     pointView('clothing', 'Lojas de roupa', 'getClothingShops', 'createClothingShop', 'updateClothingShop', 'deleteClothingShop'),
     pointView('barbershop', 'Barbearias', 'getBarbershops', 'createBarbershop', 'updateBarbershop', 'deleteBarbershop'),
     pointView('tattoo', 'Estúdios de tatuagem', 'getTattooShops', 'createTattooShop', 'updateTattooShop', 'deleteTattooShop'),
     view('desmanche', 'desmanche', 'Desmanches', 'getDesmanches', { rows: data => data?.desmanches || [], create: 'createDesmanche', update: 'updateDesmanche', remove: 'deleteDesmanche',
-        initial: () => ({ name: '', permissao: '', precisa_de_item: false, itens_necessarios: [], inicio: xyz(), local_veiculo: xyz(), local_ferramentas: { ...xyz(), w: 0 }, local_finalizar: xyz() }),
+        initial: () => ({ name: '', permissao: '', precisa_de_item: false, itens_necessarios: [{ item: 'lockpick', qtd: 1 }], inicio: xyz(), local_veiculo: xyz(), local_ferramentas: { ...xyz(), w: 0 }, local_finalizar: xyz() }),
         pack: (data, row) => row ? { originalName: row.name, data } : data, deletePayload: row => ({ name: row.name }) }),
     view('safezone', 'safezone', 'Zonas seguras', 'getSafeZones', { rows: data => data?.safezones || [], create: 'createSafeZone', update: 'updateSafeZone', remove: 'deleteSafeZone',
         initial: () => ({ name: '', debug: false, zones: [] }), pack: (data, row) => row ? { originalName: row.name, data } : data, deletePayload: row => ({ name: row.name }),
-        note: 'Cada polígono usa coords [{x,y},…], minZ e maxZ. São necessários pelo menos três pontos.' }),
+        note: 'Adicione polígonos e vértices pelo formulário ou desenhe os limites no jogo. Cada área exige pelo menos três pontos.' }),
     view('jobs', 'jobs', 'Empregos', 'getJobs', { rows: data => objectRows(data?.jobs), update: 'updateJob',
         toEditor: (row, all) => ({ job: row.data, extra: all.extras?.[row.name] || {} }), pack: (payload, row) => ({ name: row.name, ...payload }),
         extraAction: { method: 'captureJobUniform', label: 'Capturar uniforme', initial: row => ({ name: row?.name || '' }) } }),
@@ -102,6 +102,7 @@ settings('robberies', 'centralBank', 'Banco Central', 'getBancoCentral', 'saveBa
 settings('robberies', 'jewelry', 'Joalheria', 'getJoalheria', 'saveJoalheria', identity);
 settings('robberies', 'vaults', 'Cofres', 'getRoubocofre', 'saveRoubocofre', identity);
 settings('dealership', 'dealershipSettings', 'Regras da concessionária', 'getDealership', 'saveDealershipSettings', data => ({ settings: data.settings || {}, testDrive: data.testDrive || {}, categories: data.categories || [], vips: data.vips || [] }));
+settings('houses', 'residencesSettings', 'Logs das residências', 'getResidences', 'saveResidencesSettings', data => data.settings || {});
 
 export function recordsFor(view, data) {
     const source = view.rows(data) || [];

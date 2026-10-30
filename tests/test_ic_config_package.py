@@ -48,3 +48,17 @@ class CandidatePackageTests(unittest.TestCase):
             with tarfile.open(parent/'candidate/release.tar.gz')as archive:
                 self.assertNotIn('config/ic_config_runtime.cfg',archive.getnames())
                 self.assertEqual(archive.extractfile('README.md').read(),b'candidate documentation\n')
+            # A user may have committed unrelated work after the deployed release.
+            # An explicit deployed baseline must still exclude that work from this release.
+            git('commit','-qm','user unrelated commit')
+            committed_head=git('rev-parse','HEAD');committed_index=(repo/'.git/index').read_bytes()
+            (repo/'README.md').write_text('next candidate documentation\n')
+            with patch.object(m,'ROOT',repo):baseline_report=m.prepare(parent/'baseline-candidate',base_commit=head)
+            self.assertEqual(baseline_report['baseCommit'],head)
+            self.assertEqual(baseline_report['sourceHead'],committed_head)
+            self.assertIn('unrelated.txt',baseline_report['excludedTrackedChanges'])
+            self.assertEqual(git('show',baseline_report['candidateCommit']+':unrelated.txt'),'original')
+            self.assertEqual((repo/'unrelated.txt').read_text(),'user staged edit\n')
+            self.assertEqual(git('rev-parse','HEAD'),committed_head)
+            self.assertEqual((repo/'.git/index').read_bytes(),committed_index)
+            self.assertEqual(git('symbolic-ref','HEAD'),branch)
