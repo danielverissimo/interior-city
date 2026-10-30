@@ -124,7 +124,7 @@ class DockerReleaseTests(unittest.TestCase):
         (release/'.replxx_history').write_text('runtime console history')
         self.assertEqual(set(r.inventory(release)), {'server.cfg'})
 
-    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False, web_assets=False):
+    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False, web_assets=False, config_cutover=False, config_fail=''):
         """Exercise the installer in a temp root; Docker/privileged Linux commands are fakes."""
         base = self.root.resolve()/'deploy'; stage = self.root.resolve()/'stage'; stage.mkdir()
         store = self.root.resolve()/'store'; store.mkdir()
@@ -134,6 +134,21 @@ class DockerReleaseTests(unittest.TestCase):
 with open(os.environ['FIXTURE_LOG'],'a') as out: out.write(json.dumps(['schema-migration']+sys.argv[1:])+'\\n')
 sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
 ''')
+        config_helper='''import json,os,sys
+from pathlib import Path
+mode=sys.argv[1]
+with open(os.environ['FIXTURE_LOG'],'a') as out:out.write(json.dumps(['config-cutover',mode])+'\\n')
+if mode==os.environ.get('FIXTURE_CONFIG_FAIL'):sys.exit(1)
+args=dict(zip(sys.argv[2::2],sys.argv[3::2]));root=Path(args['--root'])
+if mode=='configure-candidate':
+    (Path(args['--release'])/'config/ic_config_runtime.cfg').write_text('fixture selection\\n')
+if mode=='prepare':
+    directory=root/'state/ic-config/overlays';directory.mkdir(parents=True,exist_ok=True)
+    (directory/(Path(args['--release']).name+'.yaml')).write_text('services: {}\\n')
+if mode=='mark-starting':
+    (root/'state/ic-config/selection.json').write_text('{"phase":"starting"}')
+'''
+        (source/'scripts/ic-config-cutover.py').write_text(config_helper)
         (source/'config/resource-secrets.schema.json').write_text('{}')
         (source/'assets.lock.json').write_text(json.dumps({'format':1,'project':a.PROJECT,'packages':[]}))
         (source/'compose.yaml').write_text('services: {}\n')
@@ -152,6 +167,7 @@ sys.exit(int(os.environ.get('FIXTURE_SCHEMA_FAIL','0')))
         with tarfile.open(archive,'w') as tar:
             for child in source.iterdir(): tar.add(child,arcname=child.name)
         shutil.copyfile(ROOT/'scripts/release.py',stage/'release.py')
+        (stage/'ic-config-cutover.py').write_text(config_helper)
         installer = (ROOT/'scripts/install-uriel-release.sh').read_text().replace('/opt/uriel/interior-city-tocado',str(base)).replace('/srv/diskaux/interior-city-assets',str(store))
         (stage/'install.sh').write_text(installer)
         old_sha, new_sha = 'a'*40, 'b'*40
@@ -196,8 +212,10 @@ shutil.move(*args)
         for name,script in commands.items(): p=binary/name; p.write_text(script); p.chmod(0o755)
         env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],FIXTURE_LOG=str(log),FIXTURE_FAIL_UP='1' if fail else '0',FIXTURE_SCHEMA_FAIL='1' if schema_fail else '0')
         env.update(FIXTURE_DESMANCHE_MOUNT=str(desmanche_state) if persisted_desmanche else '',FIXTURE_DESMANCHE_SOURCE=str(old/'resources/[scripts]/m_desmanche/config.json'))
+        env['FIXTURE_CONFIG_FAIL']=config_fail
         args=['bash',str(stage/'install.sh'),new_sha,str(archive)]
         if schema: args.append('--ic-admin-schema')
+        if config_cutover:args.append('--ic-config-cutover')
         result=subprocess.run(args,capture_output=True,text=True,env=env)
         self.assertEqual(json.loads(radio_state.read_text()), {'fixture_channel':777})
         expected={'settings':{'edited':True},'desmanches':[{'name':'fixture'}]} if persisted_desmanche else {'settings':{'finalEdit':True},'desmanches':[]}
@@ -215,6 +233,39 @@ shutil.move(*args)
         self.assertLess(backup,up)
         self.assertFalse(any('down' in e for e in events))
         self.assertFalse(any('schema-migration' in e for e in events))
+
+    def test_config_cutover_prepares_after_backup_and_uses_release_specific_overlay(self):
+        result,current,events=self.simulated_deploy(config_cutover=True,schema=True)
+        self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(current,'b'*40)
+        configure=events.index(['config-cutover','configure-candidate'])
+        stop=next(i for i,e in enumerate(events)if 'stop'in e)
+        backup=next(i for i,e in enumerate(events)if 'predeploy'in e)
+        prepared=events.index(['config-cutover','prepare'])
+        starting=events.index(['config-cutover','mark-starting'])
+        up=next(i for i,e in enumerate(events)if 'up'in e)
+        verified=events.index(['config-cutover','verify-runtime'])
+        self.assertLess(configure,stop);self.assertLess(stop,backup);self.assertLess(backup,prepared)
+        self.assertLess(prepared,starting);self.assertLess(starting,up);self.assertLess(up,verified)
+        self.assertTrue(any('/state/ic-config/overlays/'in str(e)for e in events if 'up'in e))
+
+    def test_config_preparation_failure_restores_previous_code_before_candidate_start(self):
+        result,current,events=self.simulated_deploy(config_cutover=True,config_fail='prepare')
+        self.assertNotEqual(result.returncode,0);self.assertEqual(current,'a'*40)
+        self.assertNotIn(['config-cutover','mark-starting'],events)
+        self.assertFalse(any('up'in e and any('/'+('b'*40)+'/'in x for x in e)for e in events))
+
+    def test_config_runtime_failure_stops_candidate_without_replaying_legacy_state(self):
+        result,current,events=self.simulated_deploy(config_cutover=True,config_fail='verify-runtime')
+        self.assertNotEqual(result.returncode,0);self.assertEqual(current,'b'*40)
+        up=next(i for i,e in enumerate(events)if 'up'in e)
+        self.assertTrue(any('stop'in e for e in events[up+1:]))
+        self.assertFalse(any('up'in e and any('/'+('a'*40)+'/'in x for x in e)for e in events))
+
+    def test_config_startup_failure_stops_candidate_instead_of_automatic_rollback(self):
+        result,current,events=self.simulated_deploy(config_cutover=True,fail=True)
+        self.assertNotEqual(result.returncode,0);self.assertEqual(current,'b'*40)
+        self.assertNotIn(['config-cutover','verify-runtime'],events)
+        self.assertEqual(sum('stop'in e for e in events),2)
 
     def test_installer_renders_media_urls_before_sealing_the_release(self):
         result,current,events=self.simulated_deploy(web_assets=True)

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- FiveM callback hosts may contain underscores, which CSP host expressions reject.
+         The transport constructs its HTTPS host exclusively from GetParentResourceName. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https:; img-src 'self' data:; object-src 'none'; base-uri 'none'">
+    <link rel="icon" href="data:,">
+    <title>Interior City · Configurações</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mansions.css">
+</head>
+<body>
+<main id="panel" hidden>
+    <aside class="sidebar">
+        <div class="brand"><span class="brand-symbol">IC</span><div>INTERIOR CITY<small>Configurações da cidade</small></div></div>
+        <p class="nav-label">ADMINISTRAÇÃO</p>
+        <nav id="navigation" aria-label="Áreas de configuração"></nav>
+        <footer><span class="status-dot"></span> Painel próprio <kbd>ESC</kbd></footer>
+    </aside>
+    <section class="workspace">
+        <header>
+            <div><p class="eyebrow">CONTROLE DA CIDADE</p><h1 id="title">Configurações</h1><p id="subtitle">Cadastros e integrações da sua base.</p></div>
+            <button id="close-panel" class="icon-button" aria-label="Fechar painel">×</button>
+        </header>
+        <p id="preview-banner" class="banner" hidden>PRÉVIA LOCAL · Dados fictícios · Gravação desativada</p>
+        <p id="mode-banner" class="banner" hidden></p>
+        <div id="tabs" class="tabs" role="tablist" aria-label="Seções da área"></div>
+        <div class="toolbar"><label class="search"><span>Buscar</span><input id="search" type="search" placeholder="Nome, identificador, permissão…" autocomplete="off"></label><div class="tools"><button id="refresh">Atualizar</button><button id="additional" hidden></button><button id="create" class="primary" hidden>Novo cadastro</button></div></div>
+        <div class="summary"><span id="count">Selecione uma área</span><span id="loading" hidden>Carregando…</span></div>
+        <p id="view-note" class="view-note" hidden></p>
+        <section id="error" class="error" role="alert" hidden></section>
+        <div id="records" class="records" aria-live="polite"></div>
+        <div class="workspace-footer"><span>INTERIOR CITY / CONFIG</span><span>Permissões verificadas pelo servidor</span></div>
+    </section>
+</main>
+<dialog id="editor" aria-labelledby="editor-title">
+    <div class="dialog-head"><div><p class="eyebrow">CONFIGURAÇÃO</p><h2 id="editor-title">Editar cadastro</h2></div><button id="cancel-editor" class="icon-button" type="button" aria-label="Fechar editor">×</button></div>
+    <form id="edit-form"><div id="fields" class="fields"></div><p id="editor-error" role="alert" class="error" hidden></p><div class="dialog-actions"><span id="edit-hint">Revise os campos antes de salvar.</span><button id="cancel-edit" type="button">Cancelar</button><button id="save" class="primary">Salvar alterações</button></div></form>
+</dialog>
+<dialog id="confirmation" aria-labelledby="confirmation-title"><div class="confirm-body"><p class="eyebrow">CONFIRMAÇÃO</p><h2 id="confirmation-title">Excluir cadastro?</h2><p id="confirmation-message"></p><div id="deletion-impact" hidden></div><div id="deletion-phrase" class="field" hidden><label for="deletion-confirmation">Digite a frase de confirmação</label><input id="deletion-confirmation" autocomplete="off" spellcheck="false"><small id="deletion-expected"></small></div><p id="confirmation-error" class="error" role="alert" hidden></p><div class="dialog-actions"><button id="cancel-delete">Cancelar</button><button id="confirm-delete" class="danger">Excluir cadastro</button></div></div></dialog>
+<div id="toast" role="status" hidden></div>
+<script type="module" src="app.mjs"></script>
+</body>
+</html>

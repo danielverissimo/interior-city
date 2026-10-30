@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https:; img-src 'self' data:; object-src 'none'; base-uri 'none'">
+    <link rel="icon" href="data:,"><link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="recovery.css">
+    <title>Interior City · Minha mansão</title>
+</head>
+<body>
+<main id="home" hidden>
+    <aside><div class="brand"><span>IC</span><div>INTERIOR CITY<small>Seu espaço na cidade</small></div></div>
+        <nav aria-label="Seções da mansão"><button data-view="overview" aria-current="page">Visão geral</button><button data-view="residents">Moradores</button><button data-view="catalog">Catálogo de mobílias</button><button data-view="placed">Minhas mobílias</button><button data-view="prices" hidden>Valores do catálogo</button><button data-view="recovery" hidden>Reconciliação</button></nav>
+        <div class="aside-bottom"><span>MINHA MANSÃO</span><small>ESC para voltar à cidade</small></div>
+    </aside>
+    <section class="workspace">
+        <header><div><p class="eyebrow">MORAR EM INTERIOR CITY</p><h1 id="property-name">Minha mansão</h1><p id="property-subtitle">Um lugar para chamar de seu.</p></div><div class="header-actions"><button id="refresh">Atualizar</button><button id="close" class="icon" aria-label="Fechar">×</button></div></header>
+        <label id="property-selector-label" class="property-selector" hidden><span>Mansão</span><select id="property-selector"></select></label>
+        <p id="preview-note" class="notice" hidden>PRÉVIA LOCAL · Dados fictícios · Alterações desativadas</p>
+        <p id="operation-note" class="notice" hidden></p>
+        <p id="error" class="error" role="alert" hidden></p>
+        <div id="loading" hidden>Carregando sua mansão…</div>
+        <section id="content" aria-live="polite"></section>
+        <footer><span>INTERIOR CITY / MANSÕES</span><span id="role">Acesso verificado pela cidade</span></footer>
+    </section>
+</main>
+<dialog id="confirmation" aria-labelledby="confirm-title"><form id="confirm-form"><p class="eyebrow">CONFIRMAÇÃO</p><h2 id="confirm-title"></h2><p id="confirm-description"></p><dl id="confirm-details"></dl><div id="recovery-checks" hidden><label class="recovery-check"><input type="checkbox" id="recovery-settled"><span>Conferi e reconciliei manualmente os pagamentos, vales, grupos e integrações afetados, restaurando o estado anterior fora desta ação.</span></label><label for="recovery-confirmation">Digite a frase de confirmação</label><input id="recovery-confirmation" autocomplete="off" spellcheck="false"><small id="recovery-expected"></small></div><p id="confirm-error" class="error" role="alert" hidden></p><div class="actions"><button type="button" id="cancel-confirm">Cancelar</button><button id="confirm" class="primary">Confirmar</button></div></form></dialog>
+<div id="toast" role="status" hidden></div>
+<script type="module" src="app.mjs"></script>
+</body>
+</html>

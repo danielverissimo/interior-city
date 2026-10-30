@@ -5,6 +5,9 @@
 local DYNAMIC_FILE = "dynamic_orgs.json"
 local DynamicOrgs = { organizations = {}, deleted = {} }
 local BaseOrganizationNames = {}
+local function icConfigDeleting(orgName)
+    return type(DynamicOrgs.icConfigDeletions)=='table' and DynamicOrgs.icConfigDeletions[orgName]~=nil
+end
 
 -- Guarda quais organizações vieram originalmente do config.lua.
 for name in pairs(Config.Groups or {}) do
@@ -206,6 +209,7 @@ end
 
 exports("canCreateManagedOrganization",function(orgName)
     orgName = trim(orgName)
+    if icConfigDeleting(orgName) then return false,'Finalize a exclusão anterior antes de recriar a organização.' end
     if orgName == "" then return false,"Informe o orgName da FAC." end
     if Config.Groups[orgName] then return false,"Esta organização já existe no m_orgs_v2." end
     return true
@@ -213,6 +217,7 @@ end)
 
 exports("addManagedOrganization",function(orgName,goalItem,goalAmount,defaultReward)
     orgName = trim(orgName)
+    if icConfigDeleting(orgName) then return false,'Finalize a exclusão anterior antes de recriar a organização.' end
     goalItem = trim(goalItem)
     goalAmount = tonumber(goalAmount)
     defaultReward = tonumber(defaultReward)
@@ -280,4 +285,43 @@ exports("getManagedOrganizationNames",function()
     end
     table.sort(result,function(a,b) return a:lower() < b:lower() end)
     return result
+end)
+
+-- No SQL here: IC Config commits all owning tables together and finalizes this
+-- JSON/runtime projection afterward. Recovery can safely call this again.
+exports('icConfigOrganizationPlan',function(orgName)
+    if GetInvokingResource()~='ic_config' then return false end
+    orgName=trim(orgName)
+    return {exists=Config.Groups[orgName]~=nil,deleted=isDeleted(orgName),raw=LoadResourceFile(GetCurrentResourceName(),DYNAMIC_FILE)}
+end)
+
+exports('icConfigOrganizationFinalize',function(orgName,operationId)
+    if GetInvokingResource()~='ic_config' then return false end
+    orgName=trim(orgName)
+    if orgName=='' or type(operationId)~='string' then return false end
+    DynamicOrgs.icConfigDeletions=DynamicOrgs.icConfigDeletions or {}
+    if DynamicOrgs.icConfigDeletions[orgName] and DynamicOrgs.icConfigDeletions[orgName]~=operationId then return false end
+    DynamicOrgs.icConfigDeletions[orgName]=operationId
+    DynamicOrgs.organizations[orgName]=nil
+    if not isDeleted(orgName) then DynamicOrgs.deleted[#DynamicOrgs.deleted+1]=orgName end
+    if not saveDynamicFile() then return false end
+    local raw=LoadResourceFile(GetCurrentResourceName(),DYNAMIC_FILE)
+    local ok,persisted=pcall(json.decode,raw or '')
+    if not ok or type(persisted)~='table' or (persisted.organizations or {})[orgName]~=nil then return false end
+    local found=false
+    for _,name in ipairs(persisted.deleted or {}) do if name==orgName then found=true end end
+    if not found then return false end
+    unregisterRuntimeOrganization(orgName)
+    Config.Groups[orgName]=nil
+    return true
+end)
+
+exports('icConfigOrganizationRecreate',function(orgName,operationId)
+    if GetInvokingResource()~='ic_config' then return false end
+    if type(DynamicOrgs.icConfigDeletions)=='table' then
+        local current=DynamicOrgs.icConfigDeletions[orgName]
+        if current and current~=operationId then return false end
+        DynamicOrgs.icConfigDeletions[orgName]=nil
+    end
+    return saveDynamicFile()==true
 end)

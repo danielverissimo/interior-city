@@ -246,10 +246,14 @@ local function mansionBelongsToUser(mansion, userId)
 end
 
 local function resolveHomeSpawn(userId)
-    local data = readJsonResource(
-        Config.MansionsResource or "m_mansions",
-        Config.MansionsDataFile or "mansions.json"
-    )
+    local provider=GetConvar('ic_mansions_resource',Config.MansionsResource or 'm_mansions')
+    local data
+    if provider=='ic_mansions' then
+        if GetResourceState(provider)~='started' then return nil end
+        local ok,rows=pcall(function()return exports[provider]:getUserMansions(userId)end)
+        if not ok or type(rows)~='table' then return nil end
+        data={mansions=rows}
+    else data=readJsonResource(provider,Config.MansionsDataFile or 'mansions.json') end
     if not data then return nil end
 
     local mansions = data.mansions or data

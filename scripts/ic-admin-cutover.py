@@ -307,7 +307,8 @@ def verify_runtime(root,release):
         time.sleep(2)
     if not info:raise CutoverError('Game endpoint did not become ready; inspect private runtime logs')
     resources=info.get('resources',[])
-    if 'ic_admin' not in resources or 'mg_config_panel' not in resources or 'm_paineladm_v2' in resources:raise CutoverError('Runtime resource authority verification failed')
+    config_manager='ic_config' if (release/'config/ic_config_runtime.cfg').is_file() else 'mg_config_panel'
+    if 'ic_admin' not in resources or config_manager not in resources or 'm_paineladm_v2' in resources:raise CutoverError('Runtime resource authority verification failed')
     if not marker or marker.get('active') is not True or marker.get('provider')!='ic_admin' or marker.get('schemaVersion')!=2:raise CutoverError('IC Admin database/authority readiness marker missing or inactive')
     report.update(runtimeVerified=True,runtime=marker,configManagerStarted=True,legacyStopped=True)
     write(path,report);print(json.dumps({'runtimeVerified':True,'legacyStopped':True,'runtime':marker}))

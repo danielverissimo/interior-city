@@ -1,0 +1,65 @@
+{
+  "producer": "inert-python-carrier-reader",
+  "sourceSha256": "e5bae65aa5852c5b4a161fb9aa0308d2772fec05bbd6e9da551ab205da22578c",
+  "decodedSha256": "f23c2e3875ed60963bf7f3b29987feda99763b14ac8a68ba0e0b07f6c7cc9666",
+  "decodedBytes": 87401,
+  "prototypes": 86,
+  "exhausted": true,
+  "targetExecuted": false,
+  "bindings": [
+    {
+      "export": "checkAccessByPermission",
+      "prototype": "root.36",
+      "parameters": 2,
+      "decodedRange": [
+        38687,
+        39247
+      ],
+      "registrationInstruction": 126
+    },
+    {
+      "export": "checkAccessByMansionId",
+      "prototype": "root.37",
+      "parameters": 2,
+      "decodedRange": [
+        39247,
+        40015
+      ],
+      "registrationInstruction": 134
+    },
+    {
+      "export": "getMansions",
+      "prototype": "root.38",
+      "parameters": 0,
+      "decodedRange": [
+        40015,
+        40792
+      ],
+      "registrationInstruction": 142
+    },
+    {
+      "export": "saveMansion",
+      "prototype": "root.39",
+      "parameters": 2,
+      "decodedRange": [
+        40792,
+        44018
+      ],
+      "registrationInstruction": 150
+    },
+    {
+      "export": "removeMansion",
+      "prototype": "root.41",
+      "parameters": 1,
+      "decodedRange": [
+        44824,
+        48891
+      ],
+      "registrationInstruction": 167
+    }
+  ],
+  "limits": [
+    "Static ABI only; no runtime execution or equivalence proof.",
+    "Authentication and unrelated constants are not emitted."
+  ]
+}

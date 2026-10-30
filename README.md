@@ -75,22 +75,19 @@ O script de desenvolvimento usa um projeto Compose distinto, portas locais **301
 
 Antes de `up`, instale/verifique os assets do perfil escolhido e revise a compatibilidade dos recursos, dependências, seeds e credenciais. A configuração preserva a ordem de recursos fornecida; nenhuma receita foi aplicada. Os scripts desta branch integram código e assets em releases isoladas no Uriel. A execução da nova base ainda precisa de homologação; não use o instalador da branch anterior.
 
-## Painéis administrativos no Uriel
+## Painéis e sistema próprio de mansões
 
-O `server.cfg` carrega `config/config.cfg`, que executa [config/resources.cfg](config/resources.cfg). Esse arquivo já inicia os painéis nesta ordem quando o FXServer sobe:
+O IC Admin é o provedor administrativo selecionado por esta base. O painel
+de configurações e o sistema de mansões próprios estão implementados em
+`ic_config` e `ic_mansions`. A troca é preparada no candidato isolado pelo
+instalador explícito `--ic-config-cutover`; não execute os recursos antigos e
+novos juntos pelo console.
 
-```cfg
-ensure m_paineladm_v2
-ensure mg_config_panel
-```
-
-Para aplicar esses comandos no servidor em execução, abra um túnel SSH no Mac e mantenha o terminal aberto:
-
-```bash
-ssh -L 40121:127.0.0.1:40121 danyelsanches@100.124.79.57
-```
-
-Acesse `http://127.0.0.1:40121`, entre no txAdmin, abra **Console** e execute as duas linhas acima, uma de cada vez, na mesma ordem. É necessário ter permissão de escrita no console. O comando `ensure` inicia um recurso parado ou reinicia um recurso já iniciado; portanto, os painéis podem ficar brevemente indisponíveis. Consulte também [txAdmin e conexão de teste](docs/URIEL_DOCKER.md#txadmin-e-conexão-de-teste) e os [comandos oficiais da Cfx](https://docs.fivem.net/docs/server-manual/server-commands/).
+O fluxo integra estado persistente, backup, ensaio de restauração, migração
+SQL, importação única das mansões e verificação de runtime. A atualização
+posterior preserva os dados novos e não reimporta o estado antigo.
+Consulte [instalação e recuperação](docs/IC_CONFIG_INSTALL.md),
+[IC Config](docs/IC_CONFIG.md) e [IC Mansões](docs/IC_MANSIONS.md).
 
 ## IC Admin próprio
 

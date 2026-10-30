@@ -41,6 +41,11 @@ AddEventHandler("tryLockDoor", function(id)
         if doors[id] ~= nil then
             local door = doors[id]
             if vRP.hasPermission(user_id, "admin.permissao") or vRP.hasPermission(user_id, doors[id].perm) then
+                if door.mansionId and GetConvar('ic_mansions_resource','m_mansions')=='ic_mansions' then
+                    if GetResourceState('ic_mansions')~='started' then return end
+                    local ok,allowed=pcall(function()return exports['ic_mansions']:checkAccessByMansionId(source,tostring(door.mansionId))end)
+                    if not ok or allowed~=true then return end
+                end
                 local state = doors[id].lock
 
                 if doorslock[id] ~= nil then

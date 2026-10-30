@@ -20,7 +20,9 @@ backup_once() {
     tar -C /txData -czf "$work/txData.tar.gz" .
     mv "$work/txData.tar.gz" "/backups/txData-$stamp.tar.gz"
     if [[ -d /kvp && -d /resource-state ]]; then
-      tar -C / -czf "$work/runtime.tar.gz" kvp resource-state
+      runtime_paths=(kvp resource-state)
+      if [[ -d /ic-config-control ]]; then runtime_paths+=(ic-config-control); fi
+      tar -C / -czf "$work/runtime.tar.gz" "${runtime_paths[@]}"
       mv "$work/runtime.tar.gz" "/backups/runtime-$stamp.tar.gz"
       (cd /backups && sha256sum "runtime-$stamp.tar.gz" > "runtime-$stamp.tar.gz.sha256")
     fi

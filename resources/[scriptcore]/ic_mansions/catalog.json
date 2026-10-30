@@ -1,0 +1,1405 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "prop_couch_01",
+      "name": "Sofá Clássico 01",
+      "model": "prop_couch_01",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_03",
+      "name": "Sofá Clássico 03",
+      "model": "prop_couch_03",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_04",
+      "name": "Sofá Clássico 04",
+      "model": "prop_couch_04",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_05",
+      "name": "Sofá Clássico 05",
+      "model": "prop_couch_05",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_06",
+      "name": "Sofá Clássico 06",
+      "model": "prop_couch_06",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_07",
+      "name": "Sofá Clássico 07",
+      "model": "prop_couch_07",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_08",
+      "name": "Sofá Clássico 08",
+      "model": "prop_couch_08",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_09",
+      "name": "Sofá Clássico 09",
+      "model": "prop_couch_09",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_10",
+      "name": "Sofá Clássico 10",
+      "model": "prop_couch_10",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_armchair_01",
+      "name": "Poltrona Moderna",
+      "model": "prop_armchair_01",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_couch_sm_02",
+      "name": "Poltrona de Sala",
+      "model": "prop_couch_sm_02",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "v_ilev_m_sofa",
+      "name": "Sofá de Luxo",
+      "model": "v_ilev_m_sofa",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_sofacorn_01",
+      "name": "Sofá Apartamento 01",
+      "model": "apa_mp_h_stn_sofacorn_01",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_sofacorn_05",
+      "name": "Sofá Apartamento 02",
+      "model": "apa_mp_h_stn_sofacorn_05",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_sofacorn_06",
+      "name": "Sofá Apartamento 03",
+      "model": "apa_mp_h_stn_sofacorn_06",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_sofacorn_07",
+      "name": "Sofá Apartamento 04",
+      "model": "apa_mp_h_stn_sofacorn_07",
+      "category": "Sofás",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_01a",
+      "name": "Cadeira 01",
+      "model": "prop_chair_01a",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_01b",
+      "name": "Cadeira 02",
+      "model": "prop_chair_01b",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_02",
+      "name": "Cadeira 03",
+      "model": "prop_chair_02",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_03",
+      "name": "Cadeira 04",
+      "model": "prop_chair_03",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_04a",
+      "name": "Cadeira 05",
+      "model": "prop_chair_04a",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_04b",
+      "name": "Cadeira 06",
+      "model": "prop_chair_04b",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_05",
+      "name": "Cadeira 07",
+      "model": "prop_chair_05",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_06",
+      "name": "Cadeira 08",
+      "model": "prop_chair_06",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_07",
+      "name": "Cadeira 09",
+      "model": "prop_chair_07",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_08",
+      "name": "Cadeira 10",
+      "model": "prop_chair_08",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_09",
+      "name": "Cadeira 11",
+      "model": "prop_chair_09",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_chair_10",
+      "name": "Cadeira 12",
+      "model": "prop_chair_10",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_off_chair_01",
+      "name": "Cadeira Escritório 01",
+      "model": "prop_off_chair_01",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_off_chair_03",
+      "name": "Cadeira Escritório 03",
+      "model": "prop_off_chair_03",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_off_chair_04",
+      "name": "Cadeira Escritório 04",
+      "model": "prop_off_chair_04",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_bar_stool_01",
+      "name": "Banco Alto",
+      "model": "prop_bar_stool_01",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_din_chair_04",
+      "name": "Cadeira Apartamento 01",
+      "model": "apa_mp_h_din_chair_04",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_din_chair_08",
+      "name": "Cadeira Apartamento 02",
+      "model": "apa_mp_h_din_chair_08",
+      "category": "Cadeiras",
+      "price": 500
+    },
+    {
+      "id": "prop_table_01",
+      "name": "Mesa de Centro 01",
+      "model": "prop_table_01",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_02",
+      "name": "Mesa 02",
+      "model": "prop_table_02",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_03",
+      "name": "Mesa 03",
+      "model": "prop_table_03",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_04",
+      "name": "Mesa 04",
+      "model": "prop_table_04",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_05",
+      "name": "Mesa 05",
+      "model": "prop_table_05",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_06",
+      "name": "Mesa 06",
+      "model": "prop_table_06",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_07",
+      "name": "Mesa 07",
+      "model": "prop_table_07",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_08",
+      "name": "Mesa 08",
+      "model": "prop_table_08",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_table_03b",
+      "name": "Mesa Baixa 01",
+      "model": "prop_table_03b",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "prop_side_spreader",
+      "name": "Mesa Lateral",
+      "model": "prop_side_spreader",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_din_table_01",
+      "name": "Mesa Apartamento 01",
+      "model": "apa_mp_h_din_table_01",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_din_table_04",
+      "name": "Mesa Apartamento 04",
+      "model": "apa_mp_h_din_table_04",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_tblecoffee_05",
+      "name": "Mesa de Centro Moderna",
+      "model": "apa_mp_h_stn_tblecoffee_05",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_tblecoffee_07",
+      "name": "Mesa de Centro Luxo",
+      "model": "apa_mp_h_stn_tblecoffee_07",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_stn_tbleside_01",
+      "name": "Mesa Lateral Moderna",
+      "model": "apa_mp_h_stn_tbleside_01",
+      "category": "Mesas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_bed_double_08",
+      "name": "Cama Moderna 01",
+      "model": "apa_mp_h_bed_double_08",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_bed_double_09",
+      "name": "Cama Moderna 02",
+      "model": "apa_mp_h_bed_double_09",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_bed_double_10",
+      "name": "Cama Moderna 03",
+      "model": "apa_mp_h_bed_double_10",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "v_res_msonbed",
+      "name": "Cama de Luxo",
+      "model": "v_res_msonbed",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "v_res_tre_bed1",
+      "name": "Cama Simples",
+      "model": "v_res_tre_bed1",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "v_res_tre_bed2",
+      "name": "Cama Casal",
+      "model": "v_res_tre_bed2",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "v_res_msonbed_s",
+      "name": "Mesa de Cabeceira",
+      "model": "v_res_msonbed_s",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "v_res_tre_bedsidetable",
+      "name": "Criado-mudo",
+      "model": "v_res_tre_bedsidetable",
+      "category": "Camas",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_flat_01",
+      "name": "TV Flat 01",
+      "model": "prop_tv_flat_01",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_flat_02",
+      "name": "TV Flat 02",
+      "model": "prop_tv_flat_02",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_flat_03",
+      "name": "TV Flat 03",
+      "model": "prop_tv_flat_03",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_flat_michael",
+      "name": "TV Michael",
+      "model": "prop_tv_flat_michael",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_02",
+      "name": "TV Clássica 02",
+      "model": "prop_tv_02",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_04",
+      "name": "TV Clássica 04",
+      "model": "prop_tv_04",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_06",
+      "name": "TV Clássica 06",
+      "model": "prop_tv_06",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_07",
+      "name": "TV Clássica 07",
+      "model": "prop_tv_07",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_tv_stand_01",
+      "name": "Suporte de TV",
+      "model": "prop_tv_stand_01",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_laptop_01a",
+      "name": "Notebook",
+      "model": "prop_laptop_01a",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_laptop_02_closed",
+      "name": "Notebook Fechado",
+      "model": "prop_laptop_02_closed",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_pc_01a",
+      "name": "Computador 01",
+      "model": "prop_pc_01a",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_pc_02a",
+      "name": "Computador 02",
+      "model": "prop_pc_02a",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_monitor_01c",
+      "name": "Monitor",
+      "model": "prop_monitor_01c",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_keyboard_01a",
+      "name": "Teclado",
+      "model": "prop_keyboard_01a",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_mouse_01a",
+      "name": "Mouse",
+      "model": "prop_mouse_01a",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_speaker_01",
+      "name": "Caixa de Som 01",
+      "model": "prop_speaker_01",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_speaker_02",
+      "name": "Caixa de Som 02",
+      "model": "prop_speaker_02",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_speaker_03",
+      "name": "Caixa de Som 03",
+      "model": "prop_speaker_03",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_portable_hifi_01",
+      "name": "Som Portátil",
+      "model": "prop_portable_hifi_01",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_phone_ing",
+      "name": "Telefone",
+      "model": "prop_phone_ing",
+      "category": "TV & Eletrônicos",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_01a",
+      "name": "Abajur 01",
+      "model": "prop_lamp_01a",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_02",
+      "name": "Abajur 02",
+      "model": "prop_lamp_02",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_03",
+      "name": "Abajur 03",
+      "model": "prop_lamp_03",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_04",
+      "name": "Abajur 04",
+      "model": "prop_lamp_04",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_05",
+      "name": "Abajur 05",
+      "model": "prop_lamp_05",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_07",
+      "name": "Abajur 07",
+      "model": "prop_lamp_07",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_lamp_08",
+      "name": "Abajur 08",
+      "model": "prop_lamp_08",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_table_lamp_01",
+      "name": "Luminária de Mesa",
+      "model": "prop_table_lamp_01",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_lit_floorlamp_01",
+      "name": "Luminária Apartamento 01",
+      "model": "apa_mp_h_lit_floorlamp_01",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_lit_floorlamp_03",
+      "name": "Luminária Apartamento 03",
+      "model": "apa_mp_h_lit_floorlamp_03",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_lit_floorlamp_05",
+      "name": "Luminária Apartamento 05",
+      "model": "apa_mp_h_lit_floorlamp_05",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_lit_lamptable_04",
+      "name": "Luminária de Mesa Luxo",
+      "model": "apa_mp_h_lit_lamptable_04",
+      "category": "Iluminação",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_01a",
+      "name": "Planta 01",
+      "model": "prop_plant_int_01a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_01b",
+      "name": "Planta 01B",
+      "model": "prop_plant_int_01b",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_02a",
+      "name": "Planta 02A",
+      "model": "prop_plant_int_02a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_02b",
+      "name": "Planta 02B",
+      "model": "prop_plant_int_02b",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_03a",
+      "name": "Planta 03A",
+      "model": "prop_plant_int_03a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_03b",
+      "name": "Planta 03B",
+      "model": "prop_plant_int_03b",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_04a",
+      "name": "Planta 04A",
+      "model": "prop_plant_int_04a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_04b",
+      "name": "Planta 04B",
+      "model": "prop_plant_int_04b",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_05a",
+      "name": "Planta 05A",
+      "model": "prop_plant_int_05a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_05b",
+      "name": "Planta 05B",
+      "model": "prop_plant_int_05b",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_plant_int_06a",
+      "name": "Planta Pequena",
+      "model": "prop_plant_int_06a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_pot_plant_01a",
+      "name": "Vaso de Planta 01",
+      "model": "prop_pot_plant_01a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_pot_plant_02a",
+      "name": "Vaso de Planta 02",
+      "model": "prop_pot_plant_02a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_pot_plant_03a",
+      "name": "Vaso de Planta 03",
+      "model": "prop_pot_plant_03a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_pot_plant_05a",
+      "name": "Vaso de Planta 05",
+      "model": "prop_pot_plant_05a",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_acc_plant_tall_01",
+      "name": "Planta Apartamento",
+      "model": "apa_mp_h_acc_plant_tall_01",
+      "category": "Plantas",
+      "price": 500
+    },
+    {
+      "id": "prop_vase_01",
+      "name": "Vaso Decorativo 01",
+      "model": "prop_vase_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_vase_02",
+      "name": "Vaso Decorativo 02",
+      "model": "prop_vase_02",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_vase_03",
+      "name": "Vaso Decorativo 03",
+      "model": "prop_vase_03",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_vase_04",
+      "name": "Vaso Decorativo 04",
+      "model": "prop_vase_04",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_ashtray_01",
+      "name": "Cinzeiro",
+      "model": "prop_ashtray_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_alarm_01",
+      "name": "Relógio de Mesa",
+      "model": "prop_alarm_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_globe_01",
+      "name": "Globo Decorativo",
+      "model": "prop_globe_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_binoc_01",
+      "name": "Binóculo Decorativo",
+      "model": "prop_binoc_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_bottle_01a",
+      "name": "Garrafa Decorativa 01",
+      "model": "prop_bottle_01a",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_bottle_02a",
+      "name": "Garrafa Decorativa 02",
+      "model": "prop_bottle_02a",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_wine_glass",
+      "name": "Taça",
+      "model": "prop_wine_glass",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_tumbler_01",
+      "name": "Copo",
+      "model": "prop_tumbler_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_pitcher_01",
+      "name": "Jarra",
+      "model": "prop_pitcher_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_fruit_basket",
+      "name": "Fruteira",
+      "model": "prop_fruit_basket",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_cs_book_01",
+      "name": "Livro 01",
+      "model": "prop_cs_book_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_cs_magazine",
+      "name": "Revistas",
+      "model": "prop_cs_magazine",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_p_h_acc_artwalll_01",
+      "name": "Quadro Moderno 01",
+      "model": "apa_p_h_acc_artwalll_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_p_h_acc_artwalll_02",
+      "name": "Quadro Moderno 02",
+      "model": "apa_p_h_acc_artwalll_02",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_p_h_acc_artwalll_03",
+      "name": "Quadro Moderno 03",
+      "model": "apa_p_h_acc_artwalll_03",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_acc_sculpture_01",
+      "name": "Escultura 01",
+      "model": "apa_mp_h_acc_sculpture_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_acc_sculpture_02",
+      "name": "Escultura 02",
+      "model": "apa_mp_h_acc_sculpture_02",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_acc_sculpture_03",
+      "name": "Escultura 03",
+      "model": "apa_mp_h_acc_sculpture_03",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_acc_dec_head_01",
+      "name": "Ornamento 01",
+      "model": "apa_mp_h_acc_dec_head_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "apa_mp_h_acc_dec_plate_01",
+      "name": "Ornamento 02",
+      "model": "apa_mp_h_acc_dec_plate_01",
+      "category": "Decoração",
+      "price": 500
+    },
+    {
+      "id": "prop_fridge_01",
+      "name": "Geladeira",
+      "model": "prop_fridge_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_micro_01",
+      "name": "Micro-ondas",
+      "model": "prop_micro_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_coffee_mac_02",
+      "name": "Cafeteira",
+      "model": "prop_coffee_mac_02",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_kettle",
+      "name": "Chaleira",
+      "model": "prop_kettle",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_toaster_01",
+      "name": "Torradeira",
+      "model": "prop_toaster_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_foodprocess_01",
+      "name": "Liquidificador",
+      "model": "prop_foodprocess_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_cs_kitchen_cab_l2",
+      "name": "Tábua de Corte",
+      "model": "prop_cs_kitchen_cab_l2",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_plate_01",
+      "name": "Prato",
+      "model": "prop_plate_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_mug_01",
+      "name": "Caneca",
+      "model": "prop_mug_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "p_ing_coffeecup_01",
+      "name": "Copo de Café",
+      "model": "p_ing_coffeecup_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_pot_01",
+      "name": "Panela",
+      "model": "prop_pot_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_pot_02",
+      "name": "Panela Grande",
+      "model": "prop_pot_02",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_pan_01",
+      "name": "Frigideira",
+      "model": "prop_pan_01",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_bin_10a",
+      "name": "Lixeira de Cozinha",
+      "model": "prop_bin_10a",
+      "category": "Cozinha",
+      "price": 500
+    },
+    {
+      "id": "prop_toilet_01",
+      "name": "Vaso Sanitário",
+      "model": "prop_toilet_01",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_sink_02",
+      "name": "Pia",
+      "model": "prop_sink_02",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_toilet_soap_01",
+      "name": "Sabonete",
+      "model": "prop_toilet_soap_01",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_toilet_roll_01",
+      "name": "Papel Higiênico",
+      "model": "prop_toilet_roll_01",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_towel_01",
+      "name": "Toalha 01",
+      "model": "prop_towel_01",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_towel_02",
+      "name": "Toalha 02",
+      "model": "prop_towel_02",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_laundry_basket_01",
+      "name": "Cesto de Roupa",
+      "model": "prop_laundry_basket_01",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_cs_hairdryer",
+      "name": "Secador",
+      "model": "prop_cs_hairdryer",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_mirror_bathroom_01",
+      "name": "Espelho de Banheiro",
+      "model": "prop_mirror_bathroom_01",
+      "category": "Banheiro",
+      "price": 500
+    },
+    {
+      "id": "prop_office_desk_01",
+      "name": "Mesa de Escritório",
+      "model": "prop_office_desk_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_filing_cab_01",
+      "name": "Arquivo 01",
+      "model": "prop_filing_cab_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_filing_cab_02",
+      "name": "Arquivo 02",
+      "model": "prop_filing_cab_02",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_printer_01",
+      "name": "Impressora",
+      "model": "prop_printer_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_office_phone_tnt",
+      "name": "Telefone de Mesa",
+      "model": "prop_office_phone_tnt",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_bin_07a",
+      "name": "Lixeira Escritório",
+      "model": "prop_bin_07a",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_ld_folder_01",
+      "name": "Pasta de Arquivos",
+      "model": "prop_ld_folder_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_paper_box_01",
+      "name": "Papelada",
+      "model": "prop_paper_box_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_whiteboard_01",
+      "name": "Quadro Branco",
+      "model": "prop_whiteboard_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_till_01",
+      "name": "Calculadora",
+      "model": "prop_till_01",
+      "category": "Escritório",
+      "price": 500
+    },
+    {
+      "id": "prop_pooltable_02",
+      "name": "Mesa de Sinuca",
+      "model": "prop_pooltable_02",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_pooltable_3b",
+      "name": "Mesa de Sinuca Luxo",
+      "model": "prop_pooltable_3b",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_pool_cue",
+      "name": "Taco de Sinuca",
+      "model": "prop_pool_cue",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_poker_table",
+      "name": "Mesa de Poker",
+      "model": "prop_poker_table",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_ping_pong",
+      "name": "Mesa de Ping Pong",
+      "model": "prop_ping_pong",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_acc_guitar_01",
+      "name": "Violão",
+      "model": "prop_acc_guitar_01",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_el_guitar_01",
+      "name": "Guitarra",
+      "model": "prop_el_guitar_01",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_el_guitar_02",
+      "name": "Guitarra 02",
+      "model": "prop_el_guitar_02",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_el_guitar_03",
+      "name": "Guitarra 03",
+      "model": "prop_el_guitar_03",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_amp_01",
+      "name": "Amplificador",
+      "model": "prop_amp_01",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_jukebox_01",
+      "name": "Jukebox",
+      "model": "prop_jukebox_01",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_bar_caddy",
+      "name": "Barra de Bar",
+      "model": "prop_bar_caddy",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_bucket_01a",
+      "name": "Balde de Gelo",
+      "model": "prop_bucket_01a",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_champ_01a",
+      "name": "Champagne",
+      "model": "prop_champ_01a",
+      "category": "Bar & Lazer",
+      "price": 500
+    },
+    {
+      "id": "prop_barbell_01",
+      "name": "Halter 01",
+      "model": "prop_barbell_01",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_barbell_02",
+      "name": "Halter 02",
+      "model": "prop_barbell_02",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_weight_10k",
+      "name": "Peso 10kg",
+      "model": "prop_weight_10k",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_weight_15k",
+      "name": "Peso 15kg",
+      "model": "prop_weight_15k",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_weight_20k",
+      "name": "Peso 20kg",
+      "model": "prop_weight_20k",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_weight_bench_02",
+      "name": "Banco de Academia",
+      "model": "prop_weight_bench_02",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_treadmill_01",
+      "name": "Esteira",
+      "model": "prop_treadmill_01",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_exercisebike",
+      "name": "Bicicleta Ergométrica",
+      "model": "prop_exercisebike",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_fit_ball_01",
+      "name": "Bola de Exercício",
+      "model": "prop_fit_ball_01",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_yoga_mat_01",
+      "name": "Tapete de Yoga",
+      "model": "prop_yoga_mat_01",
+      "category": "Academia",
+      "price": 500
+    },
+    {
+      "id": "prop_bbq_1",
+      "name": "Churrasqueira 01",
+      "model": "prop_bbq_1",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_bbq_2",
+      "name": "Churrasqueira 02",
+      "model": "prop_bbq_2",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_bbq_3",
+      "name": "Churrasqueira 03",
+      "model": "prop_bbq_3",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_sun_lounger_01",
+      "name": "Espreguiçadeira 01",
+      "model": "prop_sun_lounger_01",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_sun_lounger_02",
+      "name": "Espreguiçadeira 02",
+      "model": "prop_sun_lounger_02",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_parasol_01",
+      "name": "Guarda-sol 01",
+      "model": "prop_parasol_01",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_parasol_02",
+      "name": "Guarda-sol 02",
+      "model": "prop_parasol_02",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_table_para_comb_01",
+      "name": "Mesa de Jardim",
+      "model": "prop_table_para_comb_01",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_fib_plant_01",
+      "name": "Vaso Grande",
+      "model": "prop_fib_plant_01",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_fountain1",
+      "name": "Fonte 01",
+      "model": "prop_fountain1",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_fountain2",
+      "name": "Fonte 02",
+      "model": "prop_fountain2",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_gardnght_01",
+      "name": "Luminária Jardim",
+      "model": "prop_gardnght_01",
+      "category": "Exterior",
+      "price": 500
+    },
+    {
+      "id": "prop_letterbox_01",
+      "name": "Caixa de Correio",
+      "model": "prop_letterbox_01",
+      "category": "Exterior",
+      "price": 500
+    }
+  ]
+}

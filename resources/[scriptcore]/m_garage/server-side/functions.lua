@@ -1,14 +1,19 @@
 local function mansionIptuAccess(source, permission)
-    if not permission or permission == "" or GetResourceState("m_mansions") ~= "started" then
-        return true
+    if not permission or permission == "" then return true end
+    local provider=GetConvar('ic_mansions_resource','m_mansions')
+    local own=provider=='ic_mansions'
+    if GetResourceState(provider)~='started' then
+        if own and type(GlobalState.ic_mansions_permissions)=='table' and not GlobalState.ic_mansions_permissions[permission] then return true end
+        return not own
     end
     local ok,allowed = pcall(function()
-        return exports["m_mansions"]:checkAccessByPermission(source,permission)
+        return exports[provider]:checkAccessByPermission(source,permission)
     end)
     if not ok then
-        print(("^1[m_garage]^7 Falha ao consultar IPTU da mansão: %s"):format(tostring(allowed)))
-        return true
+        print('^1[m_garage]^7 Não foi possível consultar o serviço de IPTU.')
+        return not own
     end
+    if own then return allowed==true end
     return allowed ~= false
 end
 

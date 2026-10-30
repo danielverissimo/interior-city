@@ -2,10 +2,18 @@
 set -Eeuo pipefail
 umask 077
 sha="${1:-}"; archive="${2:-}"
-schema_mode="${3:---no-schema}"
-[[ $# -le 3 && ( "$schema_mode" == --no-schema || "$schema_mode" == --ic-admin-schema || "$schema_mode" == --ic-admin-cutover ) ]] || {
-  echo 'Optional third argument: --ic-admin-schema or --ic-admin-cutover.' >&2; exit 2;
-}
+schema_mode=--no-schema
+schema_option=''
+config_cutover=false
+for option in "${@:3}"; do
+  case "$option" in
+    --no-schema|--ic-admin-schema|--ic-admin-cutover)
+      [[ -z "$schema_option" || "$schema_option" == "$option" ]] || { echo 'Conflicting schema flags.' >&2; exit 2; }
+      schema_option="$option"; schema_mode="$option" ;;
+    --ic-config-cutover) config_cutover=true ;;
+    *) echo 'Supported flags: --ic-admin-schema, --ic-admin-cutover, --ic-config-cutover.' >&2; exit 2 ;;
+  esac
+done
 [[ "$(id -u)" -eq 0 && "$sha" =~ ^[0-9a-f]{40}$ && -f "$archive" ]] || {
   echo 'Run as root with commit SHA and staged code archive.' >&2; exit 2;
 }
@@ -40,15 +48,25 @@ compose_at() {
   if [[ -f "$root/state/compose.runtime.yaml" ]]; then
     runtime_override=(-f "$root/state/compose.runtime.yaml")
   fi
+  if [[ -f "$root/state/ic-config/overlays/${release##*/}.yaml" ]]; then
+    runtime_override+=(-f "$root/state/ic-config/overlays/${release##*/}.yaml")
+  fi
   INTERIOR_CITY_RELEASE_PATH="$release" COMPOSE_PROJECT_NAME=interior-city-tocado \
     docker compose --env-file "$root/.env" --project-directory "$root" -p interior-city-tocado \
     -f "$release/compose.yaml" ${runtime_override[@]+"${runtime_override[@]}"} ${profiles[@]+"${profiles[@]}"} "$@"
 }
 old=''
+if [[ -f "$root/state/ic-config/selection.json" && "$config_cutover" != true ]]; then
+  echo 'Own configuration state exists; use --ic-config-cutover for a forward fix. Legacy rollback requires reconciliation.' >&2; exit 1
+fi
 if [[ -L "$root/current" ]]; then
   old="$(readlink -f "$root/current")"
   [[ "$old" =~ ^$root/releases/[0-9a-f]{40}$ ]] || { echo 'Invalid current release link.' >&2; exit 1; }
-  if [[ "$schema_mode" == --ic-admin-cutover ]]; then
+  if [[ "$config_cutover" == true || -f "$root/state/ic-config/selection.json" ]]; then
+    admin_state=()
+    if [[ "$schema_mode" == --ic-admin-cutover ]]; then admin_state=(--allow-ic-admin-state); fi
+    python3 -B "$(dirname "${BASH_SOURCE[0]}")/ic-config-cutover.py" check-previous --root "$root" --previous "$old" ${admin_state[@]+"${admin_state[@]}"}
+  elif [[ "$schema_mode" == --ic-admin-cutover ]]; then
     # Only the explicit operational migrator can approve mutable legacy JSON drift.
     python3 -B "$(dirname "${BASH_SOURCE[0]}")/ic-admin-cutover.py" check-previous --root "$root" --previous "$old"
   else
@@ -62,6 +80,9 @@ if [[ ! -e "$release" ]]; then
   incoming="$(mktemp -d "$root/releases/.incoming-$sha.XXXXXX")"
   trap 'rm -rf "$incoming"' EXIT
   python3 "$helper" extract "$archive" "$incoming"
+  if [[ -f "$incoming/config/ic_config_release.json" && "$config_cutover" != true ]]; then
+    echo 'This candidate requires explicit --ic-config-cutover.' >&2; exit 1
+  fi
   python3 "$incoming/scripts/configure-secrets.py" --directory "$root/secrets" check
   reuse_assets=()
   if [[ -n "$old" ]]; then reuse_assets=(--reuse-from "$old"); fi
@@ -76,6 +97,9 @@ if [[ ! -e "$release" ]]; then
     fi
     python3 "$incoming/scripts/web-assets.py" configure --release "$incoming" \
       --base-url "$asset_origin" --media "$root/state/www"
+  fi
+  if [[ "$config_cutover" == true ]]; then
+    python3 -B "$incoming/scripts/ic-config-cutover.py" configure-candidate --root "$root" --release "$incoming"
   fi
   python3 "$helper" manifest "$incoming" "$root/state/manifests/$sha.json"
   chown -R 1000:1000 "$incoming"
@@ -92,6 +116,9 @@ else
     python3 "$release/scripts/web-assets.py" configure --release "$release" \
       --base-url "$asset_origin" --media "$root/state/www"
   fi
+fi
+if [[ ( -f "$release/config/ic_config_release.json" || -f "$release/config/ic_config_runtime.cfg" ) && "$config_cutover" != true ]]; then
+  echo 'An IC Config candidate requires explicit --ic-config-cutover, including forward fixes.' >&2; exit 1
 fi
 if [[ -f "$release/config/ic_admin.cfg" ]] && rg_mode="$(sed -n 's/^setr ic_admin_mode "\([^"]*\)"/\1/p' "$release/config/ic_admin.cfg")" && [[ "$rg_mode" == active && "$schema_mode" != --ic-admin-cutover ]]; then
   echo 'Active IC Admin requires explicit --ic-admin-cutover migration/forward-fix verification.' >&2; exit 1
@@ -182,12 +209,29 @@ fi
 if [[ "$schema_mode" == --ic-admin-cutover ]]; then
   python3 -B "$release/scripts/ic-admin-cutover.py" prepare --root "$root" --previous "$old" --release "$release"
 fi
+if [[ "$config_cutover" == true ]]; then
+  [[ -n "$old" ]] || { echo 'IC Config cutover requires an existing managed release to import.' >&2; exit 1; }
+  python3 -B "$release/scripts/ic-config-cutover.py" prepare --root "$root" --previous "$old" --release "$release"
+  compose_at "$release" config --quiet
+fi
 ln -sfn "releases/$sha" "$root/current.next"; mv -Tf "$root/current.next" "$root/current"
+stop_candidate() {
+  trap - ERR
+  compose_at "$release" --profile public --profile listing stop connect_proxy playit fxserver || true
+  echo 'Candidate stopped after startup failure. State retained; inspect reports and reconcile before any rollback.' >&2
+}
+if [[ "$config_cutover" == true ]]; then
+  python3 -B "$release/scripts/ic-config-cutover.py" mark-starting --root "$root" --release "$release"
+  trap stop_candidate ERR
+fi
 compose_at "$release" up -d --force-recreate --remove-orphans --wait --wait-timeout 180
 if [[ "$schema_mode" == --ic-admin-cutover ]]; then
   # Do not automatically restore code over new operational data after starting writers.
-  trap - ERR
+  if [[ "$config_cutover" != true ]]; then trap - ERR; fi
   python3 -B "$release/scripts/ic-admin-cutover.py" verify-runtime --root "$root" --release "$release"
+fi
+if [[ "$config_cutover" == true ]]; then
+  python3 -B "$release/scripts/ic-config-cutover.py" verify-runtime --root "$root" --release "$release"
 fi
 trap - ERR
 printf 'Installed %s; previous release: %s. Validate game resources and a real player separately.\n' "$sha" "${old:-none}"

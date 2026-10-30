@@ -7,6 +7,45 @@ local GROUPS_FILE = "cfg/groups.json"
 local groups = {}
 local ManagedGroups = { groups = {} }
 local INDEX
+-- Persistent tombstones for explicitly confirmed IC Config organization deletions.
+-- A stale autosave must never restore a deleted membership after SQL commit.
+local deletionTombstones={}
+local deletionOrganizations={}
+local deletionSchemaArmed=GetResourceKvpString('ic_config:organization_schema_active')=='1'
+local deletionMarkersReady=not deletionSchemaArmed
+do
+    local raw=GetResourceKvpString('ic_config:deleted_groups')
+    local ok,value=pcall(json.decode,raw or '{}')
+    if ok and type(value)=='table' then deletionTombstones=value end
+    raw=GetResourceKvpString('ic_config:deleted_organizations')
+    ok,value=pcall(json.decode,raw or '{}')
+    if ok and type(value)=='table' then deletionOrganizations=value end
+end
+local function refreshDeletionMarkers()
+    if not deletionSchemaArmed or deletionMarkersReady then return true end
+    local queried,rows=pcall(function()
+        return exports['oxmysql']:query_async("SELECT g.group_name,g.operation_id,d.org_name FROM ic_config_deleted_groups g JOIN ic_config_org_deletions d ON d.operation_id=g.operation_id WHERE d.phase IN ('prepared','sql_committed','complete')")
+    end)
+    if not queried or type(rows)~='table' then return false end
+    for _,row in ipairs(rows) do deletionTombstones[row.group_name]=row.operation_id;deletionOrganizations[row.org_name]=row.operation_id end
+    deletionMarkersReady=true
+    if INDEX then for userId in pairs(INDEX) do INDEX[userId]=nil end end
+    return true
+end
+-- Arming is persisted BEFORE SQL intent, so a restart knows that the absence of
+-- KVP membership projections is not proof that no deletion is pending.
+refreshDeletionMarkers()
+function vRP.icConfigFilterGroupData(data)
+    if not refreshDeletionMarkers() then error('IC Config: permissões aguardam recuperação do diário de organizações.',0) end
+    if type(data)~='table' then return data end
+    local changed=false
+    for name in pairs(deletionTombstones) do
+        if type(data.groups)=='table' and data.groups[name]~=nil then data.groups[name]=nil;changed=true end
+        if type(data.vip_group_expirations)=='table' and data.vip_group_expirations[name]~=nil then data.vip_group_expirations[name]=nil;changed=true end
+    end
+    return data,changed
+end
+local function icConfigTrusted()return GetInvokingResource()=='ic_config' end
 
 local function mageGroupOrigin()
     return type(vRP.mageAuditOrigin) == "function" and vRP.mageAuditOrigin() or (GetInvokingResource() or GetCurrentResourceName() or "vrp")
@@ -229,6 +268,7 @@ end
 function vRP.getUserGroups(user_id)
     local data = vRP.getUserDataTable(user_id)
     if data then
+        vRP.icConfigFilterGroupData(data)
         if data.groups == nil then
             data.groups = {}
         end
@@ -261,18 +301,60 @@ INDEX = setmetatable({}, {
 
 
 function vRP.getGroups()
+    if not refreshDeletionMarkers() then error('IC Config: permissões aguardam recuperação do diário de organizações.',0) end
     return groups
 end
 
 exports("getManagedGroups", function()
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     return copyTable(ManagedGroups.groups or {})
 end)
 
+-- Exact membership references for the own mansion service's recovery journal.
+-- Do not expose datatables, identities, inventory or unrelated group assignments.
+exports('getManagedGroupAssignments',function(groupName)
+    if GetInvokingResource()~='ic_mansions' or not refreshDeletionMarkers() then return false,'Acesso indisponível.' end
+    if type(groupName)~='string' or groupName=='' or not groups[groupName] then return false,'Cargo não encontrado.' end
+    local queried,rows=pcall(function()
+        return exports['oxmysql']:executeSync('SELECT user_id,dvalue FROM vrp_user_data WHERE dkey = ?',{'vRP:datatable'})
+    end)
+    if not queried or type(rows)~='table' then return false,'Não foi possível conferir os vínculos do cargo.' end
+    local assignments,live={},{}
+    local function capture(userId,data,online)
+        userId=tonumber(userId)
+        if not userId or userId<1 or userId%1~=0 or type(data)~='table' or (data.groups~=nil and type(data.groups)~='table')
+            or (data.vip_group_expirations~=nil and type(data.vip_group_expirations)~='table') then return false end
+        if data.groups and data.groups[groupName]~=nil then
+            local expiration=data.vip_group_expirations and data.vip_group_expirations[groupName]
+            if expiration~=nil and not tonumber(expiration) then return false end
+            assignments[userId]={userId=userId,online=online,expiresAt=expiration and tonumber(expiration) or nil}
+        end
+        return true
+    end
+    for userId,data in pairs(vRP.user_tables or {}) do
+        local id=tonumber(userId)
+        if not capture(id,data,true) then return false,'Vínculos online em formato inválido.' end
+        live[id]=true
+    end
+    for _,row in ipairs(rows) do
+        local ok,data=pcall(json.decode,row.dvalue or '')
+        if not ok or type(data)~='table' then return false,'Um datatable está inválido; a ausência de vínculos não pôde ser comprovada.' end
+        if not live[tonumber(row.user_id)] and not capture(row.user_id,data,false) then return false,'Vínculos offline em formato inválido.' end
+    end
+    local out={}
+    for _,entry in pairs(assignments) do out[#out+1]=entry end
+    table.sort(out,function(a,b)return a.userId<b.userId end)
+    return {group=groupName,assignments=out,count=#out}
+end)
+
 exports("saveManagedGroup", function(originalName, payload)
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     originalName = trimGroupValue(originalName)
     local isNew = originalName == ""
     local entry,err = normalizeGroupPayload(payload,isNew)
     if not entry then return false,err end
+    if deletionTombstones[entry.name] or deletionTombstones[originalName] then return false,'Cargo reservado por uma exclusão de organização.' end
+    if entry.config.orgName and deletionOrganizations[entry.config.orgName] then return false,'Organização em exclusão; finalize antes de alterar cargos.' end
 
     if originalName == "user" and entry.name ~= "user" then
         return false,"O cargo 'user' é obrigatório e não pode ser renomeado."
@@ -336,7 +418,10 @@ end)
 -- persistido da mansão existir mas o cargo tiver sido removido/ficado ausente,
 -- o próprio sistema consegue reconstruí-lo antes de entregar a propriedade.
 exports("ensureManagedGroup", function(name, permission, config)
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     name = trimGroupValue(name)
+    if deletionTombstones[name] then return false,'Cargo reservado por uma exclusão de organização.' end
+    if type(config)=='table' and config.orgName and deletionOrganizations[config.orgName] then return false,'Organização em exclusão.' end
     if name == "" then return false,"Informe o nome do cargo." end
 
     permission = trimGroupValue(permission)
@@ -408,6 +493,7 @@ exports("managedGroupExists", function(name)
 end)
 
 exports("removeManagedGroup", function(name)
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     name = trimGroupValue(name)
 
     if name == "user" then
@@ -461,7 +547,9 @@ local function facPermissionSlug(value)
 end
 
 exports("createFacGroups", function(orgName, orgType)
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     orgName = trimGroupValue(orgName)
+    if deletionOrganizations[orgName] then return false,'Organização em exclusão.' end
     orgType = trimGroupValue(orgType)
 
     if orgName == "" then
@@ -477,6 +565,7 @@ exports("createFacGroups", function(orgName, orgType)
     -- Valida TODOS os cargos antes de salvar qualquer coisa.
     for _,rank in ipairs(FAC_DEFAULT_RANKS) do
         local name = rank..orgName
+        if deletionTombstones[name] then return false,'Cargo reservado por uma exclusão de organização.' end
         if findManagedGroup(name) then
             return false,("Já existe o cargo %s. Nenhum cargo da FAC foi criado."):format(name)
         end
@@ -530,6 +619,7 @@ end)
 
 
 exports("removeFacGroups", function(orgName)
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     orgName = trimGroupValue(orgName)
     if orgName == "" then return false,"Informe o orgName da FAC." end
 
@@ -582,6 +672,7 @@ exports("removeFacGroups", function(orgName)
 end)
 
 exports("reloadManagedGroups", function()
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     loadManagedGroups()
     invalidateAllPermissionCaches()
     mageGroupLog("vrp_managed_groups_reloaded", nil,
@@ -674,6 +765,7 @@ function vRP.setUserGroupExpiration(user_id, group, duration)
 end
 
 function vRP.addUserGroup(user_id,group)
+    if deletionTombstones[group] then return false end
     local ngroup = groups[group]
     if not ngroup then return false end
 
@@ -961,8 +1053,10 @@ end)
 -- tambem de jogadores offline, mantendo o mesmo vRP:datatable da base.
 -- ============================================================================
 local function mutateManagedUserGroup(user_id, group, add)
+    if not refreshDeletionMarkers() then return false,'Diário de organizações indisponível.' end
     user_id = tonumber(user_id)
     group = trimGroupValue(group)
+    if add and deletionTombstones[group] then return false,'Cargo reservado por uma exclusão de organização.' end
     if not user_id or group == '' then return false,'Usuario ou cargo invalido.' end
     if not groups[group] then return false,'Cargo nao encontrado na vRP.' end
 
@@ -1015,4 +1109,97 @@ end)
 
 exports('removeManagedUserGroup',function(user_id,group)
     return mutateManagedUserGroup(user_id,group,false)
+end)
+
+exports('icConfigOrganizationPlan',function(orgName)
+    if not icConfigTrusted() then return false end
+    if not refreshDeletionMarkers() then return false end
+    orgName=trimGroupValue(orgName)
+    local names,entries,online={}, {},{}
+    for _,entry in ipairs(ManagedGroups.groups) do
+        if entry.config and entry.config.gtype=='org' and entry.config.orgName==orgName then
+            names[#names+1]=entry.name;entries[#entries+1]=copyTable(entry)
+        end
+    end
+    table.sort(names)
+    for userId,data in pairs(vRP.user_tables or {}) do
+        for _,name in ipairs(names) do
+            if type(data.groups)=='table' and data.groups[name]~=nil then online[#online+1]=tonumber(userId);break end
+        end
+    end
+    table.sort(online)
+    return {names=names,entries=entries,online=online,raw=LoadResourceFile(GetCurrentResourceName(),GROUPS_FILE)}
+end)
+
+exports('icConfigOrganizationArm',function()
+    if not icConfigTrusted() then return false end
+    SetResourceKvp('ic_config:organization_schema_active','1')
+    if GetResourceKvpString('ic_config:organization_schema_active')~='1' then return false end
+    deletionSchemaArmed=true;deletionMarkersReady=false
+    return refreshDeletionMarkers()
+end)
+
+exports('icConfigOrganizationFreeze',function(operationId,orgName,names)
+    if not icConfigTrusted() or type(operationId)~='string' or type(orgName)~='string' or type(names)~='table' then return false end
+    for _,name in ipairs(names) do
+        if type(name)~='string' or name=='' then return false end
+        if deletionTombstones[name] and deletionTombstones[name]~=operationId then return false end
+    end
+    for _,name in ipairs(names) do deletionTombstones[name]=operationId end
+    if deletionOrganizations[orgName] and deletionOrganizations[orgName]~=operationId then return false end
+    deletionOrganizations[orgName]=operationId
+    local encoded=json.encode(deletionTombstones)
+    SetResourceKvp('ic_config:deleted_groups',encoded)
+    if GetResourceKvpString('ic_config:deleted_groups')~=encoded then return false end
+    local orgEncoded=json.encode(deletionOrganizations)
+    SetResourceKvp('ic_config:deleted_organizations',orgEncoded)
+    if GetResourceKvpString('ic_config:deleted_organizations')~=orgEncoded then return false end
+    for _,data in pairs(vRP.user_tables or {}) do vRP.icConfigFilterGroupData(data) end
+    invalidateAllPermissionCaches()
+    return true
+end)
+
+exports('icConfigOrganizationFinalize',function(operationId,orgName,names)
+    if not icConfigTrusted() or type(names)~='table' then return false end
+    local selected={}
+    for _,name in ipairs(names) do
+        if deletionTombstones[name]~=operationId then return false end
+        selected[name]=true
+    end
+    local backup=copyTable(ManagedGroups)
+    for i=#ManagedGroups.groups,1,-1 do
+        local entry=ManagedGroups.groups[i]
+        if selected[entry.name] then
+            if not entry.config or entry.config.gtype~='org' or entry.config.orgName~=orgName then return false end
+            table.remove(ManagedGroups.groups,i)
+        end
+    end
+    local ok=saveManagedGroups()
+    if not ok then ManagedGroups=backup;return false end
+    local raw=LoadResourceFile(GetCurrentResourceName(),GROUPS_FILE)
+    local valid,persisted=pcall(json.decode,raw or '')
+    if not valid or type(persisted)~='table' then return false end
+    for _,entry in ipairs(persisted.groups or {}) do if selected[entry.name] then return false end end
+    rebuildRuntimeGroups()
+    for _,data in pairs(vRP.user_tables or {}) do vRP.icConfigFilterGroupData(data) end
+    invalidateAllPermissionCaches()
+    return true
+end)
+
+exports('icConfigOrganizationRecreate',function(operationId,orgName,names)
+    if not icConfigTrusted() or type(names)~='table' then return false end
+    for _,name in ipairs(names) do
+        if deletionTombstones[name] and deletionTombstones[name]~=operationId then return false end
+        if findManagedGroup(name) then return false end
+    end
+    for _,name in ipairs(names) do deletionTombstones[name]=nil end
+    if deletionOrganizations[orgName] and deletionOrganizations[orgName]~=operationId then return false end
+    deletionOrganizations[orgName]=nil
+    local encoded=json.encode(deletionTombstones)
+    SetResourceKvp('ic_config:deleted_groups',encoded)
+    if GetResourceKvpString('ic_config:deleted_groups')~=encoded then return false end
+    local orgEncoded=json.encode(deletionOrganizations)
+    SetResourceKvp('ic_config:deleted_organizations',orgEncoded)
+    if GetResourceKvpString('ic_config:deleted_organizations')~=orgEncoded then return false end
+    return true
 end)

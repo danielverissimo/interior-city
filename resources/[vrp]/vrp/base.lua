@@ -47,6 +47,13 @@ end
 -- BASE.LUA
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function vRP.setUData(user_id,key,value)
+	if key=='vRP:datatable' and type(vRP.icConfigFilterGroupData)=='function' then
+		local ok,data=pcall(json.decode,value or '{}')
+		if ok and type(data)=='table' then
+			local filtered,changed=vRP.icConfigFilterGroupData(data)
+			if changed then value=json.encode(filtered) end
+		end
+	end
 	exports["oxmysql"]:executeSync([[
 		REPLACE INTO `vrp_user_data`(`user_id`,`dkey`,`dvalue`) VALUES(?,?,?)
 	]],{ 
@@ -266,7 +273,9 @@ end
 -- FUNCTION GERAIS
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function vRP.getUserDataTable(user_id)
-	return vRP.user_tables[user_id]
+	local data=vRP.user_tables[user_id]
+	if type(vRP.icConfigFilterGroupData)=='function' then vRP.icConfigFilterGroupData(data) end
+	return data
 end
 
 function vRP.getUserApparence(user_id)
