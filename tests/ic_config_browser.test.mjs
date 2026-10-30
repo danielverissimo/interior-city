@@ -22,7 +22,7 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
         const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
         page.setDefaultTimeout(7000);
         async function clickRpc(locator, method) { const response = page.waitForResponse(response => response.url() === 'https://ic_config/request' && response.request().postDataJSON()?.method === method); await locator.click(); await response; }
-        const errors = [], requests = [], chests = [], mansions = []; let readonly = false, previewSequence = 0, conflictOnce = true, denyMansions = false;
+        const errors = [], requests = [], chests = [], mansions = []; let readonly = false, previewSequence = 0, conflictOnce = true, denyMansions = false, denyTeleport = true;
         page.on('pageerror', error => errors.push(error.message));
         await page.addInitScript(() => { window.GetParentResourceName = () => 'ic_config'; });
         const headers = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'POST,OPTIONS', 'access-control-allow-headers': 'Content-Type' };
@@ -32,6 +32,11 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
             const request = route.request().postDataJSON(); requests.push(request);
             let data = {}, error = null;
             if (request.method === 'bootstrap') data = { writesEnabled: !readonly, methods: [] };
+            else if (request.method === 'teleport') {
+                if (denyTeleport) error = { code: 'FORBIDDEN', message: 'Permissão de teleporte revogada.' };
+                else data = { coords: request.payload.coords };
+            }
+            else if (request.method === 'getCraftSetups') data = { benches: [{ name: 'Bancada de teste', coords: [{ x: 10, y: 20, z: 30 }, { x: 90, y: 80, z: 70 }] }, { name: 'Bancada sem ponto', coords: [] }], farm: {} };
             else if (request.method === 'getManagedGroups') data = [{ name: 'Developer', config: { gtype: 'staff' }, permissions: ['perm.test'] }];
             else if (request.method === 'getChests') data = chests;
             else if (request.method === 'getSafeZones') data = { safezones: [], settings: {}, whitelist: [] };
@@ -184,6 +189,20 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
         await page.evaluate(() => { window.postMessage({ action: 'close' }, '*'); window.postMessage({ action: 'open' }, '*'); });
         await page.locator('#mode-banner').getByText(/SOMENTE LEITURA/).waitFor();
         assert.equal(await page.locator('#create').isDisabled(), true);
+        // Row teleport remains available with config writes disabled, validates
+        // server denial and closes only after a successful, single request.
+        await page.locator('#navigation button[data-area="craft"]').click();
+        const bench = page.locator('.record').filter({ hasText: 'Bancada de teste' });
+        await bench.getByRole('button', { name: 'Teleportar', exact: true }).waitFor();
+        assert.equal(await page.locator('.record').filter({ hasText: 'Bancada sem ponto' }).getByRole('button', { name: 'Teleportar' }).count(), 0);
+        await bench.getByRole('button', { name: 'Teleportar', exact: true }).click();
+        await page.locator('#error').filter({ hasText: 'Permissão de teleporte revogada.' }).waitFor();
+        assert.equal(await page.locator('#panel').isVisible(), true);
+        assert.deepEqual(requests.find(request => request.method === 'teleport').payload, { coords: { x: 10, y: 20, z: 30 } });
+        denyTeleport = false;
+        await bench.getByRole('button', { name: 'Teleportar', exact: true }).click();
+        await page.locator('#panel').waitFor({ state: 'hidden' });
+        assert.equal(requests.filter(request => request.method === 'teleport').length, 2);
         assert.deepEqual(errors, []);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     } finally { await browser?.close(); await new Promise(resolve => server.close(resolve)); }

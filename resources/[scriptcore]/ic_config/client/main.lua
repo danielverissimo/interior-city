@@ -1,6 +1,7 @@
 local resource = GetCurrentResourceName()
 local pending, serial, opened, opening, generation = {}, 0, false, false, 0
 local capture
+local teleportRequest
 
 local function failure(id, code, message)
     return {requestId=id, ok=false, message=message, error={code=code,message=message}}
@@ -10,6 +11,7 @@ local function closeUI()
     generation = generation + 1
     local previousCapture = capture
     capture = nil
+    teleportRequest = nil
     if previousCapture and previousCapture.kind == 'doors' then
         TriggerEvent('doorsv2:cancelMansionCapture',resource)
     end
@@ -140,7 +142,7 @@ local function finishCapture(cancelled, capturedData)
 end
 
 local function startCapture(data, callback)
-    if capture then callback(failure(data.requestId,'BUSY','Finalize a captura atual.')); return end
+    if capture or teleportRequest then callback(failure(data.requestId,'BUSY','Finalize a ação atual.')); return end
     local payload = data.payload
     if type(payload) ~= 'table' or type(payload.target) ~= 'string' or #payload.target > 512 then
         callback(failure(data.requestId,'INVALID_REQUEST','Destino de captura inválido.')); return
@@ -222,6 +224,29 @@ RegisterNUICallback('request', function(data, callback)
         callback(failure('', 'INVALID_REQUEST', 'Solicitação inválida.')); return
     end
     if not opened then callback(failure(data.requestId,'CLOSED','Abra o painel novamente.')); return end
+    if data.method == 'teleport' then
+        if capture or teleportRequest then callback(failure(data.requestId,'BUSY','Finalize a ação atual.')); return end
+        local current,token = {},generation
+        teleportRequest = current
+        request('teleport',data.payload or {},function(response)
+            if teleportRequest == current then teleportRequest = nil end
+            if token ~= generation or not opened then callback(failure(data.requestId,'CLOSED','O painel foi fechado.')); return end
+            if not response.ok then callback(response); return end
+            local coords = type(response.data)=='table' and response.data.coords
+            for _,axis in ipairs({'x','y','z'}) do
+                local value = type(coords)=='table' and coords[axis]
+                if type(value)~='number' or value~=value or math.abs(value)>1000000 then
+                    callback(failure(data.requestId,'INVALID_RESPONSE','Destino de teleporte inválido.')); return
+                end
+            end
+            local ped = PlayerPedId()
+            local entity = IsPedInAnyVehicle(ped,false) and GetVehiclePedIsIn(ped,false) or ped
+            SetEntityCoords(entity,coords.x,coords.y,coords.z+0.25,false,false,false,false)
+            closeUI()
+            callback(response)
+        end,data.requestId)
+        return
+    end
     if data.method == 'startPositionCapture' or data.method == 'startSafeZonePolygon'
         or data.method == 'startMansionDoorCapture' then
         startCapture(data,callback); return

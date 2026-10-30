@@ -95,8 +95,20 @@ A NUI tem formulários para campos simples e coordenadas. Listas/objetos
 complexos usam editor JSON com validação de formato. Isso preserva os dados
 editáveis, mas difere dos seletores especializados do painel antigo. Mansões
 têm formulário próprio com vagas de garagem e captura de portas no jogo.
-Teleporte e catálogo visual de ícones não foram reconstruídos.
+O botão **Teleportar** está disponível nos cadastros com localização válida,
+incluindo Craft + Farm. Como no painel anterior, bancadas e lojas usam o primeiro
+ponto; zonas seguras usam o centro médio do primeiro polígono. Cargos, tipos,
+catálogos e configurações gerais não têm destino de teleporte. O catálogo visual
+de ícones não foi reconstruído.
 As respostas indisponíveis e falhas aparecem explicitamente na interface.
+
+Cada teleporte passa pela autorização atual de `dono`/`developer` no servidor e
+pela validação de coordenadas finitas. Move somente o próprio personagem ou seu
+veículo atual, aplica o deslocamento vertical de 0,25 m do recurso anterior e
+fecha a NUI liberando o foco. Permanece disponível com gravações de configuração
+desligadas; não altera cadastros. Captura ativa, pedidos simultâneos, permissão
+revogada, painel fechado e respostas atrasadas impedem o efeito. A prévia local
+não executa teleporte.
 
 `client/main.lua` registra `/icconfig` e F9. `/painelconfig` e Home só são
 registrados com `setr ic_config_legacy_aliases "true"` antes do início do recurso.

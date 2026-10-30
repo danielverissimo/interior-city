@@ -157,6 +157,10 @@ function S.mutate(ctx, resourceKey, exportName, ...)
 end
 
 S.register('hasAccess',false,function() return true end)
+-- Authorize and validate each self-teleport; never accept a target player/entity.
+S.register('teleport',false,function(_,payload)
+    return {coords=S.coords(payload.coords)}
+end)
 S.register('bootstrap',false,function()
     local methods={}
     for name,definition in pairs(S.methods) do

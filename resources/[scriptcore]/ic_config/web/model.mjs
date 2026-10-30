@@ -109,6 +109,40 @@ export function recordsFor(view, data) {
     return (Array.isArray(source) ? source : Object.values(source)).map(value => withoutPrivate(value));
 }
 export function displayName(row) { return String(row?.name ?? row?.spawn ?? (row?.type ? `${row.type} #${row.id ?? ''}` : row?.id) ?? 'Configuração'); }
+function coordinate(value) {
+    if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return null;
+    const number = Number(value);
+    return Number.isFinite(number) && Math.abs(number) <= 1000000 ? number : null;
+}
+function point(value) {
+    if (!value || typeof value !== 'object') return null;
+    const result = Array.isArray(value) ? { x: coordinate(value[0]), y: coordinate(value[1]), z: coordinate(value[2]) }
+        : { x: coordinate(value.x), y: coordinate(value.y), z: coordinate(value.z) };
+    return Object.values(result).every(value => value !== null) ? result : null;
+}
+// Match the original row action: craft/shops use the first configured point.
+export function teleportCoords(view, row) {
+    if (!row || view.singleton) return null;
+    switch (view.id) {
+        case 'chests': case 'garages': case 'mapmarkings': case 'cloakroom':
+        case 'clothing': case 'barbershop': case 'tattoo': return point(row.coords);
+        case 'craft': return point(row.coords?.[0]);
+        case 'shops': return point(row.data?.coords?.[0]?.coords);
+        case 'desmanche': return point(row.inicio);
+        case 'jobs': return point(row.data?.inicio);
+        case 'houses': case 'robberies': return point(row);
+        case 'mansions': return point(row.purchaseCoords);
+        case 'safezone': {
+            const zone = row.zones?.[0], minZ = coordinate(zone?.minZ), maxZ = coordinate(zone?.maxZ);
+            if (!Array.isArray(zone?.coords) || zone.coords.length < 3 || minZ === null || maxZ === null || minZ > maxZ) return null;
+            const points = zone.coords.map(value => point({ x: value?.x, y: value?.y, z: 0 }));
+            if (points.some(value => !value)) return null;
+            return { x: points.reduce((sum, value) => sum + value.x, 0) / points.length,
+                y: points.reduce((sum, value) => sum + value.y, 0) / points.length, z: (minZ + maxZ) / 2 };
+        }
+        default: return null;
+    }
+}
 function defaults(template, value) {
     if (!template || typeof template !== 'object' || Array.isArray(template) || !value || typeof value !== 'object' || Array.isArray(value)) return value;
     const merged = clone(template);

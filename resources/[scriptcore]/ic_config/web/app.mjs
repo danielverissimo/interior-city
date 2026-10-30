@@ -1,5 +1,5 @@
 import { createTransport, createLatestLoader, createWriteGate, PanelError } from './transport.mjs';
-import { AREAS, VIEWS, recordsFor, displayName, editorValue, mutationFor, clone, withoutPrivate } from './model.mjs';
+import { AREAS, VIEWS, recordsFor, displayName, editorValue, mutationFor, clone, withoutPrivate, teleportCoords } from './model.mjs';
 import { mountMansionForm } from './mansions.mjs';
 
 const $ = selector => document.querySelector(selector);
@@ -11,6 +11,7 @@ let activeArea = 'groups', activeView = VIEWS[0], data = null, rows = [], opened
 let editor = null, deletion = null, toastTimer = null, pendingView = null;
 let writesEnabled = false, methods = new Map(), openGeneration = 0, editorSequence = 0, suspended = false;
 let deletionExpiryTimer = null;
+let teleportPending = null;
 const captureTargets = new Map();
 const labels = {
     name: 'Nome', id: 'Identificador', type: 'Tipo', data: 'Configuração', config: 'Propriedades do cargo',
@@ -88,6 +89,21 @@ function updateNavigation() {
     $('#additional').title = methods.get(activeView.extraAction?.method)?.reason || '';
     $('#additional').disabled = disableWrites() || data === null || unavailable(activeView.extraAction?.method);
 }
+async function teleportTo(row, view) {
+    const coords = teleportCoords(view, row);
+    if (!coords || preview || writes.busy || teleportPending) return;
+    const pending = {}, generation = openGeneration;
+    teleportPending = pending; renderRecords();
+    try {
+        await transport.call('teleport', { coords });
+        if (opened && generation === openGeneration) await closePanel();
+    } catch (error) {
+        if (opened && generation === openGeneration) showError($('#error'), error);
+    } finally {
+        if (teleportPending === pending) teleportPending = null;
+        if (opened && generation === openGeneration) renderRecords();
+    }
+}
 function renderRecords() {
     updateNavigation();
     const query = $('#search').value.toLocaleLowerCase('pt-BR');
@@ -101,6 +117,13 @@ function renderRecords() {
         const details = document.createElement('div'); details.className = 'details';
         details.textContent = row.permission || row.permiss || row.permissao || row.data?.name || row.config?.title || (row.stock != null ? `Estoque: ${row.stock}` : Object.keys(row).filter(key => !['name', 'id', 'spawn'].includes(key)).map(label).slice(0, 4).join(' · '));
         const actions = document.createElement('div'); actions.className = 'row-actions';
+        if (teleportCoords(activeView, row)) {
+            const view = activeView;
+            const teleport = button('Teleportar', () => teleportTo(row, view));
+            teleport.disabled = preview || writes.busy || !!teleportPending || unavailable('teleport');
+            teleport.title = methods.get('teleport')?.reason || 'Teleportar para o ponto cadastrado';
+            actions.append(teleport);
+        }
         if (activeView.update) { const edit = button(disableWrites() ? 'Ver detalhes' : 'Editar', () => openEditor(row)); edit.title = methods.get(activeView.update)?.reason || ''; actions.append(edit); }
         if (activeView.remove) { const remove = button('Excluir', () => askDelete(row), 'delete'); remove.disabled = disableWrites() || unavailable(activeView.remove); remove.title = methods.get(activeView.remove)?.reason || ''; actions.append(remove); }
         card.append(identity, details, actions); return card;
@@ -307,6 +330,7 @@ function displayDeletionPreview(preview, viewId) {
 }
 function closeEditor() { if (!writes.busy) { $('#editor').close(); editor = null; } }
 async function closePanel() {
+    teleportPending = null;
     opened = false; openGeneration++; captureTargets.clear(); clearTimeout(deletionExpiryTimer); deletion = null; suspended = false; loader.cancel(); $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); $('#toast').hidden = true;
     if (!preview) {
         try { await fetch(`https://${resource}/close`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }); } catch { /* FiveM may be stopping the resource. */ }
@@ -383,7 +407,7 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$
 window.addEventListener('message', event => {
     const message = event.data;
     if (message?.action === 'open') openPanel();
-    if (message?.action === 'close') { opened = false; openGeneration++; captureTargets.clear(); clearTimeout(deletionExpiryTimer); deletion = null; suspended = false; loader.cancel(); $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); }
+    if (message?.action === 'close') { opened = false; openGeneration++; teleportPending = null; captureTargets.clear(); clearTimeout(deletionExpiryTimer); deletion = null; suspended = false; loader.cancel(); $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); }
     if (message?.action === 'suspend' && opened) { suspended = true; $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); }
     if (message?.action === 'captureResult') {
         const capture = captureTargets.get(message.target); captureTargets.delete(message.target);
