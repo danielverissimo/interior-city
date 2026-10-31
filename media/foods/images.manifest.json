@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "files": {
+    "images/arrozcarreteiro.png": {
+      "size": 302966,
+      "sha256": "def387bd911afb5891070752ab1714f9809325d5a8c413454f1cfeb7412458f3"
+    },
+    "images/arrozcompequi.png": {
+      "size": 298618,
+      "sha256": "506b026e731365bcc9b75c0beebd26ee0439354f1f8e1bfc4f46424a710f7b68"
+    },
+    "images/bolodemilho.png": {
+      "size": 301131,
+      "sha256": "6bcedbac49be947b9e481535697f2654ab2d1aaef0ada512a232a0f0c43d48f9"
+    },
+    "images/cafecoado.png": {
+      "size": 200295,
+      "sha256": "54ae5d0f9b64807839b45ffb6a84e75f503440b14685a1fa5cfde5ec38c55565"
+    },
+    "images/caldodecana.png": {
+      "size": 215303,
+      "sha256": "5e168ae0271b4767c55250880e19104ff0dd8040051a8fc15217667503934f5b"
+    },
+    "images/curau.png": {
+      "size": 305638,
+      "sha256": "0462928e6f2f738793b17948c44268e03b56d3244f97e1e732f5666d3a08eadf"
+    },
+    "images/cuscuz.png": {
+      "size": 242848,
+      "sha256": "1669d02fba8738bdbe6cfba6d3d57190cb5b4e4f8a45adfe6c5cec55b0d18e1c"
+    },
+    "images/docedeleite.png": {
+      "size": 304349,
+      "sha256": "f822fcd82a2d501aa8d5fd004a64b56557a2f7fd7dcdfcb52d233e46da548117"
+    },
+    "images/feijaotropeiro.png": {
+      "size": 315069,
+      "sha256": "0a45150a339bbdec1bf7451418f783cdc1ac719c0c17afe405ad8db555d09ced"
+    },
+    "images/galinhada.png": {
+      "size": 302823,
+      "sha256": "d6874d511687433eb0e11f99ab84678a95d6769422fcd6909f9a840f6cd359f2"
+    },
+    "images/goiabada.png": {
+      "size": 299511,
+      "sha256": "5add28322a27b8e48fba5ceb91db8fc77d827a6811645ae2fcb33f4d63086fde"
+    },
+    "images/pacoca.png": {
+      "size": 341057,
+      "sha256": "38e36df3b844042aad7eb73edc7b313745dcbe272349b242734651c480fa4bc5"
+    },
+    "images/pamonha.png": {
+      "size": 359873,
+      "sha256": "d96ff2bb33f6c713989e250b70c77ec64f7ea3ba0cf04d7d20a393428baa0e4e"
+    },
+    "images/pedemoleque.png": {
+      "size": 279569,
+      "sha256": "f56aa81a1a4062832f6f47436d1a17dd1974ca22fb54a7813d164ffbceb4e82f"
+    },
+    "images/tapioca.png": {
+      "size": 311273,
+      "sha256": "52fffb5d654ef7421516437b319626c9094c5fcd74737ee7c7ce818442bd56ad"
+    }
+  }
+}

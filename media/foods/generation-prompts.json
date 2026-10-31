@@ -1,0 +1,66 @@
+{
+  "tool": "image_gen (built-in)",
+  "transparent_background": true,
+  "items": [
+    {
+      "id": "pamonha",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian pamonha, one yellow sweet-corn dumpling partly unwrapped from its green corn husk, with a second tied husk bundle tucked behind it. Clean realistic game inventory product render, appetizing, detailed natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the food and its corn-husk wrapper. No plate, table, scenery, text, lettering, logo, border, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "curau",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian curau, a small plain terracotta bowl filled with silky golden sweet-corn pudding with a light cinnamon dusting. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "tapioca",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian tapioca, one folded white cassava-starch crepe with visible small tapioca grains and white cheese filling visible at its open edge. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "cuscuz",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian northeastern cuscuz, a small molded golden steamed corn couscous dome topped with a melting pat of butter on a plain small ceramic saucer. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "bolodemilho",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: two thick slices of Brazilian bolo de milho, moist golden corn cake with a lightly browned crust, one slice leaning against the other. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "galinhada",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian galinhada served in a small plain rustic ceramic bowl, yellow rice with visible cooked chicken pieces and a few chopped green herbs. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "arrozcompequi",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian arroz com pequi served in a small plain ceramic bowl, golden rice with distinctive round bright yellow-orange pequi fruit pieces. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "feijaotropeiro",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian feijão tropeiro in a small plain ceramic bowl, brown beans mixed with toasted cassava flour, bacon cubes, egg and finely sliced collard greens. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "arrozcarreteiro",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian arroz carreteiro in a small plain ceramic bowl, rice with clearly visible browned dried-beef chunks and chopped green herbs. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "docedeleite",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian doce de leite, three caramel-brown firm milk-fudge squares, one cut to reveal a soft dense interior. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "goiabada",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian goiabada, a thick ruby-red guava paste block with two slices cut in front, slightly glossy dense texture. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "pacoca",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian paçoca, three small tan crumbly peanut-candy cylinders, one broken to reveal the fine crushed-peanut texture. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "pedemoleque",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian pé de moleque, two irregular rectangular golden caramel peanut brittle pieces with clearly visible whole roasted peanuts. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "caldodecana",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian caldo de cana, a single unbranded clear takeaway cup of pale yellow-green freshly pressed sugarcane juice with a little light foam at the top, no straw. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    },
+    {
+      "id": "cafecoado",
+      "prompt": "Use case: product-mockup. Asset type: square FiveM inventory food icon for a Brazilian countryside roleplay server. Subject: Brazilian café coado, a single small rustic white enamel mug with a blue rim filled with black filtered coffee, no saucer. Clean realistic game inventory product render, appetizing natural textures, three-quarter elevated view, soft studio lighting, centered isolated cutout on a truly transparent background, generous 12 percent padding on every side, recognizable at 100px. Only the described food and necessary serving container. No table, scenery, additional food, utensils, text, lettering, logos, borders, watermark, or cast background shadow. Single asset only."
+    }
+  ]
+}

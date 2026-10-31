@@ -1,5 +1,25 @@
 # Marca e introdução da Interior City
 
+## Identidade na conexão do FiveM
+
+`config/config.cfg` define `sv_hostname` e `sv_projectName` como `INTERIOR CITY`,
+`sv_projectDesc` como `Viva sua história na Interior City.` e o metadata `base`
+como `Interior City`. O `load_server_icon` continua apontando para `logo.png`,
+que já contém a marca da cidade. A identificação antiga de VRPEX Delux e o texto
+promocional do fornecedor foram retirados desses campos.
+
+ESTABLISHED: `server.cfg` executa `config/config.cfg`, que é a fonte desses
+campos no projeto. O cartão é desenhado pelo cliente FiveM; esta configuração
+altera os dados enviados pelo servidor. O texto “Last connected server” e o
+botão de conexão pertencem ao cliente.
+
+Verificação local: campos públicos conferidos, ausência da marca antiga nesses
+campos, PNG da logo inspecionado e `git diff --check`. A publicação posterior no
+Uriel foi concluída e os dados públicos de conexão foram conferidos; consulte
+[relatório de publicação](DEPLOY_COMIDAS_MARCA_2026-10-30.md). A renderização do
+cartão em um cliente FiveM e a renovação de seus dados armazenados não foram
+executadas automaticamente.
+
 As imagens fornecidas pelo proprietário são distribuídas pelo catálogo privado
 `assets.lock.json`. A logo quadrada corresponde a `logo.png` da raiz (96×96);
 a logo transparente da HUD corresponde ao arquivo fornecido para a marca grande

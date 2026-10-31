@@ -114,7 +114,9 @@ end
 function play_drink(source, tipo, segundos)
     local prop = ""
     -- BEBIDAS
-    if tipo == "energetico" then
+    if Items[tipo] and Items[tipo].prop then
+        prop = Items[tipo].prop
+    elseif tipo == "energetico" then
         prop = "prop_energy_drink"
     elseif tipo == "water" then
         prop = "prop_ld_flow_bottle"
@@ -155,7 +157,9 @@ end
 function play_eat(source, tipo, segundos)
     local prop = ""
     -- COMIDAS
-    if tipo == "pao" then
+    if Items[tipo] and Items[tipo].prop then
+        prop = Items[tipo].prop
+    elseif tipo == "pao" then
         prop = "prop_food_burg2"
     elseif tipo == "sanduiche" then
         prop = "prop_cs_burger_01"
@@ -186,6 +190,173 @@ function play_eat(source, tipo, segundos)
 end
 
 Items = {
+    -- Comidas e bebidas do interior: valores equivalentes aos itens existentes.
+
+    ["pamonha"] = {
+        index = "pamonha",
+        name = "Pamonha",
+        png = "pamonha",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 24, thirst = 0 },
+        prop = "prop_food_cb_nugets",
+        func = Comer
+    },
+
+    ["curau"] = {
+        index = "curau",
+        name = "Curau",
+        png = "curau",
+        weight = 0.2,
+        type = "use",
+        needs = { hunger = 16, thirst = 0 },
+        prop = "prop_food_cb_nugets",
+        func = Comer
+    },
+
+    ["tapioca"] = {
+        index = "tapioca",
+        name = "Tapioca",
+        png = "tapioca",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 32, thirst = 0 },
+        prop = "prop_food_burg2",
+        func = Comer
+    },
+
+    ["cuscuz"] = {
+        index = "cuscuz",
+        name = "Cuscuz",
+        png = "cuscuz",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 32, thirst = 0 },
+        prop = "prop_food_cb_nugets",
+        func = Comer
+    },
+
+    ["bolodemilho"] = {
+        index = "bolodemilho",
+        name = "Bolo de Milho",
+        png = "bolodemilho",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 18, thirst = 0 },
+        prop = "prop_food_burg2",
+        func = Comer
+    },
+
+    ["galinhada"] = {
+        index = "galinhada",
+        name = "Galinhada",
+        png = "galinhada",
+        weight = 2.0,
+        type = "use",
+        needs = { hunger = 50, thirst = 0 },
+        prop = "prop_taco_01",
+        func = Comer
+    },
+
+    ["arrozcompequi"] = {
+        index = "arrozcompequi",
+        name = "Arroz com Pequi",
+        png = "arrozcompequi",
+        weight = 2.0,
+        type = "use",
+        needs = { hunger = 50, thirst = 0 },
+        prop = "prop_taco_01",
+        func = Comer
+    },
+
+    ["feijaotropeiro"] = {
+        index = "feijaotropeiro",
+        name = "Feijão Tropeiro",
+        png = "feijaotropeiro",
+        weight = 2.0,
+        type = "use",
+        needs = { hunger = 50, thirst = 0 },
+        prop = "prop_taco_01",
+        func = Comer
+    },
+
+    ["arrozcarreteiro"] = {
+        index = "arrozcarreteiro",
+        name = "Arroz Carreteiro",
+        png = "arrozcarreteiro",
+        weight = 2.0,
+        type = "use",
+        needs = { hunger = 50, thirst = 0 },
+        prop = "prop_taco_01",
+        func = Comer
+    },
+
+    ["docedeleite"] = {
+        index = "docedeleite",
+        name = "Doce de Leite",
+        png = "docedeleite",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 14, thirst = 0 },
+        prop = "prop_choc_meto",
+        func = Comer
+    },
+
+    ["goiabada"] = {
+        index = "goiabada",
+        name = "Goiabada",
+        png = "goiabada",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 14, thirst = 0 },
+        prop = "prop_choc_meto",
+        func = Comer
+    },
+
+    ["pacoca"] = {
+        index = "pacoca",
+        name = "Paçoca",
+        png = "pacoca",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 14, thirst = 0 },
+        prop = "prop_choc_meto",
+        func = Comer
+    },
+
+    ["pedemoleque"] = {
+        index = "pedemoleque",
+        name = "Pé de Moleque",
+        png = "pedemoleque",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 14, thirst = 0 },
+        prop = "prop_choc_meto",
+        func = Comer
+    },
+
+    ["caldodecana"] = {
+        index = "caldodecana",
+        name = "Caldo de Cana",
+        png = "caldodecana",
+        weight = 0.5,
+        type = "use",
+        needs = { hunger = 0, thirst = 36 },
+        prop = "ng_proc_sodacan_01b",
+        func = Beber
+    },
+
+    ["cafecoado"] = {
+        index = "cafecoado",
+        name = "Café Coado",
+        png = "cafecoado",
+        weight = 0.25,
+        type = "use",
+        needs = { hunger = 0, thirst = 20 },
+        prop = "prop_fib_coffee",
+        func = Beber
+    },
+
     ["weapon_hammer"] = {
         index = "weapon_hammer",
         name = "Hammer",

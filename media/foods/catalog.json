@@ -1,0 +1,125 @@
+{
+  "format": 1,
+  "items": [
+    {
+      "id": "pamonha",
+      "name": "Pamonha",
+      "reference": "coxinha",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/pamonha.png"
+    },
+    {
+      "id": "curau",
+      "name": "Curau",
+      "reference": "donut",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/curau.png"
+    },
+    {
+      "id": "tapioca",
+      "name": "Tapioca",
+      "reference": "sanduiche",
+      "shop": "Lanchonete",
+      "price": 125,
+      "image": "images/tapioca.png"
+    },
+    {
+      "id": "cuscuz",
+      "name": "Cuscuz",
+      "reference": "sanduiche",
+      "shop": "Restaurante",
+      "price": 125,
+      "image": "images/cuscuz.png"
+    },
+    {
+      "id": "bolodemilho",
+      "name": "Bolo de Milho",
+      "reference": "pao",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/bolodemilho.png"
+    },
+    {
+      "id": "galinhada",
+      "name": "Galinhada",
+      "reference": "marmita",
+      "shop": "Restaurante",
+      "price": 300,
+      "image": "images/galinhada.png"
+    },
+    {
+      "id": "arrozcompequi",
+      "name": "Arroz com Pequi",
+      "reference": "marmita",
+      "shop": "Restaurante",
+      "price": 300,
+      "image": "images/arrozcompequi.png"
+    },
+    {
+      "id": "feijaotropeiro",
+      "name": "Feijão Tropeiro",
+      "reference": "marmita",
+      "shop": "Restaurante",
+      "price": 300,
+      "image": "images/feijaotropeiro.png"
+    },
+    {
+      "id": "arrozcarreteiro",
+      "name": "Arroz Carreteiro",
+      "reference": "marmita",
+      "shop": "Restaurante",
+      "price": 300,
+      "image": "images/arrozcarreteiro.png"
+    },
+    {
+      "id": "docedeleite",
+      "name": "Doce de Leite",
+      "reference": "barrac",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/docedeleite.png"
+    },
+    {
+      "id": "goiabada",
+      "name": "Goiabada",
+      "reference": "barrac",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/goiabada.png"
+    },
+    {
+      "id": "pacoca",
+      "name": "Paçoca",
+      "reference": "barrac",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/pacoca.png"
+    },
+    {
+      "id": "pedemoleque",
+      "name": "Pé de Moleque",
+      "reference": "barrac",
+      "shop": "Lanchonete",
+      "price": 100,
+      "image": "images/pedemoleque.png"
+    },
+    {
+      "id": "caldodecana",
+      "name": "Caldo de Cana",
+      "reference": "sucol",
+      "shop": "Lanchonete",
+      "price": 200,
+      "image": "images/caldodecana.png"
+    },
+    {
+      "id": "cafecoado",
+      "name": "Café Coado",
+      "reference": "cafe",
+      "shop": "Restaurante",
+      "price": 200,
+      "image": "images/cafecoado.png"
+    }
+  ]
+}
