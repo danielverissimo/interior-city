@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -16,7 +17,7 @@ import types
 
 ROOT=Path(__file__).resolve().parents[1]
 OWNED=[
-    'README.md','docs/IC_CONFIG.md','docs/IC_MANSIONS.md','docs/IC_CONFIG_INSTALL.md','docs/evidence',
+    'README.md','docs/IC_CONFIG.md','docs/IC_CONFIG_FORMS.md','docs/IC_MANSIONS.md','docs/IC_CONFIG_INSTALL.md','docs/evidence',
     'config/ic_config.example.cfg','config/ic_mansions.example.cfg','config/ic_config_release.json','database/ic_config',
     'resources/[scriptcore]/ic_config','resources/[scriptcore]/ic_mansions',
     'resources/[scriptcore]/dm_spawn/server/server.lua',
@@ -42,7 +43,7 @@ def load(path,name):
     value=types.ModuleType(name);value.__file__=str(path)
     exec(compile(path.read_text(),str(path),'exec'),value.__dict__);return value
 
-def prepare(output,validation_report=None):
+def prepare(output,validation_report=None,base_commit=None):
     if not output.is_absolute()or '..'in output.parts or any(p.is_symlink()for p in(output,*output.parents)):
         raise ValueError('Use an absolute new output directory without symlinks')
     if output.exists():raise ValueError('Output already exists')
@@ -55,7 +56,10 @@ def prepare(output,validation_report=None):
             raise ValueError('Operational mansion state cannot be admitted to source release')
     output.mkdir(parents=True,mode=0o700)
     output.chmod(0o700)
-    base=git(['rev-parse','HEAD'])
+    source_head=git(['rev-parse','HEAD'])
+    if base_commit is not None and not re.fullmatch('[0-9a-f]{40}',base_commit):
+        raise ValueError('The deployed baseline must be a full commit SHA')
+    base=git(['rev-parse','--verify',(base_commit or source_head)+'^{commit}'])
     with tempfile.TemporaryDirectory(prefix='ic-config-index-')as tmp:
         env=dict(os.environ,GIT_INDEX_FILE=str(Path(tmp)/'index'))
         git(['read-tree',base],env)
@@ -83,7 +87,7 @@ def prepare(output,validation_report=None):
         configure.validate_candidate(inspection)
     changes=git(['diff','--name-only',base]).splitlines()
     excluded=sorted(set(changes)-set(included))
-    report={'version':1,'baseCommit':base,'candidateCommit':commit,'localRef':ref,
+    report={'version':1,'baseCommit':base,'sourceHead':source_head,'candidateCommit':commit,'localRef':ref,
         'archive':archive.name,'archiveSha256':hashlib.sha256(archive.read_bytes()).hexdigest(),
         'includedWorkingPaths':included,'excludedTrackedChanges':excluded,
         'defaultIndexAndBranchUnchanged':True,'hostContacted':False,'deployed':False,
@@ -101,8 +105,9 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--validation-report',type=Path)
+    parser.add_argument('--base-commit',help='Full deployed SHA; preserve unrelated files from that release')
     args=parser.parse_args()
-    try:print(json.dumps(prepare(args.output,args.validation_report),indent=2,sort_keys=True))
+    try:print(json.dumps(prepare(args.output,args.validation_report,args.base_commit),indent=2,sort_keys=True))
     except (ValueError,OSError,subprocess.SubprocessError):
         print('Candidate preparation failed; inspect the private output directory. No upload or deployment was attempted.',file=sys.stderr)
         raise SystemExit(1)

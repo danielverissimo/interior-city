@@ -1,6 +1,8 @@
 import { createTransport, createLatestLoader, createWriteGate, PanelError } from './transport.mjs';
-import { AREAS, VIEWS, recordsFor, displayName, editorValue, mutationFor, clone, withoutPrivate } from './model.mjs';
+import { AREAS, VIEWS, recordsFor, displayName, editorValue, mutationFor, clone, withoutPrivate, teleportCoords } from './model.mjs';
 import { mountMansionForm } from './mansions.mjs';
+import { mountCraftForm } from './craft.mjs';
+import { mountStructuredForm, catalogRequirements, makeCatalogs } from './forms.mjs';
 
 const $ = selector => document.querySelector(selector);
 const preview = typeof GetParentResourceName !== 'function' && new URLSearchParams(location.search).get('preview') === '1';
@@ -11,6 +13,7 @@ let activeArea = 'groups', activeView = VIEWS[0], data = null, rows = [], opened
 let editor = null, deletion = null, toastTimer = null, pendingView = null;
 let writesEnabled = false, methods = new Map(), openGeneration = 0, editorSequence = 0, suspended = false;
 let deletionExpiryTimer = null;
+let teleportPending = null;
 const captureTargets = new Map();
 const labels = {
     name: 'Nome', id: 'Identificador', type: 'Tipo', data: 'Configuração', config: 'Propriedades do cargo',
@@ -88,6 +91,21 @@ function updateNavigation() {
     $('#additional').title = methods.get(activeView.extraAction?.method)?.reason || '';
     $('#additional').disabled = disableWrites() || data === null || unavailable(activeView.extraAction?.method);
 }
+async function teleportTo(row, view) {
+    const coords = teleportCoords(view, row);
+    if (!coords || preview || writes.busy || teleportPending) return;
+    const pending = {}, generation = openGeneration;
+    teleportPending = pending; renderRecords();
+    try {
+        await transport.call('teleport', { coords });
+        if (opened && generation === openGeneration) await closePanel();
+    } catch (error) {
+        if (opened && generation === openGeneration) showError($('#error'), error);
+    } finally {
+        if (teleportPending === pending) teleportPending = null;
+        if (opened && generation === openGeneration) renderRecords();
+    }
+}
 function renderRecords() {
     updateNavigation();
     const query = $('#search').value.toLocaleLowerCase('pt-BR');
@@ -101,6 +119,13 @@ function renderRecords() {
         const details = document.createElement('div'); details.className = 'details';
         details.textContent = row.permission || row.permiss || row.permissao || row.data?.name || row.config?.title || (row.stock != null ? `Estoque: ${row.stock}` : Object.keys(row).filter(key => !['name', 'id', 'spawn'].includes(key)).map(label).slice(0, 4).join(' · '));
         const actions = document.createElement('div'); actions.className = 'row-actions';
+        if (teleportCoords(activeView, row)) {
+            const view = activeView;
+            const teleport = button('Teleportar', () => teleportTo(row, view));
+            teleport.disabled = preview || writes.busy || !!teleportPending || unavailable('teleport');
+            teleport.title = methods.get('teleport')?.reason || 'Teleportar para o ponto cadastrado';
+            actions.append(teleport);
+        }
         if (activeView.update) { const edit = button(disableWrites() ? 'Ver detalhes' : 'Editar', () => openEditor(row)); edit.title = methods.get(activeView.update)?.reason || ''; actions.append(edit); }
         if (activeView.remove) { const remove = button('Excluir', () => askDelete(row), 'delete'); remove.disabled = disableWrites() || unavailable(activeView.remove); remove.title = methods.get(activeView.remove)?.reason || ''; actions.append(remove); }
         card.append(identity, details, actions); return card;
@@ -114,9 +139,6 @@ function renderRecords() {
     $('#records').replaceChildren(...children);
 }
 
-function getAt(object, path) { return path.reduce((parent, key) => parent?.[key], object); }
-function setAt(object, path, value) { let target = object; for (const key of path.slice(0, -1)) target = target[key]; target[path.at(-1)] = value; }
-function coordinateObject(value) { return value && typeof value === 'object' && !Array.isArray(value) && ['x', 'y', 'z'].every(key => Object.hasOwn(value, key)); }
 async function captureInGame(path, kind, heading = false, mode = 'set') {
     if (!editor || preview) return;
     const target = `${editor.token}:${mode}:${JSON.stringify(path)}`;
@@ -124,68 +146,6 @@ async function captureInGame(path, kind, heading = false, mode = 'set') {
     const method = kind === 'polygon' ? 'startSafeZonePolygon' : kind === 'doors' ? 'startMansionDoorCapture' : 'startPositionCapture';
     try { await transport.call(method, { target, heading }); }
     catch (error) { captureTargets.delete(target); showError($('#editor-error'), error); }
-}
-function renderFields(value, parent, path = [], depth = 0) {
-    const entries = Object.entries(value);
-    for (const [key, child] of entries) {
-        const fieldPath = [...path, key];
-        if (child && typeof child === 'object' && !Array.isArray(child) && Object.keys(child).length && depth < 2) {
-            const group = document.createElement('fieldset'); group.className = 'object-group';
-            const legend = document.createElement('legend'); legend.textContent = label(key); group.append(legend);
-            renderFields(child, group, fieldPath, depth + 1);
-            if (coordinateObject(child)) {
-                const capture = button('Usar minha posição no jogo', async () => {
-                    capture.disabled = true;
-                    try {
-                        const coords = await transport.call('getPlayerPosition');
-                        if (!editor) return;
-                        for (const axis of ['x', 'y', 'z', 'w', 'h', 'heading']) {
-                            if (!Object.hasOwn(child, axis)) continue;
-                            const next = ['w', 'h', 'heading'].includes(axis) ? (coords.w ?? coords.heading ?? 0) : coords[axis];
-                            setAt(editor.draft, [...fieldPath, axis], next);
-                            const input = editor.inputs.find(item => JSON.stringify(item.path) === JSON.stringify([...fieldPath, axis]));
-                            if (input) input.node.value = next;
-                        }
-                    } catch (error) { showError($('#editor-error'), error); }
-                    finally { capture.disabled = false; }
-                }, 'capture-position'); capture.disabled = preview; group.append(capture);
-                const position = button('Posicionar no jogo', () => captureInGame(fieldPath, 'position', ['w', 'h', 'heading'].some(axis => Object.hasOwn(child, axis))), 'capture-position'); position.disabled = preview; group.append(position);
-            }
-            parent.append(group); continue;
-        }
-        const holder = document.createElement('div'); holder.className = 'field';
-        const id = `field-${editor.inputs.length}`;
-        const title = document.createElement('label'); title.htmlFor = id; title.textContent = label(key); holder.append(title);
-        let node, kind;
-        if (child !== null && typeof child === 'object') {
-            kind = 'json'; node = document.createElement('textarea'); node.spellcheck = false; node.value = JSON.stringify(child, null, 2); holder.classList.add('wide');
-            const hint = document.createElement('small'); hint.textContent = Array.isArray(child) ? 'Lista JSON. Preserve os campos e o formato de cada elemento.' : 'Objeto JSON. Preserve os campos exigidos pelo recurso.'; holder.append(hint);
-        } else if (typeof child === 'boolean') {
-            kind = 'boolean'; node = document.createElement('input'); node.type = 'checkbox'; node.checked = child; holder.classList.add('boolean');
-        } else if (typeof child === 'number' || child === null) {
-            kind = 'number'; node = document.createElement('input'); node.type = 'number'; node.step = 'any'; node.value = child ?? ''; node.required = child === null;
-        } else {
-            kind = 'string'; node = document.createElement('input'); node.type = 'text'; node.value = String(child ?? '');
-        }
-        node.id = id; node.autocomplete = 'off'; holder.append(node);
-        editor.inputs.push({ node, path: fieldPath, kind, original: child });
-        if (key === 'zones' && Array.isArray(child)) {
-            const polygon = button('Desenhar polígono no jogo', () => captureInGame(fieldPath, 'polygon'), 'capture-position'); polygon.disabled = preview; holder.append(polygon);
-            const hint = document.createElement('small'); hint.textContent = 'E adiciona um vértice · Backspace conclui · X cancela. Revise minZ e maxZ no JSON após capturar.'; holder.append(hint);
-        }
-        if (key === 'uniforms' && Array.isArray(child)) {
-            const capture = button('Adicionar fardamento atual', async () => {
-                capture.disabled = true;
-                try {
-                    const current = await transport.call('getCurrentOutfit');
-                    if (!['masculino', 'feminino'].includes(current?.gender) || !current.outfit) throw new Error('Roupa atual indisponível.');
-                    const uniforms = JSON.parse(node.value); if (!Array.isArray(uniforms)) throw new Error('Fardamentos precisam ser uma lista JSON.');
-                    uniforms.push({ name: 'Novo fardamento', masculino: {}, feminino: {}, [current.gender]: current.outfit }); node.value = JSON.stringify(uniforms, null, 2);
-                } catch (error) { showError($('#editor-error'), error); } finally { capture.disabled = false; }
-            }, 'capture-position'); capture.disabled = preview; holder.append(capture);
-        }
-        parent.append(holder);
-    }
 }
 async function openEditor(row = null, extra = false) {
     if ((disableWrites() && !row) || writes.busy) return;
@@ -203,9 +163,32 @@ async function openEditor(row = null, extra = false) {
             $('#fields').replaceChildren();
             editor.custom = mountMansionForm({ container: $('#fields'), value: editor.draft, row, garageTypes, allowedVouchers: data?.allowedVouchers,
                 readOnly: editor.readOnly, capture: captureInGame, onError: error => showError($('#editor-error'), error) });
-        } catch (error) { if (editor !== current) return; showError($('#editor-error'), error); editor.readOnly = true; }
+        } catch (error) { if (editor !== current || !$('#editor').open || !opened) return; showError($('#editor-error'), error); editor.readOnly = true; }
+    } else if (activeView.id === 'craft' && !action) {
+        const current = editor;
+        $('#save').disabled = true; $('#fields').textContent = 'Carregando catálogo de itens…'; $('#editor').showModal();
+        try {
+            const items = preview ? [] : await transport.call('getItemList');
+            if (editor !== current || !$('#editor').open) return;
+            $('#fields').replaceChildren();
+            editor.custom = mountCraftForm({ container: $('#fields'), value: editor.draft, items, farmConfig: data?.farm,
+                readOnly: editor.readOnly, capture: captureInGame, position: () => transport.call('getPlayerPosition'),
+                onError: error => { if (editor === current) showError($('#editor-error'), error); } });
+        } catch (error) { if (editor !== current || !$('#editor').open || !opened) return; showError($('#editor-error'), error); editor.readOnly = true; }
     } else {
-        renderFields(editor.draft, $('#fields'));
+        const current = editor;
+        $('#save').disabled = true; $('#fields').textContent = 'Carregando opções de preenchimento…'; $('#editor').showModal();
+        let responses = {};
+        try {
+            const entries = await Promise.all((preview ? [] : catalogRequirements(activeView.id, !!action)).map(async method => [method, await transport.call(method)]));
+            if (editor !== current || !$('#editor').open) return;
+            responses = Object.fromEntries(entries);
+        } catch (error) { if (editor !== current || !$('#editor').open || !opened) return; showError($('#editor-error'), error); editor.readOnly = true; }
+        $('#fields').replaceChildren();
+        editor.custom = mountStructuredForm({ container: $('#fields'), value: editor.draft, view: editor.view, row, action: !!action, data,
+            catalogs: makeCatalogs(editor.view, data, responses), readOnly: editor.readOnly, capture: captureInGame,
+            position: () => transport.call('getPlayerPosition'), outfit: () => transport.call('getCurrentOutfit'),
+            onError: error => { if (editor === current && opened) showError($('#editor-error'), error); } });
         if (action?.previewMethod) {
             const current = editor;
             const statusButton = button('Consultar exclusão pendente', async () => {
@@ -219,30 +202,16 @@ async function openEditor(row = null, extra = false) {
                 finally { editorBusy(false); }
             }, 'capture-position'); $('#fields').append(statusButton);
         }
-        const hint = document.createElement('p'); hint.className = 'json-help'; hint.textContent = 'Listas e configurações complexas usam JSON. Campos privados são mantidos no servidor.'; $('#fields').append(hint);
     }
     $('#save').textContent = action?.previewMethod ? 'Visualizar impacto' : action?.danger ? 'Continuar para exclusão' : 'Salvar alterações';
     $('#save').disabled = editor.readOnly;
     $('#edit-hint').textContent = editor.readOnly ? 'Visualização · Gravação indisponível.' : 'Revise os campos antes de salvar.';
-    if (editor.readOnly) $('#fields').querySelectorAll('input,textarea,button').forEach(node => { node.disabled = true; });
+    if (editor.readOnly) { $('#fields').querySelectorAll('input,textarea,button').forEach(node => { node.disabled = true; }); editor.custom?.setBusy(false); }
     if (!$('#editor').open) $('#editor').showModal(); $('#fields input, #fields textarea, #fields select')?.focus();
 }
 function readDraft() {
-    if (editor.custom) return editor.custom.read();
-    const result = clone(editor.draft);
-    for (const item of editor.inputs) {
-        let value;
-        if (item.kind === 'json') {
-            try { value = JSON.parse(item.node.value); }
-            catch { throw new Error(`JSON inválido no campo ${label(item.path.at(-1))}.`); }
-            if (Array.isArray(item.original) ? !Array.isArray(value) : !value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Preserve o formato do campo ${label(item.path.at(-1))}.`);
-        } else if (item.kind === 'number') {
-            if (!item.node.value.trim()) throw new Error(`Informe ${label(item.path.at(-1))}.`);
-            value = Number(item.node.value); if (!Number.isFinite(value)) throw new Error(`Número inválido em ${label(item.path.at(-1))}.`);
-        } else value = item.kind === 'boolean' ? item.node.checked : item.node.value.trim();
-        setAt(result, item.path, value);
-    }
-    return withoutPrivate(result);
+    if (!editor?.custom) throw new Error('Aguarde o carregamento do formulário.');
+    return withoutPrivate(editor.custom.read());
 }
 function editorBusy(busy) { $('#edit-form').querySelectorAll('button,input,textarea,select').forEach(node => { node.disabled = busy; }); editor?.custom?.setBusy(busy); $('#cancel-editor').disabled = busy; }
 async function commit(method, payload) {
@@ -307,6 +276,7 @@ function displayDeletionPreview(preview, viewId) {
 }
 function closeEditor() { if (!writes.busy) { $('#editor').close(); editor = null; } }
 async function closePanel() {
+    teleportPending = null;
     opened = false; openGeneration++; captureTargets.clear(); clearTimeout(deletionExpiryTimer); deletion = null; suspended = false; loader.cancel(); $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); $('#toast').hidden = true;
     if (!preview) {
         try { await fetch(`https://${resource}/close`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }); } catch { /* FiveM may be stopping the resource. */ }
@@ -383,30 +353,13 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$
 window.addEventListener('message', event => {
     const message = event.data;
     if (message?.action === 'open') openPanel();
-    if (message?.action === 'close') { opened = false; openGeneration++; captureTargets.clear(); clearTimeout(deletionExpiryTimer); deletion = null; suspended = false; loader.cancel(); $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); }
+    if (message?.action === 'close') { opened = false; openGeneration++; teleportPending = null; captureTargets.clear(); clearTimeout(deletionExpiryTimer); deletion = null; suspended = false; loader.cancel(); $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); }
     if (message?.action === 'suspend' && opened) { suspended = true; $('#panel').hidden = true; $('#editor').close(); $('#confirmation').close(); }
     if (message?.action === 'captureResult') {
         const capture = captureTargets.get(message.target); captureTargets.delete(message.target);
         if (!opened || !editor || !capture || capture.token !== editor.token || capture.kind !== message.kind) return;
         if (message.cancelled) { toast('Captura cancelada.'); return; }
-        if (editor.custom) { editor.custom.applyCapture(capture.path, message.data, capture.mode, capture.kind); return; }
-        if (capture.kind === 'position') {
-            const current = getAt(editor.draft, capture.path);
-            for (const axis of ['x', 'y', 'z', 'w', 'h', 'heading']) {
-                if (!Object.hasOwn(current, axis)) continue;
-                const value = message.data?.[axis]; if (!Number.isFinite(value)) continue;
-                setAt(editor.draft, [...capture.path, axis], value);
-                const input = editor.inputs.find(item => JSON.stringify(item.path) === JSON.stringify([...capture.path, axis])); if (input) input.node.value = value;
-            }
-        } else {
-            const input = editor.inputs.find(item => JSON.stringify(item.path) === JSON.stringify(capture.path));
-            if (input && Array.isArray(message.data?.coords)) {
-                try {
-                    const polygons = JSON.parse(input.node.value); if (!Array.isArray(polygons)) throw new Error();
-                    polygons.push({ coords: message.data.coords, minZ: message.data.minZ, maxZ: message.data.maxZ }); input.node.value = JSON.stringify(polygons, null, 2);
-                } catch { showError($('#editor-error'), new Error('A lista de polígonos possui JSON inválido. Corrija o campo antes de capturar novamente.')); }
-            }
-        }
+        editor.custom?.applyCapture(capture.path, message.data, capture.mode, capture.kind);
     }
     if (message?.action === 'resume' && opened && suspended) { suspended = false; $('#panel').hidden = false; if (editor) $('#editor').showModal(); }
 });

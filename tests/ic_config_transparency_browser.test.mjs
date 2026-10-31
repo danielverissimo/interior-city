@@ -26,7 +26,7 @@ for (const resource of ['ic_config', 'ic_mansions']) {
                 return;
             }
             const name = path.slice(1);
-            if (!['index.html', 'style.css', 'mansions.css', 'recovery.css', 'app.mjs', 'model.mjs', 'transport.mjs', 'mansions.mjs'].includes(name)) { res.writeHead(404).end(); return; }
+            if (!['index.html', 'style.css', 'mansions.css', 'craft.css', 'forms.css', 'recovery.css', 'app.mjs', 'model.mjs', 'transport.mjs', 'mansions.mjs', 'craft.mjs', 'forms.mjs', 'form-schema.mjs', 'catalog-picker.mjs'].includes(name)) { res.writeHead(404).end(); return; }
             try {
                 res.setHeader('Content-Type', name.endsWith('.mjs') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html');
                 res.end(await readFile(new URL(name, root)));

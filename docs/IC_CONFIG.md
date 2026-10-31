@@ -25,10 +25,10 @@ o núcleo, a chave ou o servidor de autenticação do `mg_config_panel`.
 Os recursos de gameplay continuam sendo os instalados na base; a independência
 do painel não comprova independência desses recursos.
 
-Esta revisão é candidata local, desabilitada por padrão e sem `ensure` no
-`config/resources.cfg`. Não houve deploy, migração do estado efetivo, alteração
-do painel em execução nem homologação GTA. Não é equivalência completa com o
-painel original em apresentação: listas complexas ainda usam editor JSON.
+Os recursos são distribuídos desabilitados por padrão e sem `ensure` no
+`config/resources.cfg`; a seleção é feita pelo instalador explícito. Não há
+equivalência completa com o painel original em apresentação: algumas listas
+complexas ainda usam editor JSON. Craft + Farm e mansões têm formulários próprios.
 As 17 áreas estão implementadas; mansões usam o módulo independente
 `ic_mansions`, incluindo compra, moradores, IPTU, mobílias e limpeza.
 Consulte [IC_MANSIONS.md](IC_MANSIONS.md) para contratos e importação.
@@ -91,12 +91,28 @@ nem endpoint que aceite nomes arbitrários de recurso/export.
 | Mansões | `ic_mansions/server/{admin,gameplay,furniture,bootstrap}.lua` | Cadastro, edição, exclusão desocupada, ocupantes preservados, baús/garagens/trancas, compra, IPTU, moradores, mobílias e limpeza administrativa. |
 | Concessionária | `m_dealership/server/config_manager.lua` e catálogo da garagem | Estoque, catálogo, exclusão em lote e configurações gerais. |
 
-A NUI tem formulários para campos simples e coordenadas. Listas/objetos
-complexos usam editor JSON com validação de formato. Isso preserva os dados
-editáveis, mas difere dos seletores especializados do painel antigo. Mansões
-têm formulário próprio com vagas de garagem e captura de portas no jogo.
-Teleporte e catálogo visual de ícones não foram reconstruídos.
+A NUI usa campos, seletores e listas nas 17 áreas e 31 telas, sem exigir edição
+de JSON. Mansões têm formulário próprio com vagas de garagem e captura de portas
+no jogo. Craft + Farm usa editor de receitas com busca no catálogo, produtos,
+materiais, quantidades e tempo de produção. Pontos, permissões, armazém e
+recompensas do farm têm controles próprios. As demais telas usam os contratos
+de `web/form-schema.mjs` e os controles de `web/forms.mjs`, incluindo listas
+complexas, polígonos, uniformes e opções específicas de empregos e roubos.
+Veja a [comparação de todas as telas com o painel anterior](IC_CONFIG_FORMS.md).
+O botão **Teleportar** está disponível nos cadastros com localização válida,
+incluindo Craft + Farm. Como no painel anterior, bancadas e lojas usam o primeiro
+ponto; zonas seguras usam o centro médio do primeiro polígono. Cargos, tipos,
+catálogos e configurações gerais não têm destino de teleporte. O catálogo visual
+de ícones não foi reconstruído.
 As respostas indisponíveis e falhas aparecem explicitamente na interface.
+
+Cada teleporte passa pela autorização atual de `dono`/`developer` no servidor e
+pela validação de coordenadas finitas. Move somente o próprio personagem ou seu
+veículo atual, aplica o deslocamento vertical de 0,25 m do recurso anterior e
+fecha a NUI liberando o foco. Permanece disponível com gravações de configuração
+desligadas; não altera cadastros. Captura ativa, pedidos simultâneos, permissão
+revogada, painel fechado e respostas atrasadas impedem o efeito. A prévia local
+não executa teleporte.
 
 `client/main.lua` registra `/icconfig` e F9. `/painelconfig` e Home só são
 registrados com `setr ic_config_legacy_aliases "true"` antes do início do recurso.
@@ -114,6 +130,31 @@ usa E para confirmar e Backspace para cancelar. No polígono, E adiciona,
 Backspace conclui com pelo menos três pontos e X cancela. A captura devolve
 vértices XY e limites Z iniciais editáveis de um metro abaixo e dois acima dos
 pontos coletados. Iniciar ou terminar uma captura não grava configuração.
+
+## Editor de Craft + Farm
+
+`web/craft.mjs:mountCraftForm` usa o contrato existente `getItemList` para buscar
+por nome ou código, com comparação sem distinção de acentos. O editor tem abas
+para bancada/farm e receitas. Não pede edição de JSON para pontos, produtos,
+materiais, quantidades, tempo, permissões ou recompensas. Capturas de posição
+usam o fluxo existente e atualizam apenas o rascunho.
+
+O salvamento mantém `saveCraftSetup` e o formato esperado pelos recursos.
+Itens antigos fora do catálogo, metadados não editados e múltiplos grupos de
+recompensas permanecem no rascunho. Materiais novos necessários às receitas são
+incluídos no armazém; itens extras existentes só saem por ação explícita. Dinheiro
+não gera nova entrada de armazém automaticamente, como no formulário anterior.
+Quantidades e limites do farm são validados; erro não descarta o formulário.
+Cancelar não salva. Falha de catálogo impede salvar; modo de leitura permite
+trocar as abas e consultar receitas sem habilitar alterações.
+
+Cobertura: `tests/ic_config_craft.test.mjs` verifica preservação/validação dos
+dados; `tests/ic_config_craft_browser.test.mjs` usa Chrome com NUI simulada para
+seleção, captura, edição, cancelamento, modo de leitura e falha do catálogo.
+Os testes de transparência também cobrem a página com os novos módulos.
+Estas melhorias e o teleporte compõem a atualização conjunta. O envio adiado
+em 29/10/2026 foi autorizado em 30/10/2026; o resultado operacional acompanha
+o relatório privado da release. A tentativa anterior foi cancelada antes da ativação.
 
 ## Falhas, permissões e limites
 

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createTransport, createLatestLoader, createWriteGate, escapeHtml } from '../resources/[scriptcore]/ic_config/web/transport.mjs';
-import { AREAS, VIEWS, recordsFor, mutationFor, editorValue, withoutPrivate } from '../resources/[scriptcore]/ic_config/web/model.mjs';
+import { AREAS, VIEWS, recordsFor, mutationFor, editorValue, withoutPrivate, teleportCoords } from '../resources/[scriptcore]/ic_config/web/model.mjs';
 import { mansionEditable, mansionDoor, mansionPermission } from '../resources/[scriptcore]/ic_config/web/mansions.mjs';
 
 test('transport sends one identified mutation and preserves server error', async () => {
@@ -44,6 +44,23 @@ test('all 17 areas expose original contract names without vendor runtime depende
     assert.ok(VIEWS.some(view => view.read === 'getGarageTypes'));
     assert.ok(VIEWS.some(view => view.update === 'saveServerVehicle'));
     assert.ok(VIEWS.some(view => view.update === 'saveRobberySetup'));
+});
+test('teleport uses the original destination for each location view and rejects missing/invalid coordinates', () => {
+    const tp = (id, row) => teleportCoords(VIEWS.find(view => view.id === id), row);
+    const p = { x: 1, y: 2, z: 3 };
+    for (const id of ['chests', 'garages', 'mapmarkings', 'cloakroom', 'clothing', 'barbershop', 'tattoo']) assert.deepEqual(tp(id, { coords: p }), p);
+    assert.deepEqual(tp('craft', { coords: [p, { x: 9, y: 9, z: 9 }] }), p);
+    assert.deepEqual(tp('shops', { data: { coords: [{ coords: p }] } }), p);
+    assert.deepEqual(tp('jobs', { data: { inicio: ['1', '2', '3'] } }), p);
+    assert.deepEqual(tp('desmanche', { inicio: p }), p);
+    assert.deepEqual(tp('mansions', { purchaseCoords: p }), p);
+    assert.deepEqual(tp('houses', p), p); assert.deepEqual(tp('robberies', p), p);
+    assert.deepEqual(tp('safezone', { zones: [{ coords: [{ x: 0, y: 0 }, { x: 6, y: 0 }, { x: 0, y: 6 }], minZ: 2, maxZ: 4 }] }), { x: 2, y: 2, z: 3 });
+    for (const coords of [{ x: null, y: 2, z: 3 }, { x: '', y: 2, z: 3 }, { x: true, y: 2, z: 3 }, { x: Infinity, y: 2, z: 3 }, { x: 1000001, y: 2, z: 3 }]) assert.equal(tp('chests', { coords }), null);
+    assert.equal(tp('craft', { coords: [] }), null);
+    assert.equal(tp('safezone', { zones: [{ coords: [{ x: 1, y: 2 }], minZ: 0, maxZ: 1 }] }), null);
+    assert.equal(tp('groups', { coords: p }), null); assert.equal(tp('garageTypes', { coords: p }), null);
+    assert.equal(tp('catalog', { coords: p }), null); assert.equal(tp('robberySettings', p), null);
 });
 test('private configuration is excluded recursively and unsafe names remain inert', () => {
     const payload = JSON.parse('{"settings":{"webhook":"private","tax":2},"rows":[{"token":"private","name":"<img onerror=steal()>"}],"__proto__":{"polluted":true}}');

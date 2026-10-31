@@ -1,6 +1,7 @@
 local root = assert(arg[1])
 local events, nui, commands, timers, sent, messages = {}, {}, {}, {}, {}, {}
 local focused = false
+local movements,inVehicle = {},false
 local threads, pressed = {}, nil
 local localEvents = {}
 function GetCurrentResourceName() return 'ic_config' end
@@ -34,6 +35,9 @@ function TriggerEvent(name,...)
 end
 function TriggerServerEvent(name, value) sent[#sent+1] = {name=name,value=value} end
 function PlayerPedId() return 7 end
+function IsPedInAnyVehicle() return inVehicle end
+function GetVehiclePedIsIn() return 77 end
+function SetEntityCoords(entity,x,y,z) movements[#movements+1]={entity=entity,x=x,y=y,z=z} end
 function GetEntityCoords() return {x=1,y=2,z=3} end
 function GetEntityHeading() return 90 end
 function GetEntityModel() return 11 end
@@ -129,6 +133,42 @@ local check = latest()
 nui.close({},function() end)
 answer({requestId=check.requestId,ok=true,data=true})
 assert(result.error.code == 'CLOSED')
+local function reopen()
+    commands.icconfig();answer({requestId=latest().requestId,ok=true,data=true});assert(focused)
+end
+reopen()
+result=nil
+nui.request({requestId='tp:denied',method='teleport',payload={coords={x=1,y=2,z=3}}},function(v)result=v end)
+answer({requestId=latest().requestId,ok=false,error={code='FORBIDDEN',message='Permissão revogada.'}})
+assert(result.error.code=='FORBIDDEN' and #movements==0 and focused)
+nui.request({requestId='tp:invalid',method='teleport',payload={}},function(v)result=v end)
+answer({requestId=latest().requestId,ok=true,data={coords={x=1,y=2,z=math.huge}}})
+assert(result.error.code=='INVALID_RESPONSE' and #movements==0)
+nui.request({requestId='tp:ped',method='teleport',payload={coords={x=999,y=999,z=999}}},function(v)result=v end)
+local tp=latest();assert(tp.method=='teleport' and #movements==0)
+local duplicate
+nui.request({requestId='tp:busy',method='teleport',payload={}},function(v)duplicate=v end)
+assert(duplicate.error.code=='BUSY')
+nui.request({requestId='capture:busy',method='startPositionCapture',payload={target='test'}},function(v)duplicate=v end)
+assert(duplicate.error.code=='BUSY')
+answer({requestId=tp.requestId,ok=true,data={coords={x=11,y=22,z=33}}},1)
+assert(#movements==0,'forged response must not move anyone')
+answer({requestId=tp.requestId,ok=true,data={coords={x=11,y=22,z=33}}})
+assert(result.ok and #movements==1 and movements[1].entity==7 and movements[1].x==11 and movements[1].z==33.25 and not focused)
+reopen();inVehicle=true
+nui.request({requestId='tp:vehicle',method='teleport',payload={coords={x=1,y=2,z=3}}},function(v)result=v end)
+answer({requestId=latest().requestId,ok=true,data={coords={x=1,y=2,z=3}}})
+assert(#movements==2 and movements[2].entity==77 and movements[2].z==3.25 and not focused)
+reopen()
+nui.request({requestId='tp:closed',method='teleport',payload={}},function(v)result=v end)
+tp=latest();nui.close({},function()end)
+answer({requestId=tp.requestId,ok=true,data={coords={x=1,y=2,z=3}}})
+assert(result.error.code=='CLOSED' and #movements==2 and not focused)
+reopen()
+nui.request({requestId='tp:timeout',method='teleport',payload={}},function(v)result=v end)
+tp=latest();timers[#timers]()
+answer({requestId=tp.requestId,ok=true,data={coords={x=1,y=2,z=3}}})
+assert(result.error.code=='TIMEOUT' and #movements==2)
 events.onResourceStop('ic_config')
 assert(not focused)
 print('ic_config client harness passed')

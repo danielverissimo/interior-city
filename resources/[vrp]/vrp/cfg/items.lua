@@ -191,6 +191,23 @@ cfg.items = {
 	["rubi"] = { "Rubi", "none", 1.0, nil, nil},
 	["safira"] = { "Safira", "none", 1.0, nil, nil},
 
+	-- COMIDAS E BEBIDAS DO INTERIOR
+	["pamonha"] = { "Pamonha", "comer", 0.5, -24, nil},
+	["curau"] = { "Curau", "comer", 0.2, -16, nil},
+	["tapioca"] = { "Tapioca", "comer", 0.5, -32, nil},
+	["cuscuz"] = { "Cuscuz", "comer", 0.5, -32, nil},
+	["bolodemilho"] = { "Bolo de Milho", "comer", 0.5, -18, nil},
+	["galinhada"] = { "Galinhada", "comer", 2.0, -50, nil},
+	["arrozcompequi"] = { "Arroz com Pequi", "comer", 2.0, -50, nil},
+	["feijaotropeiro"] = { "Feijão Tropeiro", "comer", 2.0, -50, nil},
+	["arrozcarreteiro"] = { "Arroz Carreteiro", "comer", 2.0, -50, nil},
+	["docedeleite"] = { "Doce de Leite", "comer", 0.5, -14, nil},
+	["goiabada"] = { "Goiabada", "comer", 0.5, -14, nil},
+	["pacoca"] = { "Paçoca", "comer", 0.5, -14, nil},
+	["pedemoleque"] = { "Pé de Moleque", "comer", 0.5, -14, nil},
+	["caldodecana"] = { "Caldo de Cana", "beber", 0.5, nil, -36},
+	["cafecoado"] = { "Café Coado", "beber", 0.25, nil, -20},
+
 	-- COMIDAS
 
 	["pao"] = { "Pao", "comer", 0.5, -18, nil},

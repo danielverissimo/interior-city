@@ -37,6 +37,12 @@ e cria uma referência local `codex/ic-config-candidate-<sha>`. Não modifica
 HEAD, branch atual, índice padrão ou a alteração alheia em `m_patrulha.sql`.
 Não faz push, SSH, upload ou deploy. Só admite os slots vazios de distribuição.
 
+Em uma atualização, `--base-commit <SHA completo da release atual>` permite
+montar somente os caminhos desta entrega sobre a versão publicada. Assim,
+trabalho alheio já commitado em HEAD também fica fora do pacote, sem alterar
+o arquivo, a branch ou o índice local. `candidate.json` registra `baseCommit`,
+`sourceHead` e os caminhos excluídos para revisão antes do envio.
+
 O diretório privado contém `candidate.json`, `validation.json`,
 `release.tar.gz`, `source-manifest.json` e `provider-preview-manifest.json`.
 O manifesto de prévia representa apenas a seleção dos provedores; o manifesto

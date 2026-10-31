@@ -11,7 +11,7 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
     const root = new URL('../resources/[scriptcore]/ic_config/web/', import.meta.url);
     const server = createServer(async (req, res) => {
         const path = req.url.split('?')[0] === '/' ? 'index.html' : req.url.split('?')[0].slice(1);
-        if (!['index.html', 'style.css', 'mansions.css', 'app.mjs', 'model.mjs', 'transport.mjs', 'mansions.mjs'].includes(path)) { res.writeHead(404).end(); return; }
+        if (!['index.html', 'style.css', 'mansions.css', 'craft.css', 'forms.css', 'app.mjs', 'model.mjs', 'transport.mjs', 'mansions.mjs', 'craft.mjs', 'forms.mjs', 'form-schema.mjs', 'catalog-picker.mjs'].includes(path)) { res.writeHead(404).end(); return; }
         res.setHeader('Content-Type', path.endsWith('.mjs') ? 'text/javascript' : path.endsWith('.css') ? 'text/css' : 'text/html');
         res.end(await readFile(new URL(path, root)));
     });
@@ -22,7 +22,7 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
         const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
         page.setDefaultTimeout(7000);
         async function clickRpc(locator, method) { const response = page.waitForResponse(response => response.url() === 'https://ic_config/request' && response.request().postDataJSON()?.method === method); await locator.click(); await response; }
-        const errors = [], requests = [], chests = [], mansions = []; let readonly = false, previewSequence = 0, conflictOnce = true, denyMansions = false;
+        const errors = [], requests = [], chests = [], mansions = []; let readonly = false, previewSequence = 0, conflictOnce = true, denyMansions = false, denyTeleport = true;
         page.on('pageerror', error => errors.push(error.message));
         await page.addInitScript(() => { window.GetParentResourceName = () => 'ic_config'; });
         const headers = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'POST,OPTIONS', 'access-control-allow-headers': 'Content-Type' };
@@ -32,6 +32,11 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
             const request = route.request().postDataJSON(); requests.push(request);
             let data = {}, error = null;
             if (request.method === 'bootstrap') data = { writesEnabled: !readonly, methods: [] };
+            else if (request.method === 'teleport') {
+                if (denyTeleport) error = { code: 'FORBIDDEN', message: 'Permissão de teleporte revogada.' };
+                else data = { coords: request.payload.coords };
+            }
+            else if (request.method === 'getCraftSetups') data = { benches: [{ name: 'Bancada de teste', coords: [{ x: 10, y: 20, z: 30 }, { x: 90, y: 80, z: 70 }] }, { name: 'Bancada sem ponto', coords: [] }], farm: {} };
             else if (request.method === 'getManagedGroups') data = [{ name: 'Developer', config: { gtype: 'staff' }, permissions: ['perm.test'] }];
             else if (request.method === 'getChests') data = chests;
             else if (request.method === 'getSafeZones') data = { safezones: [], settings: {}, whitelist: [] };
@@ -88,7 +93,7 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
         await page.locator('#cancel-edit').click();
         await page.locator('#navigation button[data-area="safezone"]').click();
         await page.locator('#create').click();
-        await page.getByLabel('Nome', { exact: true }).fill('Captured zone');
+        await page.getByLabel('Nome da zona segura', { exact: true }).fill('Captured zone');
         await clickRpc(page.getByRole('button', { name: 'Desenhar polígono no jogo' }), 'startSafeZonePolygon');
         const polygon = requests.findLast(request => request.method === 'startSafeZonePolygon');
         await page.evaluate(target => {
@@ -96,9 +101,9 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
             window.postMessage({ action: 'captureResult', kind: 'polygon', target, cancelled: false, data: { coords: [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 2 }], minZ: 20, maxZ: 24 } }, '*');
             window.postMessage({ action: 'resume' }, '*');
         }, polygon.payload.target);
-        await page.waitForFunction(() => document.querySelector('#editor').open && document.querySelector('#fields textarea').value.includes('minZ'));
-        const zones = JSON.parse(await page.getByLabel('Polígonos', { exact: true }).inputValue());
-        assert.equal(zones.length, 1); assert.equal(zones[0].coords.length, 3); assert.equal(zones[0].minZ, 20);
+        await page.getByRole('group', { name: 'Vértice 3', exact: true }).waitFor();
+        assert.equal(await page.getByLabel('Altura mínima (minZ)', { exact: true }).inputValue(), '20');
+        assert.equal(await page.locator('#fields textarea').count(), 0);
         await page.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
         await page.locator('#editor').waitFor({ state: 'hidden' });
         assert.equal(requests.find(request => request.method === 'createSafeZone').payload.zones.length, 1);
@@ -184,6 +189,20 @@ test('live NUI creates records, captures positions/polygons, keeps drafts and re
         await page.evaluate(() => { window.postMessage({ action: 'close' }, '*'); window.postMessage({ action: 'open' }, '*'); });
         await page.locator('#mode-banner').getByText(/SOMENTE LEITURA/).waitFor();
         assert.equal(await page.locator('#create').isDisabled(), true);
+        // Row teleport remains available with config writes disabled, validates
+        // server denial and closes only after a successful, single request.
+        await page.locator('#navigation button[data-area="craft"]').click();
+        const bench = page.locator('.record').filter({ hasText: 'Bancada de teste' });
+        await bench.getByRole('button', { name: 'Teleportar', exact: true }).waitFor();
+        assert.equal(await page.locator('.record').filter({ hasText: 'Bancada sem ponto' }).getByRole('button', { name: 'Teleportar' }).count(), 0);
+        await bench.getByRole('button', { name: 'Teleportar', exact: true }).click();
+        await page.locator('#error').filter({ hasText: 'Permissão de teleporte revogada.' }).waitFor();
+        assert.equal(await page.locator('#panel').isVisible(), true);
+        assert.deepEqual(requests.find(request => request.method === 'teleport').payload, { coords: { x: 10, y: 20, z: 30 } });
+        denyTeleport = false;
+        await bench.getByRole('button', { name: 'Teleportar', exact: true }).click();
+        await page.locator('#panel').waitFor({ state: 'hidden' });
+        assert.equal(requests.filter(request => request.method === 'teleport').length, 2);
         assert.deepEqual(errors, []);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     } finally { await browser?.close(); await new Promise(resolve => server.close(resolve)); }
