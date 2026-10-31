@@ -17,6 +17,34 @@ local DutyLoaded = {}
 
 HotbarWeapons = HotbarWeapons or {}
 
+local function isEventWeaponAllowed(source)
+    source = tonumber(source)
+    if not source then return false end
+
+    -- O m_eventos roda eventos em routing bucket próprio. Liberamos a troca
+    -- de armas somente quando o próprio m_eventos marca explicitamente o
+    -- jogador como autorizado. Isso não altera as demais regras do inventory.
+    local player = Player(source)
+    if player and player.state then
+        if player.state.m_eventosAllowEventWeapons == true or player.state.m_eventosBattleRoyale == true then
+            return true
+        end
+    end
+
+    -- Fallback server-side para a pequena janela em que a state bag possa
+    -- ainda estar sincronizando depois de teleporte/respawn/troca de bucket.
+    if GetResourceState('m_eventos') == 'started' then
+        local ok, allowed = pcall(function()
+            return exports['m_eventos']:CanUseEventWeapons(source)
+        end)
+        if ok and allowed == true then
+            return true
+        end
+    end
+
+    return false
+end
+
 local function clampInt(value, minValue, maxValue)
     value = math.floor(tonumber(value) or 0)
     if value < minValue then return minValue end
@@ -226,7 +254,7 @@ local function captureActive(user_id, source)
 end
 
 local function canEquip(user_id, source)
-    if GetPlayerRoutingBucket(source) ~= 0 then
+    if GetPlayerRoutingBucket(source) ~= 0 and not isEventWeaponAllowed(source) then
         return false, "Você não pode equipar arma agora."
     end
 

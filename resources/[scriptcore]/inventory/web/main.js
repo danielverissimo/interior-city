@@ -1,7 +1,6 @@
 window.classInstances = {};
 globalThis.SelectedItem = {};
 window.imageUrl = 'http://127.0.0.1/images/'
-window.inventoryImageUrl = (name) => `${window.imageUrl}${encodeURIComponent(String(name || ''))}.png?v=20261029-2`;
 
 window.isOnline = true;
 
@@ -76,7 +75,7 @@ function renderEquippedWeaponsPanel(snapshot = {}) {
 			</div>
 			<div class="equipped-weapon-content">
 				<div class="equipped-weapon-visual">
-					${image ? `<img src="${window.inventoryImageUrl(image)}" alt="" onerror="this.onerror=null;this.src='./images/weapon.svg'">` : '<img src="./images/weapon.svg" alt="">'}
+					${image ? `<img src="${window.imageUrl}${image}.png" alt="" onerror="this.onerror=null;this.src='./images/weapon.svg'">` : '<img src="./images/weapon.svg" alt="">'}
 				</div>
 				<div class="equipped-weapon-info">
 					<strong title="${displayName.replace(/"/g, "&quot;")}">${displayName}</strong>
@@ -144,7 +143,7 @@ function updateWeaponHud(payload = {}) {
 	reserve.textContent = String(Math.max(0, Number(payload.reserve) || 0));
 
 	if (itemImage) {
-		const nextSrc = window.inventoryImageUrl(itemImage);
+		const nextSrc = `${window.imageUrl}${itemImage}.png`;
 		if (image.dataset.src !== nextSrc) {
 			image.dataset.src = nextSrc;
 			image.onerror = () => {
@@ -223,7 +222,7 @@ function renderQuickHotbar(payload = {}, held = false) {
 		slot.className = `quick-hotbar-slot${isActive ? " is-active" : ""}${data.empty ? " is-empty" : ""}`;
 		slot.innerHTML = `
 			<div class="quick-hotbar-key">${i}</div>
-			${image ? `<img class="quick-hotbar-item" src="${window.inventoryImageUrl(image)}" alt="" onerror="this.style.opacity='.18'">` : ""}
+			${image ? `<img class="quick-hotbar-item" src="${window.imageUrl}${image}.png" alt="" onerror="this.style.opacity='.18'">` : ""}
 			${amountText ? `<div class="quick-hotbar-amount">${amountText}</div>` : ""}
 			${isActive ? '<div class="quick-hotbar-equipped">EQUIPADO</div>' : ""}
 		`;

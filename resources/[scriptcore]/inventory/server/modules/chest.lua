@@ -6,21 +6,16 @@ local CHESTS_FILE <const> = "config/shared.chests.json"
 
 
 local function mansionIptuAccess(source, permission)
-    if not permission or permission == "" then return true end
-    local provider=GetConvar('ic_mansions_resource','m_mansions')
-    local own=provider=='ic_mansions'
-    if GetResourceState(provider)~='started' then
-        if own and type(GlobalState.ic_mansions_permissions)=='table' and not GlobalState.ic_mansions_permissions[permission] then return true end
-        return not own
+    if not permission or permission == "" or GetResourceState("m_mansions") ~= "started" then
+        return true
     end
     local ok,allowed = pcall(function()
-        return exports[provider]:checkAccessByPermission(source,permission)
+        return exports["m_mansions"]:checkAccessByPermission(source,permission)
     end)
     if not ok then
-        print('^1[inventory]^7 Não foi possível consultar o serviço de IPTU.')
-        return not own
+        print(("^1[inventory]^7 Falha ao consultar IPTU da mansão: %s"):format(tostring(allowed)))
+        return true
     end
-    if own then return allowed==true end
     return allowed ~= false
 end
 
@@ -236,19 +231,6 @@ end)
 
 local CACHED_HASHS = {}
 local ITEMS_CACHE <const> = {}
--- IC Admin invokes these only while its global maintenance gate is held.
-exports('icAdminOwnershipReady',function()
-    if GetInvokingResource()~='ic_admin' then return false end
-    return next(ChestUtils.chests or {})==nil and next(ChestUtils.users or {})==nil
-end)
-exports('icAdminOwnershipCommitted',function()
-    if GetInvokingResource()~='ic_admin' then return false end
-    if next(ChestUtils.chests or {}) or next(ChestUtils.users or {}) then return false end
-    for key in pairs(ITEMS_CACHE) do ITEMS_CACHE[key]=nil end
-    for key in pairs(CACHED_HASHS) do CACHED_HASHS[key]=nil end
-    return true
-end)
-
 local USERS_BYPASS_VEHICLE = {}
 
 
@@ -413,10 +395,6 @@ end)
 ---@param chest_name string | nil
 ---@return table<string, table | number> | false
 function API.requireChest(type, network_id, chest_name)
-    if GetResourceState('ic_admin')=='started' and exports['ic_admin']:isUserInMaintenance(0) then
-        TriggerClientEvent('Notify',source,'negado','Manutenção de patrimônio em andamento. Tente novamente em instantes.',5000)
-        return
-    end
     local source = source
     local user_id = vRP.getUserId(source)
     if incomingRequests[user_id] then

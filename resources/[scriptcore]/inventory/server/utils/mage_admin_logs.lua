@@ -2,13 +2,13 @@
 -- INVENTORY -> MAGE ADMIN CENTRAL AUDIT LOGS
 -- ============================================================================
 -- Todas as ocorrências deste resource passam pelo sistema central do
--- IC Admin. Se o painel estiver reiniciando, a ocorrência fica em uma
+-- m_paineladm_v2. Se o painel estiver reiniciando, a ocorrência fica em uma
 -- pequena fila temporária e mantém o horário original da ação.
 -- ============================================================================
 
 InventoryAudit = InventoryAudit or {}
 
-local PANEL_RESOURCE <const> = GetConvar("ic_admin_service_resource", "ic_admin")
+local PANEL_RESOURCE <const> = "m_paineladm_v2"
 local MAX_PENDING <const> = 300
 local FLUSH_INTERVAL <const> = 10000
 local pendingLogs = {}

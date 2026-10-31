@@ -170,7 +170,7 @@ class Inventory {
 							item.price ? `R$${item.price}` : `${item.amount}x`
 						}</p>
             <p class="name-item-inventory" title="${item.name}">${item.name}</p>
-            <img src="${window.inventoryImageUrl(item.png || item.item)}" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
+            <img src="http://127.0.0.1/images/${item.item}.png" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
             `;
 		}
 		return `
@@ -180,7 +180,7 @@ class Inventory {
 							item.price ? `R$${item.price}` : `${item.amount}x`
 						}</p>
             <p class="name-item-inventory" title="${item.name}">${item.name}</p>
-            <img src="${window.inventoryImageUrl(item.png || item.item)}" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
+            <img src="http://127.0.0.1/images/${item.item}.png" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
         </div>
         `;
 	}
@@ -224,7 +224,7 @@ class Inventory {
 		// );
 		$(".image-grame").attr(
 			"src",
-			window.inventoryImageUrl(globalThis.SelectedItem.png || globalThis.SelectedItem.item),
+			`http://127.0.0.1/images/${globalThis.SelectedItem.item}.png`,
 		);
 		$(`.slot-${side}${item.id}`).addClass("slot-active");
 	}

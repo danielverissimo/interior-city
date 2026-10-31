@@ -4,6 +4,34 @@ local tn <const> = tonumber
 
 local imagesProfile = imagesProfile or {}
 
+local function isEventWeaponAllowed(source)
+    source = tonumber(source)
+    if not source then return false end
+
+    -- O m_eventos roda eventos em routing bucket próprio. Liberamos a troca
+    -- de armas somente quando o próprio m_eventos marca explicitamente o
+    -- jogador como autorizado. Isso não altera as demais regras do inventory.
+    local player = Player(source)
+    if player and player.state then
+        if player.state.m_eventosAllowEventWeapons == true or player.state.m_eventosBattleRoyale == true then
+            return true
+        end
+    end
+
+    -- Fallback server-side para a pequena janela em que a state bag possa
+    -- ainda estar sincronizando depois de teleporte/respawn/troca de bucket.
+    if GetResourceState('m_eventos') == 'started' then
+        local ok, allowed = pcall(function()
+            return exports['m_eventos']:CanUseEventWeapons(source)
+        end)
+        if ok and allowed == true then
+            return true
+        end
+    end
+
+    return false
+end
+
 WeaponsTypes = {
     ["WEAPON_SNSPISTOL_MK2"] = "PISTOLAS",
     ["WEAPON_PISTOL_MK2"] = "PISTOLAS",
@@ -663,7 +691,7 @@ function API.useItem(slot, amount)
                     end
 
                     if Items[slot_data.item].type == "equip" then
-                        if GetPlayerRoutingBucket(source) ~= 0 then return { error = "Você não pode equipar arma agora." } end
+                        if GetPlayerRoutingBucket(source) ~= 0 and not isEventWeaponAllowed(source) then return { error = "Você não pode equipar arma agora." } end
 
                         if exports.vrp_admin:checkIfUserIsBlacklisted(user_id) then return { error = "Você não pode equipar arma agora." } end
 
