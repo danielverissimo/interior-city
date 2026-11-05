@@ -108,7 +108,7 @@ Config.Groups = {
     ['Mafia'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -135,17 +135,14 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorMafia'] = {
-                prefix = 'GerenteMafia',
+                prefix = 'RecrutadorMafia',
                 tier = 6,
             },
             ['MembroMafia'] = {
                 prefix = 'MembroMafia',
                 tier = 7,
             },
-            ['RecrutadorMafia'] = {
-                prefix = 'RecrutadorMafia',
-                tier = 8,
-            },
+           
 
 
         }
@@ -153,7 +150,7 @@ Config.Groups = {
     ['Cartel'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -180,17 +177,14 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorCartel'] = {
-                prefix = 'GerenteCartel',
+                prefix = 'RecrutadorCartel',
                 tier = 6,
             },
             ['MembroCartel'] = {
                 prefix = 'MembroCartel',
                 tier = 7,
             },
-            ['RecrutadorCartel'] = {
-                prefix = 'RecrutadorCartel',
-                tier = 8,
-            },
+            
 
 
         }
@@ -198,7 +192,7 @@ Config.Groups = {
     ['Motoclube'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -225,17 +219,14 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorMotoclube'] = {
-                prefix = 'GerenteMotoclube',
+                prefix = 'RecrutadorMotoclube',
                 tier = 6,
             },
             ['MembroMotoclube'] = {
                 prefix = 'MembroMotoclube',
                 tier = 7,
             },
-            ['RecrutadorMotoclube'] = {
-                prefix = 'RecrutadorMotoclube',
-                tier = 8,
-            },
+           
 
 
         }
@@ -243,7 +234,7 @@ Config.Groups = {
     ['Vanilla'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -270,25 +261,21 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorVanilla'] = {
-                prefix = 'GerenteVanilla',
+                prefix = 'RecrutadorVanilla',
                 tier = 6,
             },
             ['MembroVanilla'] = {
                 prefix = 'MembroVanilla',
                 tier = 7,
             },
-            ['RecrutadorVanilla'] = {
-                prefix = 'RecrutadorVanilla',
-                tier = 8,
-            },
-
+           
 
         }
     },
     ['Bahamas'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -315,25 +302,21 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorBahamas'] = {
-                prefix = 'GerenteBahamas',
+                prefix = 'RecrutadorBahamas',
                 tier = 6,
             },
             ['MembroBahamas'] = {
                 prefix = 'MembroBahamas',
                 tier = 7,
             },
-            ['RecrutadorBahamas'] = {
-                prefix = 'RecrutadorBahamas',
-                tier = 8,
-            },
-
+           
 
         }
     },
     ['Vermelhos'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -341,7 +324,7 @@ Config.Groups = {
             Goals = { -- METAS
                 defaultReward = 300, -- Valor Padrão da recompensa ( obs Lider consegue alterar in-game )
                 itens = {
-                    ["capsulas"] = 500,
+                    ["anfetamina"] = 500,
                 }
             }
         },
@@ -360,17 +343,14 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorVermelhos'] = {
-                prefix = 'GerenteVermelhos',
+                prefix = 'RecrutadorVermelhos',
                 tier = 6,
             },
             ['MembroVermelhos'] = {
                 prefix = 'MembroVermelhos',
                 tier = 7,
             },
-            ['RecrutadorVermelhos'] = {
-                prefix = 'RecrutadorVermelhos',
-                tier = 8,
-            },
+           
 
 
         }
@@ -378,7 +358,7 @@ Config.Groups = {
     ['Verdes'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -386,7 +366,7 @@ Config.Groups = {
             Goals = { -- METAS
                 defaultReward = 300, -- Valor Padrão da recompensa ( obs Lider consegue alterar in-game )
                 itens = {
-                    ["pecadearma"] = 500,
+                    ["folhamaconha"] = 500,
                 }
             }
         },
@@ -405,17 +385,14 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorVerdes'] = {
-                prefix = 'GerenteVerdes',
+                prefix = 'RecrutadorVerdes',
                 tier = 6,
             },
             ['MembroVerdes'] = {
                 prefix = 'MembroVerdes',
                 tier = 7,
             },
-            ['RecrutadorVerdes'] = {
-                prefix = 'RecrutadorVerdes',
-                tier = 8,
-            },
+          
 
 
         }
@@ -423,7 +400,7 @@ Config.Groups = {
     ['Franca'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -450,17 +427,14 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorFranca'] = {
-                prefix = 'GerenteFranca',
+                prefix = 'RecrutadorFranca',
                 tier = 6,
             },
             ['MembroFranca'] = {
                 prefix = 'MembroFranca',
                 tier = 7,
             },
-            ['RecrutadorFranca'] = {
-                prefix = 'RecrutadorFranca',
-                tier = 8,
-            },
+           
 
 
         }
@@ -468,7 +442,7 @@ Config.Groups = {
     ['Roxos'] = {
         Config = {
             Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
+                active = true, -- Se vai esta ativo ou nao
                 amount = 2000, -- Valor que vai receber
                 time = 30, -- tempo em tempo que vai receber salario em minuto(s)
             },
@@ -495,112 +469,21 @@ Config.Groups = {
                 tier = 3,
             },
             ['RecrutadorRoxos'] = {
-                prefix = 'GerenteRoxos',
+                prefix = 'RecrutadorRoxos',
                 tier = 6,
             },
             ['MembroRoxos'] = {
                 prefix = 'MembroRoxos',
                 tier = 7,
             },
-            ['RecrutadorRoxos'] = {
-                prefix = 'RecrutadorRoxos',
-                tier = 8,
-            },
+           
 
 
         }
     },
-    ['Laranjas'] = {
-        Config = {
-            Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
-            },
-
-            Goals = { -- METAS
-                defaultReward = 300, -- Valor Padrão da recompensa ( obs Lider consegue alterar in-game )
-                itens = {
-                    ["anfetamina"] = 500,
-                }
-            }
-        },
-
-        List = {
-            ['LiderLaranjas'] = {
-                prefix = 'LiderLaranjas',
-                tier = 1,
-            },
-            ['SubLiderLaranjas'] = {
-                prefix = 'SubLiderLaranjas',
-                tier = 2,
-            },
-            ['GerenteLaranjas'] = {
-                prefix = 'GerenteLaranjas',
-                tier = 3,
-            },
-            ['RecrutadorLaranjas'] = {
-                prefix = 'GerenteLaranjas',
-                tier = 6,
-            },
-            ['MembroLaranjas'] = {
-                prefix = 'MembroLaranjas',
-                tier = 7,
-            },
-            ['RecrutadorLaranjas'] = {
-                prefix = 'RecrutadorLaranjas',
-                tier = 8,
-            },
-
-
-        }
-    },
-    ['Colombia'] = {
-        Config = {
-            Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
-            },
-
-            Goals = { -- METAS
-                defaultReward = 300, -- Valor Padrão da recompensa ( obs Lider consegue alterar in-game )
-                itens = {
-                    ["folhamaconha"] = 500,
-                }
-            }
-        },
-
-        List = {
-            ['LiderColombia'] = {
-                prefix = 'LiderColombia',
-                tier = 1,
-            },
-            ['SubLiderColombia'] = {
-                prefix = 'SubLiderColombia',
-                tier = 2,
-            },
-            ['GerenteColombia'] = {
-                prefix = 'GerenteColombia',
-                tier = 3,
-            },
-            ['RecrutadorColombia'] = {
-                prefix = 'GerenteColombia',
-                tier = 6,
-            },
-            ['MembroColombia'] = {
-                prefix = 'MembroColombia',
-                tier = 7,
-            },
-            ['RecrutadorColombia'] = {
-                prefix = 'RecrutadorColombia',
-                tier = 8,
-            },
-
-
-        }
-    },
+    
 }
+    
 
 Config.Langs = {
     ['offlinePlayer'] = function(source) TriggerClientEvent("Notify", source,"negado","Este jogador não está online.",5000) end,
