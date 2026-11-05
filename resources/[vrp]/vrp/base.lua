@@ -234,7 +234,7 @@ function vRP.isWhitelisted(user_id)
 	if #rows > 0 then
 		return rows[1].whitelist
 	else
-		return false
+		return true
 	end
 end
 
