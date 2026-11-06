@@ -1,9 +1,12 @@
+import { useEffect, useState } from "react";
+import { emit } from "../utils/emit";
+import { observe } from "../hooks/observe";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.svg";
 
-const categories = [
+const defaultCategories = [
   { id: "esportivos", label: "ESPORTIVOS" },
   { id: "sedan", label: "SEDAN" },
   { id: "meus-veiculos", label: "MEUS CARROS" },
@@ -23,6 +26,15 @@ export default function Header({
   category: string;
   setCategory: (category: string) => void;
 }) {
+  const [categories, setCategories] = useState(defaultCategories);
+  const updateCategories = (data: {id:string; label:string}[]) => {
+    if (!Array.isArray(data) || !data.length) return;
+    const items = data.filter(c => c.id !== "meus-veiculos").map(c => ({...c, vip:c.id === "vips"}));
+    items.splice(Math.min(2, items.length), 0, {id:"meus-veiculos", label:"MEUS CARROS", vip:false});
+    setCategories(items);
+  };
+  observe("categoriesUpdated", updateCategories);
+  useEffect(() => { emit("GET_CATEGORIES", {}, defaultCategories).then(updateCategories).catch(console.error); }, []);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,7 +63,7 @@ export default function Header({
         <img className="h-[2.55rem] w-auto object-contain" src={logo} alt="Dealership" />
       </motion.button>
 
-      <nav className="flex-1 min-w-0 flex items-center justify-between gap-[1rem] whitespace-nowrap">
+      <nav className="flex-1 min-w-0 flex items-center justify-between gap-[1rem] whitespace-nowrap overflow-x-auto pb-2">
         {categories.map((item, index) => {
           const active = category === item.id;
 

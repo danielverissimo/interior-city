@@ -23,6 +23,7 @@ local targetCursorActive = false
 local targetStartedWithAlt = false
 local targetOpenedAt = 0
 local altReleasedSince = 0
+local targetAltDown = false
 local playerActive = true
 local windowState = {}
 local trunkState = {
@@ -41,8 +42,18 @@ local function closeTargetState()
     targetStartedWithAlt = false
     targetOpenedAt = 0
     altReleasedSince = 0
+    targetAltDown = false
     SetNuiFocus(false,false)
     SendNUIMessage({ response = "closeTarget" })
+end
+
+local function enableTargetCursor()
+    if not targetActive or targetCursorActive then return end
+
+    SetCursorLocation(0.5,0.5)
+    targetCursorActive = true
+    SetNuiFocus(true,true)
+    SendNUIMessage({ response = "cursorTarget" })
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- VRP:PLAYERACTIVE
@@ -55,8 +66,16 @@ end)
 -- BASIC TARGET MODELS
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
-    RegisterCommand("+entityTarget",playerTargetEnable)
-    RegisterCommand("-entityTarget",playerTargetDisable)
+    RegisterCommand("+entityTarget",function()
+        targetAltDown = true
+        playerTargetEnable()
+    end)
+
+    RegisterCommand("-entityTarget",function()
+        targetAltDown = false
+        playerTargetDisable()
+    end)
+
     RegisterKeyMapping("+entityTarget","Target","keyboard","LMENU")
 
     AddTargetModel({ 1631638868,2117668672,-1498379115,-1519439119,-289946279 },{
@@ -93,31 +112,34 @@ Citizen.CreateThread(function()
     })
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
--- ALT+TAB / LOST KEY-UP GUARD
+-- ALT / ALT+TAB / LOST KEY-UP GUARD
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
     while true do
-        if targetActive and not targetCursorActive and targetStartedWithAlt then
+        if targetActive and not targetCursorActive then
             local now = GetGameTimer()
             local altPressed = IsControlPressed(0,19) or IsDisabledControlPressed(0,19)
-            local tabPressed = IsControlJustPressed(0,37) or IsDisabledControlJustPressed(0,37)
+            local tabPressed = IsControlPressed(0,37) or IsDisabledControlPressed(0,37)
+                or IsControlJustPressed(0,37) or IsDisabledControlJustPressed(0,37)
 
-            -- ALT+TAB pode tirar o foco do FiveM antes que o evento de key-up
-            -- do ALT chegue ao RegisterKeyMapping. Se TAB ainda for capturado,
-            -- encerramos o target antes da troca de janela.
-            if altPressed and tabPressed then
+            -- ALT+TAB: fecha antes da troca de janela sempre que o FiveM ainda
+            -- conseguir capturar o TAB.
+            if tabPressed and (altPressed or targetAltDown) then
                 closeTargetState()
-            elseif now - targetOpenedAt > 250 then
-                -- Fallback para o caso em que o TAB/keyup foi perdido pelo jogo:
-                -- assim que o FiveM recuperar o foco e perceber que o ALT não
-                -- está mais pressionado, o estado preso é limpo automaticamente.
+
+            -- O RegisterKeyMapping pode abrir alguns frames antes de
+            -- IsControlPressed(ALT) ficar true. Depois dessa pequena janela,
+            -- o estado fisico da tecla passa a ser a autoridade. Isso tambem
+            -- limpa ALT preso quando o key-up se perde durante ALT+TAB.
+            elseif now - targetOpenedAt >= 120 then
                 if not altPressed then
                     if altReleasedSince == 0 then
                         altReleasedSince = now
-                    elseif now - altReleasedSince >= 200 then
+                    elseif now - altReleasedSince >= 60 then
                         closeTargetState()
                     end
                 else
+                    targetAltDown = true
                     altReleasedSince = 0
                 end
             end
@@ -125,7 +147,7 @@ Citizen.CreateThread(function()
             Citizen.Wait(0)
         else
             altReleasedSince = 0
-            Citizen.Wait(150)
+            Citizen.Wait(100)
         end
     end
 end)
@@ -140,7 +162,7 @@ local paramedicMenu = {
 }
 
 local policeMenu = {
-    { event = "vrp_policia:algemar", label = "Algemar", tunnel = "server" },
+    { event = "target:algemar", label = "Algemar", tunnel = "server" },
     { event = "target:revistar", label = "Revistar", tunnel = "server" },
     { event = "target:cv", label = "Colocar no veiculo", tunnel = "server" },
     { event = "target:rv", label = "Retirar do veiculo", tunnel = "server" },
@@ -149,7 +171,7 @@ local policeMenu = {
 }
 
 local twoPed = {
-    { event = "vrp_policia:algemar", label = "Algemar", tunnel = "server" },
+    { event = "target:algemar", label = "Algemar", tunnel = "server" },
     { event = "target:revistar", label = "Revistar", tunnel = "server" },
     { event = "target:cobrar", label = "Cobrar", tunnel = "server" }
 }
@@ -318,12 +340,13 @@ end
 -- PLAYERTARGETENABLE
 -----------------------------------------------------------------------------------------------------------------------------------------
 function playerTargetEnable()
-    if not playerActive then return end
+    if not playerActive or targetActive then return end
     if success or IsPedArmed(PlayerPedId(),6) or IsPedInAnyVehicle(PlayerPedId()) then return end
 
     local role = vSERVER.GetRole() or "player"
     targetCursorActive = false
-    targetStartedWithAlt = IsControlPressed(0,19) or IsDisabledControlPressed(0,19)
+    targetStartedWithAlt = true
+    targetAltDown = true
     targetOpenedAt = GetGameTimer()
     altReleasedSince = 0
     targetActive = true
@@ -368,9 +391,7 @@ function playerTargetEnable()
                             DisablePlayerFiring(currentPed,true)
 
                             if (IsControlJustReleased(1,24) or IsDisabledControlJustReleased(1,24)) then
-                                SetCursorLocation(0.5,0.5)
-                                targetCursorActive = true
-                                SetNuiFocus(true,true)
+                                enableTargetCursor()
                             end
 
                             if currentHit ~= 1 or GetEntityType(currentEntity) == 0 or #(currentCoords - currentEntCoords) > 1.0 then
@@ -404,9 +425,7 @@ function playerTargetEnable()
                             DisablePlayerFiring(currentPed,true)
 
                             if (IsControlJustReleased(1,24) or IsDisabledControlJustReleased(1,24)) then
-                                SetCursorLocation(0.5,0.5)
-                                targetCursorActive = true
-                                SetNuiFocus(true,true)
+                                enableTargetCursor()
                             end
 
                             if currentHit ~= 1 or GetEntityType(currentEntity) == 0 or #(currentCoords - currentEntCoords) > 1.0 then
@@ -446,9 +465,7 @@ function playerTargetEnable()
                                 DisablePlayerFiring(currentPed,true)
 
                                 if (IsControlJustReleased(1,24) or IsDisabledControlJustReleased(1,24)) then
-                                    SetCursorLocation(0.5,0.5)
-                                    targetCursorActive = true
-                                    SetNuiFocus(true,true)
+                                    enableTargetCursor()
                                 end
 
                                 if currentHit ~= 1 or GetEntityType(currentEntity) == 0 or #(currentCoords - currentEntCoords) > modelData["distance"] then
@@ -479,9 +496,7 @@ function playerTargetEnable()
                         DisablePlayerFiring(currentPed,true)
 
                         if (IsControlJustReleased(1,24) or IsDisabledControlJustReleased(1,24)) then
-                            SetCursorLocation(0.5,0.5)
-                            targetCursorActive = true
-                            SetNuiFocus(true,true)
+                            enableTargetCursor()
                         end
 
                         if currentHit ~= 1 or not zoneData:isPointInside(currentEntCoords) or #(currentCoords - zoneData["center"]) > zoneData["targetoptions"]["distance"] then
@@ -732,7 +747,11 @@ Citizen.CreateThread(function()
 end)
 
 AddEventHandler("onResourceStop",function(resource)
-    if resource == GetCurrentResourceName() and trunkState.vehicle ~= 0 then
+    if resource ~= GetCurrentResourceName() then return end
+
+    closeTargetState()
+
+    if trunkState.vehicle ~= 0 then
         leaveTrunk()
     end
 end)
@@ -781,6 +800,19 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNUICallback("closeTarget",function(data,cb)
     closeTargetState()
+    if cb then cb("ok") end
+end)
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- TARGET LOST FOCUS
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNUICallback("targetLostFocus",function(data,cb)
+    -- Perda de foco (ex.: ALT+TAB) só força o fechamento enquanto o target
+    -- ainda está no modo "segurar ALT". Se o cursor já foi liberado para
+    -- escolher uma opção, o target permanece aberto como solicitado.
+    if targetActive and not targetCursorActive then
+        closeTargetState()
+    end
+
     if cb then cb("ok") end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------

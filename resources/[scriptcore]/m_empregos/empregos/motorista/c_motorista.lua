@@ -60,10 +60,12 @@ Citizen.CreateThread(function()
                     
                     if distance <= 1.2 then
                         if IsControlJustPressed(0,38) and vSERVER.checkEmp('Motorista') then
-                            TriggerEvent("Notify", "sucesso", "Você entrou em serviço! Pegue um ônibus ao lado")
-                            emservico = true
-                            destino = 1
-                            CriandoBlipMT(entregas,destino)
+                            if MageJobsBeginService("Motorista") then
+                                TriggerEvent("Notify", "sucesso", "Você entrou em serviço! Pegue um ônibus ao lado")
+                                emservico = true
+                                destino = 1
+                                CriandoBlipMT(entregas,destino)
+                            end
                         end
  				    end
                                  
@@ -135,6 +137,7 @@ Citizen.CreateThread(function()
 				TriggerEvent("Notify", "negado", "Você saiu de serviço!")
 				emservico = false
 				RemoveBlip(blip)
+                MageJobsEndService("Motorista")
 			end
 		end
 		Citizen.Wait(sleep3)

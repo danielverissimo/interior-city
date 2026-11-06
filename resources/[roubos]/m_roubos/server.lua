@@ -119,6 +119,24 @@ local function clearSession(user_id,reason)
     end
 end
 
+-- Mensagens do vrp_notifycall por tipo, adaptadas dos módulos corrigidos
+-- de mercados/Ammu-Nation/ATM. Não modifica o funcionamento do roubo.
+local function qruForRobbery(typeName)
+    local kind = tostring(typeName or ""):lower()
+    if kind == "caixa" then
+        return "ROUBO A CAIXA ELETRÔNICO", "Roubo em andamento em um caixa eletrônico. Verifique a ocorrência."
+    elseif kind == "ammunition" or kind == "ammunation" then
+        return "ROUBO À AMMU-NATION", "Assalto em andamento em uma Ammu-Nation. Verifique a ocorrência."
+    elseif kind == "registradora" then
+        return "ROUBO A MERCADO", "Assalto em andamento em um mercado. Verifique a ocorrência."
+    elseif kind == "loja de departamento" then
+        return "ROUBO A LOJA DE DEPARTAMENTO", "Roubo em andamento em uma loja de departamento. Verifique a ocorrência."
+    elseif kind == "bebidas" then
+        return "ROUBO A COMÉRCIO", "Roubo em andamento em um comércio. Verifique a ocorrência."
+    end
+    return "ROUBO EM ANDAMENTO", "Roubo em andamento: "..tostring(typeName or "Comércio")..". Verifique a ocorrência."
+end
+
 local function dispatchPolice(title,text,x,y,z,robberyName)
     local users = policeUsers()
     local notifyCfg = Config.NotifyCall or {}
@@ -261,15 +279,11 @@ function sRP.startRobbery(typeName,id)
     vCLIENT.iniciandoRoubo(source,location.x,location.y,location.z,duration,location.h)
 
     local robberyName = tostring(location.type or typeName)
-    dispatchPolice(
-        "Roubo em andamento",
-        "Um roubo foi iniciado em "..robberyName..". Verifique a ocorrência.",
-        location.x,location.y,location.z,robberyName
-    )
+    local qruTitle,qruText = qruForRobbery(robberyName)
+    dispatchPolice(qruTitle,qruText,location.x,location.y,location.z,robberyName)
 
     local identity = vRP.getUserIdentity(user_id) or {}
-    -- Resolve private destinations here; Config is also sent to game clients.
-    local hook = GetConvar("ic_secret_m_roubos_webhook", GetConvar("interior_city_webhook_logs", ""))
+    local hook = Config.webhooks and Config.webhooks[typeName] or ""
     sendWebhook(hook,"```prolog\n[ID]: "..user_id.." "..tostring(identity.nome or "").." "..tostring(identity.sobrenome or "")..
         "\n[ROUBO]: "..tostring(typeName)..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 
@@ -340,4 +354,44 @@ AddEventHandler("playerDropped",function()
     for key,owner in pairs(startLocks) do
         if owner == source then startLocks[key] = nil end
     end
+end)
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- QRU DE DISPARO - VALIDACAO E DISPATCH EXCLUSIVAMENTE NO SERVIDOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+local nextGunshotAlert = {}
+
+RegisterNetEvent("m_roubos:reportGunshot")
+AddEventHandler("m_roubos:reportGunshot",function()
+    local source = source
+    local cfg = Config.GunshotQRU or {}
+    if cfg.enabled == false then return end
+
+    local user_id = vRP.getUserId(source)
+    if not user_id then return end
+
+    -- Disparos de policiais nao geram QRU. Consulta no servidor, nunca no cliente.
+    local policePermission = (Config.settings and Config.settings.policePermission) or "perm.policia"
+    if vRP.hasPermission(user_id,policePermission) then return end
+
+    local ped = GetPlayerPed(source)
+    if not ped or ped <= 0 or GetEntityHealth(ped) <= 100 then return end
+
+    local now = os.time()
+    local cooldown = math.max(1,math.floor(tonumber(cfg.cooldownSeconds) or 25))
+    if nextGunshotAlert[user_id] and now < nextGunshotAlert[user_id] then return end
+
+    -- Posicao obtida no servidor para nao aceitar coordenadas arbitrarias enviadas por clientes.
+    local coords = GetEntityCoords(ped)
+    if not coords then return end
+    local x,y,z = tonumber(coords.x),tonumber(coords.y),tonumber(coords.z)
+    if not x or not y or not z then return end
+
+    nextGunshotAlert[user_id] = now + cooldown
+    dispatchPolice(
+        cfg.title or "QRU de Disparo",
+        cfg.text or "Disparos de arma de fogo foram registrados nesta localizacao. Verifique a ocorrencia.",
+        x,y,z,"Disparo"
+    )
 end)

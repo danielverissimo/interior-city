@@ -10,6 +10,7 @@ RegisterNetEvent("m_dealership:syncConfig",function(data)
     Default.maxCars=tonumber(s.maxCars) or Default.maxCars or 5
     Default.notTop4Vehicles=s.notTop4Vehicles or Default.notTop4Vehicles or {}
     DealershipCategories=data.categories or DealershipCategories or {}
+    SendNUIMessage({action="categoriesUpdated",data=DealershipCategories})
 
     local td=data.testDrive or {}
     TestDrive.cooldownTestDriver=tonumber(td.cooldownTestDriver) or TestDrive.cooldownTestDriver or 60

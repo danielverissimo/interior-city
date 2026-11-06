@@ -36,6 +36,26 @@ local SorF = false
 local Hacking = false
 local UsingComputer = false
 local hackingBank = nil
+local mHacking = false
+
+-- Portas internas do cofre (etapa obrigatória após o hack).
+-- Elas permanecem fechadas até serem abertas com maçarico, uma por uma.
+local internalVaultDoors = {
+    [1] = {
+        { coords = vector3(252.52,221.23,101.67), model = -1508355822, opened = false, closedHeading = 160.0, openOffset = 90.0 },
+        { coords = vector3(261.68,215.11,101.67), model = -1508355822, opened = false, closedHeading = 250.0, openOffset = 90.0 }
+    }
+}
+local internalWelding = false
+
+local function areInternalVaultDoorsOpen(bankIndex)
+    local doors = internalVaultDoors[tonumber(bankIndex)]
+    if not doors or #doors == 0 then return true end
+    for _,door in ipairs(doors) do
+        if not door.opened then return false end
+    end
+    return true
+end
 
 Citizen.CreateThread(function()
     function Initialize(scaleform)
@@ -171,8 +191,18 @@ Citizen.CreateThread(function()
         local sleep = 1000
         if HasScaleformMovieLoaded(scaleform) and UsingComputer then
 			sleep = 5
-            DisableControlAction(0, 24, true)
-            DisableControlAction(0, 25, true)
+            -- Enquanto o computador/força bruta estiver ativo, o mouse pertence ao hack.
+            -- Bloqueia tiro, mira e golpes para que os cliques não sejam enviados ao ped.
+            DisablePlayerFiring(PlayerId(), true)
+            DisableControlAction(0, 24, true)  -- INPUT_ATTACK
+            DisableControlAction(0, 25, true)  -- INPUT_AIM
+            DisableControlAction(0, 257, true) -- INPUT_ATTACK2
+            DisableControlAction(0, 140, true) -- INPUT_MELEE_ATTACK_LIGHT
+            DisableControlAction(0, 141, true) -- INPUT_MELEE_ATTACK_HEAVY
+            DisableControlAction(0, 142, true) -- INPUT_MELEE_ATTACK_ALTERNATE
+            DisableControlAction(0, 143, true) -- INPUT_MELEE_BLOCK
+            DisableControlAction(0, 37, true)  -- INPUT_SELECT_WEAPON
+            DisableControlAction(0, 45, true)  -- INPUT_RELOAD
             if GetScaleformMovieFunctionReturnBool(ClickReturn) then
 				sleep = 5
                 ProgramID = GetScaleformMovieFunctionReturnInt(ClickReturn)
@@ -223,8 +253,20 @@ Citizen.CreateThread(function()
                     Hacking = false
                     SorF = false    
                     local v = Config.BankRobbery[hackingBank]
-                    TriggerServerEvent('loffe_heist:setDoorFreezeStatus', hackingBank, #v.Doors, false)
+                    -- Ao concluir a força bruta, libera o cofre localmente imediatamente
+                    -- e pede ao servidor para tornar esse estado autoritativo/sincronizado.
+                    -- Isso preserva o comportamento original do Banco Central e evita
+                    -- que uma latência/evento perdido deixe o cofre visualmente fechado.
+                    if v and v.Doors and v.Doors[#v.Doors] then
+                        v.Doors[#v.Doors].Frozen = false
+                    end
+                    TriggerServerEvent('loffe_heist:hackCompleted', hackingBank)
                     mHacking = false
+                    UsingComputer = false
+                    FreezeEntityPosition(PlayerPedId(), false)
+                    if scaleform then
+                        SetScaleformMovieAsNoLongerNeeded(scaleform)
+                    end
                     -- TriggerServerEvent('esx_phone:send', 'police', 'Ett dataintrång har skett på ' .. v.BankName .. ' och bankvalvet har öppnats!', {x = v.Doors[#v.Doors].Coords.x, y = v.Doors[#v.Doors].Coords.y, z = v.Doors[#v.Doors].Coords.z})
                 elseif ProgramID == 6 then
 					sleep = 5
@@ -266,8 +308,6 @@ Citizen.CreateThread(function()
 		Citizen.Wait(sleep)
     end
 end)
-
-local mHacking = false
 
 function USBSuccess(success, timeremaining)
     if success then
@@ -362,7 +402,9 @@ local soundid = nil
 
 RegisterNetEvent('loffe_heist:updateMoney')
 AddEventHandler('loffe_heist:updateMoney', function(bank, money)
-    Config.BankRobbery[bank].Money.Amount = money
+    if Config.BankRobbery[bank] and Config.BankRobbery[bank].Money then
+        Config.BankRobbery[bank].Money.Amount = money
+    end
 end)
 
 local moneyPile = {}
@@ -388,7 +430,7 @@ Citizen.CreateThread(function() -- loopen för att spawna pengarna (loop för at
             local coords = GetEntityCoords(player)
             sdfwa = nil -- vet inte vad jag ska döpa variabeln till..
 
-            TriggerServerEvent('loffe_heist:getBox', box)
+            TriggerServerEvent('loffe_heist:getBox', k)
 
             while sdfwa == nil do -- vänta på att man får svar på callbacken
                 Wait(0)
@@ -434,7 +476,7 @@ Citizen.CreateThread(function()
         for k, v in pairs(Config.BankRobbery) do
             local player = PlayerPedId()
             local coords = GetEntityCoords(player)
-            if GetDistanceBetweenCoords(coords, v.Money.BoxPosition, true) <= 1.5 and not v.Doors[#v.Doors].Frozen then
+            if GetDistanceBetweenCoords(coords, v.Money.BoxPosition, true) <= 1.5 and not v.Doors[#v.Doors].Frozen and areInternalVaultDoorsOpen(k) then
                 if v.Money.Amount > 0 then
                     BeginTextCommandDisplayHelp('STRING')
                     AddTextComponentSubstringPlayerName('Pressione ~INPUT_CONTEXT~ para pegar dinheiro')
@@ -452,10 +494,18 @@ Citizen.CreateThread(function()
                             TaskLookAtCoord(player, v.Money.BoxPosition, 1000, 0, 2)
                             Wait(500)
                             local cam = CreateCam("DEFAULT_SCRIPTED_Camera", 1)
-                            SetCamCoord(cam, v.Money.Cam.Coords.x, v.Money.Cam.Coords.y, v.Money.Cam.Coords.z)
-                            SetCamRot(cam, v.Money.Cam.Rotation.rx, v.Money.Cam.Rotation.ry, v.Money.Cam.Rotation.rz, v.Money.Cam.Rotation.r)
-                            RenderScriptCams(1, 0, 0, 1, 1)
-                            SetCamActive(cam, true)
+                            local moneyCam = v.Money.Cam or {}
+                            local camCoords = moneyCam.Coords or moneyCam.coords
+                            local camRotation = moneyCam.Rotation or moneyCam.rotation
+                            if camCoords and camRotation then
+                                SetCamCoord(cam, tonumber(camCoords.x) or v.Money.BoxPosition.x, tonumber(camCoords.y) or v.Money.BoxPosition.y, tonumber(camCoords.z) or (v.Money.BoxPosition.z + 1.5))
+                                SetCamRot(cam, tonumber(camRotation.rx) or -35.0, tonumber(camRotation.ry) or 0.0, tonumber(camRotation.rz) or 0.0, tonumber(camRotation.r) or 2)
+                                RenderScriptCams(1, 0, 0, 1, 1)
+                                SetCamActive(cam, true)
+                            else
+                                DestroyCam(cam, false)
+                                cam = nil
+                            end
 
                             --SetEntityCoords(player, v.Money.Coords)
                             --SetEntityHeading(player, v.Money.Heading)
@@ -565,17 +615,164 @@ AddEventHandler('loffe_heist:getTimeCl', function(x)
     end
 end)
 
+-- Mantém a indicação de interação oculta apenas durante a espera pela
+-- confirmação real do servidor. Se falhar, a UI é restaurada.
+local awaitingC4 = {}
+local function c4Key(bank,door)
+    return tostring(bank)..":"..tostring(door)
+end
 local weldedDoors = {}
+
+-- Re-synchronize every live state after configuration is received, not merely at client boot.
+AddEventHandler('m_banco_central:clientConfigLoaded', function()
+    for bankIndex,bank in ipairs(Config.BankRobbery or {}) do
+        for doorIndex=1,#(bank.Doors or {}) do
+            TriggerServerEvent('loffe_heist:getDoorFreezeStatus',bankIndex,doorIndex)
+        end
+        local inner=internalVaultDoors[bankIndex]
+        if inner then
+            for doorIndex=1,#inner do
+                TriggerServerEvent('loffe_heist:getInnerVaultDoorState',bankIndex,doorIndex)
+            end
+        end
+    end
+end)
 
 RegisterNetEvent('loffe_heist:setDoorFreezeStatusCl')
 AddEventHandler('loffe_heist:setDoorFreezeStatusCl', function(bank, door, status)
-    Config.BankRobbery[bank].Doors[door].Frozen = status
+    if Config.BankRobbery[bank] and Config.BankRobbery[bank].Doors[door] then
+        Config.BankRobbery[bank].Doors[door].Frozen = status == true
+    end
 	-- print("Linha 579:"..bank, door, status)
+end)
+
+-- Confirmação explícita da C4 para manter o client do executor alinhado ao servidor.
+RegisterNetEvent('loffe_heist:c4ExplosionConfirmed')
+AddEventHandler('loffe_heist:c4ExplosionConfirmed', function(bank, door)
+    bank,door=tonumber(bank),tonumber(door)
+    if not bank or not door then return end
+    awaitingC4[c4Key(bank,door)]=nil
+    local bankData=Config.BankRobbery[bank]
+    local d=bankData and bankData.Doors[door]
+    if d then
+        d.Frozen=false
+        -- Abre a entidade imediatamente, sem aguardar o loop de sincronização.
+        local obj=GetClosestObjectOfType(d.Coords.x,d.Coords.y,d.Coords.z,2.5,GetHashKey(d.Object),false,false,false)
+        if obj and obj~=0 then
+            FreezeEntityPosition(obj,false)
+            SetEntityHeading(obj,d.OpenHeading or ((tonumber(d.Heading) or 0.0)+90.0))
+            if d.OpenHeading == nil then FreezeEntityPosition(obj,true) end
+        end
+    end
+end)
+
+RegisterNetEvent('loffe_heist:c4ExplosionRejected')
+AddEventHandler('loffe_heist:c4ExplosionRejected', function(reason)
+    awaitingC4={}
+    local msg=reason or 'O servidor rejeitou a explosão. Consulte o console para detalhes.'
+    TriggerEvent('Notify','negado',msg,6000)
+    for bankIndex=1,#Config.BankRobbery do
+        for doorIndex=1,#Config.BankRobbery[bankIndex].Doors do
+            TriggerServerEvent('loffe_heist:getDoorFreezeStatus',bankIndex,doorIndex)
+        end
+    end
+end)
+
+-- Confirmações devem chegar em poucos segundos. Reconsulta o servidor se
+-- algum pacote/evento de sincronização não chegar ao cliente.
+CreateThread(function()
+    while true do
+        Wait(1000)
+        for key,created in pairs(awaitingC4) do
+            if GetGameTimer()-created>8000 then
+                awaitingC4[key]=nil
+                for bankIndex,bank in ipairs(Config.BankRobbery or {}) do
+                    for doorIndex=1,#bank.Doors do
+                        TriggerServerEvent('loffe_heist:getDoorFreezeStatus',bankIndex,doorIndex)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- Sincronização das duas portas internas do cofre.
+RegisterNetEvent('loffe_heist:syncInnerVaultDoor')
+AddEventHandler('loffe_heist:syncInnerVaultDoor', function(bankIndex, doorIndex, opened)
+    local bankDoors = internalVaultDoors[tonumber(bankIndex)]
+    local door = bankDoors and bankDoors[tonumber(doorIndex)]
+    if door then door.opened = opened == true end
+end)
+
+local function angleDistance(a,b)
+    local d = math.abs((a - b) % 360.0)
+    return d > 180.0 and (360.0 - d) or d
+end
+
+local function faceInternalVaultDoor(ped, door)
+    local obj = GetClosestObjectOfType(door.coords.x,door.coords.y,door.coords.z,2.5,door.model,false,false,false)
+    local pedCoords = GetEntityCoords(ped)
+    local toDoor = GetHeadingFromVector_2d(door.coords.x - pedCoords.x, door.coords.y - pedCoords.y)
+    if obj and obj ~= 0 then
+        local doorHeading = GetEntityHeading(obj)
+        local opposite = (doorHeading + 180.0) % 360.0
+        local chosen = angleDistance(doorHeading,toDoor) <= angleDistance(opposite,toDoor) and doorHeading or opposite
+        SetEntityHeading(ped,chosen)
+    else
+        SetEntityHeading(ped,toDoor)
+    end
+end
+
+RegisterNetEvent('loffe_heist:beginInnerVaultWeld')
+AddEventHandler('loffe_heist:beginInnerVaultWeld', function(bankIndex, doorIndex)
+    if internalWelding then return end
+    local bankDoors = internalVaultDoors[tonumber(bankIndex)]
+    local door = bankDoors and bankDoors[tonumber(doorIndex)]
+    if not door or door.opened then return end
+
+    internalWelding = true
+    local ped = PlayerPedId()
+    faceInternalVaultDoor(ped, door)
+    Wait(150)
+    ClearPedTasksImmediately(ped)
+    faceInternalVaultDoor(ped, door)
+    TaskStartScenarioInPlace(ped, 'WORLD_HUMAN_WELDING', 0, true)
+    FreezeEntityPosition(ped, true)
+    -- Progressbar padrão da base durante os 10 segundos do maçarico.
+    TriggerEvent("progress",10,"Passando o maçarico")
+
+    local finishAt = GetGameTimer() + 10000
+    while GetGameTimer() < finishAt do
+        Wait(0)
+        DisablePlayerFiring(PlayerId(), true)
+        DisableControlAction(0,24,true)
+        DisableControlAction(0,25,true)
+        DisableControlAction(0,30,true)
+        DisableControlAction(0,31,true)
+        DisableControlAction(0,21,true)
+        DisableControlAction(0,22,true)
+        DisableControlAction(0,23,true)
+        DisableControlAction(0,75,true)
+    end
+
+    ClearPedTasksImmediately(ped)
+    FreezeEntityPosition(ped, false)
+    internalWelding = false
+    TriggerServerEvent('loffe_heist:completeInnerVaultWeld', bankIndex, doorIndex)
+end)
+
+RegisterNetEvent('loffe_heist:cancelInnerVaultWeld')
+AddEventHandler('loffe_heist:cancelInnerVaultWeld', function(message)
+    if message and message ~= '' then
+        TriggerEvent('Notify','negado',message,4000)
+    end
 end)
 
 RegisterNetEvent('loffe_heist:safeLooted')
 AddEventHandler('loffe_heist:safeLooted', function(bank, safe, toggle)
-    Config.BankRobbery[bank].Safes[safe].Looted = toggle
+    if Config.BankRobbery[bank] and Config.BankRobbery[bank].Safes[safe] then
+        Config.BankRobbery[bank].Safes[safe].Looted = toggle
+    end
 end)
 
 RegisterNetEvent('loffe_heist:text')
@@ -660,7 +857,7 @@ Citizen.CreateThread(function()
                             Wait(50)
                             if allowed then
                                 TriggerEvent('loffe_heist:helpTimed', '', 50)
-                                if IsControlPressed(0, 38) then
+                                if IsControlJustPressed(0, 38) then
                                     -- local police = nil
                                     -- ESX.TriggerServerCallback('loffe_heist:getCops', function(cops)
                                         -- police = 5
@@ -672,15 +869,19 @@ Citizen.CreateThread(function()
 									solda = nil
 									cops = nil
 									
-									TriggerServerEvent('loffe_heist:getCops')
-
-                                    TriggerServerEvent('loffe_heist:getSolda')
-									while solda == nil do
-										Wait(5)
-									end
-									while cops == nil do
-										Wait(5)
-									end
+                                    TriggerServerEvent('loffe_heist:getCops')
+                                    local deadline = GetGameTimer() + 8000
+                                    while cops == nil and GetGameTimer() < deadline do
+                                        Wait(10)
+                                    end
+                                    -- First police authorization, then inventory/consumption: no race.
+                                    if cops == true then
+                                        TriggerServerEvent('loffe_heist:getSolda')
+                                        deadline = GetGameTimer() + 8000
+                                        while solda == nil and GetGameTimer() < deadline do
+                                            Wait(10)
+                                        end
+                                    end
 									
 									if solda then
 										if cops then
@@ -702,16 +903,20 @@ Citizen.CreateThread(function()
                                             ClearPedTasksImmediately(PlayerPedId(-1))
 											blockKeys = false
 											local welded = true
-                                            for i = 1, 600 do
+                                            -- Não reutilizar `i` aqui: `i` é o índice do banco no loop externo.
+                                            -- A versão anterior sobrescrevia esse índice e enviava banco 600 ao servidor,
+                                            -- impedindo a abertura da porta depois da explosão.
+                                            for progress = 1, 600 do
                                                 drawTxt("APERTE ~r~M~w~ PARA CANCELAR O ROUBO EM ANDAMENTO",4,0.5,0.91,0.36,255,255,255,70, d.Time)
-                                                drawTxt("RESTAM ~g~".. math.floor(i/6) .."% ~w~PARA EXPLODIR",4,0.5,0.93,0.50,255,255,255,180, d.Time)
+                                                drawTxt("RESTAM ~g~".. math.floor(progress/6) .."% ~w~PARA EXPLODIR",4,0.5,0.93,0.50,255,255,255,180, d.Time)
                                                 TriggerEvent('loffe_heist:text', '', 0.900, 0.0, d.Time)
-                                                drawSub('Solda ~b~' .. math.floor(i/2) .. '%', 0,1,0.5,0.96,0.6,255,0,0,0, d.Time)
+                                                drawSub('Solda ~b~' .. math.floor(progress/2) .. '%', 0,1,0.5,0.96,0.6,255,0,0,0, d.Time)
                                                 if IsDisabledControlPressed(0, 301) then
                                                     DeleteObject(propbomb)
 													ClearPedTasks(player)
 													blockKeys = false
 													welded = false
+                                                    TriggerServerEvent('loffe_heist:cancelC4')
 													break
 												end
 											end
@@ -722,7 +927,11 @@ Citizen.CreateThread(function()
 											-- print(welded)
                                             if welded then
                                                 AddExplosion(x,y,z, 2, 1.0, 1, 0, 2.0)
-                                                TriggerServerEvent('loffe_heist:setDoorFreezeStatus', i, j, false)
+                                                -- A porta já foi autorizada pelo servidor quando a C4 foi consumida.
+                                                -- Na explosão o servidor usa essa autorização como fonte definitiva,
+                                                -- evitando divergência de índices/porta.
+                                                awaitingC4[c4Key(i,j)] = GetGameTimer()
+                                                TriggerServerEvent('loffe_heist:confirmC4Explosion',i,j)
                                                 DeleteObject(propbomb)
                                             end
 											Wait(50)
@@ -737,7 +946,13 @@ Citizen.CreateThread(function()
 																							 
 				
                                     else
-                                        TriggerEvent("Notify","importante","Precisa de uma <b>C4</b> para abrir as portas do banco.")
+                                        if cops == false then
+                                            TriggerEvent("Notify","aviso","Número de policiais é insuficiente para iniciar o roubo.")
+                                        elseif cops == nil or solda == nil then
+                                            TriggerEvent("Notify","aviso","O servidor não respondeu. Tente novamente.")
+                                        else
+                                            TriggerEvent("Notify","importante","Precisa de uma <b>C4</b> para abrir as portas do banco.")
+                                        end
 									end
                                     break
                                 end
@@ -780,21 +995,93 @@ Citizen.CreateThread(function()
             for j = 1, #v.Doors do
                 Wait(0)
                 local d = v.Doors[j]
-                local door = GetClosestObjectOfType(d.Coords, 2.0, GetHashKey(d.Object), false, 0, 0)
-                if door ~= nil then
-                    if not d.Frozen then
+                local door = GetClosestObjectOfType(d.Coords.x, d.Coords.y, d.Coords.z, 2.5, GetHashKey(d.Object), false, false, false)
+                if door and door ~= 0 then
+                    if d.Frozen then
+                        -- Fechada/travada.
+                        SetEntityHeading(door, d.Heading)
+                        FreezeEntityPosition(door, true)
+                    else
+                        -- O cofre usa a lógica original do resource: aplica o OpenHeading
+                        -- e deixa a entidade destravada. As grades sem OpenHeading continuam
+                        -- sendo abertas 90 graus e mantidas na posição aberta.
                         if d.OpenHeading ~= nil then
                             SetEntityHeading(door, d.OpenHeading)
+                            FreezeEntityPosition(door, false)
+                        else
+                            local openHeading = (tonumber(d.Heading) or GetEntityHeading(door)) + 90.0
+                            SetEntityHeading(door, openHeading)
+                            FreezeEntityPosition(door, true)
                         end
-                    end
-                    FreezeEntityPosition(door, d.Frozen)
-                    if d.Frozen then
-                        SetEntityHeading(door, d.Heading)
                     end
                 end
             end
         end
         Wait(250)
+    end
+end)
+
+-- Mantém as duas portas internas fechadas/abertas de forma determinística e
+-- oferece a interação do maçarico somente depois que o cofre principal abrir.
+Citizen.CreateThread(function()
+    while not NetworkIsSessionStarted() do Wait(50) end
+    Wait(1000)
+
+    for bankIndex,doors in pairs(internalVaultDoors) do
+        for doorIndex=1,#doors do
+            TriggerServerEvent('loffe_heist:getInnerVaultDoorState', bankIndex, doorIndex)
+        end
+    end
+
+    while true do
+        local sleep = 500
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+
+        for bankIndex,doors in pairs(internalVaultDoors) do
+            local bank = Config.BankRobbery[bankIndex]
+            local vaultOpen = bank and bank.Doors and bank.Doors[#bank.Doors] and not bank.Doors[#bank.Doors].Frozen
+            for doorIndex,doorData in ipairs(doors) do
+                local object = GetClosestObjectOfType(doorData.coords.x,doorData.coords.y,doorData.coords.z,2.5,doorData.model,false,false,false)
+                if object and object ~= 0 then
+                    if doorData.opened then
+                        SetEntityHeading(object, (doorData.closedHeading or 0.0) + (doorData.openOffset or 90.0))
+                        FreezeEntityPosition(object, true)
+                    else
+                        SetEntityHeading(object, doorData.closedHeading or GetEntityHeading(object))
+                        FreezeEntityPosition(object, true)
+                    end
+                end
+
+                if vaultOpen and not doorData.opened and not internalWelding then
+                    local dist = #(coords - doorData.coords)
+                    if dist <= 6.0 then
+                        sleep = 0
+                        DrawText3D(doorData.coords.x,doorData.coords.y,doorData.coords.z + 0.35,'[ ~r~E~w~ ] Para passar o maçarico',0.85)
+                        if dist <= 1.8 and IsControlJustPressed(0,38) then
+                            TriggerServerEvent('loffe_heist:requestInnerVaultWeld', bankIndex, doorIndex)
+                            Wait(500)
+                        end
+                    end
+                end
+            end
+        end
+        Wait(sleep)
+    end
+end)
+
+-- Garante que as portas internas voltem fisicamente ao estado fechado quando o resource for reiniciado/parado.
+AddEventHandler('onResourceStop', function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then return end
+    for _,doors in pairs(internalVaultDoors) do
+        for _,doorData in ipairs(doors) do
+            local object = GetClosestObjectOfType(doorData.coords.x,doorData.coords.y,doorData.coords.z,2.5,doorData.model,false,false,false)
+            if object and object ~= 0 then
+                SetEntityHeading(object, doorData.closedHeading or GetEntityHeading(object))
+                FreezeEntityPosition(object, true)
+            end
+            doorData.opened = false
+        end
     end
 end)
 
@@ -827,7 +1114,7 @@ Citizen.CreateThread(function()
                 local s = Config.BankRobbery[i].Safes[j]
                 if not s.Looted then
                     if hasDrill then
-                        if GetDistanceBetweenCoords(coords, s.Coords, true) <= 1.0 and not Config.BankRobbery[i].Doors[#Config.BankRobbery[i].Doors].Frozen then
+                        if GetDistanceBetweenCoords(coords, s.Coords, true) <= 1.0 and not Config.BankRobbery[i].Doors[#Config.BankRobbery[i].Doors].Frozen and areInternalVaultDoorsOpen(i) then
                             TriggerEvent('loffe_heist:helpTimed', '', 5)
                             if IsControlPressed(0, 57) then
                                 -- local police = nil
@@ -1304,24 +1591,51 @@ function notify(msg)
 end
 
 
+-- Marcações da sequência do Banco Central.
+-- Nunca exibimos etapas futuras nem mantemos a etapa anterior depois de concluída:
+-- Porta 1 -> Porta 2 -> PC/Hack -> Cofre/Dinheiro.
 Citizen.CreateThread(function()
     while true do
-        Wait(0)
-        if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), 257.21240234375,220.02471923828,106.28584289551,true) <= 1 then
-            DrawText3Ds(257.21240234375,220.02471923828,106.28584289551+0.5,"PRESSIONE ~r~E~w~ PARA EXPLODIR A PORTA")                
-            if IsControlJustPressed(0,47) then
+        local sleep = 500
+        local player = PlayerPedId()
+        local coords = GetEntityCoords(player)
+
+        for bankIndex = 1, #Config.BankRobbery do
+            local bank = Config.BankRobbery[bankIndex]
+            local doors = bank and bank.Doors
+            if doors and #doors >= 1 then
+                local firstDoor = doors[1]
+                local secondDoor = doors[2]
+                local vaultDoor = doors[#doors]
+
+                -- ETAPA 1: somente a primeira porta.
+                if firstDoor and firstDoor.Frozen then
+                    if not awaitingC4[c4Key(bankIndex,1)] and GetDistanceBetweenCoords(coords, firstDoor.Coords, true) <= 2.0 then
+                        sleep = 0
+                        DrawText3Ds(firstDoor.Coords.x, firstDoor.Coords.y, firstDoor.Coords.z + 0.5,
+                            "PRESSIONE ~r~E~w~ PARA EXPLODIR A PRIMEIRA PORTA")
+                    end
+
+                -- ETAPA 2: primeira concluída; somente a segunda porta.
+                elseif secondDoor and secondDoor.Frozen then
+                    if not awaitingC4[c4Key(bankIndex,2)] and GetDistanceBetweenCoords(coords, secondDoor.Coords, true) <= 2.0 then
+                        sleep = 0
+                        DrawText3Ds(secondDoor.Coords.x, secondDoor.Coords.y, secondDoor.Coords.z + 0.5,
+                            "PRESSIONE ~r~E~w~ PARA EXPLODIR A SEGUNDA PORTA")
+                    end
+
+                -- ETAPA 3: duas portas de C4 concluídas; libera somente o PC.
+                elseif vaultDoor and vaultDoor.Frozen and bank.Hacking and not mHacking and not UsingComputer then
+                    if GetDistanceBetweenCoords(coords, bank.Hacking.Coords, true) <= 2.0 then
+                        sleep = 0
+                        DrawText3Ds(bank.Hacking.Coords.x, bank.Hacking.Coords.y, bank.Hacking.Coords.z + 0.5,
+                            "PRESSIONE ~r~E~w~ PARA HACKEAR O BANCO")
+                    end
+                end
             end
         end
-        if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), 261.60485839844,221.7160949707,106.2834777832,true) <= 1 then
-            DrawText3Ds(261.60485839844,221.7160949707,106.2834777832+0.5,"PRESSIONE ~r~E~w~ PARA EXPLODIR A PORTA")                
-            if IsControlJustPressed(0,47) then	
-            end
-        end
-        if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), 264.93884277344,219.90927124023,101.68327331543,true) <= 1 then
-            DrawText3Ds(264.93884277344,219.91927124023,101.68327331543+0.5,"PRESSIONE ~r~E~w~ PARA HACKEAR O BANCO")                
-            if IsControlJustPressed(0,47) then	
-            end
-        end
+
+        Wait(sleep)
     end
 end)
 

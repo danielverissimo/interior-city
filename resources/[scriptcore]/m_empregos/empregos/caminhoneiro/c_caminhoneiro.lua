@@ -7,6 +7,7 @@ local inservice = false
 local chk = nil
 local chkattached = nil
 local cooldown = 0
+local serviceTrailer = nil
 
 tempo_entrega = 15 --- Tempo que leva para descarregar o caminhão / Em segundos!
 
@@ -139,7 +140,7 @@ RegisterNuiCallback('select_route', function(data, cb)
     if data == 'show' then
         if cooldown < 1 then
             chk = 4
-            if not inservice then
+            if not inservice and MageJobsBeginService("Caminhoneiro") then
                 chkattached = "tvtrailer"
                 spawnVehicle(chkattached,localcarga[1],localcarga[2],localcarga[3],localcarga[4])
                 TriggerEvent("delivery_route")         
@@ -155,7 +156,7 @@ RegisterNuiCallback('select_route', function(data, cb)
     elseif data == 'gas' then
         if cooldown < 1 then
             chk = 3
-            if not inservice then
+            if not inservice and MageJobsBeginService("Caminhoneiro") then
                 chkattached = "tanker"
                 spawnVehicle(chkattached,localcarga[1],localcarga[2],localcarga[3],localcarga[4])
                 TriggerEvent("delivery_route")
@@ -171,7 +172,7 @@ RegisterNuiCallback('select_route', function(data, cb)
     elseif data == 'madeiras' then
         if cooldown < 1 then
             chk = 1
-            if not inservice then
+            if not inservice and MageJobsBeginService("Caminhoneiro") then
                 chkattached = "trailerlogs"
                 spawnVehicle(chkattached,localcarga[1],localcarga[2],localcarga[3],localcarga[4])
                 TriggerEvent("delivery_route")
@@ -187,7 +188,7 @@ RegisterNuiCallback('select_route', function(data, cb)
     elseif data == 'carros' then
         if cooldown < 1 then
             chk = 2
-            if not inservice then
+            if not inservice and MageJobsBeginService("Caminhoneiro") then
                 chkattached = "tr4"
                 spawnVehicle(chkattached,localcarga[1],localcarga[2],localcarga[3],localcarga[4])
                 TriggerEvent("delivery_route")
@@ -260,6 +261,8 @@ local idle = 1000
                               	vRP.stopAnim(false)
                                 inservice = false
                                 chkattached = nil
+                                serviceTrailer = nil
+                                MageJobsEndService("Caminhoneiro")
                             end)
 
                         else
@@ -286,6 +289,12 @@ Citizen.CreateThread(function()
                 inservice = false
                 chkattached = nil
                 RemoveBlip(blips)
+                if serviceTrailer and DoesEntityExist(serviceTrailer) then
+                    SetEntityAsMissionEntity(serviceTrailer, true, true)
+                    DeleteEntity(serviceTrailer)
+                end
+                serviceTrailer = nil
+                MageJobsEndService("Caminhoneiro")
                 TriggerEvent('Notify','importante','Você cancelou a rota de entrega!')
             end
         end
@@ -342,6 +351,7 @@ function spawnVehicle(name,x,y,z,h)
 
 	if HasModelLoaded(mhash) then
 		local nveh = CreateVehicle(mhash,x,y,z+0.5,h,true,false)
+        serviceTrailer = nveh
 
 		SetVehicleOnGroundProperly(nveh)
 		SetVehicleNumberPlateText(nveh,vRP.getRegistrationNumber())

@@ -1,55 +1,6 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-
-// ============================================================================
-// TRANSPORTE NUI ABERTO / COMPATIVEL COM OFUSCACAO
-// O fetch CEF recebe imediatamente um requestId do bridge_client.js e esta
-// camada aguarda a resposta real sem depender de coroutine Lua ofuscada.
-// ============================================================================
-const MG_UI_BUILD = "2.90.5-final-obfsafe";
-const mgBridgeWaiters = new Map();
-const mgBridgeBacklog = new Map();
-let mgBridgeLastTransportToastAt = 0;
-
-function resolveMgBridgeResponse(requestId, payload) {
-    const id = String(requestId || "");
-    if (!id) return;
-
-    const waiter = mgBridgeWaiters.get(id);
-    if (waiter) {
-        mgBridgeWaiters.delete(id);
-        clearTimeout(waiter.timer);
-        waiter.resolve(payload || { ok: false, message: "Resposta vazia do servidor." });
-        return;
-    }
-
-    mgBridgeBacklog.set(id, payload || { ok: false, message: "Resposta vazia do servidor." });
-    if (mgBridgeBacklog.size > 150) {
-        const firstKey = mgBridgeBacklog.keys().next().value;
-        if (firstKey) mgBridgeBacklog.delete(firstKey);
-    }
-}
-
-function waitMgBridgeResponse(requestId, timeout = 20000) {
-    const id = String(requestId || "");
-    if (!id) return Promise.resolve({ ok: false, message: "ID de comunicacao invalido." });
-
-    if (mgBridgeBacklog.has(id)) {
-        const payload = mgBridgeBacklog.get(id);
-        mgBridgeBacklog.delete(id);
-        return Promise.resolve(payload);
-    }
-
-    return new Promise(resolve => {
-        const timer = setTimeout(() => {
-            mgBridgeWaiters.delete(id);
-            resolve({ ok: false, message: "O servidor nao respondeu a solicitacao do painel." });
-        }, timeout);
-        mgBridgeWaiters.set(id, { resolve, timer });
-    });
-}
-
 const resourceName = typeof GetParentResourceName === "function"
     ? GetParentResourceName()
     : "m_paineladm_v2";
@@ -591,21 +542,10 @@ async function post(endpoint, data = {}) {
             headers: { "Content-Type": "application/json; charset=UTF-8" },
             body: JSON.stringify(data)
         });
-
-        const firstResponse = await response.json();
-        if (firstResponse?.__mgBridgePending === true && firstResponse?.requestId) {
-            return await waitMgBridgeResponse(firstResponse.requestId);
-        }
-
-        return firstResponse;
+        return await response.json();
     } catch (error) {
-        console.error(`[m_paineladm_v2] NUI callback '${endpoint}' falhou:`, error);
-        const now = Date.now();
-        if ((now - mgBridgeLastTransportToastAt) > 3500) {
-            mgBridgeLastTransportToastAt = now;
-            toast("error", "Falha de comunicacao", `Bridge JS ${MG_UI_BUILD} nao respondeu. Verifique bridge_client.js no fxmanifest.`);
-        }
-        return { ok: false, message: "Falha de comunicacao com o transporte NUI do resource." };
+        toast("error", "Falha de comunicação", "Não foi possível comunicar com o client do resource.");
+        return { ok: false, message: "Falha de comunicação com o resource." };
     }
 }
 
@@ -3481,7 +3421,7 @@ function renderLogsEditor(category, subcategory = null) {
             </span>
             <span class="log-webhook-input-wrap">
                 <span>WEBHOOK DO DISCORD</span>
-                <input class="input log-webhook-input" type="text" name="${escapeHtml(log.key)}" value="${escapeHtml(log.webhook || "")}" placeholder="" autocomplete="off" spellcheck="false" data-log-webhook="${escapeHtml(log.key)}">
+                <input class="input log-webhook-input" type="text" name="${escapeHtml(log.key)}" value="${escapeHtml(log.webhook || "")}" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" data-log-webhook="${escapeHtml(log.key)}">
             </span>
         </label>`).join("");
 
@@ -4643,11 +4583,6 @@ document.addEventListener("click", async event => {
                 playerVipTest.disabled = false;
                 if (response?.data) renderPlayerVipChoice(response.data);
                 toast("error", "Teste VIP", response?.message || "Não foi possível iniciar o teste.");
-            } else {
-                // O servidor ja autorizou e disparou o test-drive para a bridge
-                // client aberta. Fecha o seletor imediatamente para jamais
-                // deixar a tela presa enquanto o client faz streaming do carro.
-                renderPlayerVipChoice(null);
             }
         } finally {
             playerVipActionBusy = false;
@@ -5965,11 +5900,6 @@ document.addEventListener("change", event => {
 
 window.addEventListener("message", event => {
     const data = event.data || {};
-
-    if (data.type === "mgBridgeResponse") {
-        resolveMgBridgeResponse(data.requestId, data.payload);
-        return;
-    }
 
     if (data.type === "open") {
         state.bootstrap = data.payload?.bootstrap || {};

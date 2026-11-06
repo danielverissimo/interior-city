@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestão • Organizações</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="app hidden theme-hospital">
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div id="brandIcon" class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/></svg>
+                </div>
+                <div>
+                    <strong id="brandTitle">HOSPITAL</strong>
+                    <span id="brandSubtitle">Gestão de equipe</span>
+                </div>
+            </div>
+
+            <nav>
+                <button class="nav-item active" data-view="team">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.57 3-3.5S17.66 4 16 4s-3 1.57-3 3.5 1.34 3.5 3 3.5ZM8 11c1.66 0 3-1.57 3-3.5S9.66 4 8 4 5 5.57 5 7.5 6.34 11 8 11Zm8 2c-2.33 0-7 1.17-7 3.5V20h14v-3.5C23 14.17 18.33 13 16 13ZM8 13c-2.72 0-8 1.36-8 4v3h7v-3.5c0-.91.35-1.7.94-2.39A11.6 11.6 0 0 0 8 13Z"/></svg>
+                    <span>Equipe online</span>
+                </button>
+                <button class="nav-item" data-view="ranking">
+                    <svg viewBox="0 0 24 24"><path d="M7 4h10v3h3v4c0 2.21-1.79 4-4 4h-.35A6 6 0 0 1 13 17.91V20h4v2H7v-2h4v-2.09A6 6 0 0 1 8.35 15H8c-2.21 0-4-1.79-4-4V7h3V4Zm10 5v2c0 .64-.1 1.26-.29 1.83A2 2 0 0 0 18 11V9h-1ZM6 9v2a2 2 0 0 0 1.29 1.87A6.1 6.1 0 0 1 7 11V9H6Z"/></svg>
+                    <span>Ranking</span>
+                </button>
+                <button class="nav-item" data-view="productivity">
+                    <svg viewBox="0 0 24 24"><path d="M3 3h2v18H3zm4 10h4v6H7zm6-5h4v11h-4zm6-5h4v16h-4z"/></svg>
+                    <span>Produtividade</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div>
+                    <span class="eyebrow">CENTRAL ADMINISTRATIVA</span>
+                    <h1 id="pageTitle">Equipe</h1>
+                    <p id="pageSubtitle">Membros online organizados por hierarquia.</p>
+                </div>
+
+                <div class="top-actions">
+                    <div class="top-action-buttons">
+                        <button id="hireButton" class="btn primary hidden">+ Contratar</button>
+                    </div>
+
+                    <div class="top-user">
+                        <div class="actor-card">
+                            <div class="actor-copy">
+                                <strong id="actorRole">Organização</strong>
+                                <span id="actorStatus">Equipe</span>
+                            </div>
+                        </div>
+
+                        <button id="closeButton" class="icon-button" title="Fechar">
+                            <svg viewBox="0 0 24 24"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <section class="stats-grid">
+                <article class="stat-card">
+                    <span>Online</span>
+                    <strong id="statOnline">0</strong>
+                    <small>membros conectados</small>
+                </article>
+
+                <article class="stat-card">
+                    <span>Em serviço</span>
+                    <strong id="statDuty">0</strong>
+                    <small>bateram o ponto</small>
+                </article>
+
+                <article class="stat-card">
+                    <span id="statThirdLabel">Horas acumuladas</span>
+                    <strong id="statThird">0</strong>
+                    <small id="statThirdSmall">horas em serviço</small>
+                </article>
+            </section>
+
+            <section id="teamView" class="panel-card view active">
+                <div class="panel-heading">
+                    <div>
+                        <h2 id="teamHeading">Equipe online</h2>
+                        <p id="teamDescription">ID, identificação, cargo e situação no bate-ponto.</p>
+                    </div>
+                    <div class="legend">
+                        <span><i class="dot duty"></i> Em serviço</span>
+                        <span><i class="dot off"></i> Paisana</span>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Sobrenome</th>
+                                <th>Cargo</th>
+                                <th>Status</th>
+                                <th class="actions-col">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamBody"></tbody>
+                    </table>
+                    <div id="teamEmpty" class="empty hidden">Nenhum membro está online agora.</div>
+                </div>
+            </section>
+
+            <section id="rankingView" class="panel-card view">
+                <div class="panel-heading">
+                    <div>
+                        <h2 id="rankingHeading">Ranking de horas</h2>
+                        <p id="rankingDescription">Horas em serviço acumuladas.</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th id="rankingPersonHeader">Membro</th>
+                                <th>Cargo</th>
+                                <th>Horas em serviço</th>
+                                <th id="rankingCallsHeader">Chamados</th>
+                                <th>Situação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingBody"></tbody>
+                    </table>
+                    <div id="rankingEmpty" class="empty hidden">Ainda não existem dados de serviço.</div>
+                </div>
+            </section>
+            <section id="productivityView" class="panel-card view">
+                <div class="panel-heading productivity-heading">
+                    <div><h2>Serviços por membro</h2></div>
+                    <input id="productivitySearch" type="search" placeholder="Buscar nome ou ID" aria-label="Buscar membro por nome ou ID">
+                </div>
+                <div id="productivitySummary" class="productivity-summary"></div>
+                <div class="table-wrap">
+                    <table class="productivity-table"><thead id="productivityHead"></thead><tbody id="productivityBody"></tbody></table>
+                    <div id="productivityEmpty" class="empty hidden">Nenhum membro encontrado.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+
+<!-- Diagnóstico médico: overlay independente do painel administrativo. -->
+<section id="diagnosisPanel" class="diagnosis-panel hidden" aria-hidden="true">
+    <div class="diagnosis-shell">
+        <header class="diagnosis-header">
+            <div>
+                <span class="diagnosis-kicker">AVALIAÇÃO CLÍNICA</span>
+                <h2>DIAGNÓSTICO DO PACIENTE</h2>
+                <p id="diagnosisPatient">Paciente</p>
+            </div>
+            <span class="diagnosis-esc">ESC PARA FECHAR</span>
+        </header>
+
+        <div class="diagnosis-health">
+            <div class="diagnosis-health-row">
+                <span>VIDA</span>
+                <strong id="diagnosisHealthText">0%</strong>
+            </div>
+            <div class="diagnosis-health-bar">
+                <i id="diagnosisHealthFill"></i>
+            </div>
+            <div class="diagnosis-health-meta">
+                <span id="diagnosisRawHealth">0 / 0 HP</span>
+                <span id="diagnosisStatus" class="diagnosis-status">ESTÁVEL</span>
+            </div>
+        </div>
+
+        <div class="diagnosis-main">
+            <div class="diagnosis-report">
+                <span class="diagnosis-section-label">RESULTADO DO EXAME</span>
+
+                <div class="diagnosis-report-item">
+                    <small>DIAGNÓSTICO</small>
+                    <strong id="diagnosisText">—</strong>
+                </div>
+
+                <div class="diagnosis-report-item">
+                    <small>REGIÃO AFETADA</small>
+                    <strong id="diagnosisPartLabel">—</strong>
+                </div>
+
+                <div class="diagnosis-report-item">
+                    <small>ESTADO DE SAÚDE</small>
+                    <strong id="diagnosisStateText">—</strong>
+                </div>
+            </div>
+
+            <div class="diagnosis-body-column">
+                <span class="diagnosis-section-label">MAPA CORPORAL</span>
+
+                <svg id="diagnosisBody" class="diagnosis-body" viewBox="0 0 220 340" aria-label="Mapa corporal">
+                    <g class="body-part" data-part="head">
+                        <circle cx="110" cy="38" r="24"/>
+                    </g>
+
+                    <g class="body-part" data-part="chest">
+                        <path d="M78 72 Q110 58 142 72 L151 150 Q110 166 69 150 Z"/>
+                    </g>
+
+                    <g class="body-part" data-part="abdomen">
+                        <path d="M72 151 Q110 163 148 151 L143 205 Q110 217 77 205 Z"/>
+                    </g>
+
+                    <g class="body-part" data-part="leftArm">
+                        <rect x="26" y="78" width="25" height="112" rx="12" transform="rotate(29 38 78)"/>
+                    </g>
+
+                    <g class="body-part" data-part="rightArm">
+                        <rect x="169" y="78" width="25" height="112" rx="12" transform="rotate(-29 182 78)"/>
+                    </g>
+
+                    <g class="body-part" data-part="leftLeg">
+                        <path d="M79 203 L107 208 L99 318 Q96 334 82 329 L69 318 Z"/>
+                    </g>
+
+                    <g class="body-part" data-part="rightLeg">
+                        <path d="M113 208 L141 203 L151 318 Q138 334 124 329 L115 318 Z"/>
+                    </g>
+                </svg>
+
+                <div class="diagnosis-legend">
+                    <span><i class="healthy"></i> Normal</span>
+                    <span><i class="injured"></i> Lesão</span>
+                </div>
+            </div>
+        </div>
+
+        <p id="diagnosisMessage" class="diagnosis-message"></p>
+
+        <button id="diagnosisTreatButton" class="diagnosis-treat" type="button">
+            MEDICAR PACIENTE
+        </button>
+    </div>
+</section>
+
+<div id="modalLayer" class="modal-layer hidden">
+    <div class="modal">
+        <div id="modalIcon" class="modal-icon">+</div>
+        <h3 id="modalTitle">Contratar funcionário</h3>
+        <p id="modalText">Informe o ID do jogador.</p>
+
+        <div id="hireInputWrap" class="field">
+            <label for="hireId">ID do jogador</label>
+            <input id="hireId" type="number" min="1" placeholder="Ex.: 25" autocomplete="off">
+        </div>
+
+        <div class="modal-actions">
+            <button id="modalCancel" class="btn ghost">Cancelar</button>
+            <button id="modalConfirm" class="btn primary">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

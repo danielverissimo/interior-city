@@ -1,0 +1,37 @@
+CATEGORIAS DA CONCESSIONÁRIA
+
+Instalação
+1. Faça backup dos resources m_dealership e mg_config_panel.
+2. Instale os dois resources desta entrega com os nomes originais.
+3. Se o dealership.json do servidor foi alterado após o envio dos arquivos,
+   preserve esse JSON: ele contém os estoques e as configurações atuais.
+4. Reinicie m_dealership e depois mg_config_panel. Mantenha m_garage iniciado.
+5. Feche e reabra o painel/concessionária para carregar os dados atualizados.
+Não é necessário alterar a vRP ou executar SQL para esta funcionalidade.
+A interface da concessionária já está compilada em web/build.
+
+Uso
+- Painel > Concessionária > Configurações da Concessionária > Categorias.
+- Clique em Nova categoria, preencha ID (ex.: importados) e nome (IMPORTADOS),
+  depois clique em Salvar configurações.
+- Para renomear, edite o nome exibido e salve. IDs existentes ficam fixos.
+- BRASILEIROS (id brasileiros) já está cadastrada no JSON fornecido.
+- Na lista da concessionária, cadastre ou edite o veículo e selecione
+  Categoria na concessionária. Salve o veículo.
+- A opção Automática usa o tipo do catálogo do servidor, como anteriormente.
+- Para ver veículos reclassificados em uma concessionária já aberta,
+  feche e reabra a interface.
+
+Detalhes
+Categorias novas aparecem no menu da concessionária, com rolagem horizontal
+quando necessário. MEUS CARROS continua reservado ao sistema.
+A seleção é persistida em dealership.json, separadamente do tipo do m_garage.
+Nome, preço, porta-malas e regras VIP do catálogo continuam sendo respeitados.
+Não há exclusão de categorias nesta entrega; é possível criá-las e renomeá-las.
+
+Validação
+Interface compilada com TypeScript e Vite; sintaxe JavaScript e Lua validada.
+Testes Lua com ambiente simulado cobriram criação/renomeação, seleção e retorno
+à categoria automática, IDs inválidos/duplicados/reservados, preservação de
+estoque e vendas e reversão quando a gravação falha.
+Não foi possível realizar teste dentro de um servidor FiveM nesta sessão.

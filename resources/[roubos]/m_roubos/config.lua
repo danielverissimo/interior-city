@@ -11,3 +11,13 @@ Config.NotifyCall = {
     blipColor = 1,
     blipScale = 0.85
 }
+
+
+-- QRU de Disparo: utiliza o mesmo NotifyPush dos alertas de roubo.
+-- O intervalo e aplicado individualmente a cada jogador, no servidor.
+Config.GunshotQRU = {
+    enabled = true,
+    cooldownSeconds = 25,
+    title = "QRU de Disparo",
+    text = "Disparos de arma de fogo foram registrados nesta localização. Verifique a ocorrência."
+}

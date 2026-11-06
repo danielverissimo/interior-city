@@ -74,8 +74,8 @@ local function dispatchPolice(x,y,z)
             if notifyAvailable then
                 TriggerClientEvent("NotifyPush",player,{
                     code = "911",
-                    title = "Roubo à Joalheria",
-                    text = "Denúncia de roubo em andamento na joalheria. Suspeitos possivelmente armados no local.",
+                    title = "ROUBO À JOALHERIA",
+                    text = "Roubo em andamento na Joalheria. O sistema de segurança foi comprometido.",
                     x = x, y = y, z = z,
                     time = os.date("%H:%M"),
                     rgba = {255,48,66,255},
@@ -186,6 +186,17 @@ AddEventHandler("jewelrystart",function()
     andamento = true
     segundos = math.max(1,int(settings().robberyDuration,600))
     TriggerClientEvent("iniciandojewelry",source,0.0,0.0,0.0,0.0,0,0,false)
+
+    -- QRU autoritativa no servidor, como no módulo atualizado.
+    -- Respeita os 90 segundos de vantagem já exibidos pelo cliente desta versão.
+    -- Se o cliente chamar a polícia no mesmo instante, dispatchSent impede duplicidade.
+    local robberSource,robberUser = source,user_id
+    local callDelay = math.max(0,int(settings().policeCallDelaySeconds,90))
+    SetTimeout(callDelay * 1000,function()
+        if not andamento or activeRobberSource ~= robberSource or activeRobberUser ~= robberUser then return end
+        local center = settings().centerCoords or {-622.18,-230.92,38.05}
+        dispatchPolice(tonumber(center[1]) or -622.18,tonumber(center[2]) or -230.92,tonumber(center[3]) or 38.05)
+    end)
 end)
 
 function func.callPolice(x,y,z)

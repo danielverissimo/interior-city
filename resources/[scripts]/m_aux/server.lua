@@ -166,6 +166,9 @@ local function sendDepartmentAnnouncement(source, uid, role)
         duration = math.max(3, math.min(300, tonumber(data.duration) or 15))
     })
 
+    if role == "medic" or role == "mecanic" then
+        AuxProductivity.record(role, uid, role == "medic" and "m_aviso" or "r_avisomec")
+    end
     return response(true, "Aviso enviado para toda a cidade.")
 end
 
@@ -209,7 +212,13 @@ local function beginTreatment(source, medicId, target, targetId, kind, value)
         -- is completed even if one of the players takes a small step away. This
         -- avoids unsafe refund races where the medic could spend the payment
         -- before an attempted rollback.
-        vCLIENT.treatment(currentTarget, kind)
+        -- Aguarda a recuperação em uma coroutine separada, sem prolongar a animação.
+        CreateThread(function()
+            local completed = vCLIENT.treatment(currentTarget, kind)
+            if completed == true and vRP.getUserSource(targetId) == currentTarget then
+                AuxProductivity.record("medic", medicId, kind == "quick" and "quick_treatment" or "complete_treatment")
+            end
+        end)
         vRPclient._stopAnim(currentSource, false)
         notify(currentSource, "sucesso", paid and ("Tratamento iniciado. Você recebeu R$ " .. vRP.format(amount) .. ".") or "Tratamento gratuito iniciado.")
         notify(currentTarget, "sucesso", "Tratamento iniciado.")
@@ -252,6 +261,7 @@ function API.medic(action, value)
             vRPclient._setHealth(trg, 300)
             vRPclient._stopAnim(src, false)
             TriggerClientEvent("resetBleeding", trg)
+            AuxProductivity.record("medic", uid, "revive")
             vRP.giveMoney(uid, cfg.reviveReward)
             notify(src, "sucesso", "Cidadão reanimado com sucesso.")
             notify(trg, "sucesso", "Você foi reanimado.")
@@ -260,11 +270,17 @@ function API.medic(action, value)
     elseif action == "m_cv" then
         if not target then return response(false, "Não há nenhum cidadão próximo.") end
         if not vRPclient.getNearestVehicle(source, 6) then return response(false, "Não há nenhum veículo próximo.") end
-        vRPclient.putInNearestVehicleAsPassenger(target, 7)
+        if not vCLIENT.productivityPassenger(target, "enter") then
+            return response(false, "Não foi possível colocar o cidadão no veículo.")
+        end
+        AuxProductivity.record("medic", uid, "m_cv")
         return response(true, "Cidadão colocado no veículo.")
     elseif action == "m_rv" then
         if not target then return response(false, "Não há nenhum cidadão próximo.") end
-        vRPclient.ejectVehicle(target)
+        if not vCLIENT.productivityPassenger(target, "exit") then
+            return response(false, "O cidadão não estava no veículo ou não conseguiu sair.")
+        end
+        AuxProductivity.record("medic", uid, "m_rv")
         return response(true, "Cidadão retirado do veículo.")
     elseif action == "m_aviso" then
         return sendDepartmentAnnouncement(source, uid, "medic")
@@ -503,6 +519,8 @@ local function startRepair(source, uid, mode, vehicle, consumeItem)
         local repaired = vCLIENT.repairVehicle(currentSource, vehicle, mode)
         vRPclient._stopAnim(currentSource, false)
         if repaired then
+            local actions = { engine="r_motor", tires="r_pneu", full="r_full" }
+            AuxProductivity.record("mecanic", uid, actions[mode])
             notify(currentSource, "sucesso", "Reparo concluído.")
         else
             if consumeItem then vRP.giveInventoryItem(uid, consumeItem, 1, true) end
@@ -542,6 +560,7 @@ function API.mecanic(action, value)
         vRP.giveMoney(uid, amount)
         notify(target, "sucesso", ("Pagamento de R$ %s realizado."):format(vRP.format(amount)))
         notify(source, "sucesso", ("Você recebeu R$ %s."):format(vRP.format(amount)))
+        AuxProductivity.record("mecanic", uid, "r_cobrar")
         return response(true, "Cobrança paga.")
     elseif action == "r_avisomec" then
         return sendDepartmentAnnouncement(source, uid, "mecanic")

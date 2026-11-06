@@ -19,7 +19,7 @@ local function buildRuntime(data)
     c.Solda=tostring(s.solda or "c4")
     c.itemqtd=math.max(0,math.floor(tonumber(s.itemQtd) or 0))
     c.Furadeira=tostring(s.furadeira or "furadeira")
-    c.DinheiroSujo=tostring(s.dinheiroSujo or "dinheirosujo")
+    c.DinheiroSujo=tostring(s.dinheiroSujo or "dirty_money")
     c.Cops=math.max(0,math.floor(tonumber(s.cops) or 0))
     c.PermCops=tostring(s.permCops or "perm.policia")
     c.MinPegar=math.max(0,math.floor(tonumber(s.minPegar) or 0))
@@ -50,11 +50,12 @@ local function buildRuntime(data)
             }
         end
         local m=b.money or {}
+        local mc=m.cam or {}
         rb.Money={
             StartMoney=math.max(0,math.floor(tonumber(m.startMoney) or 0)),
             Amount=math.max(0,math.floor(tonumber(m.amount) or tonumber(m.startMoney) or 0)),
             BoxPosition=vec3From(m.boxPosition),Box=tostring(m.box or "prop_cash_crate_01"),
-            Cam=clone(m.cam or {})
+            Cam={Coords=clone(mc.coords or mc.Coords or {}),Rotation=clone(mc.rotation or mc.Rotation or {})}
         }
         local h=b.hacking or {}
         rb.Hacking={Coords=vec3From(h.coords),Heading=tonumber(h.heading) or 0.0}

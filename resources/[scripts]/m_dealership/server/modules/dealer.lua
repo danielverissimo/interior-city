@@ -125,21 +125,50 @@ end
 
 local vipSlotsSourceWarned = false
 
--- Uma única fonte: o provider selecionado na configuração operacional.
-local function getPanelVipGarageSlots(user_id)
-    local provider = GetConvar("ic_admin_service_resource", "ic_admin")
-    if GetResourceState(provider) == "started" then
-        local ok, slots = pcall(function()
-            return exports[provider]:getVipGarageSlotsForUser(user_id)
-        end)
-        if ok and type(slots) == "number" then
-            vipSlotsSourceWarned = false
-            return math.max(0, math.floor(slots))
+local function getStoredPanelVipGarageSlots(user_id)
+    local raw = LoadResourceFile("m_paineladm_v2", "vip_packages.json")
+    if type(raw) ~= "string" or raw == "" then return nil end
+
+    local ok, decoded = pcall(json.decode, raw)
+    if not ok or type(decoded) ~= "table" or type(decoded.packages) ~= "table" then
+        return nil
+    end
+
+    local total = 0
+    for groupName, package in pairs(decoded.packages) do
+        if type(package) == "table" and vRP.hasGroup(user_id, tostring(groupName)) then
+            total = total + math.max(0, math.floor(tonumber(package.garageSlots) or 0))
         end
     end
+
+    return total
+end
+
+-- Fonte única das vagas VIP: o pacote criado/editado no m_paineladm_v2.
+-- Com o painel ligado usamos o export em memória; se ele estiver reiniciando,
+-- lemos o vip_packages.json diretamente. Assim a concessionária nunca depende
+-- da antiga tabela de maxCars por permissão e não existe risco de somar duas vezes.
+local function getPanelVipGarageSlots(user_id)
+    if GetResourceState("m_paineladm_v2") == "started" then
+        local ok, slots = pcall(function()
+            return exports["m_paineladm_v2"]:getVipGarageSlotsForUser(user_id)
+        end)
+
+        if ok then
+            vipSlotsSourceWarned = false
+            return math.max(0, math.floor(tonumber(slots) or 0))
+        end
+    end
+
+    local storedSlots = getStoredPanelVipGarageSlots(user_id)
+    if storedSlots ~= nil then
+        vipSlotsSourceWarned = false
+        return storedSlots
+    end
+
     if not vipSlotsSourceWarned then
         vipSlotsSourceWarned = true
-        print("^3[m_dealership]^7 Provider de vagas VIP indisponível; mantendo somente as vagas padrão.")
+        print("^3[m_dealership]^7 Não foi possível consultar vip_packages.json do m_paineladm_v2; aplicando somente as 5 vagas padrão até a integração ficar disponível.")
     end
     return 0
 end
@@ -275,6 +304,53 @@ local function getHighestDiscount(user_id)
     return math.max(0, math.min(100, highestDiscount))
 end
 
+-- Formatação apenas para as notificações (a moeda da vRP usa valores inteiros).
+local function formatReais(amount)
+    local n = math.max(0, math.floor(tonumber(amount) or 0))
+    local value = tostring(n):reverse():gsub("(%d%d%d)", "%1."):reverse()
+    return value:gsub("^%.", "")
+end
+
+-- A vRP desta base implementa vRP.execute usando query() ASSÍNCRONO.
+-- Para registrar/remover veículos é obrigatório aguardar o MySQL confirmar a gravação.
+local function insertOwnedVehicle(user_id, vehicle, ipva, tuning)
+    local params = { user_id = user_id, vehicle = vehicle, ipva = ipva, tunagem = tuning }
+    local ok, affected = pcall(function()
+        return exports["oxmysql"]:update_async([[
+            INSERT INTO vrp_user_veiculos (user_id, veiculo, ipva, tunagem)
+            SELECT @user_id, @vehicle, @ipva, @tunagem
+            WHERE NOT EXISTS (
+                SELECT 1 FROM vrp_user_veiculos WHERE user_id = @user_id AND veiculo = @vehicle
+            )
+        ]], params)
+    end)
+
+    if ok and (tonumber(affected) or 0) > 0 then
+        return true, "inserido"
+    end
+
+    -- Em falhas de comunicação pode ocorrer: a inserção foi confirmada pelo
+    -- MySQL, mas a resposta não chegou ao script. Consulte a posse antes de
+    -- considerar qualquer reembolso; jamais dê dinheiro e carro ao mesmo tempo.
+    local verified, owned = pcall(function()
+        local rows = vRP.query("bm_module/dealership/getVehicle", { user_id = user_id, vehicle = vehicle })
+        assert(type(rows) == "table", "Falha ao consultar a posse")
+        return next(rows) ~= nil
+    end)
+    if verified and owned then
+        if ok then
+            return false, "veiculo_ja_possuido"
+        end
+        return true, "confirmado_apos_erro_mysql"
+    end
+    if verified then
+        return false, ok and "nenhuma_linha_inserida" or tostring(affected)
+    end
+    -- Erro ao inserir E erro ao consultar: resultado indeterminado.
+    -- Não é seguro efetuar um reembolso automático nessa situação.
+    return nil, ("Inserção: %s | Consulta: %s"):format(tostring(affected), tostring(owned))
+end
+
 function Dealership:buyVehicle(user_id, source, vehicle, rgba)
     local nearDealership = DealershipAudit.IsNearDealership(source, 8.0)
     if not nearDealership then
@@ -303,7 +379,44 @@ function Dealership:buyVehicle(user_id, source, vehicle, rgba)
     end
 
     local chargedAmount = 0
+    local paymentMethod = nil
     local deliveryConfirmed = false
+    local deliveryUncertain = false
+    local paidNotificationSent = false
+    local purchasedPrice, purchasedStock = nil, nil
+
+    local function paidMessage()
+        local origin = paymentMethod == "bank" and "o dinheiro do banco" or "dinheiro da carteira"
+        return ("Pago com %s no valor de R$ %s."):format(origin, formatReais(chargedAmount))
+    end
+
+    local function refundOriginalAccount()
+        if chargedAmount <= 0 then return true end
+        local amount = chargedAmount
+        local ok, refunded = pcall(function()
+            if paymentMethod == "bank" then
+                local before = tonumber(vRP.getBankMoney(user_id)) or 0
+                vRP.giveBankMoney(user_id, amount)
+                return (tonumber(vRP.getBankMoney(user_id)) or 0) >= before + amount
+            elseif paymentMethod == "wallet" then
+                return vRP.giveMoney(user_id, amount) == true
+            end
+            return false
+        end)
+        if ok and refunded then
+            chargedAmount = 0
+            return true
+        end
+        DealershipAudit.Log("dealership_system_transaction_error", {
+            actorId = user_id,
+            details = ("ATENÇÃO: falha ao ressarcir compra de `%s`. Origem: %s | Valor: R$ %s | Erro: %s")
+                :format(tostring(vehicle), tostring(paymentMethod), formatReais(amount), tostring(refunded))
+        })
+        print(("^1[m_dealership]^7 REEMBOLSO NÃO CONFIRMADO: ID %s | veículo %s | origem %s | R$ %s")
+            :format(tostring(user_id), tostring(vehicle), tostring(paymentMethod), formatReais(amount)))
+        return false
+    end
+
     local ok, result = xpcall(function()
         local carBuy = self:getCar(vehicle)
         if not carBuy then
@@ -326,7 +439,7 @@ function Dealership:buyVehicle(user_id, source, vehicle, rgba)
         end
 
         local query = vRP.query("bm_module/dealership/getVehicle", { user_id = user_id, vehicle = vehicle }) or {}
-        if #query > 0 then
+        if next(query) then
             local message = "Você já possui esse veículo em sua garagem."
             notify(source, "negado", message)
             return response(false, message)
@@ -345,122 +458,180 @@ function Dealership:buyVehicle(user_id, source, vehicle, rgba)
             return response(false, message)
         end
 
-        if carBuy.vip == true or carBuy.category == "vips" then
-            DealershipAudit.Log("dealership_security_invalid_purchase", {
-                actorId = user_id,
-                details = DealershipAudit.VehicleDetails(vehicle, carBuy, {
-                    "Tentativa bloqueada: compra direta de veículo VIP pela concessionária comum.",
-                    DealershipAudit.CoordsLine(source)
-                })
-            })
-            local message = "Veículos VIP não podem ser comprados por esta concessionária."
-            notify(source, "negado", message)
-            return response(false, message)
-        end
+        -- A categoria VIP é apenas classificatória: qualquer veículo
+        -- cadastrado com estoque e preço válidos pode ser comprado.
+        -- Continuam ativas as verificações de propriedade, garagem e pagamento.
 
         local highestDiscount = getHighestDiscount(user_id)
         local basePrice = math.max(0, tonumber(carBuy.price) or 0)
         local price = parseInt(basePrice - (basePrice * highestDiscount / 100))
-
-        if not vRP.tryFullPayment(user_id, price) then
-            local message = "Você não possui dinheiro suficiente."
+        if price <= 0 then
+            local message = "Este veículo está sem preço válido para compra. Avise a administração."
             notify(source, "negado", message)
             return response(false, message)
         end
+
+        -- A vRP fornecida implementa tryFullPayment com a ordem exata:
+        -- banco integral primeiro; só se faltar no banco, carteira integral.
+        -- Não divide a compra entre as duas contas.
+        local bankBalance = tonumber(vRP.getBankMoney(user_id)) or 0
+        local walletBalance = tonumber(vRP.getMoney(user_id)) or 0
+        if bankBalance < price and walletBalance < price then
+            local message = "Você não possui saldo suficiente no banco nem na carteira."
+            notify(source, "negado", message)
+            return response(false, message)
+        end
+        if not vRP.tryFullPayment(user_id, price) then
+            local message = "Não foi possível processar o pagamento. Verifique seu saldo."
+            notify(source, "negado", message)
+            return response(false, message)
+        end
+        paymentMethod = (tonumber(vRP.getBankMoney(user_id)) or 0) < bankBalance and "bank" or "wallet"
         chargedAmount = price
+        purchasedPrice = price
 
         local tunagem = createTunagem(rgba)
-        vRP.execute("bm_module/dealership/addUserVehicleTuning", {
-            user_id = user_id,
-            vehicle = vehicle,
-            ipva = os.time(),
-            tunagem = json.encode(tunagem)
-        })
-
-        -- Confirma a entrega no banco antes de considerar a compra concluída. Se
-        -- a inserção falhar, o jogador é ressarcido e o estoque não é consumido.
-        local delivered = vRP.query("bm_module/dealership/getVehicle", { user_id = user_id, vehicle = vehicle }) or {}
-        if not next(delivered) then
-            vRP.giveMoney(user_id, price)
-            chargedAmount = 0
+        local ipva = os.time()
+        local inserted, reason = insertOwnedVehicle(user_id, vehicle, ipva, json.encode(tunagem))
+        if inserted == nil then
+            deliveryUncertain = true
+            local message = "A confirmação do MySQL está indisponível. Não repita a compra; contate o suporte para verificar a entrega e o pagamento."
+            DealershipAudit.Log("dealership_system_transaction_error", {
+                actorId = user_id,
+                details = DealershipAudit.VehicleDetails(vehicle, carBuy, {
+                    "RESULTADO INDETERMINADO: nenhum reembolso automático para evitar veículo grátis.",
+                    ("Valor: R$ %s | Origem: %s"):format(formatReais(price), tostring(paymentMethod)),
+                    ("Diagnóstico: %s"):format(tostring(reason):sub(1, 600))
+                })
+            })
+            print(("^1[m_dealership]^7 COMPRA PENDENTE DE CONFERÊNCIA: ID %s, spawn %s, %s")
+                :format(tostring(user_id), tostring(vehicle), tostring(reason)))
+            notify(source, "aviso", message)
+            return response(false, message, { pendingVerification = true })
+        end
+        if inserted == false then
+            local refunded = refundOriginalAccount()
+            local message = refunded and
+                (reason == "veiculo_ja_possuido" and "Você já possui esse veículo. O pagamento foi devolvido para a conta utilizada." or "Não foi possível registrar o veículo. O pagamento foi devolvido para a conta utilizada.") or
+                "Não foi possível registrar o veículo e o reembolso não foi confirmado. Contate o suporte."
             DealershipAudit.Log("dealership_vehicle_delivery_failed", {
                 actorId = user_id,
                 details = DealershipAudit.VehicleDetails(vehicle, carBuy, {
-                    ("Valor ressarcido: **R$ %s**"):format(price),
-                    "Falha: o veículo não foi localizado em `vrp_user_veiculos` após a inserção.",
+                    ("Valor: **R$ %s** | Origem: **%s**"):format(formatReais(price), tostring(paymentMethod)),
+                    ("Reembolso confirmado: **%s**"):format(refunded and "SIM" or "NÃO"),
+                    ("Motivo: %s"):format(tostring(reason)),
                     DealershipAudit.CoordsLine(source)
                 })
             })
-            local message = "Não foi possível entregar o veículo. O valor da compra foi devolvido."
             notify(source, "negado", message)
             return response(false, message)
         end
 
+        -- A confirmação veio da gravação aguardada pelo MySQL; uma consulta
+        -- imediata não deve mais decidir se o pagamento será reembolsado.
         deliveryConfirmed = true
         local newStock = math.max(0, stock - 1)
         local newAmountSell = math.max(0, (tonumber(carBuy.amountSell) or 0) + 1)
-        local stateSaved = self:updateVehicleState(vehicle, {
-            stock = newStock,
-            amountSell = newAmountSell
-        })
-
+        purchasedStock = newStock
+        local stateSaved = self:updateVehicleState(vehicle, { stock = newStock, amountSell = newAmountSell })
         exports['vrp']:setCooldown(user_id, "dealership:buy", math.max(0, tonumber(Default.purchaseCooldown) or 5))
 
-        local purchaseDetails = DealershipAudit.VehicleDetails(vehicle, carBuy, {
-            ("Valor de catálogo: **R$ %s**"):format(parseInt(basePrice)),
-            ("Desconto aplicado: **%s%%**"):format(highestDiscount),
-            ("Valor efetivamente pago: **R$ %s**"):format(price),
-            ("Estoque: **%s → %s**"):format(stock, newStock),
-            ("Total de vendas contabilizadas: **%s**"):format(newAmountSell),
-            ("Cor escolhida: `%s`"):format(tostring(rgba or "padrão")),
-            DealershipAudit.CoordsLine(source)
+        DealershipAudit.Log("dealership_vehicle_purchase", {
+            actorId = user_id,
+            details = DealershipAudit.VehicleDetails(vehicle, carBuy, {
+                ("Valor de catálogo: **R$ %s**"):format(formatReais(basePrice)),
+                ("Desconto aplicado: **%s%%**"):format(highestDiscount),
+                ("Valor pago: **R$ %s** | Origem: **%s**"):format(formatReais(price), paymentMethod == "bank" and "Banco" or "Carteira"),
+                ("Estoque: **%s → %s**"):format(stock, newStock),
+                ("Vendas contabilizadas: **%s**"):format(newAmountSell),
+                ("Cor: `%s` | Confirmação: `%s`"):format(tostring(rgba or "padrão"), tostring(reason)),
+                DealershipAudit.CoordsLine(source)
+            })
         })
-        DealershipAudit.Log("dealership_vehicle_purchase", { actorId = user_id, details = purchaseDetails })
         DealershipAudit.Log("dealership_vehicle_delivered", {
             actorId = user_id,
             details = DealershipAudit.VehicleDetails(vehicle, carBuy, {
-                "Entrega confirmada: veículo registrado em `vrp_user_veiculos`.",
-                ("IPVA inicial: `%s`"):format(os.time()),
+                "Entrega confirmada pelo MySQL em `vrp_user_veiculos`.",
+                ("IPVA inicial: `%s`"):format(ipva),
                 ("Estoque restante: **%s**"):format(newStock)
             })
         })
-
         if stateSaved ~= true then
             DealershipAudit.Log("dealership_system_stock_sync_error", {
                 actorId = user_id,
                 details = DealershipAudit.VehicleDetails(vehicle, carBuy, {
-                    ("A compra foi entregue, porém a persistência do estoque retornou falha. Estoque esperado: **%s**."):format(newStock)
+                    ("Veículo entregue, mas houve falha na persistência do estoque. Esperado: **%s**."):format(newStock)
                 })
             })
         end
 
         notify(source, "sucesso", "Parabéns pela compra! Você comprou um <b>" .. tostring(carBuy.name or vehicle) .. "</b>.")
+        notify(source, "sucesso", paidMessage())
+        paidNotificationSent = true
         return response(true, "Compra realizada com sucesso.", {
-            price = price,
-            stock = newStock,
-            vehicle = vehicle
+            price = price, stock = newStock, vehicle = vehicle,
+            paymentMethod = paymentMethod
         })
     end, debug.traceback)
 
     releaseLocks(user_id, vehicle)
 
     if not ok then
-        local refunded = false
-        if chargedAmount > 0 and not deliveryConfirmed then
-            local refundOk = pcall(function() vRP.giveMoney(user_id, chargedAmount) end)
-            refunded = refundOk == true
-            if refunded then chargedAmount = 0 end
+        -- Se o INSERT já foi confirmado, falhas posteriores (log/estoque/
+        -- notificação) nunca podem transformar a compra em 'falha de entrega'.
+        if deliveryConfirmed then
+            DealershipAudit.Log("dealership_system_transaction_error", {
+                actorId = user_id,
+                details = ("Veículo `%s` ENTREGUE, mas ocorreu falha pós-entrega: %s"):format(vehicle, tostring(result):sub(1, 700))
+            })
+            print(("^3[m_dealership]^7 Falha após entrega confirmada de '%s' ao ID %s:\n%s")
+                :format(tostring(vehicle), tostring(user_id), tostring(result)))
+            if not paidNotificationSent then
+                notify(source, "sucesso", "Veículo registrado na garagem com sucesso.")
+                notify(source, "sucesso", paidMessage())
+            end
+            return response(true, "Veículo entregue com sucesso.", {
+                price = purchasedPrice, stock = purchasedStock, vehicle = vehicle,
+                paymentMethod = paymentMethod
+            })
         end
+
+        -- Erro antes da confirmação: não ressarcir se a operação SQL ficou
+        -- indeterminada. A conferência manual evita dar o carro gratuitamente.
+        local refunded = false
+        if not deliveryUncertain and chargedAmount > 0 then
+            -- Um erro inesperado após o débito pode ter ocorrido durante INSERT.
+            -- Verifique a posse antes de decidir o reembolso.
+            local verified, owned = pcall(function()
+                local rows = vRP.query("bm_module/dealership/getVehicle", { user_id = user_id, vehicle = vehicle })
+                assert(type(rows) == "table", "Consulta de posse indisponível")
+                return next(rows) ~= nil
+            end)
+            if not verified then
+                deliveryUncertain = true
+            elseif owned then
+                deliveryConfirmed = true
+            else
+                refunded = refundOriginalAccount()
+            end
+        end
+
         DealershipAudit.Log("dealership_system_transaction_error", {
             actorId = user_id,
-            details = ("Erro interno durante compra do spawn `%s`.\nEntrega confirmada: **%s**\nRessarcimento de segurança: **%s**\nErro: `%s`"):format(
-                tostring(vehicle), deliveryConfirmed and "SIM" or "NÃO", refunded and "SIM" or "NÃO", tostring(result):sub(1, 700)
-            )
+            details = ("Erro interno na compra de `%s`. Entrega confirmada: %s | Indeterminado: %s | Reembolso confirmado: %s | Erro: %s")
+                :format(tostring(vehicle), deliveryConfirmed and "SIM" or "NÃO", deliveryUncertain and "SIM" or "NÃO", refunded and "SIM" or "NÃO", tostring(result):sub(1, 700))
         })
         print(("^1[m_dealership]^7 Erro ao comprar '%s' para o ID %s:\n%s"):format(tostring(vehicle), tostring(user_id), tostring(result)))
-        local message = "Ocorreu um erro ao concluir a compra. Tente novamente."
+
+        if deliveryConfirmed then
+            notify(source, "sucesso", "Veículo registrado na garagem com sucesso.")
+            notify(source, "sucesso", paidMessage())
+            return response(true, "Veículo entregue com sucesso.", { price = purchasedPrice, vehicle = vehicle, paymentMethod = paymentMethod })
+        end
+        local message = deliveryUncertain and "Não foi possível conferir o resultado da compra. Contate o suporte antes de tentar novamente." or
+            (chargedAmount > 0 and "Erro na compra; reembolso não confirmado. Contate o suporte." or "Ocorreu um erro ao concluir a compra. Tente novamente.")
         notify(source, "negado", message)
-        return response(false, message)
+        return response(false, message, { pendingVerification = deliveryUncertain })
     end
 
     return result
@@ -493,6 +664,8 @@ function Dealership:sellVehicle(user_id, source, vehicle)
         return response(false, lockMessage)
     end
 
+    local saleRemoved, salePaid, salePaymentAccount, salePrice = false, false, nil, 0
+    local saleUncertain = false
     local ok, result = xpcall(function()
         local car = self:getCar(vehicle)
         if not car then
@@ -542,26 +715,57 @@ function Dealership:sellVehicle(user_id, source, vehicle)
 
         local price = parseInt((tonumber(car.price) or 0) - ((tonumber(car.price) or 0) * (tonumber(Default.sellVehicle) or 99) / 100))
 
-        vRP.execute("bm_module/dealership/removeUserVehicle", {
-            user_id = user_id,
-            vehicle = vehicle
-        })
-
-        local stillOwned = vRP.query("bm_module/dealership/getVehicle", { user_id = user_id, vehicle = vehicle }) or {}
-        if next(stillOwned) then
+        -- DELETE aguardado: a versão antiga consultava a garagem enquanto
+        -- o vRP.execute ainda não havia concluído a remoção no MySQL.
+        local removedOk, removedResult = pcall(function()
+            return exports["oxmysql"]:update_async(
+                "DELETE FROM vrp_user_veiculos WHERE veiculo = @vehicle AND user_id = @user_id",
+                { user_id = user_id, vehicle = vehicle }
+            )
+        end)
+        if removedOk then
+            saleRemoved = (tonumber(removedResult) or 0) > 0
+        else
+            -- Pode haver falha na resposta do MySQL depois do DELETE ser aplicado.
+            local verified, owned = pcall(function()
+                local rows = vRP.query("bm_module/dealership/getVehicle", { user_id = user_id, vehicle = vehicle })
+                assert(type(rows) == "table", "Consulta de posse indisponível")
+                return next(rows) ~= nil
+            end)
+            if verified then
+                saleRemoved = not owned
+            else
+                saleUncertain = true
+            end
+        end
+        if saleUncertain then
+            local message = "Não foi possível conferir o resultado da venda. Contate o suporte antes de tentar novamente."
             DealershipAudit.Log("dealership_system_transaction_error", {
                 actorId = user_id,
-                details = DealershipAudit.VehicleDetails(vehicle, car, {
-                    "A venda foi interrompida porque o veículo continuou registrado após a tentativa de remoção.",
-                    DealershipAudit.CoordsLine(source)
-                })
+                details = ("Venda de `%s` com estado de remoção INDETERMINADO: %s"):format(vehicle, tostring(removedResult))
             })
-            local message = "Não foi possível remover o veículo da sua garagem. Nenhum valor foi pago."
+            notify(source, "aviso", message)
+            return response(false, message, { pendingVerification = true })
+        end
+        if not saleRemoved then
+            local message = "Não foi possível confirmar a remoção do veículo. Nenhum pagamento foi realizado."
             notify(source, "negado", message)
             return response(false, message)
         end
 
-        vRP.giveMoney(user_id, price)
+        -- Credita a carteira como antes; caso o inventário não aceite o item
+        -- dinheiro, credita no banco para não deixar a venda sem pagamento.
+        salePrice = price
+        salePaymentAccount = "carteira"
+        if price > 0 and vRP.giveMoney(user_id, price) ~= true then
+            local bankBefore = tonumber(vRP.getBankMoney(user_id)) or 0
+            vRP.giveBankMoney(user_id, price)
+            if (tonumber(vRP.getBankMoney(user_id)) or 0) < bankBefore + price then
+                error("Pagamento da venda não confirmado no banco")
+            end
+            salePaymentAccount = "banco"
+        end
+        salePaid = true
         exports['vrp']:setCooldown(user_id, "dealership:sell", math.max(0, tonumber(Default.sellCooldown) or 10))
 
         local basePrice = math.max(0, tonumber(car.price) or 0)
@@ -572,12 +776,12 @@ function Dealership:sellVehicle(user_id, source, vehicle)
                 ("Valor de catálogo: **R$ %s**"):format(parseInt(basePrice)),
                 ("Percentual de revenda configurado: **%s%%**"):format(receivePercent),
                 ("Valor efetivamente recebido: **R$ %s**"):format(price),
-                "Veículo removido de `vrp_user_veiculos` antes do pagamento.",
+                ("Veículo removido do MySQL antes do pagamento. Crédito realizado em: **%s**"):format(salePaymentAccount),
                 DealershipAudit.CoordsLine(source)
             })
         })
 
-        notify(source, "sucesso", "Você vendeu seu veículo <b>" .. tostring(car.name or vehicle) .. "</b> e recebeu R$ " .. price .. ".")
+        notify(source, "sucesso", "Você vendeu seu veículo <b>" .. tostring(car.name or vehicle) .. "</b> e recebeu R$ " .. formatReais(price) .. " na " .. salePaymentAccount .. ".")
 
         return response(true, "Venda realizada com sucesso.", {
             price = price,
@@ -590,12 +794,18 @@ function Dealership:sellVehicle(user_id, source, vehicle)
     if not ok then
         DealershipAudit.Log("dealership_system_transaction_error", {
             actorId = user_id,
-            details = ("Erro interno durante venda do spawn `%s`.\nErro: `%s`"):format(tostring(vehicle), tostring(result):sub(1, 700))
+            details = ("Erro interno durante venda do spawn `%s`. Removido: %s | Pago: %s | Erro: `%s`")
+                :format(tostring(vehicle), saleRemoved and "SIM" or "NÃO", salePaid and "SIM" or "NÃO", tostring(result):sub(1, 700))
         })
         print(("^1[m_dealership]^7 Erro ao vender '%s' do ID %s:\n%s"):format(tostring(vehicle), tostring(user_id), tostring(result)))
-        local message = "Ocorreu um erro ao concluir a venda. Tente novamente."
+        if saleRemoved and salePaid then
+            notify(source, "sucesso", "Veículo vendido e pagamento realizado na " .. tostring(salePaymentAccount) .. ".")
+            return response(true, "Venda concluída com sucesso.", { price = salePrice, vehicle = vehicle })
+        end
+        local message = saleRemoved and "Veículo removido, mas o pagamento não foi confirmado. Contate o suporte; não tente repetir a operação." or
+            "Ocorreu um erro ao concluir a venda. Tente novamente."
         notify(source, "negado", message)
-        return response(false, message)
+        return response(false, message, { pendingVerification = saleRemoved })
     end
 
     return result

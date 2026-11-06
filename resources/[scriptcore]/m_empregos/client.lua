@@ -10,6 +10,51 @@ vSERVER = Tunnel.getInterface(GetCurrentResourceName())
 
 local nui = false
 
+local serviceVehicleReturnUntil = 0
+
+-- Helpers compartilhados por todos os módulos de emprego.
+function MageJobsBeginService(jobName)
+    return vSERVER.startService(jobName) == true
+end
+
+function MageJobsEndService(jobName)
+    return vSERVER.endService(jobName) == true
+end
+
+local function drawServiceVehicleReturnText(seconds)
+    SetTextFont(4)
+    SetTextScale(0.42, 0.42)
+    SetTextColour(255, 255, 255, 235)
+    SetTextOutline()
+    SetTextCentre(true)
+    SetTextEntry("STRING")
+    AddTextComponentString(("Este veículo é de serviço e será devolvido em ~y~%d~w~ Segundos"):format(seconds))
+    DrawText(0.5, 0.875)
+end
+
+RegisterNetEvent("m_empregos:serviceVehicleCountdown")
+AddEventHandler("m_empregos:serviceVehicleCountdown", function(seconds)
+    seconds = math.max(1, math.floor(tonumber(seconds) or 30))
+    serviceVehicleReturnUntil = GetGameTimer() + (seconds * 1000)
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        local wait = 1000
+
+        if serviceVehicleReturnUntil > GetGameTimer() then
+            wait = 0
+            local remaining = math.max(1, math.ceil((serviceVehicleReturnUntil - GetGameTimer()) / 1000))
+            drawServiceVehicleReturnText(remaining)
+        elseif serviceVehicleReturnUntil ~= 0 then
+            serviceVehicleReturnUntil = 0
+        end
+
+        Citizen.Wait(wait)
+    end
+end)
+
+
 -----------------------------------------------------------------------------
 ------ MAIN THREAD NUI
 -----------------------------------------------------------------------------
@@ -26,7 +71,7 @@ Citizen.CreateThread(function()
             DrawMarker(27,cfg.central[1],cfg.central[2],cfg.central[3] - 0.95,0,0,0,0,0,0,1.5,1.5,1.5,132,102,226,180,0,0,0,1)
             if distance <= 3.0 then
                 DrawText3D(cfg.central[1],cfg.central[2],cfg.central[3], "Bem-Vindo a Central de Empregos \n")
-                if distance <= 5.0 and IsControlJustPressed(0, 38) and not nui then
+                if distance <= 5.0 and IsControlJustPressed(0, 38) and not nui and vSERVER.canOpenCentral() then
                     
                     -- vSERVER.getInitCache()
 

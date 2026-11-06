@@ -79,8 +79,8 @@ local function dispatchPolice(bankId,x,y,z)
             if notifyAvailable then
                 TriggerClientEvent("NotifyPush",player,{
                     code = "911",
-                    title = "Roubo a Cofre Bancário",
-                    text = "Um roubo foi iniciado em "..tostring(bankId)..". Suspeitos estão tentando acessar o cofre.",
+                    title = "ROUBO A COFRE BANCÁRIO",
+                    text = "Roubo em andamento em "..tostring(bankId)..". Suspeitos tentando acessar o cofre.",
                     x = x, y = y, z = z,
                     time = os.date("%H:%M"),
                     rgba = {255,48,66,255},

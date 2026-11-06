@@ -1,433 +1,383 @@
--- print('[DEBUG]: Client Entregador Init Sucess')
-
------------------------------------------------------------------------------------------------------------------------------------------
--- VARIAVEIS
------------------------------------------------------------------------------------------------------------------------------------------
-local check_em_servico = false -- Booleana para saber se player está em serviõ.
-local object = nil -- Variavel para guardar objeto que player pegou (encomenda).
-local pegou_pacote = false -- Para saber se player pegou encomenda. Quando pega vira true, quando entrega retorna para false.
-local trava = false -- Variável auxiliar para PARAR loop while (caso o user aperte F7(para cancelar a rota), ou entregue a comida).
-local encomenda_guardada = false -- Para saber se a encomenda está guardada ou não na moto do ifood.
-local nome_moto_ifood = 'cg160' -- Nome de spawn da moto do ifood usada. ( aviso !!!! ). Se você trocar o modelo de sua moto de ifood e não alterar nesta variável, não estará mais habilitado a
--- ... pegar ou guardar encomendas no caixote do ifood.
-local moto = nil
-local indexAntigo = 0
-
-local escondeu = false
-
------------------------------------------------------------------------------------------------------------------------------------------
--- GERANDO LOCAIS PARA PEGAR/ENTREGAR O PACOTE
------------------------------------------------------------------------------------------------------------------------------------------
-
--- COORDENADAS/LOCAL DE AQUISIÇÃO DA ENCOMENDA --
-local pegarlocal = {
-	------ cfg.list["Motorista"]["inicio"][1],cfg.list["Motorista"]["inicio"][2],cfg.list["Motorista"]["inicio"][3]
-	[1] = {x=-1816.49, y=-1193.59, z=14.31},
-
-}
-
--- COORDENADAS/LOCAIS DE ENTREGA --
--- Se alterar A QUANTIDADE de locais na lista, altere o valor de r_max abaixo também --
-local r_max = 11 -- QUANTIDADE DE LOCAIS LISTADOS ABAIXO
-local entregalocal = {
-	[1] = {x=-521.92,y=-11.35,z=44.38},
-	[2] = {x=-242.13,y=279.0,z=92.04}, 
-	[3] = {x=494.31,y=-1541.85,z=29.29}, 
-	[4] = {x=-785.83,y=-1044.96,z=12.98}, 
-	[5] = {x=-636.83,y=105.64,z=57.03}, 
-	[6] = {x=132.19,y=-1461.88,z=29.36}, 
-	[7] = {x=416.39,y=-1107.41,z=30.06},
-	[8] = {x=117.77,y=-1305.62,z=29.23},
-	[9] = {x=243.06,y=-44.73,z=69.9},
-	[10] = {x=-430.37,y=260.64,z=83.01},
-	[11] = {x=1209.41,y=-470.87,z=66.21} -- Dentro (barbearia)     
-}
-
--- ENCOMENDAS/OBJETOS A SEREM PEGOS (ALEATÓRIO DENTRE OS LISTADOS ABAIXO) --
--- Se alterar A QUANTIDADE de objetos na lista, altere o número máximo da variável abaixo também -- [ aviso !!! ]
-obj_rand_max = 3
-local objNomes = {
-	"prop_paper_bag_01",
-	"prop_food_cb_bag_01",
-	"prop_food_bs_bag_01",
-}
-
------------------------------------------------------------------------------------------------------------------------------------------
--- INICIANDO TRABALHO
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterNetEvent('vrp_ifood:permissao')
-AddEventHandler('vrp_ifood:permissao',function()
-	if not check_em_servico then
-		TriggerEvent("Notify","aviso","Voce iniciou seu <b>trabalho</b>. Entregue a encomenda no local marcado!")
-		check_em_servico = true
-	end
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- NÃO APARECER ENCOMENDA QUANDO ENTRA EM VEÍCULO
------------------------------------------------------------------------------------------------------------------------------------------
-
-Citizen.CreateThread(function()
-
-	while true do
-		local idle = 1000
-		local ped = PlayerPedId()
-    	local x,y,z = table.unpack(GetEntityCoords(ped))
-
-		if (IsPedInAnyVehicle(ped, false)) and (not escondeu) and (check_em_servico) and (pegou_pacote) and (object) and (not encomenda_guardada) then
-			idle = 1
-			DeleteObject(object)
-			ClearPedTasks(ped)
-			escondeu = true
-
-			TriggerEvent("Notify","aviso","A encomenda foi guardada.")
-
-			Citizen.Wait(1000)
-
-		elseif (not IsPedInAnyVehicle(ped, false)) and (escondeu) and (not encomenda_guardada) then
-			idle = 1
-			-- CRIAR OBJETO NOVAMENTE --
-			local coords = GetOffsetFromEntityInWorldCoords(ped,0.0,0.0,-5.0)
-			object = CreateObject(GetHashKey(objNomes[indexAntigo]),coords.x,coords.y,coords.z,true,true,true)
-			SetEntityCollision(object,true,true)
-			AttachEntityToEntity(object,ped,GetPedBoneIndex(ped,28422),0.25,0.0,0.06,65.0,-130.0,-65.0,true,true,false,true,0,true)
-			SetEntityAsMissionEntity(object,true,true)
-
-			escondeu = false
-
-			TriggerEvent("Notify","aviso","Você pegou a encomenda.")
-
-			Citizen.Wait(1000)
-
-		end
-
-
-
-		Citizen.Wait(idle)
-
-	end
-
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- GUARDAR NA MOTO
------------------------------------------------------------------------------------------------------------------------------------------
-
-Citizen.CreateThread(function()
-
-	while true do
-		local idle = 1000
-		local ped = PlayerPedId()
-        local x,y,z = table.unpack(GetEntityCoords(ped))
-
-		moto = GetClosestVehicle(x,y,z, 100.0, GetHashKey(nome_moto_ifood), 70);
-
-		local trunkpos = GetWorldPositionOfEntityBone(moto, GetEntityBoneIndexByName(moto, "exhaust"))
-		local playerpos = GetEntityCoords(GetPlayerPed(-1), 1)
-		local distanceToTrunk = GetDistanceBetweenCoords(trunkpos, playerpos, 1)
-
-		--print(moto)
-
-		if (check_em_servico) and (pegou_pacote) and (not encomenda_guardada) and (not escondeu) then
-			idle = 1
-        	if (distanceToTrunk <= 1) and (DoesEntityExist(moto)) and (IsEntityAVehicle(moto)) then
-				idle = 1
-				SetTextFont(0)
-				SetTextProportional(1)
-				SetTextScale(0.0, 0.5)
-				SetTextColour(128, 128, 128, 255)
-				SetTextDropshadow(0, 0, 0, 0, 255)
-				SetTextEdge(0, 0, 0, 1, 255)
-				SetTextDropShadow()
-				SetTextOutline()
-				SetTextEntry("STRING")
-				AddTextComponentString("~w~APERTE ~r~E ~w~PARA GUARDAR A ENCOMENDA")
-				DrawText(0.35, 0.83)
-
-				if IsControlJustPressed(0,38) then
-
-
-					-- ANIMAÇÃO --
-					RequestAnimDict('mp_common')
-										
-					while not HasAnimDictLoaded('mp_common') do
-					Citizen.Wait(1)
-					end
-
-					TaskPlayAnim(ped, "mp_common", "givetake1_a",2.0, -2.0, -1, 50, 0, false, false, false )
-
-					Citizen.Wait(idle)
-
-
-					encomenda_guardada = true -- Setar encomenda como guardada
-					DeleteObject(object) -- Tirar objeto da mão do player
-					ClearPedTasks(ped)
-
-					TriggerEvent("Notify","aviso","Você guardou a encomenda.")
-
-					Citizen.Wait(idle)
-
-				end
-
-			end
-
-		end
-
-
-
-		if (distanceToTrunk <= 1) and (DoesEntityExist(moto)) and (IsEntityAVehicle(moto)) and (encomenda_guardada) and (not escondeu) then
-			idle = 1
-			SetTextFont(0)
-			SetTextProportional(1)
-			SetTextScale(0.0, 0.5)
-			SetTextColour(128, 128, 128, 255)
-			SetTextDropshadow(0, 0, 0, 0, 255)
-			SetTextEdge(0, 0, 0, 1, 255)
-			SetTextDropShadow()
-			SetTextOutline()
-			SetTextEntry("STRING")
-			AddTextComponentString("~w~APERTE ~g~E ~w~PARA PEGAR A ENCOMENDA")
-			DrawText(0.35, 0.83)
-
-			if IsControlJustPressed(0,38) and vSERVER.checkEmp('Entregador') then
-
-
-				-- ANIMAÇÃO --
-				RequestAnimDict('mp_common')
-										
-				while not HasAnimDictLoaded('mp_common') do
-				Citizen.Wait(1)
-				end
-
-				TaskPlayAnim(ped, "mp_common", "givetake1_a",2.0, -2.0, -1, 50, 0, false, false, false )
-
-				Citizen.Wait(idle)
-
-				ClearPedTasks(ped)
-
-
-				-- CRIAR OBJETO NOVAMENTE --
-				local coords = GetOffsetFromEntityInWorldCoords(ped,0.0,0.0,-5.0)
-				object = CreateObject(GetHashKey(objNomes[indexAntigo]),coords.x,coords.y,coords.z,true,true,true)
-				SetEntityCollision(object,true,true)
-				vRP.playSound("Object_Collect_Player", "GTAO_FM_Events_Soundset") -- Som, pegando objeto
-				AttachEntityToEntity(object,ped,GetPedBoneIndex(ped,28422),0.25,0.0,0.06,65.0,-130.0,-65.0,true,true,false,true,0,true)
-				SetEntityAsMissionEntity(object,true,true)
-
-				encomenda_guardada = false
-
-				TriggerEvent("Notify","aviso","Você pegou a encomenda.")
-
-			end
-
-		end
-
-		Citizen.Wait(idle)
-	end
-
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- GERANDO ENTREGA
------------------------------------------------------------------------------------------------------------------------------------------
--- COORDENADA PEGAR COMIDA: -63.84,-791.54,44.23
-
-Citizen.CreateThread(function()
-
-	CriandoBlipIF()
-
-	destinoantigo = destino
-	destino = math.random(7,r_max) -- RANDOM DE LOCAIS DE DESTINO //// GERA LOCAL DE ENTREGA ALEATÓRIO (entre 1 e 7 poque existem 7 coordenadas possíveis na linha 29 do código)
-
-    while true do
-        local sleep = 1000
-        local ped = PlayerPedId()
-        local x,y,z = table.unpack(GetEntityCoords(ped))
-        if Vdist(x,y,z,cfg.list["Entregador"]["inicio"][1],cfg.list["Entregador"]["inicio"][2],cfg.list["Entregador"]["inicio"][3]) <= 10  then
-        	sleep = 1
-             DrawMarker(27,cfg.list["Entregador"]["inicio"][1],cfg.list["Entregador"]["inicio"][2],cfg.list["Entregador"]["inicio"][3] - 0.95,0,0,0,0,0,0,1.5,1.5,1.5,132,102,226,180,0,0,0,1)
-			if  Vdist(x,y,z,cfg.list["Entregador"]["inicio"][1],cfg.list["Entregador"]["inicio"][2],cfg.list["Entregador"]["inicio"][3]) <= 5 and not  check_em_servico then
-				DrawText3D(cfg.list["Entregador"]["inicio"][1],cfg.list["Entregador"]["inicio"][2],cfg.list["Entregador"]["inicio"][3], "Bem-Vindo a Central de Entrega\n")
-			end
-
-            if Vdist(x,y,z,cfg.list["Entregador"]["inicio"][1],cfg.list["Entregador"]["inicio"][2],cfg.list["Entregador"]["inicio"][3]) <= 1.0 then
-				sleep = 1
-              if IsControlJustPressed(0,38) and vSERVER.checkEmp('Entregador') and not iniciandoServico and not pegou_pacote then
-    
-    iniciandoServico = true -- TRAVA IMEDIATA (anti spam)
-    trava = true -- bloqueia outras ações
-
-    if DoesBlipExist(blip) then
-        RemoveBlip(blip) -- REMOVE O BLIP NA HORA
+-- Entregador - cliente
+-- Ciclo contínuo: inicia com lanches -> entrega -> coleta -> entrega ... até F6.
+
+local inService = false
+local currentStage = nil
+local currentTarget = nil
+local currentBatch = nil
+local packageObject = nil
+local packageHidden = false
+local routeBlip = nil
+local startBlip = nil
+local actionBusy = false
+
+local function extraConfig()
+    return (cfg.extra and cfg.extra["Entregador"]) or {}
+end
+
+local function serviceVehicleModel()
+    return tostring(extraConfig().veiculo or "cg160")
+end
+
+local function removeRouteBlip()
+    if routeBlip and DoesBlipExist(routeBlip) then
+        RemoveBlip(routeBlip)
+    end
+    routeBlip = nil
+end
+
+local function createStartBlip()
+    if startBlip and DoesBlipExist(startBlip) then RemoveBlip(startBlip) end
+    startBlip = nil
+
+    local start = cfg.list["Entregador"] and cfg.list["Entregador"].inicio
+    if not start then return end
+
+    startBlip = AddBlipForCoord(start[1] + 0.0, start[2] + 0.0, start[3] + 0.0)
+    SetBlipSprite(startBlip, 494)
+    SetBlipColour(startBlip, 1)
+    SetBlipScale(startBlip, 0.6)
+    SetBlipAsShortRange(startBlip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString("Central | Entregador")
+    EndTextCommandSetBlipName(startBlip)
+end
+
+local function setRouteBlip(target, stage)
+    removeRouteBlip()
+    if not target then return end
+
+    routeBlip = AddBlipForCoord(target.x + 0.0, target.y + 0.0, target.z + 0.0)
+    SetBlipSprite(routeBlip, stage == "pickup" and 478 or 501)
+    SetBlipColour(routeBlip, stage == "pickup" and 5 or 1)
+    SetBlipScale(routeBlip, 0.72)
+    SetBlipAsShortRange(routeBlip, false)
+    SetBlipRoute(routeBlip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString(stage == "pickup" and "Retirar Lanches" or "Entrega de Lanches")
+    EndTextCommandSetBlipName(routeBlip)
+end
+
+local function deletePackageProp()
+    if packageObject and DoesEntityExist(packageObject) then
+        DeleteEntity(packageObject)
+    end
+    packageObject = nil
+end
+
+local function spawnPackageProp()
+    if not inService or currentStage ~= "delivery" or not currentBatch or packageHidden then return end
+    if packageObject and DoesEntityExist(packageObject) then return end
+
+    local ped = PlayerPedId()
+    if IsPedInAnyVehicle(ped, false) then
+        packageHidden = true
+        return
     end
 
-    destinoantigo = destino
-    destino = math.random(7,r_max)
+    local propName = tostring(currentBatch.prop or "prop_food_cb_bag_01")
+    local model = GetHashKey(propName)
+    RequestModel(model)
 
-    while destinoantigo == destino do
-        destino = math.random(7,r_max)
-        Citizen.Wait(1)
-    end
-
-    local indexObj = math.random(1,obj_rand_max)
-    indexAntigo = indexObj
-
-    RequestModel(GetHashKey(objNomes[indexObj]))
-    while not HasModelLoaded(GetHashKey(objNomes[indexObj])) do
+    local deadline = GetGameTimer() + 5000
+    while not HasModelLoaded(model) and GetGameTimer() < deadline do
         Citizen.Wait(10)
     end
+    if not HasModelLoaded(model) then return end
 
-    local coords = GetOffsetFromEntityInWorldCoords(ped,0.0,0.0,-5.0)
-    object = CreateObject(GetHashKey(objNomes[indexObj]),coords.x,coords.y,coords.z,true,true,true)
-
-    SetEntityCollision(object,true,true)
-    vRP.playSound("Object_Collect_Player", "GTAO_FM_Events_Soundset")
-
-    AttachEntityToEntity(object,ped,GetPedBoneIndex(ped,28422),0.25,0.0,0.06,65.0,-130.0,-65.0,true,true,false,true,0,true)
-    SetEntityAsMissionEntity(object,true,true)
-
-    pegou_pacote = true
-
-    -- Libera depois de um pequeno delay (evita spam extremo)
-    SetTimeout(1000,function()
-        iniciandoServico = false
-        trava = false
-    end)
-
-    CriandoBlipIFEntrega(entregalocal,destino)
+    local coords = GetEntityCoords(ped)
+    packageObject = CreateObject(model, coords.x, coords.y, coords.z - 2.0, true, true, true)
+    SetEntityCollision(packageObject, false, false)
+    AttachEntityToEntity(
+        packageObject,
+        ped,
+        GetPedBoneIndex(ped, 28422),
+        0.25, 0.0, 0.06,
+        65.0, -130.0, -65.0,
+        true, true, false, true, 0, true
+    )
+    SetEntityAsMissionEntity(packageObject, true, true)
+    SetModelAsNoLongerNeeded(model)
 end
+
+local function resetClientState()
+    inService = false
+    currentStage = nil
+    currentTarget = nil
+    currentBatch = nil
+    actionBusy = false
+    packageHidden = false
+    deletePackageProp()
+    removeRouteBlip()
+    ClearPedTasks(PlayerPedId())
+end
+
+local function notify(message, kind)
+    if message and message ~= "" then
+        TriggerEvent("Notify", kind or "aviso", message, 7)
+    end
+end
+
+local function applyServerStep(result)
+    if not result or result.ok ~= true then
+        notify(result and result.message or "Não foi possível atualizar a rota.", "negado")
+        return false
+    end
+
+    currentStage = result.stage
+    currentTarget = result.target
+    currentBatch = result.batch
+    packageHidden = false
+
+    deletePackageProp()
+    setRouteBlip(currentTarget, currentStage)
+
+    if currentStage == "delivery" and currentBatch then
+        spawnPackageProp()
+    end
+
+    notify(result.message, "aviso")
+    return true
+end
+
+local function playTakeGiveAnimation()
+    local ped = PlayerPedId()
+    RequestAnimDict("mp_common")
+    local deadline = GetGameTimer() + 3000
+    while not HasAnimDictLoaded("mp_common") and GetGameTimer() < deadline do
+        Citizen.Wait(10)
+    end
+    if HasAnimDictLoaded("mp_common") then
+        TaskPlayAnim(ped, "mp_common", "givetake1_a", 2.0, -2.0, 900, 49, 0.0, false, false, false)
+        Citizen.Wait(650)
+        ClearPedTasks(ped)
+    end
+end
+
+local function startDeliveryService()
+    if inService or actionBusy then return end
+    actionBusy = true
+
+    if not vSERVER.checkEmp("Entregador") then
+        actionBusy = false
+        return
+    end
+
+    if not MageJobsBeginService("Entregador") then
+        notify("Não foi possível iniciar o expediente.", "negado")
+        actionBusy = false
+        return
+    end
+
+    local result = vSERVER.startDeliveryCycle()
+    if result and result.ok then
+        inService = true
+        applyServerStep(result)
+    else
+        notify(result and result.message or "Não foi possível iniciar a rota.", "negado")
+        MageJobsEndService("Entregador")
+        resetClientState()
+    end
+
+    actionBusy = false
+end
+
+local function finishCurrentAction()
+    if not inService or actionBusy or not currentStage then return end
+    local ped = PlayerPedId()
+    if IsPedInAnyVehicle(ped, false) then
+        notify("Desça do veículo para realizar esta ação.", "negado")
+        return
+    end
+
+    actionBusy = true
+    playTakeGiveAnimation()
+
+    local result
+    if currentStage == "delivery" then
+        result = vSERVER.completeDeliveryStep()
+    elseif currentStage == "pickup" then
+        result = vSERVER.collectDeliveryStep()
+    end
+
+    if result and result.delivered then
+        deletePackageProp()
+        currentBatch = nil
+    end
+
+    if result and result.ok then
+        applyServerStep(result)
+    else
+        notify(result and result.message or "Não foi possível concluir esta etapa.", "negado")
+        if result and result.delivered then
+            currentStage = "paused"
+            currentTarget = nil
+            removeRouteBlip()
+        end
+    end
+
+    actionBusy = false
+end
+
+Citizen.CreateThread(function()
+    Citizen.Wait(800)
+    createStartBlip()
+end)
+
+-- Marker principal do emprego.
+Citizen.CreateThread(function()
+    while true do
+        local idle = 1000
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        local start = cfg.list["Entregador"] and cfg.list["Entregador"].inicio
+
+        if start then
+            local dist = #(coords - vector3(start[1] + 0.0, start[2] + 0.0, start[3] + 0.0))
+            if dist <= 12.0 then
+                idle = 0
+                DrawMarker(27, start[1], start[2], start[3] - 0.95, 0,0,0, 0,0,0, 1.5,1.5,1.5, 132,102,226,180, false,false,2,false)
+
+                if dist <= 3.0 and not inService then
+                    DrawText3DIF(start[1], start[2], start[3], "~w~[ ~r~E ~w~] Iniciar expediente de entregas")
+                    if dist <= 1.5 and IsControlJustPressed(0, 38) then
+                        startDeliveryService()
+                    end
+                end
             end
         end
-        --end	
-        
-       Citizen.Wait(sleep)
 
-	   --------------------------- POR AQUI: ENTREGA NO PONTO MARCADO -----------------
-	   if pegou_pacote then -- APARECE SE (E SOMENTE SE) PLAYER TIVER PEGADO A ENCOMENDA
-
-			while true and not trava do
-				local sleep = 1000
-
-				local pagamento = math.random(500,1000)
-				local ped = PlayerPedId()
-				local x,y,z = table.unpack(GetEntityCoords(ped))
-
-				if Vdist(x,y,z,entregalocal[destino].x,entregalocal[destino].y,entregalocal[destino].z) <= 50 then
-					sleep = 1
-					DrawMarker(27,entregalocal[destino].x,entregalocal[destino].y,entregalocal[destino].z-0.9,0,0,0,0.0,0,0,1.5,1.5,1.2,255,0,0,70,0,1,0,1) -- Desenha a marker no chão de ENTREGAR COMIDA
-					DrawMarker(3,entregalocal[destino].x,entregalocal[destino].y,entregalocal[destino].z-0.1,0,0,0,0.0,0,0,1.0,1.0,1.3,255,0,0,70,1,1,0,0) -- Desenha a flutuante de ENTREGAR COMIDA
-					if Vdist(x,y,z,entregalocal[destino].x,entregalocal[destino].y,entregalocal[destino].z) <= 3 then
-						if IsControlJustPressed(0,38) and not IsPedInAnyVehicle(ped) and not encomenda_guardada then
-							-- FINALIZA A ENTREGA AQUI --
-							ClearPedTasksImmediately(ped)
-							-- TriggerServerEvent("vrp_ifood:receber",pagamento) -- Chamar o server-side(server.lua na pasta) para entregar o dinheiro
-							vRP.playSound("PEYOTE_COMPLETED","HUD_AWARDS") -- Som ao ganhar dinheiro
-							-- TriggerEvent("Notify","sucesso","<b>Comida</b> entregue, voce ganhou <b>$"..pagamento.."</b>!") -- Mensagem de entrega
-							TriggerServerEvent('m_empregos:upgrade_level')
-							TriggerServerEvent('m_empregos:payment')
-							DeleteObject(object) --DELETAR OBJETO DA MAO
-							pegou_pacote = false
-							check_em_servico = false
-							trava = true
-							object = nil
-							RemoveBlip(blip)
-							break
-						end
-					end
-				end	
-				Citizen.Wait(sleep)
-			end
-		end
-
+        Citizen.Wait(idle)
     end
 end)
 
-
------------------------------------------------------------------------------------------------------------------------------------------
--- CANCELANDO ENTREGA
------------------------------------------------------------------------------------------------------------------------------------------
-
+-- Ponto atual: entrega ou coleta.
 Citizen.CreateThread(function()
-	while true do
-		local idle = 1000
-		if check_em_servico then
-			idle = 1
-            drawTxtIF("~y~PRESSIONE ~r~F7 ~w~SE DESEJA CANCELAR A ENTREGA ",4,0.270,0.905,0.45,255,255,255,200)
-			if IsControlJustPressed(0,168) then
-				check_em_servico = false
-				pegou_pacote = false
-				trava = true
-				TriggerEvent('cancelando',false)
-				RemoveBlip(blip)
-				vRP.playSound("Oneshot_Final","MP_MISSION_COUNTDOWN_SOUNDSET") -- SOM de cancelamento pelo F7
-				TriggerEvent("Notify","aviso","Voce pressionou <b>F7</b>. A rota foi CANCELADA.") -- Mensagem de cancelamento da entrega
-				DeleteObject(object) --DELETAR OBJETO DA MAO
-			end
-		end
-		Citizen.Wait(idle)
-	end
+    while true do
+        local idle = 1000
+        if inService and currentTarget and (currentStage == "delivery" or currentStage == "pickup") then
+            local ped = PlayerPedId()
+            local coords = GetEntityCoords(ped)
+            local target = vector3(currentTarget.x + 0.0, currentTarget.y + 0.0, currentTarget.z + 0.0)
+            local dist = #(coords - target)
+
+            if dist <= 35.0 then
+                idle = 0
+                local r,g,b = 255,80,80
+                if currentStage == "pickup" then r,g,b = 255,200,70 end
+                DrawMarker(27, target.x, target.y, target.z - 0.92, 0,0,0, 0,0,0, 1.25,1.25,1.0, r,g,b,120, false,false,2,false)
+
+                if dist <= 3.0 then
+                    local text = currentStage == "delivery"
+                        and "~w~[ ~r~E ~w~] Entregar os lanches"
+                        or "~w~[ ~y~E ~w~] Retirar novos lanches"
+                    DrawText3DIF(target.x, target.y, target.z, text)
+
+                    if dist <= 1.7 and IsControlJustPressed(0,38) then
+                        finishCurrentAction()
+                    end
+                end
+            end
+        end
+        Citizen.Wait(idle)
+    end
 end)
 
+-- Prop automático: some ao entrar em veículo e volta ao sair.
+Citizen.CreateThread(function()
+    while true do
+        local idle = 750
+        if inService and currentStage == "delivery" and currentBatch then
+            idle = 150
+            local ped = PlayerPedId()
+            local inVehicle = IsPedInAnyVehicle(ped, false)
 
+            if inVehicle then
+                if packageObject and DoesEntityExist(packageObject) then
+                    deletePackageProp()
+                end
+                packageHidden = true
+            else
+                if packageHidden then packageHidden = false end
+                if not packageObject or not DoesEntityExist(packageObject) then
+                    spawnPackageProp()
+                end
+            end
+        elseif packageObject and DoesEntityExist(packageObject) then
+            deletePackageProp()
+        end
+        Citizen.Wait(idle)
+    end
+end)
 
------------------------------------------------------------------------------------------------------------------------------------------
--- FUNÇÕES
------------------------------------------------------------------------------------------------------------------------------------------
-function CriandoBlipIFEntrega(entregalocal,destino)
-	blip = AddBlipForCoord(entregalocal[destino].x,entregalocal[destino].y,entregalocal[destino].z)
-	SetBlipSprite(blip,501) -- O icone que aparece no mapa no destino da entrega
-	SetBlipColour(blip,5) -- Escolhendo a cor do icone: cor 5 (cores disponiveis em: https://docs.fivem.net/docs/game-references/blips/ no final da pagina.) 
-	SetBlipScale(blip,0.7) -- Set do TAMANHO do blip que aparece no mapa
-	SetBlipAsShortRange(blip,false)
-	SetBlipRoute(blip,true)
-	BeginTextCommandSetBlipName("STRING")
-	AddTextComponentString("Entrega de Comida")
-	EndTextCommandSetBlipName(blip)
-end
+-- F6 encerra o expediente em qualquer etapa.
+Citizen.CreateThread(function()
+    while true do
+        local idle = 1000
+        if inService then
+            idle = 0
+            drawTxtIF("~y~PRESSIONE ~r~F6 ~w~PARA ENCERRAR O EXPEDIENTE", 4, 0.270, 0.905, 0.45, 255,255,255,200)
+            if IsControlJustPressed(0,167) and not actionBusy then
+                actionBusy = true
+                local ended = MageJobsEndService("Entregador")
+                if ended then
+                    vRP.playSound("Oneshot_Final", "MP_MISSION_COUNTDOWN_SOUNDSET")
+                    resetClientState()
+                else
+                    notify("Não foi possível encerrar o expediente agora.", "negado")
+                    actionBusy = false
+                end
+            end
+        end
+        Citizen.Wait(idle)
+    end
+end)
 
-function CriandoBlipIF()
-	blip = AddBlipForCoord(cfg.list["Entregador"]["inicio"][1],cfg.list["Entregador"]["inicio"][2],cfg.list["Entregador"]["inicio"][3])
-	SetBlipSprite(blip,494) -- O icone que aparece no mapa
-	SetBlipColour(blip,1) -- Escolhendo a cor do icone: cor 75 (cores disponiveis em: https://docs.fivem.net/docs/game-references/blips/ no final da pagina.) 
-	SetBlipScale(blip,0.6) -- Set do TAMANHO do blip que aparece no mapa
-	SetBlipAsShortRange(blip,true)
-	BeginTextCommandSetBlipName("STRING")
-	AddTextComponentString("Central | Entregador")
-	EndTextCommandSetBlipName(blip)
-end
+-- Sincroniza o estado local caso o expediente seja encerrado no servidor/restart.
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(5000)
+        if inService then
+            local active = vSERVER.getActiveService()
+            if active ~= "Entregador" then
+                resetClientState()
+            end
+        end
+    end
+end)
 
--- PARA DESENHAR O TEXTO 3D
-function DrawText3DIF(x,y,z, text, scl, font) 
-	local onScreen,_x,_y=World3dToScreen2d(x,y,z)
-	local px,py,pz=table.unpack(GetGameplayCamCoords())
-	local dist = GetDistanceBetweenCoords(px,py,pz, x,y,z, 1)
+RegisterNetEvent('vrp_ifood:permissao')
+AddEventHandler('vrp_ifood:permissao', function()
+    if not inService then startDeliveryService() end
+end)
 
-	local scale = (1/dist)*scl
-	local fov = (1/GetGameplayCamFov())*100
-	local scale = scale*fov
-	if onScreen then
-		SetTextScale(0.0*scale, 1.1*scale)
-        SetTextFont(font)
-        SetTextProportional(1)
-        SetTextColour(255, 255, 255, 255)
-        SetTextDropshadow(0, 0, 0, 0, 255)
-        SetTextEdge(2, 0, 0, 0, 150)
-        SetTextDropShadow()
-        SetTextOutline()
-        SetTextEntry("STRING")
-        SetTextCentre(1)
-        AddTextComponentString(text)
-        DrawText(_x,_y)
-	end
+AddEventHandler("m_empregos:clientConfigUpdated", function()
+    createStartBlip()
+    -- Pontos/itens atualizados passam a valer no próximo passo do ciclo.
+end)
+
+-- Texto 3D local do entregador.
+function DrawText3DIF(x,y,z,text)
+    local onScreen,_x,_y = World3dToScreen2d(x,y,z)
+    if not onScreen then return end
+    SetTextFont(4)
+    SetTextScale(0.35,0.35)
+    SetTextColour(255,255,255,220)
+    SetTextEntry("STRING")
+    SetTextCentre(1)
+    AddTextComponentString(text)
+    DrawText(_x,_y)
+    local factor = string.len(text) / 400
+    DrawRect(_x,_y+0.0125,0.03+factor,0.04,0,0,0,110)
 end
 
 function drawTxtIF(text,font,x,y,scale,r,g,b,a)
-	SetTextFont(font)
-	SetTextScale(scale,scale)
-	SetTextColour(r,g,b,a)
-	SetTextOutline()
-	SetTextCentre(1)
-	SetTextEntry("STRING")
-	AddTextComponentString(text)
-	DrawText(x,y)
+    SetTextFont(font)
+    SetTextScale(scale,scale)
+    SetTextColour(r,g,b,a)
+    SetTextOutline()
+    SetTextCentre(1)
+    SetTextEntry("STRING")
+    AddTextComponentString(text)
+    DrawText(x,y)
 end

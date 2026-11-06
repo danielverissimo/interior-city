@@ -1,0 +1,36 @@
+m_dealership — COMPRA DE VEÍCULOS VIP LIBERADA
+================================================
+
+Esta correção parte da última versão que já continha o conserto
+para entrega de veículos e as notificações de pagamento.
+
+ALTERAÇÕES:
+- Removida a proibição de comprar veículos marcados com vip=true
+  ou category="vips" no servidor.
+- Botão COMPRAR habilitado também na categoria VIPS.
+- Atualizado o JavaScript compilado utilizado pelo FiveM, além do
+  arquivo fonte web/src/pages/dealer.tsx.
+
+NÃO ALTERADO:
+- Banco primeiro, carteira como alternativa, se houver saldo integral.
+- Confirmação de entrega com MySQL, estoque, limite de garagem,
+  anti-duplicação, cooldown, notificações e reembolsos seguros.
+- Proteção já existente de VENDA de carros VIP para a concessionária.
+  Esta solicitação era para permitir a COMPRA.
+
+INSTALAÇÃO:
+1. Faça backup do m_dealership em uso.
+2. Substitua o recurso pelo ZIP completo, ou substitua pelo menos:
+   server/modules/dealer.lua
+   web/src/pages/dealer.tsx
+   web/build/assets/index-BH0nWuGN.js
+3. Execute "restart m_dealership" no console do servidor.
+4. Confirme no jogo que veículos da categoria VIPS exibem COMPRAR.
+
+O veículo precisa estar cadastrado na concessionária, com estoque
+maior que zero e preço válido, e o jogador precisa cumprir os
+requisitos normais de compra.
+
+Testes locais: checagem sintática Lua/JS e validações estáticas de
+que o bloqueio VIP foi removido do servidor e do cliente compilado.
+O funcionamento no FiveM deve ser validado com uma compra real.

@@ -141,28 +141,68 @@ end)
 -- ==========================================================================
 -- MEDICAL
 -- ==========================================================================
+local treatmentInProgress = false
 function API.treatment(kind)
+    if treatmentInProgress or (kind ~= "quick" and kind ~= "complete") then return false end
     local ped = PlayerPedId()
     local target = kind == "quick" and cfg.table.medic_options[1].quantidade_de_vida or cfg.table.medic_options[2].quantidade_de_vida
     local step = kind == "quick" and 10 or 5
     local delay = kind == "quick" and 1500 or 800
-
-    CreateThread(function()
-        while DoesEntityExist(ped) do
-            local health = GetEntityHealth(ped)
-            if health <= 105 then
-                ClearPedTasks(ped)
-                return
-            end
-            if health >= target then
-                notify("sucesso", "Tratamento concluído.")
-                ClearPedTasks(ped)
-                return
-            end
-            SetEntityHealth(ped, math.min(target, health + step))
-            Wait(delay)
+    target = math.min(target, GetEntityMaxHealth(ped))
+    local health = GetEntityHealth(ped)
+    if health <= 105 or health >= target then return false end
+    treatmentInProgress = true
+    -- A chamada Tunnel retorna somente após a recuperação, permitindo registrar
+    -- uma conclusão por atendimento (morte/interrupção não conta).
+    while DoesEntityExist(ped) and PlayerPedId() == ped do
+        health = GetEntityHealth(ped)
+        if health <= 105 then
+            ClearPedTasks(ped)
+            treatmentInProgress = false
+            return false
         end
-    end)
+        if health >= target then
+            notify("sucesso", "Tratamento concluído.")
+            ClearPedTasks(ped)
+            treatmentInProgress = false
+            return true
+        end
+        SetEntityHealth(ped, math.min(target, health + step))
+        Wait(delay)
+    end
+    treatmentInProgress = false
+    return false
+end
+
+-- Confirma mudança real de estado antes de contar uma ação de ambulância.
+function API.productivityPassenger(action)
+    local ped = PlayerPedId()
+    if action == "enter" then
+        if IsPedInAnyVehicle(ped, false) then return false end
+        local coords = GetEntityCoords(ped)
+        local closest, bestDistance = nil, 7.0
+        for _, vehicle in ipairs(GetGamePool("CVehicle")) do
+            local d = #(GetEntityCoords(vehicle) - coords)
+            if d < bestDistance then closest, bestDistance = vehicle, d end
+        end
+        if not closest then return false end
+        for seat = 0, GetVehicleMaxNumberOfPassengers(closest) - 1 do
+            if IsVehicleSeatFree(closest, seat) then
+                SetPedIntoVehicle(ped, closest, seat)
+                Wait(100)
+                return GetVehiclePedIsIn(ped, false) == closest
+            end
+        end
+        return false
+    elseif action == "exit" then
+        local vehicle = GetVehiclePedIsIn(ped, false)
+        if not vehicle or vehicle == 0 then return false end
+        TaskLeaveVehicle(ped, vehicle, 16)
+        local deadline = GetGameTimer() + 5000
+        while IsPedInAnyVehicle(ped, false) and GetGameTimer() < deadline do Wait(100) end
+        return not IsPedInAnyVehicle(ped, false)
+    end
+    return false
 end
 
 function API.removeMask()

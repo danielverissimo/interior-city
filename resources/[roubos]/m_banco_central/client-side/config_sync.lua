@@ -14,7 +14,7 @@ local function apply(data)
     Config.Solda=tostring(s.solda or "c4")
     Config.itemqtd=tonumber(s.itemQtd) or 0
     Config.Furadeira=tostring(s.furadeira or "furadeira")
-    Config.DinheiroSujo=tostring(s.dinheiroSujo or "dinheirosujo")
+    Config.DinheiroSujo=tostring(s.dinheiroSujo or "dirty_money")
     Config.Cops=tonumber(s.cops) or 0
     Config.PermCops=tostring(s.permCops or "perm.policia")
     Config.MinPegar=tonumber(s.minPegar) or 0
@@ -44,8 +44,10 @@ local function apply(data)
             }
         end
         local m=b.money or {}
+        local mc=m.cam or {}
         rb.Money={StartMoney=tonumber(m.startMoney) or 0,Amount=tonumber(m.amount) or tonumber(m.startMoney) or 0,
-            BoxPosition=v3(m.boxPosition),Box=m.box or "prop_cash_crate_01",Cam=clone(m.cam or {})}
+            BoxPosition=v3(m.boxPosition),Box=m.box or "prop_cash_crate_01",
+            Cam={Coords=clone(mc.coords or mc.Coords or {}),Rotation=clone(mc.rotation or mc.Rotation or {})}}
         local h=b.hacking or {}
         rb.Hacking={Coords=v3(h.coords),Heading=tonumber(h.heading) or 0}
         Config.BankRobbery[#Config.BankRobbery+1]=rb
@@ -53,7 +55,10 @@ local function apply(data)
 end
 
 RegisterNetEvent("m_banco_central:syncConfig",function(data)
-    if type(data)=="table" then apply(data) end
+    if type(data)=="table" then
+        apply(data)
+        TriggerEvent('m_banco_central:clientConfigLoaded')
+    end
 end)
 
 CreateThread(function()

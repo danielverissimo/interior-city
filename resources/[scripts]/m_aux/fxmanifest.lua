@@ -15,6 +15,7 @@ client_scripts {
 }
 
 server_scripts {
+    "productivity.lua",
     "server.lua"
 }
 
@@ -23,3 +24,5 @@ files {
     "nui/style.css",
     "nui/script.js"
 }
+
+ dependency "oxmysql"

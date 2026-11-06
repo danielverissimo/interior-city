@@ -1,0 +1,52 @@
+M_DEALERSHIP — CORREÇÃO DE COMPRAS E VENDAS / v1
+
+ORIGEM DO BUG
+Na sua vRP, vRP.execute chama oxmysql:query() sem aguardar o SQL terminar.
+O código anterior usava vRP.execute(INSERT ...) e imediatamente SELECT para
+validar a entrega: o SELECT às vezes rodava antes do INSERT. Resultado:
+veículo adquirido + reembolso incorreto + notificação NEGADO.
+A venda tinha a mesma falha, usando DELETE assíncrono seguido de SELECT.
+
+ALTERAÇÕES
+- Compra: INSERT aguardado via oxmysql:update_async.
+- Caso o MySQL retorne erro depois de executar o INSERT, verifica a posse
+  antes de decidir o resultado (sem ressarcir veículo entregue).
+- Fluxo de compra mantém locks, limite de garagem, desconto VIP, estoque,
+  anti-fraude, cooldown, tunagem e logs.
+- Pagamento usa vRP.tryFullPayment desta base: banco integral primeiro;
+  carteira integral somente se o banco não tiver o valor total.
+  Sem saldo suficiente em uma das fontes, a compra é negada.
+- Notify após compra confirma o meio de pagamento e a quantia:
+    Pago com o dinheiro do banco no valor de R$ X.
+    Pago com dinheiro da carteira no valor de R$ X.
+- Ressarcimento de compra realmente não entregue retorna ao meio original.
+- Com falha total de consulta ao MySQL, a compra fica PENDENTE DE
+  CONFERÊNCIA e NÃO recebe reembolso automático, evitando carro gratuito.
+  Nesse caso o administrador deve conferir veículo + saldo antes de corrigir.
+- Venda: DELETE aguardado via oxmysql:update_async; pagamento só ocorre
+  após remoção confirmada. Se o crédito em dinheiro vivo for recusado,
+  tenta crédito no banco. Proteção adicional contra mensagens falsas de
+  erro depois da exclusão já confirmada.
+
+INSTALAÇÃO
+1. Faça backup do m_dealership atual, do dealership.json e do banco de dados.
+2. Substitua a pasta m_dealership pelo conteúdo deste ZIP.
+3. No console do servidor FiveM: restart m_dealership
+4. Teste com um veículo que o jogador ainda não possui. Verifique:
+   - Compra com banco, carteira, e sem saldo.
+   - O veículo na garagem.
+   - Estoque reduzido e notificações.
+   - Venda normal e pagamento.
+
+IMPORTANTE
+Não são necessárias alterações na vrp, inventário ou m_garage para esta correção.
+O recurso requer oxmysql, já utilizado pela sua vRP.
+Veículos/ressarcimentos que ocorreram ANTES da correção não são desfeitos
+nem alterados; confira esses casos manualmente.
+
+VALIDAÇÃO
+- Sintaxe de todos os Lua verificada.
+- Testes com dependências simuladas: compra banco/carteira, saldo insuficiente,
+  posse prévia, erro SQL, confirmação atrasada, resultado indeterminado,
+  venda efetuada e venda sem remoção.
+- Ainda é necessário validar contra o MySQL/FiveM do servidor real.

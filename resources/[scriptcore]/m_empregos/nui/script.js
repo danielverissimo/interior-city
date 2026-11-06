@@ -273,6 +273,7 @@ function select_trucker(route) {
 
 
     document.onkeyup = function(data) {
+      if (window.FishingMinigame && window.FishingMinigame.isActive()) return;
       if (data.which == 27) {
         close_central()
       }
@@ -301,3 +302,386 @@ document.addEventListener('click', () => {
     app.closeMenu();
   }
 });
+
+// -----------------------------------------------------------------------------
+// MINIGAME DE PESCA
+// Implementação própria para NUI: barra com inércia + peixe com padrões de movimento
+// + progresso de captura. O servidor continua sendo a autoridade sobre peixe e prêmio.
+// -----------------------------------------------------------------------------
+window.FishingMinigame = (() => {
+  const game = document.getElementById('fishing-game');
+  const track = document.getElementById('fishing-track');
+  const catchBar = document.getElementById('fishing-catch-bar');
+  const fish = document.getElementById('fishing-fish');
+  const progressEl = document.getElementById('fishing-progress');
+  const difficultyEl = document.getElementById('fishing-difficulty');
+
+  let active = false;
+  let resolving = false;
+  let holding = false;
+  let challenge = null;
+  let animationFrame = 0;
+  let startedAt = 0;
+  let lastFrame = 0;
+  let rng = Math.random;
+
+  let catchY = 0.62;
+  let catchVelocity = 0;
+  let fishY = 0.60;
+  let fishVelocity = 0;
+  let fishTarget = 0.60;
+  let targetTimer = 0.6;
+  let progress = 0.28;
+  let phaseSpeedMul = 1.0;
+  let phaseAccelMul = 1.0;
+  let lastCatchingState = null;
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function approach(current, target, amount) {
+    if (current < target) return Math.min(current + amount, target);
+    return Math.max(current - amount, target);
+  }
+
+  function seededRandom(seed) {
+    let a = (Number(seed) || 1) >>> 0;
+    return function() {
+      a |= 0;
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function randomRange(min, max) {
+    return min + ((max - min) * rng());
+  }
+
+  function chooseFishTarget() {
+    const behavior = String(challenge.behavior || 'mixed');
+    phaseSpeedMul = 1.0;
+    phaseAccelMul = 1.0;
+
+    if (behavior === 'sinker') {
+      fishTarget = rng() < 0.72 ? randomRange(0.58, 0.92) : randomRange(0.10, 0.88);
+    } else if (behavior === 'floater') {
+      fishTarget = rng() < 0.72 ? randomRange(0.08, 0.42) : randomRange(0.10, 0.88);
+    } else if (behavior === 'dart') {
+      const calmChance = Number(challenge.calmChance) || 0.30;
+      const isCalmPhase = rng() < calmChance;
+
+      if (isCalmPhase) {
+        const calmDistance = Number(challenge.calmDistance) || 0.18;
+        const localTarget = fishY + randomRange(-calmDistance, calmDistance);
+        fishTarget = clamp(localTarget, 0.10, 0.90);
+        phaseSpeedMul = Number(challenge.calmSpeedMul) || 0.58;
+        phaseAccelMul = Number(challenge.calmAccelMul) || 0.62;
+        targetTimer = randomRange(
+          Number(challenge.calmDurationMin) || 0.95,
+          Number(challenge.calmDurationMax) || 1.70
+        );
+        return;
+      }
+
+      const direction = rng() < 0.5 ? -1 : 1;
+      const distance = randomRange(0.28, 0.58);
+      fishTarget = clamp(fishY + (direction * distance), 0.07, 0.93);
+      if (Math.abs(fishTarget - fishY) < 0.18) {
+        fishTarget = fishY < 0.5 ? randomRange(0.66, 0.93) : randomRange(0.07, 0.34);
+      }
+    } else if (behavior === 'smooth') {
+      const localTarget = fishY + randomRange(-0.28, 0.28);
+      fishTarget = clamp(localTarget, 0.10, 0.90);
+    } else {
+      fishTarget = randomRange(0.08, 0.92);
+    }
+
+    targetTimer = randomRange(
+      Number(challenge.changeMin) || 0.45,
+      Number(challenge.changeMax) || 1.05
+    );
+  }
+
+  function updateVisuals(catching) {
+    const barSize = clamp(Number(challenge.barSize) || 0.24, 0.12, 0.42);
+    catchBar.style.height = `${barSize * 100}%`;
+    catchBar.style.top = `${catchY * 100}%`;
+    fish.style.top = `${fishY * 100}%`;
+    progressEl.style.height = `${clamp(progress, 0, 1) * 100}%`;
+
+    if (lastCatchingState !== catching) {
+      catchBar.classList.toggle('is-catching', catching);
+      fish.classList.toggle('is-catching', catching);
+      lastCatchingState = catching;
+    }
+  }
+
+  function finish(success, reason) {
+    if (!active || resolving) return;
+    resolving = true;
+    holding = false;
+
+    const elapsedMs = Math.max(0, Math.floor(performance.now() - startedAt));
+    const payload = {
+      token: challenge && challenge.token,
+      success: success === true,
+      reason: reason || (success ? 'caught' : 'escaped'),
+      elapsedMs
+    };
+
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+
+    // Fecha esta rodada imediatamente. A próxima só poderá ser criada depois
+    // que o callback Lua concluir a validação server-side.
+    closeVisual();
+
+    const resource = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'm_empregos';
+    fetch(`https://${resource}/fishingResult`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  }
+
+  function cancelFish() {
+    if (!active || resolving) return;
+    resolving = true;
+    holding = false;
+    const elapsedMs = Math.max(0, Math.floor(performance.now() - startedAt));
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+
+    const token = challenge && challenge.token;
+    closeVisual();
+
+    const resource = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'm_empregos';
+    fetch(`https://${resource}/fishingCancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify({ token, elapsedMs })
+    }).catch(() => {});
+  }
+
+  function quitService() {
+    if (!active || resolving) return;
+    resolving = true;
+    holding = false;
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+
+    const token = challenge && challenge.token;
+    closeVisual();
+
+    const resource = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'm_empregos';
+    fetch(`https://${resource}/fishingQuitService`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify({ token })
+    }).catch(() => {});
+  }
+
+  function frame(now) {
+    if (!active || resolving) return;
+
+    let dt = (now - lastFrame) / 1000;
+    lastFrame = now;
+    dt = clamp(dt || 0.016, 0.001, 0.04);
+
+    const barSize = clamp(Number(challenge.barSize) || 0.24, 0.12, 0.42);
+    const halfBar = barSize / 2;
+    const liftForce = Number(challenge.liftForce) || 1.88;
+    const gravity = Number(challenge.gravity) || 1.82;
+    const maxBarSpeed = Number(challenge.maxBarSpeed) || 0.82;
+    const bounce = clamp(Number(challenge.barBounce) || 0.34, 0, 0.8);
+
+    catchVelocity += (holding ? -liftForce : gravity) * dt;
+    catchVelocity *= Math.pow(0.955, dt * 60);
+    catchVelocity = clamp(catchVelocity, -maxBarSpeed, maxBarSpeed);
+    catchY += catchVelocity * dt;
+
+    if (catchY < halfBar) {
+      catchY = halfBar;
+      if (catchVelocity < 0) catchVelocity = Math.abs(catchVelocity) * bounce;
+    } else if (catchY > 1 - halfBar) {
+      catchY = 1 - halfBar;
+      if (catchVelocity > 0) catchVelocity = -Math.abs(catchVelocity) * bounce;
+    }
+
+    targetTimer -= dt;
+    if (targetTimer <= 0) chooseFishTarget();
+
+    const fishSpeed = (Number(challenge.fishSpeed) || 0.55) * phaseSpeedMul;
+    const fishAccel = (Number(challenge.fishAccel) || 2.5) * phaseAccelMul;
+    const desiredVelocity = clamp((fishTarget - fishY) * fishAccel, -fishSpeed, fishSpeed);
+    fishVelocity = approach(fishVelocity, desiredVelocity, fishAccel * 0.82 * dt);
+    fishVelocity *= Math.pow(0.992, dt * 60);
+    fishY += fishVelocity * dt;
+
+    if (fishY < 0.055) {
+      fishY = 0.055;
+      fishVelocity = Math.abs(fishVelocity) * 0.55;
+      chooseFishTarget();
+    } else if (fishY > 0.945) {
+      fishY = 0.945;
+      fishVelocity = -Math.abs(fishVelocity) * 0.55;
+      chooseFishTarget();
+    }
+
+    const fishRadius = 0.032;
+    const catching = (fishY + fishRadius) >= (catchY - halfBar) && (fishY - fishRadius) <= (catchY + halfBar);
+    const gain = Number(challenge.progressGain) || 0.31;
+    const loss = Number(challenge.progressLoss) || 0.22;
+
+    if (catching) {
+      progress += gain * dt;
+    } else {
+      progress -= loss * dt;
+    }
+    progress = clamp(progress, 0, 1);
+
+    updateVisuals(catching);
+
+    if (progress >= 1) {
+      finish(true, 'caught');
+      return;
+    }
+
+    if (progress <= 0) {
+      finish(false, 'escaped');
+      return;
+    }
+
+    const timeoutMs = Math.max(8000, Number(challenge.timeoutMs) || 45000);
+    if ((now - startedAt) >= timeoutMs) {
+      finish(false, 'timeout');
+      return;
+    }
+
+    animationFrame = requestAnimationFrame(frame);
+  }
+
+  function open(data) {
+    if (!game || !track || !catchBar || !fish || !progressEl) return;
+
+    challenge = data || {};
+    rng = seededRandom(challenge.seed);
+    active = true;
+    resolving = false;
+    holding = false;
+
+    catchY = 0.62;
+    catchVelocity = 0;
+    const barSize = clamp(Number(challenge.barSize) || 0.24, 0.12, 0.42);
+    fishY = clamp(catchY + randomRange(-barSize * 0.24, barSize * 0.24), 0.08, 0.92);
+    fishVelocity = 0;
+    fishTarget = fishY;
+    targetTimer = 0.55;
+    phaseSpeedMul = 1.0;
+    phaseAccelMul = 1.0;
+    progress = clamp(Number(challenge.startProgress) || 0.28, 0.12, 0.65);
+    lastCatchingState = null;
+
+    const difficulty = Math.max(1, Math.min(5, Number(challenge.difficulty) || 1));
+    if (difficultyEl) difficultyEl.textContent = `NÍVEL ${difficulty}`;
+
+    game.classList.add('active');
+    game.setAttribute('aria-hidden', 'false');
+    updateVisuals(true);
+
+    startedAt = performance.now();
+    lastFrame = startedAt;
+    cancelAnimationFrame(animationFrame);
+    animationFrame = requestAnimationFrame(frame);
+  }
+
+  function closeVisual() {
+    active = false;
+    resolving = false;
+    holding = false;
+    challenge = null;
+    lastCatchingState = null;
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+    if (game) {
+      game.classList.remove('active');
+      game.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function keyDown(event) {
+    if (!active) return;
+
+    const code = event.code || '';
+    const key = String(event.key || '').toLowerCase();
+
+    if (code === 'Space' || code === 'KeyE' || key === 'e') {
+      holding = true;
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (code === 'Escape' || key === 'escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      cancelFish();
+      return;
+    }
+
+    if (code === 'F6' || key === 'f6') {
+      event.preventDefault();
+      event.stopPropagation();
+      quitService();
+    }
+  }
+
+  function keyUp(event) {
+    if (!active) return;
+    const code = event.code || '';
+    const key = String(event.key || '').toLowerCase();
+    if (code === 'Space' || code === 'KeyE' || key === 'e') {
+      holding = false;
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  window.addEventListener('keydown', keyDown, true);
+  window.addEventListener('keyup', keyUp, true);
+
+  window.addEventListener('mousedown', (event) => {
+    if (!active || event.button !== 0) return;
+    holding = true;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+
+  window.addEventListener('mouseup', (event) => {
+    if (!active || event.button !== 0) return;
+    holding = false;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+
+  window.addEventListener('blur', () => {
+    if (active) holding = false;
+  });
+
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.showFishing === true) {
+      open(event.data.challenge || {});
+    }
+    if (event.data && event.data.hideFishing === true) {
+      closeVisual();
+    }
+  });
+
+  return {
+    isActive: () => active,
+    close: closeVisual
+  };
+})();

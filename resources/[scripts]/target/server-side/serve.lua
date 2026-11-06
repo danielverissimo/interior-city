@@ -5,6 +5,7 @@ local Tunnel = module("vrp","lib/Tunnel")
 local Proxy = module("vrp","lib/Proxy")
 local vRP = Proxy.getInterface("vRP")
 local vRPclient = Tunnel.getInterface("vRP")
+local inventoryClient = Tunnel.getInterface("inventory")
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- CONNECTION
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ local PERMISSIONS = {
 local MAX_BILLING = 500000
 local REVIVE_REWARD = 1500
 local actionCooldown = {}
+local handcuffAction = {}
 
 local BLOCKED_FULL_REPAIR = {
     [-666449931] = true,
@@ -196,41 +198,87 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- ALGEMAR
 -----------------------------------------------------------------------------------------------------------------------------------------
-RegisterNetEvent("vrp_policia:algemar")
-AddEventHandler("vrp_policia:algemar",function(payload)
+RegisterNetEvent("target:algemar")
+AddEventHandler("target:algemar",function(payload)
     local source = source
     local uid = userId(source)
-    if not uid or not actionAllowed(source,1) then return end
+    if not uid or not actionAllowed(source,1) or handcuffAction[source] then return end
 
     local target,targetId = validPlayerTarget(source,payload,3.0)
     if not target then return notify(source,"negado","Não há nenhum cidadão próximo.") end
 
-    local cuffed = vRPclient.isHandcuffed(target) == true
-    local privileged = vRP.hasPermission(uid,"perm.algemar") or getRole(source) == "staff"
-
-    if not privileged then
-        if cuffed then
-            local hasKey = (tonumber(vRP.getInventoryItemAmount(uid,"chave_algemas")) or 0) > 0
-            local hasCuffs = (tonumber(vRP.getInventoryItemAmount(uid,"algemas")) or 0) > 0
-            if not hasKey and not hasCuffs then
-                return notify(source,"negado","Você precisa de uma chave de algemas para soltar esta pessoa.")
-            end
-        else
-            if (tonumber(vRP.getInventoryItemAmount(uid,"algemas")) or 0) <= 0 then
-                return notify(source,"negado","Você precisa de algemas para realizar esta ação.")
-            end
-        end
+    if vRPclient.isHandcuffed(source) then
+        return notify(source,"negado","Você não pode utilizar algemas enquanto estiver algemado.")
     end
 
-    vRPclient._setHandcuffed(target,not cuffed)
-    if cuffed then
-        notify(source,"sucesso","Cidadão desalgemado.")
-        notify(target,"aviso","Você foi desalgemado.")
+    if vRPclient.isInVehicle(source) or vRPclient.isInVehicle(target) then
+        return notify(source,"negado","Não é possível algemar ou desalgemar dentro de um veículo.")
+    end
+
+    local cuffed = vRPclient.isHandcuffed(target) == true
+
+    if not cuffed then
+        if vRP.isPoliceMember(targetId) then
+            return notify(source,"negado","Não é possível algemar outro policial.")
+        end
+
+        -- Target segue a mesma regra do item Algemas: o alvo precisa estar rendido.
+        if not inventoryClient.checkAnim(target) then
+            return notify(source,"importante","O jogador não está rendido.")
+        end
+
+        if (tonumber(vRP.getInventoryItemAmount(uid,"algemas")) or 0) <= 0 then
+            return notify(source,"negado","Você precisa de algemas para realizar esta ação.")
+        end
+
+        if not vRP.tryGetInventoryItem(uid,"algemas",1,true) then
+            return notify(source,"negado","Você precisa de algemas para realizar esta ação.")
+        end
+
+        vRP.giveInventoryItem(uid,"chave_algemas",1,true)
+        handcuffAction[source] = true
+        vRPclient._prepareHandcuffInteraction(source,target,false)
+        vRPclient._prepareHandcuffInteraction(target,source,true)
+        vRPclient._playAnim(source,false,{{"mp_arrest_paired","cop_p2_back_left"}},false)
+        vRPclient._playAnim(target,false,{{"mp_arrest_paired","crook_p2_back_left"}},false)
+
+        SetTimeout(3500,function()
+            if vRP.getUserSource(targetId) == target then
+                vRPclient._stopAnim(source,false)
+                vRPclient._setHandcuffed(target,true)
+                TriggerClientEvent("vrp_sound:source",source,"cuff",0.1)
+                TriggerClientEvent("vrp_sound:source",target,"cuff",0.1)
+            end
+            handcuffAction[source] = nil
+        end)
     else
-        notify(source,"sucesso","Cidadão algemado.")
-        notify(target,"aviso","Você foi algemado.")
+        -- Para desalgemar pelo Target é obrigatória a chave, exatamente como o item.
+        if (tonumber(vRP.getInventoryItemAmount(uid,"chave_algemas")) or 0) <= 0 then
+            return notify(source,"negado","Você precisa de uma chave de algemas para soltar esta pessoa.")
+        end
+
+        if not vRP.tryGetInventoryItem(uid,"chave_algemas",1,true) then
+            return notify(source,"negado","Você precisa de uma chave de algemas para soltar esta pessoa.")
+        end
+
+        vRP.giveInventoryItem(uid,"algemas",1,true)
+        handcuffAction[source] = true
+        vRPclient._prepareHandcuffInteraction(source,target,false)
+        vRPclient._prepareHandcuffInteraction(target,source,true)
+        vRPclient._playAnim(source,false,{{"mp_arresting","a_uncuff"}},false)
+
+        SetTimeout(5000,function()
+            if vRP.getUserSource(targetId) == target then
+                vRPclient._stopAnim(source,false)
+                vRPclient._setHandcuffed(target,false)
+                TriggerClientEvent("vrp_sound:source",source,"uncuff",0.4)
+                TriggerClientEvent("vrp_sound:source",target,"uncuff",0.4)
+            end
+            handcuffAction[source] = nil
+        end)
     end
 end)
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- COLOCAR / RETIRAR DO VEÍCULO
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -535,4 +583,5 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 AddEventHandler("playerDropped",function()
     actionCooldown[source] = nil
+    handcuffAction[source] = nil
 end)

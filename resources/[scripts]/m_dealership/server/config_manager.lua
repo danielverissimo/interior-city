@@ -34,6 +34,36 @@ local function categoryFromGarageType(tp)
     return map[tp] or "outros"
 end
 
+local function categoryExists(id, categories)
+    for _,category in ipairs(categories or DealershipConfig.categories) do
+        if category.id==id then return true end
+    end
+    return false
+end
+
+local function validateCategories(categories)
+    if type(categories)~="table" or #categories==0 then
+        return false,"Cadastre pelo menos uma categoria."
+    end
+    local seen={}
+    for _,category in ipairs(categories) do
+        if type(category)~="table" or type(category.id)~="string" or
+            not category.id:match("^[a-z0-9][a-z0-9_-]*$") or #category.id>40 or
+            category.id=="meus-veiculos" or seen[category.id] then
+            return false,"ID de categoria inválido, reservado ou duplicado."
+        end
+        if type(category.label)~="string" or trim(category.label)=="" or #category.label>80 then
+            return false,"Informe um nome de categoria com até 80 bytes."
+        end
+        seen[category.id]=true
+    end
+    -- IDs existentes são estáveis; renomeie somente o nome exibido.
+    for _,category in ipairs(DealershipConfig.categories) do
+        if not seen[category.id] then return false,"Não remova nem altere IDs de categorias existentes." end
+    end
+    return true
+end
+
 local function garageEntry(spawn)
     if GetResourceState("m_garage")~="started" then return nil end
     local ok,data=pcall(function()
@@ -53,7 +83,7 @@ local function buildRuntimeVehicle(spawn,state)
         stock=math.max(0,math.floor(tonumber(state.stock) or 0)),
         price=math.max(0,math.floor(tonumber(g.price) or 0)),
         type=tp,
-        category=categoryFromGarageType(tp),
+        category=state.category or categoryFromGarageType(tp),
         trunk=math.max(0,math.floor(tonumber(g.trunk) or 0)),
         vip=tp=="vip",
         amountSell=math.max(0,math.floor(tonumber(state.amountSell) or 0))
@@ -210,14 +240,14 @@ exports("getDealershipConfig",function()
     return response
 end)
 
-exports("saveDealershipVehicle",function(spawn,stock,auditContext)
+exports("saveDealershipVehicle",function(spawn,stock,auditContext,category)
     local invokingResource=GetInvokingResource()
     auditContext=type(auditContext)=="table" and auditContext or {}
     spawn=string.lower(trim(spawn))
     stock=tonumber(stock)
 
     if spawn=="" then return false,"Informe o spawn do veículo." end
-    if not stock or stock<0 then return false,"Quantidade de estoque inválida." end
+    if not stock or stock~=stock or stock==math.huge or stock<0 then return false,"Quantidade de estoque inválida." end
 
     local g=garageEntry(spawn)
     if not g then
@@ -226,15 +256,29 @@ exports("saveDealershipVehicle",function(spawn,stock,auditContext)
 
     local current=DealershipConfig.vehicles[spawn] or {}
     local previousStock=current.stock
+    if category~=nil then
+        if type(category)~="string" then return false,"Categoria inválida." end
+        category=trim(category)
+        if category~="" and not categoryExists(category) then
+            return false,"Categoria não cadastrada na concessionária."
+        end
+    else
+        category=current.category
+    end
+    if category=="" then category=nil end
+    local previous=DealershipConfig.vehicles[spawn]
     DealershipConfig.vehicles[spawn]={
         stock=math.floor(stock),
+        category=category,
         amountSell=math.max(0,math.floor(tonumber(current.amountSell) or 0))
     }
 
-    vRP.execute("bm_module/dealership/addVehicle",{vehicle=spawn,stock=math.floor(stock)})
-
     local ok,msg=saveFile()
-    if not ok then return false,msg end
+    if not ok then
+        DealershipConfig.vehicles[spawn]=previous
+        return false,msg
+    end
+    vRP.execute("bm_module/dealership/addVehicle",{vehicle=spawn,stock=math.floor(stock)})
     rebuildList()
 
     local runtime=buildRuntimeVehicle(spawn,DealershipConfig.vehicles[spawn])
@@ -287,6 +331,9 @@ exports("saveDealershipSettings",function(payload,auditContext)
         return false,"Estrutura da configuração inválida."
     end
 
+    local valid,validationMessage=validateCategories(payload.categories or DealershipConfig.categories)
+    if not valid then return false,validationMessage end
+    local previous=clone(DealershipConfig)
     DealershipConfig.settings=clone(payload.settings)
     DealershipConfig.testDrive=clone(payload.testDrive)
     DealershipConfig.vips=clone(payload.vips)
@@ -295,7 +342,7 @@ exports("saveDealershipSettings",function(payload,auditContext)
     end
 
     local ok,msg=saveFile()
-    if not ok then return false,msg end
+    if not ok then DealershipConfig=previous; return false,msg end
     rebuildList()
     local s=DealershipConfig.settings or {}
     local td=DealershipConfig.testDrive or {}

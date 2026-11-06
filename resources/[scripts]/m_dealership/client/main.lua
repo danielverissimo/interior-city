@@ -16,8 +16,8 @@ CreateThread(function()
 
         for locationIndex, location in pairs(TestDrive.Locations) do
             local distance = #(playerCoords - location.coords)
-            if distance <= 15.0 then
-                THREAD_TIMER = 5
+            if distance <= 5.0 then
+                THREAD_TIMER = 1
                 DrawMarker(36, location.coords.x, location.coords.y, location.coords.z, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 131, 133, 132, 155, 1, 1, 1, 1)
                 DrawMarker(27, location.coords.x, location.coords.y, location.coords.z - 0.97, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.5, 131, 133, 132, 155, 0, 0, 0, 1)
 

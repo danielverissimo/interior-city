@@ -275,8 +275,7 @@ export default function Dealer() {
                       {actionBusy === "test" ? "AGUARDE..." : "TEST-DRIVE"}
                     </motion.button>
                   )}
-                  {(category === "meus-veiculos" || category !== "vips") && (
-                    <motion.button
+                  <motion.button
                       onClick={category === "meus-veiculos" ? handleSell : handleBuy}
                       disabled={actionBusy !== null}
                       whileHover={{ scale: 1.05 }}
@@ -288,7 +287,6 @@ export default function Dealer() {
                     >
                       {actionBusy === "sell" ? "VENDENDO..." : actionBusy === "buy" ? "COMPRANDO..." : category === "meus-veiculos" ? "VENDER" : "COMPRAR"}
                     </motion.button>
-                  )}
                 </motion.div>
               </div>
               <motion.div

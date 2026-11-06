@@ -188,3 +188,35 @@ AddEventHandler('blip:remover:roubo',function()
 		blip = nil
 	end
 end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- QRU DE DISPARO - DETECCAO LOCAL / COOLDOWN VALIDADO NO SERVIDOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+CreateThread(function()
+    local lastReport = nil
+
+    while true do
+        local cfg = Config.GunshotQRU or {}
+        if cfg.enabled == false then
+            Wait(1000)
+        else
+            local now = GetGameTimer()
+            local cooldownMs = math.max(1, tonumber(cfg.cooldownSeconds) or 25) * 1000
+            local elapsed = lastReport and (now - lastReport) or cooldownMs
+
+            if elapsed >= 0 and elapsed < cooldownMs then
+                -- Evita checagens por frame enquanto este jogador esta no cooldown.
+                Wait(math.min(500,cooldownMs - elapsed))
+            else
+                -- IsPedShooting pode durar apenas um frame: usar 100ms poderia perder tiros isolados.
+                Wait(0)
+                local ped = PlayerPedId()
+                if ped and ped ~= 0 and not IsEntityDead(ped) and IsPedShooting(ped) then
+                    lastReport = GetGameTimer()
+                    -- O servidor confirma a permissao e usa as coordenadas reais do jogador.
+                    TriggerServerEvent("m_roubos:reportGunshot")
+                end
+            end
+        end
+    end
+end)

@@ -62,6 +62,10 @@ local function RegisterRoutes()
         return true
     end)
 
+    safeCallback('GET_CATEGORIES', function()
+        return DealershipCategories or {}
+    end)
+
     safeCallback('GET_VEHICLES', function()
         local vehiclesNotProcessed = Server.getVehicles()
         if type(vehiclesNotProcessed) ~= "table" or not next(vehiclesNotProcessed) then

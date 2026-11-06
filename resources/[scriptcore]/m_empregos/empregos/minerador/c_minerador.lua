@@ -47,7 +47,7 @@ Citizen.CreateThread(function()
                 if distance <= 3.0 then
                     DrawText3D(cfg.list["Minerador"]["inicio"][1],cfg.list["Minerador"]["inicio"][2],cfg.list["Minerador"]["inicio"][3], "PRESSIONE  ~b~E~w~  PARA ~y~INICIAR ~w~A ~b~MINERAÇÃO")
                     
-					if distance <= 1.2 and IsControlJustPressed(0, 38) and vSERVER.checkEmp('Minerador')  then
+					if distance <= 1.2 and IsControlJustPressed(0, 38) and vSERVER.checkEmp('Minerador') and MageJobsBeginService("Minerador") then
                         minerando()
                         generateMiner()
                         criarAreaMineracao()
@@ -580,6 +580,7 @@ Citizen.CreateThread(function()
             FreezeEntityPosition(ped, false)
             inservice = false
             etapa = 0
+            MageJobsEndService("Minerador")
 		end
 
       end

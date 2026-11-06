@@ -1,0 +1,36 @@
+M_ROUBOS - QRU DE DISPARO
+========================
+
+Novidade:
+- Quando um jogador sem a permissao policial dispara uma arma, os policiais
+  recebem uma notificacao 'QRU de Disparo' via vrp_notifycall / NotifyPush.
+- O alerta mostra a localizacao do disparo e cria um blip na area.
+- Cooldown individual de 25 segundos. Diversos tiros do mesmo jogador
+  durante esse tempo nao enviam novas QRUs.
+- Policiais com a permissao Config.settings.policePermission nao disparam QRU.
+
+INSTALACAO:
+1. Faca backup da pasta m_roubos existente no servidor.
+2. Substitua o recurso m_roubos pelos arquivos deste ZIP.
+3. Garanta que vrp_notifycall esteja iniciado antes de m_roubos.
+4. No console: restart m_roubos
+5. Teste com um jogador sem permissao policial disparando e um policial online.
+
+AJUSTES OPCIONAIS EM config.lua:
+  Config.GunshotQRU.enabled = true           -- habilita/desabilita o alerta
+  Config.GunshotQRU.cooldownSeconds = 25     -- intervalo por jogador
+  Config.GunshotQRU.title = "QRU de Disparo"
+  Config.GunshotQRU.text = "..."
+
+A permissao policial continua configurada em roubos.json:
+  settings.policePermission (padrao: perm.policia)
+
+OBSERVACOES:
+- Nao foi necessario editar o recurso vrp_notifycall.
+- O servidor determina a posicao real do jogador, evitando coordenadas
+  arbitrarias enviadas pelo cliente.
+- O recurso usa as mesmas notificacoes e blips dos roubos anteriores.
+- Se vrp_notifycall nao estiver ativo, utiliza o aviso alternativo que ja
+  existia no m_roubos.
+- Os testes automatizados verificaram sintaxe Lua e cooldown/recorrencia
+  em simulacoes. Validacao final precisa ser feita dentro do FiveM.

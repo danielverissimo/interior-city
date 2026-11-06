@@ -75,10 +75,16 @@ local function normalizeJob(name,p)
     local levels=tonumber(p.total_nivel)
     if not levels or levels<1 then return nil,"Quantidade de níveis inválida." end
 
+    local currentJob=JobData.jobs[name] or {}
+    local xpPerAction=tonumber(p.xp_per_action)
+    if xpPerAction==nil then xpPerAction=tonumber(currentJob.xp_per_action) or 1 end
+    if xpPerAction<0 then return nil,"XP por ação inválido." end
+
     return {
         index=trim(p.index~="" and p.index or name),
         inicio=start,
         total_nivel=math.floor(levels),
+        xp_per_action=xpPerAction,
         xp_for_level=clone(p.xp_for_level or {}),
         payment_for_level=clone(p.payment_for_level or {}),
         uniforme=normalizeUniform(p.uniforme)

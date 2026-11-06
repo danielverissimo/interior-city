@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=6?v=5">
     <link rel="stylesheet" href="sweetalert2.min.css">
     <title> </title>
 </head>
@@ -124,9 +124,45 @@
                 </div>
             </div>
     </div>
+
+    <div id="fishing-game" class="fishing-game" aria-hidden="true">
+        <div class="fishing-card">
+            <img src="images/fishing_rod.png" class="fishing-rod" alt="Vara de pesca">
+            <div class="fishing-head">
+                <div class="fishing-title">Mantenha o peixe no anzol</div>
+            </div>
+
+            <div class="fishing-body">
+                <div class="fishing-track-wrap">
+                    <div id="fishing-track" class="fishing-track">
+                        <div class="water-lines"></div>
+                        <div id="fishing-catch-bar" class="fishing-catch-bar"></div>
+                        <div id="fishing-fish" class="fishing-fish" aria-label="Peixe">
+                            <span class="fish-body"></span>
+                            <span class="fish-tail"></span>
+                            <span class="fish-eye"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fishing-progress-wrap">
+                    <div class="fishing-progress-label">CAPTURA</div>
+                    <div class="fishing-progress-rail">
+                        <div id="fishing-progress" class="fishing-progress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fishing-help">
+                <span><b>E / ESPAÇO / CLIQUE</b></span>
+                <span><b>SOLTE</b> para descer</span>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript" src="script.js?v=7"></script>
 </html>

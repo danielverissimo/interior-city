@@ -67,6 +67,15 @@ local checkped = true
 local timers = 0
 local payment = 1
 
+local TAXI_SERVICE_MODELS = {
+    [GetHashKey("golg9")] = true,
+    [GetHashKey("cg160")] = true
+}
+
+local function isTaxiServiceVehicle(vehicle)
+    return vehicle and vehicle ~= 0 and TAXI_SERVICE_MODELS[GetEntityModel(vehicle)] == true
+end
+
 --[ TAXIMETRO | VARIABLES ]-----------------------------------------------------------------------------------------------------------------
 
 local TaxiGuiAtivo = true -- Ativa o GUIzin (Default: true)
@@ -115,13 +124,13 @@ Citizen.CreateThread(function()
                     
                     if distance <= 1.2 then
                         if IsControlJustPressed(0,38) and vSERVER.checkEmp('Taxista') then
-                            CalculateTimeToDisplay8()
-						--if parseInt(hour) >= 06 and parseInt(hour) <= 20 then
-							vSERVER.addGroup()
-							emservico = true
-							selecionado = math.random(#configtaxi.taxi)
-							CriandoBlip(taxi,selecionado)
-							TriggerEvent("Notify","sucess","Você entrou em serviço.")
+                            if MageJobsBeginService("Taxista") then
+                                CalculateTimeToDisplay8()
+                                emservico = true
+                                selecionado = math.random(#configtaxi.taxi)
+                                CriandoBlip(taxi,selecionado)
+                                TriggerEvent("Notify","sucesso","Você entrou em serviço.")
+                            end
                         end
  				    end
                                  
@@ -151,7 +160,7 @@ Citizen.CreateThread(function()
 			local locked = GetVehicleDoorLockStatus(vehicle) >= 2
 
 
-			if distance <= 50.0 and IsVehicleModel(vehicle,GetHashKey("kuruma")) then
+			if distance <= 50.0 and isTaxiServiceVehicle(vehicle) then
 				idle = 5
 				DrawMarker(21,configtaxi.taxi[selecionado].x,configtaxi.taxi[selecionado].y,configtaxi.taxi[selecionado].z+0.20,0,0,0,0,180.0,130.0,2.0,2.0,1.0,255,0,0,50,1,0,0,1)
 				if distance <= 2.5 then
@@ -181,7 +190,8 @@ Citizen.CreateThread(function()
 
 							passageiro = CreatePed(4,configtaxi.pedlist[pmodel].hash,configtaxi.taxi[selecionado].xp,configtaxi.taxi[selecionado].yp,configtaxi.taxi[selecionado].zp,3374176,true,false)
 							SetEntityInvincible(passageiro,true)
-							TaskEnterVehicle(passageiro,vehicle,-1,2,1.0,1,0)
+							local passengerSeat = GetVehicleClass(vehicle) == 8 and 0 or 2
+                                TaskEnterVehicle(passageiro,vehicle,-1,passengerSeat,1.0,1,0)
 							checkped = false
 							payment = 1
 							lastpassageiro = passageiro
@@ -281,7 +291,7 @@ Citizen.CreateThread(function()
 				passageiro = nil
 				checkped = true
 				emservico = false
-				vSERVER.removeGroup()
+                MageJobsEndService("Taxista")
 				TriggerEvent("Notify","aviso","Você saiu de serviço.")
 			end
 		end
