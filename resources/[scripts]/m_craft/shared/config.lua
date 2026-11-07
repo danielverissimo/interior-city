@@ -387,17 +387,6 @@ Config.Coords = {
         },
     },
 
-    {
-        name = 'Verdes',
-        craftItems = Config.CraftTemplate.armas,
-        armazemItems = Config.ArmazemTemplate.armas,
-        craftPermission = 'perm.liderverdes',
-        armazemPermission = 'perm.verdes',
-        coords = {
-            vec3(1398.55,-741.49,72.15),
-        },
-    },
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Municao
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -410,17 +399,6 @@ Config.Coords = {
         armazemPermission = 'perm.cartel',
         coords = {
             vec3(1405.68,1137.76,109.74),
-        },
-    },
-
-    {
-        name = 'Vermelhos',
-        craftItems = Config.CraftTemplate.municao,
-        armazemItems = Config.ArmazemTemplate.municao,
-        craftPermission = 'perm.lidervermelhos',
-        armazemPermission = 'perm.vermelhos',
-        coords = {
-            vec3(1266.66,-299.59,87.52),
         },
     },
 
@@ -492,24 +470,24 @@ Config.Coords = {
     },
 
     {
-        name = 'Laranjas',
+        name = 'Vermelhos',
         craftItems = Config.CraftTemplate.Metanfetamina,
         armazemItems = Config.ArmazemTemplate.Metanfetamina,
-        craftPermission = 'perm.liderlaranjas',
-        armazemPermission = 'perm.laranjas',
+        craftPermission = 'perm.lidervermelhos',  
+        armazemPermission = 'perm.vermelhos', 
         coords = {
-            vec3(1413.29,1492.36,113.87),
+            vec3(1266.66,-299.59,87.52),
         },
     },
     
     {
-        name = 'Colombia',
+        name = 'Verdes',
         craftItems = Config.CraftTemplate.Maconha,
         armazemItems = Config.ArmazemTemplate.Maconha,
-        craftPermission = 'perm.lidercolombia',
-        armazemPermission = 'perm.colombia',
+        craftPermission = 'perm.liderverdes',
+        armazemPermission = 'perm.verdes',
         coords = {
-            vec3(-1402.15,1622.68,164.74),
+            vec3(1398.55,-741.49,72.15),
         },
     },
 
