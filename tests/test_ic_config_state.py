@@ -22,7 +22,7 @@ class ConfigStateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp).resolve() / 'snapshot'
             result = state.prepare(ROOT, output)
-            self.assertEqual(result['files'], 28)
+            self.assertEqual(result['files'], len(state.FILES))
             self.assertFalse(result['applied'])
             self.assertFalse(output.exists())
 
@@ -43,7 +43,7 @@ class ConfigStateTests(unittest.TestCase):
             self.assertEqual((output / key).stat().st_mode & 0o777, 0o600)
             self.assertEqual(output.stat().st_mode & 0o777, 0o700)
             overlay = (output / 'compose.ic-config.yaml').read_text()
-            self.assertEqual(overlay.count('create_host_path: false'), 28)
+            self.assertEqual(overlay.count('create_host_path: false'), len(state.FILES))
             self.assertIn(str(output / key), overlay)
             self.assertTrue(state.verify(output)['verified'])
             (output / key).write_text('{}')
@@ -82,6 +82,34 @@ class ConfigStateTests(unittest.TestCase):
                 state.prepare(source, output, apply=True, writers_stopped=True)
             self.assertNotIn('do-not-print', str(error.exception))
             self.assertFalse(output.exists())
+
+    def test_empty_lua_chest_map_is_preserved_byte_for_byte_through_override(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            source, output = root / 'source', root / 'snapshot'
+            self.fixture(source)
+            key = 'resources/[scriptcore]/inventory/config/shared.chests.json'
+            effective = root / 'effective.json'
+            raw = b'[]\n'
+            effective.write_bytes(raw)
+            source_map = root / 'sources.json'
+            source_map.write_text(json.dumps({key: str(effective)}))
+            state.prepare(source, output, source_map, apply=True, writers_stopped=True)
+            self.assertEqual((output / key).read_bytes(), raw)
+            self.assertEqual(effective.read_bytes(), raw)
+            self.assertTrue(state.verify(output)['verified'])
+
+    def test_empty_array_exception_does_not_accept_nonempty_arrays_or_other_schemas(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp).resolve() / 'config.json'
+            chest = 'resources/[scriptcore]/inventory/config/shared.chests.json'
+            for value in [[{}], [1], None, False, 0, '']:
+                path.write_text(json.dumps(value))
+                with self.subTest(value=value), self.assertRaises(state.StateError):
+                    state.read_resource_json(path, chest)
+            path.write_text('[]')
+            with self.assertRaises(state.StateError):
+                state.read_resource_json(path, 'resources/[scripts]/m_craft/shared/config.json')
 
 
 if __name__ == '__main__':

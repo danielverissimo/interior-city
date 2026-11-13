@@ -52,16 +52,39 @@ class DockerReleaseTests(unittest.TestCase):
         self.assertNotIn(value, result.stdout+result.stderr)
         self.assertIn('multipleStatements=true', cfg)
 
-    def entrypoint(self):
+    def entrypoint(self, **overrides):
         server = self.root/'server'; server.mkdir(exist_ok=True)
         run = self.root/'run.sh'; run.write_text('#!/bin/sh\nexit 0\n'); run.chmod(0o755)
         source = (ROOT/'docker/fxserver/entrypoint.sh').read_text()
         source = source.replace('/run/secrets/', str(self.private)+'/').replace('/server-data', str(server)).replace('/opt/fxserver/run.sh', str(run))
         script = self.root/'entrypoint.sh'; script.write_text(source)
         env = dict(os.environ, FIVEM_LISTING_ENABLED='false', PLAYIT_PUBLIC_ENDPOINT='', PLAYIT_HTTPS_HOST='')
+        env.update(overrides)
         result = subprocess.run(['bash', str(script)], capture_output=True, text=True, env=env)
         cfg = server/'runtime/secrets.cfg'
         return result, cfg.read_text() if cfg.exists() else ''
+
+    def test_public_listing_renders_proxy_and_disables_lan(self):
+        result, _ = self.entrypoint(FIVEM_LISTING_ENABLED='true', PLAYIT_PUBLIC_ENDPOINT='192.0.2.10:30120', PLAYIT_HTTPS_HOST='city.example.invalid')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        cfg = (self.root/'server/runtime/listing.cfg').read_text()
+        self.assertIn('sv_lan false\n', cfg)
+        self.assertIn('set sv_forceIndirectListing true\n', cfg)
+        self.assertIn('set sv_listingHostOverride "city.example.invalid"', cfg)
+        self.assertIn('set sv_endpoints "192.0.2.10:30120"', cfg)
+        self.assertNotIn(self.license, cfg)
+
+    def test_private_listing_stays_private_with_tunnel(self):
+        result, _ = self.entrypoint(PLAYIT_PUBLIC_ENDPOINT='192.0.2.10:30120', PLAYIT_HTTPS_HOST='city.example.invalid')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        cfg = (self.root/'server/runtime/listing.cfg').read_text()
+        self.assertIn('sv_lan true\n', cfg)
+        self.assertNotIn('sv_listingHostOverride', cfg)
+
+    def test_public_listing_rejects_missing_endpoints(self):
+        result, _ = self.entrypoint(FIVEM_LISTING_ENABLED='true')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Playit endpoints are required', result.stderr)
 
     def test_secret_injection_rejected_in_renderer_and_entrypoint(self):
         for value in ['bad"value', 'bad\\value', 'bad\nsetr leak yes', 'bad\rvalue']:
@@ -124,7 +147,7 @@ class DockerReleaseTests(unittest.TestCase):
         (release/'.replxx_history').write_text('runtime console history')
         self.assertEqual(set(r.inventory(release)), {'server.cfg'})
 
-    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False, web_assets=False, config_cutover=False, config_fail=''):
+    def simulated_deploy(self, fail=False, schema=False, schema_fail=False, persisted_desmanche=False, web_assets=False, config_cutover=False, config_fail='', listing='false', endpoints=False):
         """Exercise the installer in a temp root; Docker/privileged Linux commands are fakes."""
         base = self.root.resolve()/'deploy'; stage = self.root.resolve()/'stage'; stage.mkdir()
         store = self.root.resolve()/'store'; store.mkdir()
@@ -180,10 +203,17 @@ if mode=='mark-starting':
         if persisted_desmanche:
             desmanche_state.parent.mkdir(parents=True)
             desmanche_state.write_text('{"settings":{"edited":true},"desmanches":[{"name":"fixture"}]}')
+            desmanche_state.chmod(0o600)
         r.manifest(old,base/'state/manifests'/(old_sha+'.json'))
         (base/'current').symlink_to(old)
         c.initialize(base/'secrets'); c.write_private(base/'secrets/cfx_license',self.license)
         (base/'.env').write_text('COMPOSE_PROJECT_NAME=interior-city-tocado\nINTERIOR_CITY_RELEASE_PATH='+str(base)+'/current\nFIVEM_LISTING_ENABLED=false\nIC_ASSET_PROFILE=core\nASSET_STORE='+str(store)+'\n')
+        env_path = base/'.env'
+        env_path.write_text(env_path.read_text().replace('FIVEM_LISTING_ENABLED=false', 'FIVEM_LISTING_ENABLED='+listing))
+        if endpoints:
+            with env_path.open('a') as out:
+                out.write('PLAYIT_PUBLIC_ENDPOINT=192.0.2.10:30120\nPLAYIT_HTTPS_HOST=city.example.invalid\n')
+            c.write_private(base/'secrets/playit_agent_key', 'fixture_not_a_real_key')
         if web_assets:
             media_source = self.root.resolve()/'media-source'
             for group in w.MEDIA: (media_source/group).mkdir(parents=True)
@@ -223,6 +253,25 @@ shutil.move(*args)
         self.assertEqual(desmanche_state.stat().st_mode&0o777,0o600)
         events=[json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
         return result, (base/'current').resolve().name, events
+
+    def test_installer_accepts_public_listing_with_valid_tunnel(self):
+        result,current,events=self.simulated_deploy(listing='true',endpoints=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(current,'b'*40)
+        up=next(e for e in events if 'up' in e)
+        self.assertIn('public',up); self.assertIn('listing',up)
+
+    def test_installer_rejects_public_listing_without_tunnel_before_changes(self):
+        result,current,events=self.simulated_deploy(listing='true',persisted_desmanche=True)
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('Public listing requires both Playit endpoints',result.stderr)
+        self.assertEqual(current,'a'*40); self.assertEqual(events,[])
+
+    def test_installer_rejects_invalid_listing_value_before_changes(self):
+        result,current,events=self.simulated_deploy(listing='invalid',persisted_desmanche=True)
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('FIVEM_LISTING_ENABLED must be true or false',result.stderr)
+        self.assertEqual(current,'a'*40); self.assertEqual(events,[])
 
     def test_installer_backs_up_before_switching_release(self):
         result,current,events=self.simulated_deploy()

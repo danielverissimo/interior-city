@@ -10,6 +10,12 @@ As imagens antes servidas pelo XAMPP usam a pasta persistente `state/www` e o
 Caddy existente. Consulte [imagens e mídias sem XAMPP](docs/WEB_ASSETS.md) para
 importação, configuração das URLs e ativação em uma nova release.
 
+## Deploy automático
+
+A publicação da `master` pode ser executada pelo runner dedicado no servidor infra,
+com destino ao Uriel e preservação do estado existente. Consulte
+[deploy automático e operação](docs/DEPLOY_AUTOMATICO_URIEL.md).
+
 ## Organização
 
 | Caminho | Conteúdo |

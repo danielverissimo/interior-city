@@ -12,8 +12,8 @@ Config.Main = {
 }
 
 Config.weebhooks = {
-    Withdraw = 'https://discordapp.com/api/webhooks/1433042365110816839/RhY65pwx8uoBN_qmhSBL9rzUMSgmN75zP0uVt_SHqDbD-5Ka1jFw0WNd43ghstjFZj5J',
-    Deposit = 'https://discordapp.com/api/webhooks/1433042491791245383/Sc8SFp693M8O6myJ3MUbLr_b6gu4Y7PC4VGlXoRRuUQk7TqvZdCQTUtgpQCbmou_WSYr',
+    Withdraw = (IsDuplicityVersion() and GetConvar("ic_secret_m_orgs_v2_webhook", GetConvar("interior_city_webhook_logs", "")) or ""),
+    Deposit = (IsDuplicityVersion() and GetConvar("ic_secret_m_orgs_v2_webhook", GetConvar("interior_city_webhook_logs", "")) or ""),
 }
 
 Config.defaultPermissions = { 

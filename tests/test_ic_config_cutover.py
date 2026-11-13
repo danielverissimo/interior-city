@@ -70,7 +70,7 @@ class ConfigCutoverTests(unittest.TestCase):
         self.assertLess((self.release/'config/config.cfg').read_text().index('ic_config_runtime'),(self.release/'config/config.cfg').read_text().index('resources.cfg'))
 
     def test_preparation_preserves_effective_mounts_imports_without_renewing_and_maps_rollback(self):
-        report=self.prepare();self.assertEqual(report['stateFiles'],28);self.assertFalse(report['continuing'])
+        report=self.prepare();self.assertEqual(report['stateFiles'],len(s.FILES));self.assertFalse(report['continuing'])
         groups=c.persistent_path(self.root,'resources/[vrp]/vrp/cfg/groups.json')
         self.assertEqual(json.loads(groups.read_text())['groups'][0]['name'],'Effective')
         own=c.persistent_path(self.root,'resources/[scriptcore]/ic_mansions/state-a.json')
@@ -81,10 +81,29 @@ class ConfigCutoverTests(unittest.TestCase):
         self.assertFalse((control/'selection.json').exists())
         previous_overlay=(control/'overlays'/(self.previous.name+'.yaml')).read_text()
         self.assertNotIn('/server-data/resources/[scriptcore]/ic_mansions/',previous_overlay)
-        self.assertEqual(previous_overlay.count('create_host_path: false'),26) # 25 files + report backup
+        self.assertEqual(previous_overlay.count('create_host_path: false'),len(s.FILES)-3+1) # without the 3 own mansion files, plus report backup
         next_overlay=(control/'overlays'/(self.release.name+'.yaml')).read_text()
-        self.assertEqual(next_overlay.count('create_host_path: false'),29)
+        self.assertEqual(next_overlay.count('create_host_path: false'),len(s.FILES)+1)
         r.manifest(self.previous,self.root/'state/manifests'/(self.previous.name+'.json'),True)
+
+    def test_spotify_runtime_storage_is_captured_and_mounted_without_source_overwrite(self):
+        relative='resources/[scripts]/b_spotify/storage.json'
+        source=self.previous/relative
+        value={'videos':{'fixture':{'title':'Saved by a player'}},'playlists':{},'favorites':{},'history':{}}
+        source.write_text(json.dumps(value))
+        report=self.prepare()
+        target=c.persistent_path(self.root,relative)
+        self.assertEqual(json.loads(target.read_text()),value)
+        self.assertNotEqual(source.stat().st_ino,target.stat().st_ino)
+        self.assertEqual(target.stat().st_mode&0o777,0o600)
+        for release in (self.previous,self.release):
+            overlay=(self.root/'state/ic-config/overlays'/(release.name+'.yaml')).read_text()
+            self.assertIn('/server-data/'+relative,overlay)
+            self.assertIn(str(target),overlay)
+        snapshot=self.root/'state/ic-config'/('prepare-'+self.release.name)/'snapshot'/relative
+        self.assertEqual(json.loads(snapshot.read_text()),value)
+        target.write_text('{"videos":{}}')
+        self.assertEqual(json.loads(source.read_text()),value)
 
     def test_forward_fix_keeps_new_ownership_and_never_reimports_legacy(self):
         self.prepare();c.mark_starting(self.root,self.release)
@@ -92,6 +111,9 @@ class ConfigCutoverTests(unittest.TestCase):
         mounts=[]
         for relative in s.FILES:
             mounts.append({'Destination':'/server-data/'+relative,'Source':str(c.persistent_path(self.root,relative)),'RW':True})
+        chest_relative='resources/[scriptcore]/inventory/config/shared.chests.json'
+        chest=c.persistent_path(self.root,chest_relative)
+        chest.write_bytes(b'[]\n')
         own=c.persistent_path(self.root,'resources/[scriptcore]/ic_mansions/state-a.json')
         envelope=json.loads(own.read_text());envelope['generation']=7;envelope['state']['mansions'][0]['iptuPaidUntil']=999
         payload=json.dumps(envelope['state'],ensure_ascii=False,separators=(',',':'));checksum=2166136261
@@ -103,6 +125,9 @@ class ConfigCutoverTests(unittest.TestCase):
              patch.object(c,'rehearse_schema',return_value={'restored':True}):
             report=c.prepare(self.root,self.release,third)
         self.assertTrue(report['continuing']);self.assertEqual(report['counts']['generation'],7)
+        self.assertEqual(chest.read_bytes(),b'[]\n')
+        snapshot=self.root/'state/ic-config'/('prepare-'+third.name)/'snapshot'/chest_relative
+        self.assertEqual(snapshot.read_bytes(),b'[]\n')
         self.assertEqual(json.loads(own.read_text())['state']['mansions'][0]['iptuPaidUntil'],999)
         receipt=json.loads((self.root/'state/ic-config'/(third.name+'.json')).read_text())
         self.assertFalse(receipt['legacyReimported'])

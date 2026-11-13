@@ -14,6 +14,9 @@ import tempfile
 
 
 FILES = {
+    # Written by b_spotify::SaveVideo during normal runtime; never replace with
+    # the source default when publishing a new release.
+    'resources/[scripts]/b_spotify/storage.json': dict,
     'resources/[scriptcore]/inventory/config/shared.chests.json': dict,
     'resources/[scriptcore]/inventory/config/shared.shops.json': dict,
     'resources/[scriptcore]/m_garage/shared-side/garages.json': list,
@@ -57,7 +60,7 @@ def safe_path(path):
     return path
 
 
-def read_json(path, expected=None):
+def read_json(path, expected=None, *, allow_empty_array=False):
     safe_path(path)
     if not path.is_file() or path.stat().st_size > 16 * 1024 * 1024:
         raise StateError('Arquivo ausente, inválido ou acima de 16 MiB.')
@@ -66,9 +69,17 @@ def read_json(path, expected=None):
         value = json.loads(raw, parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
     except (ValueError, UnicodeError):
         raise StateError('JSON inválido; conteúdo omitido.') from None
-    if expected and not isinstance(value, expected):
+    empty_lua_object = allow_empty_array and expected is dict and value == []
+    if expected and not isinstance(value, expected) and not empty_lua_object:
         raise StateError('Formato JSON incompatível; conteúdo omitido.')
     return raw, value
+
+
+def read_resource_json(path, relative):
+    # inventory::serializeChests encodes an empty Lua map as []. Keep its bytes;
+    # non-empty arrays and unrelated object schemas must still be rejected.
+    return read_json(path, FILES[relative], allow_empty_array=(
+        relative == 'resources/[scriptcore]/inventory/config/shared.chests.json'))
 
 
 def acquire(source_root, source_map=None):
@@ -82,7 +93,7 @@ def acquire(source_root, source_map=None):
     for relative, expected in FILES.items():
         selected = Path(overrides[relative]) if relative in overrides else source_root / relative
         try:
-            raw, _ = read_json(selected, expected)
+            raw, _ = read_resource_json(selected, relative)
         except (OSError, StateError):
             raise StateError(f'Fonte recusada: {relative}. Verifique o caminho efetivo e o JSON.') from None
         payloads[relative] = raw
@@ -152,7 +163,7 @@ def verify(output):
     if manifest.get('version') != 1 or not isinstance(hashes, dict) or set(hashes) != set(FILES):
         raise StateError('Manifesto incompatível.')
     for relative, expected in FILES.items():
-        raw, _ = read_json(output / relative, expected)
+        raw, _ = read_resource_json(output / relative, relative)
         if hashlib.sha256(raw).hexdigest() != hashes[relative]:
             raise StateError(f'Snapshot alterado: {relative}. Não restaure sobre estado operacional.')
     return {'files': len(FILES), 'verified': True}

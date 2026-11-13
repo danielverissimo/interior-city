@@ -32,8 +32,12 @@ setting() { sed -n "s/^$1=//p" "$root/.env" | tail -n 1; }
 profile="$(setting IC_ASSET_PROFILE)"; store="$(setting ASSET_STORE)"
 [[ "$profile" == core || "$profile" == full ]] || { echo 'Invalid asset profile.' >&2; exit 1; }
 [[ "$store" == /srv/diskaux/interior-city-assets ]] || { echo 'Unexpected private asset store.' >&2; exit 1; }
-[[ "$(setting FIVEM_LISTING_ENABLED)" == false ]] || { echo 'Public listing requires a separately reviewed change.' >&2; exit 1; }
+listing_enabled="$(setting FIVEM_LISTING_ENABLED)"
+[[ "$listing_enabled" == true || "$listing_enabled" == false ]] || { echo 'FIVEM_LISTING_ENABLED must be true or false.' >&2; exit 1; }
 endpoint="$(setting PLAYIT_PUBLIC_ENDPOINT)"; https_host="$(setting PLAYIT_HTTPS_HOST)"
+if [[ "$listing_enabled" == true && ( -z "$endpoint" || -z "$https_host" ) ]]; then
+  echo 'Public listing requires both Playit endpoints.' >&2; exit 1
+fi
 asset_origin="$(setting IC_ASSETS_BASE_URL)"
 if [[ -z "$asset_origin" && -n "$https_host" ]]; then asset_origin="https://$https_host"; fi
 profiles=()

@@ -166,7 +166,7 @@ def captured_state(root,previous,work,mounts,continuing):
     for relative,kind in states.FILES.items():
         if relative.startswith(base)and not continuing:continue
         selected=source_file(root,previous,relative,mounts)
-        payloads[relative]=states.read_json(selected,kind)[0];sources[relative]=str(selected)
+        payloads[relative]=states.read_resource_json(selected,relative)[0];sources[relative]=str(selected)
     if not continuing:
         legacy=work/'captured-mansions';legacy.mkdir(mode=0o700)
         for name in ('mansions.json','furniture_catalog.json'):
