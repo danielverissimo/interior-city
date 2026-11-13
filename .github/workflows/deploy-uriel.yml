@@ -1,0 +1,55 @@
+name: Deploy Uriel
+run-name: Uriel · ${{ github.sha }}
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      validate_only:
+        description: Check connectivity and candidate without restarting the city
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: interior-city-uriel
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.repository == 'danielverissimo/interior-city' &&
+      github.ref == 'refs/heads/master' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: [self-hosted, linux, x64, interior-city]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          clean: true
+      - name: Validate deployment tools
+        run: |
+          bash -n scripts/ci/runner-deploy.sh scripts/ci/uriel-ssh-command.sh scripts/install-uriel-release.sh
+          python3 -m unittest discover -s tests -p test_actions_deploy.py -v
+          python3 -m unittest discover -s tests -p test_docker_release.py -v
+          python3 -m unittest discover -s tests -p test_ic_config_state.py -v
+          python3 -m unittest discover -s tests -p test_ic_config_cutover.py -v
+      - name: Check candidate or deploy exact master commit
+        env:
+          DEPLOY_SHA: ${{ github.sha }}
+          AUTO_DEPLOY_ENABLED: ${{ vars.URIEL_AUTO_DEPLOY_ENABLED }}
+          VALIDATE_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.validate_only }}
+        run: |
+          mode=check
+          if [[ "$AUTO_DEPLOY_ENABLED" == true && "$VALIDATE_ONLY" != true ]]; then mode=deploy; fi
+          bash scripts/ci/runner-deploy.sh "$DEPLOY_SHA" "$mode"
+          {
+            echo '### Uriel'
+            printf 'Commit: %s\n\n' "$DEPLOY_SHA"
+            printf 'Completed mode: %s\n' "$mode"
+            if [[ "$mode" == check ]]; then echo 'The city was not restarted.'; fi
+          } >> "$GITHUB_STEP_SUMMARY"
