@@ -33,6 +33,7 @@ class DockerReleaseTests(unittest.TestCase):
         self.schema = ROOT/'config/resource-secrets.schema.json'
         self.license = 'cfxk_' + 'fixture_not_a_real_license'
         c.write_private(self.private/'cfx_license', self.license)
+        c.render(self.private, self.schema)
 
     def test_init_preserves_existing_credentials_and_private_parent(self):
         password = (self.private/'db_app_password').read_bytes()
