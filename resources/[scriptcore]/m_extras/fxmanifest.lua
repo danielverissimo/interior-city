@@ -21,6 +21,3 @@ client_scripts {
     "client-side/client.lua"
 }
 
-server_scripts {
-    "server-side/server.lua",
-}

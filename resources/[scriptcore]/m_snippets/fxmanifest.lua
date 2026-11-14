@@ -32,6 +32,7 @@ server_script {
 
 files {
 	'config/blips.json',
+	'config/elevators.json',
 	'web-site/nui/**/*',
 	'web-site/nui/*'
 }

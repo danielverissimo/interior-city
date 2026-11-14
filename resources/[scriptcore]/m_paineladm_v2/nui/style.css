@@ -10097,3 +10097,10 @@ body {
 @media (max-width:1100px){.vip-garage-slots-card .vip-benefit-head{grid-template-columns:40px 1fr}.vip-garage-slots-input{grid-column:1/-1;justify-self:stretch;grid-template-columns:28px minmax(0,140px);justify-content:end}}
 .vip-assign-summary{grid-template-columns:1.7fr repeat(4,1fr)}
 @media (max-width:1100px){.vip-assign-summary{grid-template-columns:1fr 1fr}.vip-assign-summary>div:first-child{grid-column:1/-1}}
+
+/* Resiliência do seletor VIP: saída voluntária e estados legados. */
+.player-vip-warning{display:block;margin-top:5px;color:#f1bb7b;font-size:7px}
+.player-vip-modal>footer{justify-content:space-between;gap:16px;flex-wrap:wrap}
+.player-vip-modal>footer .button{font-size:8px;white-space:nowrap;border-color:rgba(255,255,255,.25)}
+.vip-card-main:disabled{opacity:.72;cursor:not-allowed}
+.vip-repair-action{color:#f1bb7b;border-color:rgba(241,187,123,.3)}

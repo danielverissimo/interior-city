@@ -40,7 +40,7 @@ function CreateTunnel.buyKeys(keyId)
     end
 
     USER:updateInventory(user_id, inventory)
-    vRP.sendLog(GetConvar("ic_secret_m_box_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: '..user_id..'\n[KEY]: '..keyId..' \n[PRICE]: '..key.price..' \n[POINTS]: '..points..' \n[TIME]: '..os.date("%d/%m/%Y %X", os.time())..' \r```')
+    vRP.sendLog('https://discord.com/api/webhooks/1358316246776414213/IIDkLwcuc4VRIWf7x3ttsNlgWuYBO42pLETFwv-hQkwd4wjIjGFH7VvtNSPgA7Cww61b', '```prolog\n[ID]: '..user_id..'\n[KEY]: '..keyId..' \n[PRICE]: '..key.price..' \n[POINTS]: '..points..' \n[TIME]: '..os.date("%d/%m/%Y %X", os.time())..' \r```')
 
     return true
 end

@@ -180,6 +180,10 @@ Routes = {
         )
     end,
 
+    ["DELETE_ITEM"] = function(data)
+        return Remote.deleteItem(ts(data.slot), tn(data.amount))
+    end,
+
     ["DROP_ITEM"] = function(data)
         ---@return boolean | nil
         return Remote.dropItem(

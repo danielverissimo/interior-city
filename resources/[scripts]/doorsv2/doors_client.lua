@@ -115,8 +115,6 @@ local drawInteraction = function()
 end
 local isAddingDoorlock = false
 local mansionCaptureActive = false
-local mansionCaptureOwner = nil
-local mansionCaptureGeneration = 0
 
 srcDoors.rayCastDoor = function()
     local rayCastCam = function(flags, ignore, distance)
@@ -272,18 +270,13 @@ local function sameCapturedDoor(a,hash,coords)
         and math.abs((a.z or 0.0)-coords.z) < 0.08
 end
 
-RegisterNetEvent('doorsv2:startMansionCapture',function(requestedOwner)
-    -- Route only to the two known configuration panels; no arbitrary event names.
-    local owner = requestedOwner == 'ic_config' and 'ic_config' or 'mg_config_panel'
+RegisterNetEvent('doorsv2:startMansionCapture',function()
     if mansionCaptureActive or isAddingDoorlock then
-        TriggerEvent(owner..':mansionDoorCaptureCancelled','Já existe uma captura de porta em andamento.')
+        TriggerEvent('mg_config_panel:mansionDoorCaptureCancelled','Já existe uma captura de porta em andamento.')
         return
     end
 
     mansionCaptureActive = true
-    mansionCaptureOwner = owner
-    mansionCaptureGeneration = mansionCaptureGeneration + 1
-    local captureGeneration = mansionCaptureGeneration
 
     CreateThread(function()
         local captured = {}
@@ -317,9 +310,9 @@ RegisterNetEvent('doorsv2:startMansionCapture',function(requestedOwner)
         local raycastRunning = true
 
         CreateThread(function()
-            while mansionCaptureActive and captureGeneration == mansionCaptureGeneration and raycastRunning do
+            while mansionCaptureActive and raycastRunning do
                 local hit,entity,coords = mansionRayCastDoor(25.0)
-                if not mansionCaptureActive or captureGeneration ~= mansionCaptureGeneration or not raycastRunning then break end
+                if not mansionCaptureActive or not raycastRunning then break end
 
                 rayHit = hit == true
                 rayEntity = entity or 0
@@ -327,9 +320,8 @@ RegisterNetEvent('doorsv2:startMansionCapture',function(requestedOwner)
             end
         end)
 
-        while mansionCaptureActive and captureGeneration == mansionCaptureGeneration do
+        while mansionCaptureActive do
             Wait(0)
-            if not mansionCaptureActive or captureGeneration ~= mansionCaptureGeneration then break end
 
             DisablePlayerFiring(PlayerId(),true)
             DisableControlAction(0,24,true)  -- Mouse 1
@@ -421,17 +413,15 @@ RegisterNetEvent('doorsv2:startMansionCapture',function(requestedOwner)
 
             if finishPressed then
                 mansionCaptureActive = false
-                mansionCaptureOwner = nil
                 clearOutline()
-                TriggerEvent(owner..':mansionDoorsCaptured',captured)
+                TriggerEvent('mg_config_panel:mansionDoorsCaptured',captured)
                 break
             end
 
             if cancelPressed then
                 mansionCaptureActive = false
-                mansionCaptureOwner = nil
                 clearOutline()
-                TriggerEvent(owner..':mansionDoorCaptureCancelled','Captura de trancas cancelada.')
+                TriggerEvent('mg_config_panel:mansionDoorCaptureCancelled','Captura de trancas cancelada.')
                 break
             end
         end
@@ -439,21 +429,4 @@ RegisterNetEvent('doorsv2:startMansionCapture',function(requestedOwner)
         raycastRunning = false
         clearOutline()
     end)
-end)
-
-AddEventHandler('doorsv2:cancelMansionCapture',function(owner)
-    if mansionCaptureActive and mansionCaptureOwner == owner then
-        mansionCaptureActive = false
-        mansionCaptureOwner = nil
-        mansionCaptureGeneration = mansionCaptureGeneration + 1
-        TriggerEvent(owner..':mansionDoorCaptureCancelled','Captura de trancas cancelada.')
-    end
-end)
-
-AddEventHandler('onResourceStop',function(name)
-    if name == GetCurrentResourceName() or name == mansionCaptureOwner then
-        mansionCaptureActive = false
-        mansionCaptureOwner = nil
-        mansionCaptureGeneration = mansionCaptureGeneration + 1
-    end
 end)

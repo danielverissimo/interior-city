@@ -1,0 +1,912 @@
+{
+  "categories": [
+    {
+      "label": "ESPORTIVOS",
+      "id": "esportivos"
+    },
+    {
+      "label": "SEDAN",
+      "id": "sedan"
+    },
+    {
+      "label": "MOTOS",
+      "id": "motos"
+    },
+    {
+      "label": "VIPS",
+      "id": "vips"
+    },
+    {
+      "label": "OFF-ROADS",
+      "id": "off-roads"
+    },
+    {
+      "label": "CAMINHÕES",
+      "id": "caminhoes"
+    },
+    {
+      "label": "AERONAVES",
+      "id": "aeronaves"
+    },
+    {
+      "label": "BRASILEIROS",
+      "id": "brasileiros"
+    },
+    {
+      "label": "OUTROS",
+      "id": "outros"
+    }
+  ],
+  "settings": {
+    "maxCars": 5,
+    "purchaseCooldown": 5,
+    "sellVehicle": 99,
+    "sellCooldown": 10,
+    "imagesDir": "http://127.0.0.1/vrp_images/",
+    "notTop4Vehicles": [
+      "dd911gtrsr",
+      "fnfmk4",
+      "burrito",
+      "benson"
+    ],
+    "purchaseLogWebhook": "",
+    "commandConce": "concedeluxe"
+  },
+  "testDrive": {
+    "maxDistanceTestDriver": 1500,
+    "cooldownTestDriver": 60,
+    "locations": []
+  },
+  "vips": [
+    {
+      "discount": 0,
+      "maxCars": 5,
+      "permission": "perm.vagas5"
+    },
+    {
+      "discount": 0,
+      "maxCars": 10,
+      "permission": "perm.vagas10"
+    },
+    {
+      "discount": 0,
+      "maxCars": 11,
+      "permission": "perm.vagas11"
+    },
+    {
+      "discount": 0,
+      "maxCars": 12,
+      "permission": "perm.vagas12"
+    },
+    {
+      "discount": 0,
+      "maxCars": 15,
+      "permission": "perm.vagas15"
+    },
+    {
+      "discount": 0,
+      "maxCars": 32,
+      "permission": "perm.vagas32"
+    },
+    {
+      "discount": 0,
+      "maxCars": 30,
+      "permission": "perm.vagas30"
+    },
+    {
+      "discount": 0,
+      "maxCars": 19,
+      "permission": "perm.vagas19"
+    },
+    {
+      "discount": 0,
+      "maxCars": 36,
+      "permission": "perm.vagas36"
+    },
+    {
+      "discount": 0,
+      "maxCars": 3,
+      "permission": "perm.vagastres"
+    },
+    {
+      "discount": 5,
+      "maxCars": 5,
+      "permission": "perm.vipcopa"
+    },
+    {
+      "discount": 40,
+      "maxCars": 30,
+      "permission": "perm.011rp"
+    },
+    {
+      "discount": 5,
+      "maxCars": 3,
+      "permission": "perm.bronze"
+    },
+    {
+      "discount": 5,
+      "maxCars": 5,
+      "permission": "perm.prata"
+    },
+    {
+      "discount": 9,
+      "maxCars": 8,
+      "permission": "perm.ouro"
+    },
+    {
+      "discount": 9,
+      "maxCars": 8,
+      "permission": "perm.platina"
+    },
+    {
+      "discount": 13,
+      "maxCars": 15,
+      "permission": "perm.diamante"
+    },
+    {
+      "discount": 13,
+      "maxCars": 15,
+      "permission": "perm.esmeralda"
+    },
+    {
+      "discount": 25,
+      "maxCars": 25,
+      "permission": "perm.safira"
+    },
+    {
+      "discount": 30,
+      "maxCars": 30,
+      "permission": "perm.rubi"
+    },
+    {
+      "discount": 40,
+      "maxCars": 30,
+      "permission": "perm.011rp"
+    },
+    {
+      "discount": 50,
+      "maxCars": 100,
+      "permission": "perm.supremo"
+    },
+    {
+      "discount": 35,
+      "maxCars": 25,
+      "permission": "perm.vipsetembro"
+    },
+    {
+      "discount": 50,
+      "maxCars": 25,
+      "permission": "perm.vipblackfriday"
+    },
+    {
+      "discount": 50,
+      "maxCars": 25,
+      "permission": "perm.vippascoa"
+    },
+    {
+      "discount": 50,
+      "maxCars": 5,
+      "permission": "perm.vipcrianca"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.viphalloween"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipnatal"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vip2025"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipanonovo"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipcarnaval"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipmaio"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.pascoa"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.ferias"
+    },
+    {
+      "discount": 50,
+      "maxCars": 0,
+      "permission": "perm.vipwipe"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipreal"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.olimpiadas"
+    },
+    {
+      "discount": 35,
+      "maxCars": 25,
+      "permission": "perm.vipsaojoao"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipverao"
+    },
+    {
+      "discount": 50,
+      "maxCars": 50,
+      "permission": "perm.vipoutono"
+    }
+  ],
+  "vehicles": {
+    "150": {
+      "stock": 19,
+      "category": "brasileiros",
+      "amountSell": 1
+    },
+    "defiler": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "bf400": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "shotaro": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "entityxf": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "furoregt": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "tulip": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "surge": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "r1250": {
+      "stock": 50,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "massacro": {
+      "amountSell": 0,
+      "stock": 10
+    },
+    "bullet": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "issi2": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "flashgt": {
+      "amountSell": 0,
+      "stock": 60
+    },
+    "jester": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "brawler": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "nero": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "fiatstilo": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "prototipo": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "vacca": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "faggio": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "fiattoro": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "fusion": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "saveiro": {
+      "stock": 50,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "bfinjection": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "blista3": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "emperor": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "pcj": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "cliffhanger": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "specter2": {
+      "amountSell": 0,
+      "stock": 15
+    },
+    "paradise": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "rhapsody": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "xj": {
+      "stock": 50,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "carbonizzare": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "ninef": {
+      "amountSell": 0,
+      "stock": 15
+    },
+    "eletran17": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "daemon2": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "palio": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "brioso": {
+      "amountSell": 0,
+      "stock": 45
+    },
+    "reaper": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "sheava": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "amarok": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "ruffian": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "f150": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "blazer4": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "xls2": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "patriot": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "khamelion": {
+      "amountSell": 0,
+      "stock": 10
+    },
+    "l200civil": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "vwpolo": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "civic": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "panto": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "450crf": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "cheetah": {
+      "amountSell": 0,
+      "stock": 15
+    },
+    "zentorno": {
+      "amountSell": 0,
+      "stock": 100
+    },
+    "tezeract": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "ruston": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "italigto": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "fiatuno": {
+      "stock": 0,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "stretch": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "celta": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "italigtb": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "casco": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "ds4": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "dukes": {
+      "amountSell": 0,
+      "stock": 10
+    },
+    "golg7": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "fiat": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "minivan2": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "coquette": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "dominator2": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "retinue": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "manchez": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "burrito": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "sanchez": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "baller4": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "veloster": {
+      "stock": 50,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "fmj": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "sanctus": {
+      "amountSell": 0,
+      "stock": 60
+    },
+    "blade": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "t20": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "tyrant": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "cg1602": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "italigtb2": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "trophytruck": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "double": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "comet3": {
+      "amountSell": 0,
+      "stock": 15
+    },
+    "infernus": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "slamvan3": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "hornet": {
+      "stock": 24,
+      "category": "brasileiros",
+      "amountSell": 1
+    },
+    "chimera": {
+      "amountSell": 0,
+      "stock": 60
+    },
+    "sc1": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "avarus": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "cbrr": {
+      "stock": 15,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "entity2": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "fordka": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "f620": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "schlagen": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "blista": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "xa21": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "bros60": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "kuruma": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "xt66": {
+      "stock": 50,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "bifta": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "windsor2": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "punto": {
+      "stock": 50,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "akuma": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "burrito4": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "baller": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "guardian": {
+      "amountSell": 0,
+      "stock": 65
+    },
+    "rocoto": {
+      "amountSell": 0,
+      "stock": 5
+    },
+    "dominator3": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "sanchez2": {
+      "amountSell": 0,
+      "stock": 55
+    },
+    "neon": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "buffalo3": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "kamacho": {
+      "amountSell": 0,
+      "stock": 40
+    },
+    "dubsta3": {
+      "amountSell": 0,
+      "stock": 15
+    },
+    "mesa3": {
+      "amountSell": 0,
+      "stock": 35
+    },
+    "comet5": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "omnis": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "visione": {
+      "amountSell": 0,
+      "stock": 60
+    },
+    "tempesta": {
+      "amountSell": 0,
+      "stock": 10
+    },
+    "patriot2": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "sonata18": {
+      "stock": 30,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "elegy2": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "dm1200": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "surfer": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "monza": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "evoq": {
+      "stock": 20,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "impaler": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "burrito3": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "phoenix": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "schafter3": {
+      "amountSell": 0,
+      "stock": 15
+    },
+    "cbtwister": {
+      "stock": 15,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "bati": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "sandking": {
+      "amountSell": 0,
+      "stock": 20
+    },
+    "coquette3": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "civic2016": {
+      "stock": 19,
+      "category": "brasileiros",
+      "amountSell": 1
+    },
+    "dominator": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "jetta2017": {
+      "stock": 25,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "z1000": {
+      "stock": 30,
+      "category": "brasileiros",
+      "amountSell": 0
+    },
+    "gp1": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "nightshade": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "nero2": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "sovereign": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "hakuchou": {
+      "amountSell": 0,
+      "stock": 25
+    },
+    "carbonrs": {
+      "amountSell": 0,
+      "stock": 50
+    },
+    "diablous2": {
+      "amountSell": 0,
+      "stock": 55
+    },
+    "lamborghinihuracan": {
+      "amountSell": 0,
+      "stock": 2
+    },
+    "deveste": {
+      "amountSell": 0,
+      "stock": 45
+    },
+    "lynx": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "biz25": {
+      "stock": 19,
+      "category": "brasileiros",
+      "amountSell": 1
+    },
+    "feltzer2": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "michelli": {
+      "amountSell": 0,
+      "stock": 30
+    },
+    "osiris": {
+      "amountSell": 0,
+      "stock": 30
+    }
+  }
+}

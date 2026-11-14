@@ -31,7 +31,7 @@ RegisterCommand('dv',function(source,args,rawCommand)
             local plate,name,netid = vRPClient.ModelName(source, 10.0)
             DeleteVehicle(NetworkGetEntityFromNetworkId(vehicle))
 
-            vRP.sendLog(GetConvar("ic_secret_m_garage_webhook", GetConvar("interior_city_webhook_logs", "")),"O ID : "..user_id.." Utilizou o comando de DV")
+            vRP.sendLog("https://discord.com/api/webhooks/1315819219748655124/FUUrBMmnP1G8r9odf_2dyT5fzlikPkiFlCKGkvf-tWK8UKSc5x_0IoMx2jMourBlYi52","O ID : "..user_id.." Utilizou o comando de DV")
             exports["vrp_admin"]:generateLog({
                 category = "admin",
                 room = "dv",

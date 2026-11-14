@@ -204,7 +204,7 @@
           <disableBonnetCamera value="false" />
           <allowBonnetSlide value="true" />
         </Item>
-		<modelName>m3e36_roof</modelName>
+		<Item><modelName>m3e36_roof</modelName>
 		<modShopLabel>e36_roof</modShopLabel>
 		<linkedModels />
 		<turnOffBones />

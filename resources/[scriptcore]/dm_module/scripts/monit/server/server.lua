@@ -53,7 +53,7 @@ RegisterCommand('topplayer', function(source,args)
     end
 
     local result = result ~= "" and result or "Nenhuma Informação encontrada"
-    vRP.sendLog(GetConvar("ic_secret_dm_module_webhook", GetConvar("interior_city_webhook_logs", "")), "```prolog\n( INVENTARIO PLAYER )\n[ITEM]: "..itemName.."\n[USUARIOS]: \n"..result2.."```")
+    vRP.sendLog("https://discordapp.com/api/webhooks/1434184407081549996/VtFuM82kZc2YExzumRq85EJ_hk9PWfyeoC0n9h8tv81FVarYW_XpndOq_tshtp_J2Bof", "```prolog\n( INVENTARIO PLAYER )\n[ITEM]: "..itemName.."\n[USUARIOS]: \n"..result2.."```")
     TriggerClientEvent("Notify",source,"importante","( INVENTARIO PLAYER ) Filtrando pelo item: <b> "..itemName.. "</b>:<br><br>".. result, 30)
 end)
 

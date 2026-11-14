@@ -457,17 +457,8 @@ end)
 -- SISTEMA DE ENCHER A GARRAFA
 -----------------------------------------------------------------------------------------------------------------------------------------
 function API.checkFountain()
-	local ped = PlayerPedId()
-	local coords = GetEntityCoords(ped)
-
-	if DoesObjectOfTypeExistAtCoords(coords, 0.7, GetHashKey("prop_watercooler"), true) or DoesObjectOfTypeExistAtCoords(coords, 0.7, GetHashKey("prop_watercooler_dark"), true) then
-		return true, "fountain"
-	end
-
-	if IsEntityInWater(ped) then
-		return true, "floor"
-	end
-
+	local waterSource = API.getWaterSource(false)
+	if waterSource then return true, waterSource.style end
 	return false
 end
 

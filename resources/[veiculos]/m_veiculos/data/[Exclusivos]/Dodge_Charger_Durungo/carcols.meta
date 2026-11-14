@@ -13,7 +13,7 @@
       <kitName>0_default_modkit</kitName>
       <id value="0" />	 	  
       <kitType>MKT_SPECIAL</kitType>
-      <visibleMods>
+      <visibleMods />
       <statMods>
         <Item>
           <identifier />

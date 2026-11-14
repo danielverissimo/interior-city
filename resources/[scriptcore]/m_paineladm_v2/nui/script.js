@@ -256,6 +256,7 @@ const state = {
 let vipEditorDraft = null;
 let playerVipChoice = null;
 let playerVipActionBusy = false;
+let playerVipDismissVersion = 0;
 
 const app = $("#app");
 const content = $("#content");
@@ -533,6 +534,16 @@ function renderCalls() {
     }
 
     return `<div class="calls-page bounded-page"><div class="calls-top-options">${topButtons}</div><section class="calls-main-card">${state.callsData ? body : '<div class="calls-loading"><span>'+icon("refresh",26)+'</span><strong>Carregando chamados...</strong></div>'}</section></div>`;
+}
+
+async function vipRequest(payload) {
+    // Um callback Tunnel/DB nunca deve prender o jogador na NUI indefinidamente.
+    let timeoutId;
+    const timeout = new Promise(resolve => {
+        timeoutId = setTimeout(() => resolve({ ok: false, message: "A confirmação do servidor demorou demais. Seu progresso está salvo; use /vipveiculos para retomar." }), 18000);
+    });
+    try { return await Promise.race([post("vipPlayer", payload), timeout]); }
+    finally { clearTimeout(timeoutId); }
 }
 
 async function post(endpoint, data = {}) {
@@ -1162,6 +1173,9 @@ function itemImage(item) {
 }
 
 function vehicleImage(spawn) {
+    const vehicle = (state.config.vehicles || []).find(entry => String(entry.spawn).toLowerCase() === String(spawn).toLowerCase());
+    if (vehicle?.image) return vehicle.image;
+    if (vehicle?.category === "addon") return "imgs/vehicles/no-photo.svg";
     const base = state.config.images?.vehicles || "";
     return `${base}${encodeURIComponent(spawn)}.png`;
 }
@@ -1262,6 +1276,8 @@ function vipItemImage(index) {
 }
 
 function vipVehicleImage(spawn, images = null) {
+    const vehicle = (state.config.vehicles || []).find(entry => String(entry.spawn).toLowerCase() === String(spawn).toLowerCase());
+    if (vehicle?.category === "addon") return vehicleImage(spawn);
     const base = images?.vehicles || state.vipAdmin?.images?.vehicles || state.bootstrap?.vipAdmin?.images?.vehicles || state.config.images?.vehicles || "";
     return `${base}${encodeURIComponent(String(spawn || "").toLowerCase())}.png`;
 }
@@ -1300,10 +1316,10 @@ function renderVips() {
         const search = `${vip.title || ""} ${vip.group || ""} ${(vip.permissions || []).join(" ")}`.toLowerCase();
         return `
             <article class="vip-card" data-search="${escapeHtml(search)}">
-                <button class="vip-card-main" type="button" data-vip-assign="${escapeHtml(vip.group)}">
+                <button class="vip-card-main" type="button" ${vip.orphaned ? 'disabled title="Cargo ausente na vRP: recupere o VIP"' : `data-vip-assign="${escapeHtml(vip.group)}"`}>
                     <div class="vip-card-icon">${icon("star", 24)}</div>
                     <div class="vip-card-copy">
-                        <div class="vip-card-title"><strong>${escapeHtml(vip.title || vip.group)}</strong><span>30 DIAS</span></div>
+                        <div class="vip-card-title"><strong>${escapeHtml(vip.title || vip.group)}</strong><span>${vip.orphaned ? "RECUPERAR CARGO" : "30 DIAS"}</span></div>
                         <code>${escapeHtml(vip.group)}</code>
                         <div class="vip-card-stats">
                             <span>${icon("wallet", 12)} ${escapeHtml(vipMoney(vip.salary))} salário</span>
@@ -1314,6 +1330,7 @@ function renderVips() {
                     </div>
                 </button>
                 <div class="vip-card-actions">
+                    ${vip.orphaned && canUse("edit_vip") ? `<button class="vip-icon-button vip-repair-action" type="button" data-vip-repair="${escapeHtml(vip.group)}" title="Recuperar cargo VIP salvo">${icon("refresh",15)}</button>` : ""}
                     ${canUse("edit_vip") ? `<button class="vip-icon-button" type="button" data-vip-edit="${escapeHtml(vip.group)}" title="Editar VIP">${icon("edit", 15)}</button>` : ""}
                     ${canUse("delete_vip") ? `<button class="vip-icon-button danger" type="button" data-vip-delete="${escapeHtml(vip.group)}" title="Excluir VIP">${icon("trash", 15)}</button>` : ""}
                 </div>
@@ -1487,12 +1504,15 @@ function renderPlayerVipChoice(payload) {
         return;
     }
     const selected = new Set((payload.selectedVehicles || []).map(v => String(v).toLowerCase()));
+    const pendingVehicle = String(payload.pendingVehicle || "").toLowerCase();
     const cards = (payload.vehicles || []).map(vehicle => {
         const already = selected.has(String(vehicle.spawn).toLowerCase());
-        return `<article class="player-vip-vehicle ${already ? "is-selected" : ""}"><div class="player-vip-image"><img src="${escapeHtml(vipVehicleImage(vehicle.spawn, payload.images))}" onerror="this.style.opacity='.15'" alt=""></div><div class="player-vip-copy"><strong>${escapeHtml(vehicle.name || vehicle.spawn)}</strong><code>${escapeHtml(vehicle.spawn)}</code>${already ? `<span class="player-vip-chosen">${icon("check",11)} JÁ ESCOLHIDO</span>` : ""}</div><div class="player-vip-actions"><button class="button" type="button" data-player-vip-test="${escapeHtml(vehicle.spawn)}" ${already ? "disabled" : ""}>${icon("car",12)} TESTAR VEÍCULO</button><button class="button primary" type="button" data-player-vip-choose="${escapeHtml(vehicle.spawn)}" ${already ? "disabled" : ""}>${icon("check",12)} ESCOLHER VEÍCULO</button></div></article>`;
+        const recovering = pendingVehicle && pendingVehicle === String(vehicle.spawn).toLowerCase();
+        const blocked = pendingVehicle && !recovering;
+        return `<article class="player-vip-vehicle ${already ? "is-selected" : ""}"><div class="player-vip-image"><img src="${escapeHtml(vipVehicleImage(vehicle.spawn, payload.images))}" onerror="this.style.opacity='.15'" alt=""></div><div class="player-vip-copy"><strong>${escapeHtml(vehicle.name || vehicle.spawn)}</strong><code>${escapeHtml(vehicle.spawn)}</code>${already ? `<span class="player-vip-chosen">${icon("check",11)} JÁ ESCOLHIDO</span>` : ""}${vehicle.unavailable ? `<span class="player-vip-warning">Spawn antigo fora do catálogo atual</span>` : ""}</div><div class="player-vip-actions"><button class="button" type="button" data-player-vip-test="${escapeHtml(vehicle.spawn)}" ${already || blocked ? "disabled" : ""}>${icon("car",12)} TESTAR VEÍCULO</button><button class="button primary" type="button" data-player-vip-choose="${escapeHtml(vehicle.spawn)}" ${already || blocked ? "disabled" : ""}>${icon("check",12)} ${recovering ? "RETOMAR ENTREGA" : "ESCOLHER VEÍCULO"}</button></div></article>`;
     }).join("");
     const remaining = Number(payload.remainingChoices || 0);
-    vipChoiceRoot.innerHTML = `<section class="player-vip-modal"><header><div class="player-vip-title-icon">${icon("star",24)}</div><div><small>BENEFÍCIO VIP</small><h2>ESCOLHA O VEÍCULO DO VIP ${escapeHtml(String(payload.title || "VIP").toUpperCase())}</h2><p>${remaining === 1 ? "Você pode escolher 1 veículo." : `Você pode escolher ${remaining} veículos.`} O teste é opcional: você pode escolher direto se quiser.</p></div><div class="player-vip-remaining"><span>RESTANTES</span><strong>${remaining}</strong></div></header>${payload.notice ? `<div class="player-vip-notice">${icon("check",14)} ${escapeHtml(payload.notice)}</div>` : ""}<div class="player-vip-grid">${cards}</div><footer>${icon("shield",13)} O teste acontece em uma dimensão privada durante 60 segundos e não confirma sua escolha.</footer></section>`;
+    vipChoiceRoot.innerHTML = `<section class="player-vip-modal"><header><div class="player-vip-title-icon">${icon("star",24)}</div><div><small>BENEFÍCIO VIP</small><h2>ESCOLHA O VEÍCULO DO VIP ${escapeHtml(String(payload.title || "VIP").toUpperCase())}</h2><p>${remaining === 1 ? "Você pode escolher 1 veículo." : `Você pode escolher ${remaining} veículos.`} O teste é opcional: você pode escolher direto se quiser.</p></div><div class="player-vip-remaining"><span>RESTANTES</span><strong>${remaining}</strong></div></header>${payload.notice ? `<div class="player-vip-notice">${icon("check",14)} ${escapeHtml(payload.notice)}</div>` : ""}${pendingVehicle ? `<div class="player-vip-notice">${icon("refresh",14)} Entrega de ${escapeHtml(pendingVehicle)} em confirmação. Clique em RETOMAR ENTREGA para continuar com segurança.</div>` : ""}<div class="player-vip-grid">${cards || `<div class="player-vip-notice">Não há veículos válidos neste pacote. Solicite a revisão pelo administrador.</div>`}</div><footer><span>${icon("shield",13)} O teste acontece em uma dimensão privada e não confirma sua escolha. Suas escolhas ficam salvas.</span><button type="button" class="button" data-player-vip-dismiss>FECHAR POR AGORA</button></footer></section>`;
     vipChoiceRoot.classList.add("is-open");
     vipChoiceRoot.setAttribute("aria-hidden", "false");
 }
@@ -1532,7 +1552,7 @@ function renderVehicles() {
     const cards = vehicles.map(v => `
         <div class="vehicle-card" data-search="${escapeHtml(`${v.name} ${v.spawn}`.toLowerCase())}">
             <div class="thumb">
-                <img class="lazy-catalog-image" data-src="${escapeHtml(vehicleImage(v.spawn))}" loading="lazy" decoding="async" alt="">
+                <img class="lazy-catalog-image" data-src="${escapeHtml(vehicleImage(v.spawn))}" data-fallback="imgs/vehicles/no-photo.svg" loading="lazy" decoding="async" alt="${escapeHtml(v.name)}">
             </div>
             <div class="vehicle-body">
                 <strong>${escapeHtml(v.name)}</strong>
@@ -4028,7 +4048,7 @@ function openVehicleGarageModal(mode, targetId = "") {
     const cards = vehicles.map(vehicle => `
         <div class="vehicle-card vehicle-picker-card" data-search="${escapeHtml(`${vehicle.name} ${vehicle.spawn}`.toLowerCase())}">
             <div class="thumb">
-                <img class="lazy-catalog-image" data-src="${escapeHtml(vehicleImage(vehicle.spawn))}" loading="lazy" decoding="async" alt="">
+                <img class="lazy-catalog-image" data-src="${escapeHtml(vehicleImage(vehicle.spawn))}" data-fallback="imgs/vehicles/no-photo.svg" loading="lazy" decoding="async" alt="${escapeHtml(vehicle.name)}">
             </div>
             <div class="vehicle-body">
                 <strong>${escapeHtml(vehicle.name)}</strong>
@@ -4547,23 +4567,42 @@ function filterBySelector(input) {
 
 document.addEventListener("click", async event => {
 
+    if (event.target.closest("[data-player-vip-dismiss]")) {
+        playerVipDismissVersion += 1;
+        await post("vipDismiss", { assignmentId: Number(playerVipChoice?.assignmentId || 0) });
+        renderPlayerVipChoice(null);
+        toast("info", "VIP", "Escolha salva para depois. Use /vipveiculos para continuar.");
+        return;
+    }
+
     const playerVipChoose = event.target.closest("[data-player-vip-choose]");
     if (playerVipChoose) {
         if (playerVipActionBusy) return;
         playerVipActionBusy = true;
+        const requestDismissVersion = playerVipDismissVersion;
         const vehicle = playerVipChoose.dataset.playerVipChoose;
         const assignmentId = Number(playerVipChoice?.assignmentId || 0) || undefined;
         playerVipChoose.disabled = true;
         try {
-            const response = await post("vipPlayer", { mode: "choose", vehicle, assignmentId });
+            const response = await vipRequest({ mode: "choose", vehicle, assignmentId });
+            if (requestDismissVersion !== playerVipDismissVersion) return;
             if (!response?.ok) {
                 playerVipChoose.disabled = false;
                 if (response?.data) renderPlayerVipChoice(response.data);
-                toast("error", "VIP", response?.message || "Não foi possível escolher este veículo.");
+                toast("error", "VIP", response?.message || "Não foi possível escolher este veículo. Você pode fechar e retomar com /vipveiculos.");
                 return;
             }
             if (response.data?.completed) renderPlayerVipChoice(null);
-            else renderPlayerVipChoice(response.data);
+            else if (response.data) renderPlayerVipChoice(response.data);
+            else {
+                // Caso o servidor confirme sem payload, busca a pendência
+                // persistida. Evita modal preso em uma escolha já concluída.
+                const refreshed = await post("vipPlayer", { mode: "status" });
+                renderPlayerVipChoice(refreshed?.ok ? refreshed.data : null);
+            }
+        } catch (error) {
+            toast("error", "VIP", "Erro ao processar a escolha. Use /vipveiculos para retomar.");
+            playerVipChoose.disabled = false;
         } finally {
             playerVipActionBusy = false;
         }
@@ -4574,22 +4613,41 @@ document.addEventListener("click", async event => {
     if (playerVipTest) {
         if (playerVipActionBusy) return;
         playerVipActionBusy = true;
+        const requestDismissVersion = playerVipDismissVersion;
         const vehicle = playerVipTest.dataset.playerVipTest;
         const assignmentId = Number(playerVipChoice?.assignmentId || 0) || undefined;
         playerVipTest.disabled = true;
         try {
-            const response = await post("vipPlayer", { mode: "startTest", vehicle, assignmentId });
+            const response = await vipRequest({ mode: "startTest", vehicle, assignmentId });
+            if (requestDismissVersion !== playerVipDismissVersion) return;
             if (!response?.ok) {
                 playerVipTest.disabled = false;
                 if (response?.data) renderPlayerVipChoice(response.data);
                 toast("error", "Teste VIP", response?.message || "Não foi possível iniciar o teste.");
             }
+        } catch (error) {
+            toast("error", "Teste VIP", "Falha ao iniciar o teste. Tente novamente.");
+            playerVipTest.disabled = false;
         } finally {
             playerVipActionBusy = false;
         }
         return;
     }
 
+    const vipRepair = event.target.closest("[data-vip-repair]");
+    if (vipRepair) {
+        if (vipRepair.disabled) return;
+        vipRepair.disabled = true;
+        const group = vipRepair.dataset.vipRepair;
+        const response = await post("vipAdmin", { mode: "repair", group });
+        vipRepair.disabled = false;
+        if (!response?.ok) { toast("error", "Recuperar VIP", response?.message || "Não foi possível recuperar o cargo."); return; }
+        state.vipAdmin = response.data;
+        if (state.bootstrap) state.bootstrap.vipAdmin = response.data;
+        toast("success", "VIP recuperado", response.message || "Cargo restaurado na vRP.");
+        render();
+        return;
+    }
     if (event.target.closest("[data-vip-create]")) { openVipEditorModal(); return; }
     const vipEdit = event.target.closest("[data-vip-edit]");
     if (vipEdit) { openVipEditorModal(vipEdit.dataset.vipEdit); return; }
@@ -5371,6 +5429,9 @@ document.addEventListener("submit", async event => {
         if (!title || !group) { toast("error", "VIPs", "Informe o nome do VIP e o cargo da vRP."); return; }
         if (vipEditorDraft.vehicles.length) vehicleChoices = Math.max(1, Math.min(vehicleChoices, vipEditorDraft.vehicles.length));
         else vehicleChoices = 0;
+        const saveButton = event.target.querySelector('button[type="submit"]');
+        if (saveButton?.disabled) return;
+        if (saveButton) saveButton.disabled = true;
         const response = await post("vipAdmin", {
             mode: "save",
             originalGroup: vipEditorDraft.originalGroup || "",
@@ -5380,6 +5441,7 @@ document.addEventListener("submit", async event => {
             vehicleChoices,
             garageSlots
         });
+        if (saveButton) saveButton.disabled = false;
         if (!response?.ok) { toast("error", "VIPs", response?.message || "Não foi possível salvar o VIP."); return; }
         state.vipAdmin = response.data;
         if (state.bootstrap) state.bootstrap.vipAdmin = response.data;
@@ -5396,7 +5458,11 @@ document.addEventListener("submit", async event => {
         const targetId = Math.floor(Number(new FormData(event.target).get("targetId") || 0));
         if (!targetId) { toast("error", "VIPs", "Informe um Passaporte / ID válido."); return; }
         const group = event.target.dataset.vipGroup;
+        const assignButton = event.target.querySelector('button[type="submit"]');
+        if (assignButton?.disabled) return;
+        if (assignButton) assignButton.disabled = true;
         const response = await post("vipAdmin", { mode: "assign", group, targetId });
+        if (assignButton) assignButton.disabled = false;
         if (!response?.ok) { toast("error", "Setar VIP", response?.message || "Não foi possível setar o VIP."); return; }
         state.vipAdmin = response.data || state.vipAdmin;
         if (state.bootstrap) state.bootstrap.vipAdmin = state.vipAdmin;
@@ -5881,7 +5947,17 @@ $("#refreshButton").addEventListener("click", () => refreshPlayers(true));
 $("#closeButton").addEventListener("click", () => closeNui());
 
 document.addEventListener("keydown", event => {
-    if (event.key !== "Escape" || !state.open) return;
+    if (event.key !== "Escape") return;
+    if (playerVipChoice && !state.open) {
+        playerVipDismissVersion += 1;
+        // Escolha adiada, sem consumir benefício. Funciona mesmo se a
+        // confirmação anterior excedeu o tempo limite da interface.
+        post("vipDismiss", { assignmentId: Number(playerVipChoice?.assignmentId || 0) });
+        renderPlayerVipChoice(null);
+        toast("info", "VIP", "Continue suas escolhas com /vipveiculos.");
+        return;
+    }
+    if (!state.open) return;
 
     if (modalRoot.classList.contains("is-open")) {
         closeModal();

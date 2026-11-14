@@ -26,18 +26,9 @@ Config.TrunkOpenAnimation = {
     flag = 1
 }
 
--- A lockpick não é consumida no sucesso; na falha, pode quebrar.
+-- Item necessário. Por padrão a lockpick NÃO é consumida.
 Config.LockpickItem = 'lockpick'
 Config.ConsumeLockpick = false
-Config.FailedLockpickBreakChance = 30 -- % de chance de perder 1 lockpick ao falhar
-Config.FailedAttemptCooldown = 30 -- segundos por jogador após falhar
-Config.RobberyTaskbar = {
-    rounds = 4,
-    targetMinDegrees = 25,
-    targetMaxDegrees = 35,
-    initialIntervalMs = 12,
-    finalIntervalMs = 9
-}
 
 -- Integração com o inventário enviado pelo usuário.
 Config.InventoryResource = 'inventory'
@@ -48,7 +39,7 @@ Config.StoragePrefix = 'trunkrobber_'
 -- Permite arrombar o próprio veículo.
 -- Útil principalmente para testar o sistema de rastreador.
 -- Em produção, deixe false para impedir o roubo do próprio carro.
-Config.roubar_proprio_veiculo = false
+Config.roubar_proprio_veiculo = true
 
 -- Limite para veículos de JOGADORES poderem ser roubados novamente.
 -- NPC continua podendo ser roubado apenas uma única vez.
@@ -234,9 +225,6 @@ Config.NPCDrugSales = {
 
 -- Quantos itens DIFERENTES entram em cada porta-malas.
 Config.LootCount = 4
--- No máximo um item raro por porta-malas de NPC; a chance é por porta-malas,
--- não por posição de loot. Veículos de jogadores usam o conteúdo real.
-Config.RareLootChance = 20 -- %
 
 -- Os IDs abaixo estão em minúsculo porque o inventory/vRP desta base usa
 -- os índices do arquivo inventory/config/shared.items.lua em minúsculo.
@@ -244,18 +232,18 @@ Config.Loot = {
     { item = 'celular',          min = 1,  max = 1  },
     { item = 'repairkit2',       min = 1,  max = 1  },
     { item = 'weapon_bat',       min = 1,  max = 1  }, -- WEAPON_BAT
-    { item = 'weapon_pistol_mk2',min = 1,  max = 1, rare = true }, -- WEAPON_PISTOL_MK2
+    { item = 'weapon_pistol_mk2',min = 1,  max = 1  }, -- WEAPON_PISTOL_MK2
     { item = 'ammo_pistol_mk2',  min = 10, max = 25 }, -- AMMO_PISTOL_MK2
     { item = 'weapon_knife',     min = 1,  max = 1  }, -- WEAPON_KNIFE
     { item = 'energetico',       min = 1,  max = 1  },
     { item = 'baseado',          min = 1,  max = 1  },
     { item = 'radio',            min = 1,  max = 1  },
-    { item = 'alianca',          min = 1,  max = 1, rare = true },
+    { item = 'alianca',          min = 1,  max = 1  },
     { item = 'mochila',          min = 1,  max = 1  },
 
-    { item = 'relogioroubado',       min = 1, max = 1, rare = true },
-    { item = 'colarroubado',         min = 1, max = 1, rare = true },
-    { item = 'anelroubado',          min = 1, max = 1, rare = true },
-    { item = 'brincoroubado',        min = 1, max = 1, rare = true },
-    { item = 'pulseiraroubada',      min = 1, max = 1, rare = true }
+    { item = 'relogioroubado',       min = 1,  max = 1  },
+    { item = 'colarroubado',          min = 1,  max = 1  },
+    { item = 'anelroubado',            min = 1,  max = 1  },
+    { item = 'brincoroubado',          min = 1,  max = 1  },
+    { item = 'pulseiraroubada',          min = 1,  max = 1  }
 }

@@ -114,9 +114,7 @@ end
 function play_drink(source, tipo, segundos)
     local prop = ""
     -- BEBIDAS
-    if Items[tipo] and Items[tipo].prop then
-        prop = Items[tipo].prop
-    elseif tipo == "energetico" then
+    if tipo == "energetico" then
         prop = "prop_energy_drink"
     elseif tipo == "water" then
         prop = "prop_ld_flow_bottle"
@@ -157,9 +155,7 @@ end
 function play_eat(source, tipo, segundos)
     local prop = ""
     -- COMIDAS
-    if Items[tipo] and Items[tipo].prop then
-        prop = Items[tipo].prop
-    elseif tipo == "pao" then
+    if tipo == "pao" then
         prop = "prop_food_burg2"
     elseif tipo == "sanduiche" then
         prop = "prop_cs_burger_01"
@@ -190,173 +186,6 @@ function play_eat(source, tipo, segundos)
 end
 
 Items = {
-    -- Comidas e bebidas do interior: valores equivalentes aos itens existentes.
-
-    ["pamonha"] = {
-        index = "pamonha",
-        name = "Pamonha",
-        png = "pamonha",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 24, thirst = 0 },
-        prop = "prop_food_cb_nugets",
-        func = Comer
-    },
-
-    ["curau"] = {
-        index = "curau",
-        name = "Curau",
-        png = "curau",
-        weight = 0.2,
-        type = "use",
-        needs = { hunger = 16, thirst = 0 },
-        prop = "prop_food_cb_nugets",
-        func = Comer
-    },
-
-    ["tapioca"] = {
-        index = "tapioca",
-        name = "Tapioca",
-        png = "tapioca",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 32, thirst = 0 },
-        prop = "prop_food_burg2",
-        func = Comer
-    },
-
-    ["cuscuz"] = {
-        index = "cuscuz",
-        name = "Cuscuz",
-        png = "cuscuz",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 32, thirst = 0 },
-        prop = "prop_food_cb_nugets",
-        func = Comer
-    },
-
-    ["bolodemilho"] = {
-        index = "bolodemilho",
-        name = "Bolo de Milho",
-        png = "bolodemilho",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 18, thirst = 0 },
-        prop = "prop_food_burg2",
-        func = Comer
-    },
-
-    ["galinhada"] = {
-        index = "galinhada",
-        name = "Galinhada",
-        png = "galinhada",
-        weight = 2.0,
-        type = "use",
-        needs = { hunger = 50, thirst = 0 },
-        prop = "prop_taco_01",
-        func = Comer
-    },
-
-    ["arrozcompequi"] = {
-        index = "arrozcompequi",
-        name = "Arroz com Pequi",
-        png = "arrozcompequi",
-        weight = 2.0,
-        type = "use",
-        needs = { hunger = 50, thirst = 0 },
-        prop = "prop_taco_01",
-        func = Comer
-    },
-
-    ["feijaotropeiro"] = {
-        index = "feijaotropeiro",
-        name = "Feijão Tropeiro",
-        png = "feijaotropeiro",
-        weight = 2.0,
-        type = "use",
-        needs = { hunger = 50, thirst = 0 },
-        prop = "prop_taco_01",
-        func = Comer
-    },
-
-    ["arrozcarreteiro"] = {
-        index = "arrozcarreteiro",
-        name = "Arroz Carreteiro",
-        png = "arrozcarreteiro",
-        weight = 2.0,
-        type = "use",
-        needs = { hunger = 50, thirst = 0 },
-        prop = "prop_taco_01",
-        func = Comer
-    },
-
-    ["docedeleite"] = {
-        index = "docedeleite",
-        name = "Doce de Leite",
-        png = "docedeleite",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 14, thirst = 0 },
-        prop = "prop_choc_meto",
-        func = Comer
-    },
-
-    ["goiabada"] = {
-        index = "goiabada",
-        name = "Goiabada",
-        png = "goiabada",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 14, thirst = 0 },
-        prop = "prop_choc_meto",
-        func = Comer
-    },
-
-    ["pacoca"] = {
-        index = "pacoca",
-        name = "Paçoca",
-        png = "pacoca",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 14, thirst = 0 },
-        prop = "prop_choc_meto",
-        func = Comer
-    },
-
-    ["pedemoleque"] = {
-        index = "pedemoleque",
-        name = "Pé de Moleque",
-        png = "pedemoleque",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 14, thirst = 0 },
-        prop = "prop_choc_meto",
-        func = Comer
-    },
-
-    ["caldodecana"] = {
-        index = "caldodecana",
-        name = "Caldo de Cana",
-        png = "caldodecana",
-        weight = 0.5,
-        type = "use",
-        needs = { hunger = 0, thirst = 36 },
-        prop = "ng_proc_sodacan_01b",
-        func = Beber
-    },
-
-    ["cafecoado"] = {
-        index = "cafecoado",
-        name = "Café Coado",
-        png = "cafecoado",
-        weight = 0.25,
-        type = "use",
-        needs = { hunger = 0, thirst = 20 },
-        prop = "prop_fib_coffee",
-        func = Beber
-    },
-
     ["weapon_hammer"] = {
         index = "weapon_hammer",
         name = "Hammer",
@@ -3694,27 +3523,10 @@ Items = {
         png = "emptybottle",
         weight = 0.2,
         type = "use",
+        -- O handler troca a garrafa somente depois de concluir a ação.
+        keep_item = true,
         func = function(user_id, source, item, slot, cb)
-            local status, style = Remote.checkFountain(source)
-            if status then
-                if vRP.tryGetInventoryItem(user_id, item, 1, true, slot) then
-                    if style == "fountain" then
-                        Remote._closeInventory(source)
-                        vRPc._playAnim(source, false,
-                            { { "amb@prop_human_parking_meter@female@idle_a", "idle_a_female" } },
-                            true)
-                    elseif style == "floor" then
-                        Remote._closeInventory(source)
-                        vRPc._playAnim(source, false, { { "amb@world_human_bum_wash@male@high@base", "base" } }, true)
-                    end
-
-                    TriggerClientEvent("progress", source, 10)
-                    exports["vrp"]:setBlockCommand(user_id, 10)
-                    Wait(10000)
-                    vRP.giveInventoryItem(user_id, "water", 1, true)
-                    vRPc._stopAnim(source, false)
-                end
-            end
+            return cb(FillWaterBottle(source, user_id, slot))
         end
 
     },

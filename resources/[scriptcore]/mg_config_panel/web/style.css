@@ -1300,3 +1300,94 @@ table tbody td:nth-child(5) span{
 .mansion-owner-card span{display:block;color:#8fa0ad;font-size:9px;margin-top:4px}
 .mansion-resource-pill{display:inline-flex;margin:2px 3px 2px 0}
 .mansion-main-values{align-items:end}
+
+
+/* ==========================================================================
+   ELEVADORES
+   ========================================================================== */
+.elevator-floors{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:10px;
+}
+.elevator-floor-row.spawnrow{
+    grid-template-columns:minmax(100px,.9fr) minmax(0,1.6fr) 86px 34px 34px!important;
+    align-items:center;
+    padding:8px;
+    border:1px solid #2b2c2e!important;
+    border-radius:10px;
+}
+.elevator-floor-row.coord-combined-spawn{
+    grid-template-columns:minmax(100px,.9fr) minmax(0,1.6fr) 86px 34px 34px!important;
+}
+.elevator-floor-row .floor-name,
+.elevator-floor-row .sw{
+    width:100%;
+    min-width:0;
+    border:1px solid var(--line)!important;
+    background:#101214!important;
+    color:#eef1f4!important;
+    border-radius:8px!important;
+    padding:10px 11px!important;
+    font-size:10px!important;
+    outline:none!important;
+}
+.elevator-floor-row .floor-capture{
+    width:34px;
+    height:34px;
+}
+@media(max-width:1050px){
+    .elevator-floor-row.spawnrow,
+    .elevator-floor-row.coord-combined-spawn{
+        grid-template-columns:minmax(90px,.9fr) minmax(0,1.5fr) 72px 34px 34px!important;
+    }
+}
+
+
+/* Craft/Farm: copiar/colar + editor de tipos de rota */
+.craft-copybar{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(124,92,255,.18);background:linear-gradient(145deg,rgba(124,92,255,.08),rgba(255,255,255,.02));padding:12px 13px;border-radius:11px;margin-bottom:10px}
+.craft-copybar>div:first-child{display:flex;flex-direction:column;gap:4px;min-width:0}.craft-copybar b{font-size:10px;color:#dbe1ec}.craft-copybar span{font-size:9px;color:#788397}.craft-copybar .btn:disabled{opacity:.38;cursor:not-allowed;filter:none;transform:none}
+.farm-route-type-list{display:flex;flex-direction:column;gap:8px}.farm-route-type-card{border:1px solid var(--line);background:#0d131d;border-radius:11px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px}.farm-route-type-card>div:first-child{display:flex;flex-direction:column;gap:4px;min-width:0}.farm-route-type-card b{font-size:11px;color:#eef2f8}.farm-route-type-card span{font-size:9px;color:#6f7a8d;line-height:1.4}
+.farm-route-region{margin-top:8px}.farm-route-point-head,.farm-route-point{display:grid;grid-template-columns:1fr 1fr 1fr 86px 36px 34px;gap:7px;align-items:center}.farm-route-point-head{padding:0 2px 6px;color:#606b7d;font-size:8px;text-transform:uppercase;letter-spacing:.6px}.farm-route-point{margin-bottom:7px}.farm-route-point input{min-width:0;border:1px solid var(--line);background:#0b1018;color:#fff;border-radius:8px;padding:9px;font-size:10px}.farm-route-na{height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;color:#4d586b;background:#0b1018}.farm-route-point .fr-tp{color:#b8a9ff;border-color:rgba(124,92,255,.28);background:rgba(124,92,255,.08)}
+@media(max-width:1050px){.craft-copybar{align-items:flex-start;flex-direction:column}.farm-route-type-card{align-items:flex-start;flex-direction:column}.farm-route-point-head,.farm-route-point{grid-template-columns:1fr 1fr 1fr 72px 34px 32px}}
+
+/* Entregador - editor dedicado de itens/coletas/entregas */
+.job-delivery-editor{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.job-delivery-items-head,.job-delivery-points-head{display:grid;gap:8px;align-items:center;color:var(--muted);font-size:11px;padding:0 6px;text-transform:uppercase;letter-spacing:.06em}
+.job-delivery-items-head{grid-template-columns:28px minmax(120px,1.2fr) 70px 70px minmax(170px,1.5fr) 36px}
+.job-delivery-points-head{grid-template-columns:28px 1fr 1fr 1fr 92px 36px}
+.job-delivery-item-row,.job-delivery-point-row{display:grid;gap:8px;align-items:end;padding:10px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:rgba(255,255,255,.025);margin-bottom:8px}
+.job-delivery-item-row{grid-template-columns:28px minmax(120px,1.2fr) 70px 70px minmax(170px,1.5fr) 36px}
+.job-delivery-point-row{grid-template-columns:28px 1fr 1fr 1fr 92px 36px}
+.job-delivery-row-index{align-self:center;text-align:center;color:var(--muted);font-weight:700}
+.field.compact{gap:5px}.field.compact span{font-size:10px}.field.compact input{min-width:0}
+.job-delivery-point-row>input{width:100%;min-width:0}
+@media(max-width:900px){
+  .job-delivery-items-head,.job-delivery-points-head{display:none}
+  .job-delivery-item-row,.job-delivery-point-row{grid-template-columns:1fr 1fr}
+  .job-delivery-row-index{grid-column:1/-1;text-align:left}
+}
+
+/* Edicao de vagas existentes: o botao de captura substitui a coordenada da vaga. */
+.spawnrow.garage-spawnrow.coord-combined-spawn{
+    grid-template-columns:minmax(0,2fr) minmax(70px,1fr) 34px 34px!important;
+}
+.garage-spawnrow .capture-existing-spawn{
+    border:1px solid var(--line);
+    background:#202a37;
+    color:#96caff;
+    border-radius:8px;
+    font-size:16px;
+    min-width:34px;
+    cursor:pointer;
+}
+.garage-spawnrow .capture-existing-spawn:hover{
+    color:#fff;
+    background:#2b4059;
+}
+@media(max-width:1050px){
+    .spawnrow.garage-spawnrow.coord-combined-spawn{
+        grid-template-columns:minmax(0,1fr) 70px 32px 32px!important;
+    }
+}

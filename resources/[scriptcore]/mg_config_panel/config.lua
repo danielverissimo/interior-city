@@ -1,15 +1,9 @@
 Config = {}
 
 Config.Command = 'painelconfig'
-Config.RequirePermission = true
--- Somente estes cargos exatos podem abrir/usar o painel.
--- A verificacao e feita novamente no servidor em todas as operacoes da NUI.
-Config.AllowedGroups = { 'developer', 'dono' }
-
--- Mantidos apenas por compatibilidade com configuracoes antigas; nao concedem acesso
--- enquanto AllowedGroups estiver configurado.
-Config.Permissions = {}
-Config.AcePermission = ''
+Config.RequirePermission = false
+Config.Permissions = { 'perm.admin', 'admin.permissao' }
+Config.AcePermission = 'mgconfig.admin'
 
 Config.InventoryResource = 'inventory'
 Config.GarageResource = 'm_garage'
@@ -39,15 +33,15 @@ Config.EmpregosResource = 'm_empregos'
 
 Config.RoubosResource = 'm_roubos'
 
-Config.BancoCentralResource = 'm_banco_central'
+Config.BancoCentralResource = 'm_roubos'
 
-Config.JoalheriaResource = 'm_joalheria'
+Config.JoalheriaResource = 'm_roubos'
 
-Config.RoubocofreResource = 'm_roubocofre'
+Config.RoubocofreResource = 'm_roubos'
 
 Config.ResidencesResource = 'residences'
 
-Config.DealershipResource = 'm_dealership'
+Config.DealershipResource = 'concessionaria'
 
 Config.MansionsResource = 'm_mansions'
 Config.DoorsResource = 'doorsv2'

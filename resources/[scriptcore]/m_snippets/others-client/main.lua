@@ -144,57 +144,175 @@ end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- SISTEMA DE ELEVADOR
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Citizen.CreateThread(function()
-	while true do
-		local time = 1000
-		local ped = PlayerPedId()
-		local playercoords = GetEntityCoords(ped)
-		
-		for k,v in pairs(config.locationElevador) do
-			local distance = #(playercoords - v.coords)
-			if distance <= 2.0 then
-				time = 5
+-----------------------------------------------------------------------------------------------------------------------------------------
+local elevatorRuntime = {}
 
-				if v.rec == true then
-					DrawText3Ds(v.coords[1],v.coords[2],v.coords[3], "APERTE O [E] PARA SER ~r~RECRUTADO")
-					DrawMarker(20,v.coords[1],v.coords[2],v.coords[3]-0.7,0,0,0,0,0,130.0,0.4,0.1,0.5, 12,198,254,180 ,1,0,0,1)
-				else
-					DrawMarker(20,v.coords[1],v.coords[2],v.coords[3]-0.7,0,0,0,0,0,130.0,0.4,0.1,0.5, 12,198,254,180 ,1,0,0,1)
-				end
+local function rebuildElevators(list)
+    config.elevador = {}
+    config.locationElevador = {}
+    elevatorRuntime = {}
 
-				if IsControlJustReleased(1, 51) then
-					if config.elevador[v.type] ~= nil then
-						openElevador(v.type, v.andar, config.elevador[v.type].andares, v.perm)
-					end
-				end
-			end
-		end
+    for _,elevator in ipairs(type(list) == "table" and list or {}) do
+        local id = tostring(elevator.id or "")
 
-		Citizen.Wait(time)
-	end
+        if id ~= "" then
+            local runtime = {
+                id = id,
+                name = tostring(elevator.name or id),
+                permission = tostring(elevator.permission or ""),
+                drawDistance = tonumber(elevator.drawDistance) or (config.elevadorDefaults and config.elevadorDefaults.drawDistance) or 12.0,
+                interactionDistance = tonumber(elevator.interactionDistance) or (config.elevadorDefaults and config.elevadorDefaults.interactionDistance) or 2.0,
+                andares = {},
+                floors = {}
+            }
+
+            for _,floor in ipairs(type(elevator.floors) == "table" and elevator.floors or {}) do
+                local name = tostring(floor.name or "")
+                local c = floor.coords or {}
+                local x = tonumber(c.x or c[1])
+                local y = tonumber(c.y or c[2])
+                local z = tonumber(c.z or c[3])
+                local w = tonumber(c.w or c[4]) or 0.0
+
+                if name ~= "" and x and y and z then
+                    runtime.andares[name] = { x, y, z, w }
+                    runtime.floors[#runtime.floors + 1] = {
+                        name = name,
+                        coords = { x = x, y = y, z = z, w = w }
+                    }
+
+                    config.locationElevador[#config.locationElevador + 1] = {
+                        type = id,
+                        coords = vec3(x, y, z),
+                        andar = name,
+                        perm = runtime.permission,
+                        drawDistance = runtime.drawDistance,
+                        interactionDistance = runtime.interactionDistance
+                    }
+                end
+            end
+
+            config.elevador[id] = runtime
+            elevatorRuntime[id] = runtime
+        end
+    end
+end
+
+RegisterNetEvent("m_snippets:syncElevators", function(list)
+    rebuildElevators(list)
 end)
 
-function openElevador(tipo, andar, elevador, perm)
-	if perm and not vSERVER.checkPermission(perm) then return end 
+CreateThread(function()
+    Wait(800)
+    TriggerServerEvent("m_snippets:requestElevators")
+end)
 
-	SetNuiFocus(true,true)
-	SendNUIMessage({ showmenu = true, tipo = tipo, andar = andar, elevador = elevador })
+Citizen.CreateThread(function()
+    while true do
+        local wait = 1000
+        local ped = PlayerPedId()
+        local playerCoords = GetEntityCoords(ped)
+        local defaults = config.elevadorDefaults or {}
+        local marker = defaults.marker or {}
+        local markerColor = marker.color or { 236,72,153,190 }
+        local markerScale = marker.scale or { 0.40,0.10,0.50 }
+
+        for _,point in ipairs(config.locationElevador or {}) do
+            local distance = #(playerCoords - point.coords)
+            local drawDistance = tonumber(point.drawDistance) or tonumber(defaults.drawDistance) or 12.0
+            local interactionDistance = tonumber(point.interactionDistance) or tonumber(defaults.interactionDistance) or 2.0
+
+            if distance <= drawDistance then
+                wait = 0
+
+                DrawMarker(
+                    tonumber(marker.type) or 20,
+                    point.coords.x, point.coords.y, point.coords.z + (tonumber(marker.zOffset) or -0.70),
+                    0.0,0.0,0.0, 0.0,0.0,130.0,
+                    tonumber(markerScale[1]) or 0.40,
+                    tonumber(markerScale[2]) or 0.10,
+                    tonumber(markerScale[3]) or 0.50,
+                    tonumber(markerColor[1]) or 236,
+                    tonumber(markerColor[2]) or 72,
+                    tonumber(markerColor[3]) or 153,
+                    tonumber(markerColor[4]) or 190,
+                    false,false,2,false,nil,nil,false
+                )
+
+                if distance <= interactionDistance then
+                    DrawText3Ds(
+                        point.coords.x,
+                        point.coords.y,
+                        point.coords.z + 0.20,
+                        "~w~PRESSIONE ~p~[E]~w~ PARA USAR O ELEVADOR"
+                    )
+
+                    if IsControlJustReleased(0, 38) and segundos <= 0 then
+                        local elevator = elevatorRuntime[point.type]
+
+                        if elevator then
+                            if point.perm and point.perm ~= "" and not vSERVER.checkPermission(point.perm) then
+                                TriggerEvent("Notify","negado","Você não possui permissão para utilizar este elevador.",5000)
+                            else
+                                openElevador(point.type, point.andar, elevator.floors, point.perm)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        Citizen.Wait(wait)
+    end
+end)
+
+function openElevador(tipo, andar, floors, perm)
+    if perm and perm ~= "" and not vSERVER.checkPermission(perm) then
+        TriggerEvent("Notify","negado","Você não possui permissão para utilizar este elevador.",5000)
+        return
+    end
+
+    SetNuiFocus(true,true)
+    SendNUIMessage({
+        showmenu = true,
+        tipo = tipo,
+        andar = andar,
+        elevador = floors or {}
+    })
 end
 
 function updateElevador(tipo, andar)
-	local ped = PlayerPedId()
-	DoScreenFadeOut(1000)
+    local elevator = elevatorRuntime[tostring(tipo or "")]
+    local destination = elevator and elevator.andares and elevator.andares[tostring(andar or "")]
 
-	Wait(1000)
-	SetEntityCoordsNoOffset(ped,config.elevador[tipo].andares[andar][1],config.elevador[tipo].andares[andar][2],config.elevador[tipo].andares[andar][3], true,true,true)
+    if not destination then
+        TriggerEvent("Notify","negado","Andar do elevador não encontrado.",5000)
+        return
+    end
 
-	Wait(1000)
-	SetNuiFocus(false)
-	SendNUIMessage({ hidemenu = true })
+    local ped = PlayerPedId()
 
-	Wait(1000)
-	DoScreenFadeIn(1000)
+    DoScreenFadeOut(500)
+    while not IsScreenFadedOut() do Wait(0) end
+
+    SetNuiFocus(false,false)
+    SendNUIMessage({ hidemenu = true })
+
+    RequestCollisionAtCoord(destination[1],destination[2],destination[3])
+    SetEntityCoordsNoOffset(ped,destination[1],destination[2],destination[3],false,false,false)
+
+    if destination[4] then
+        SetEntityHeading(ped,tonumber(destination[4]) or GetEntityHeading(ped))
+    end
+
+    local timeout = GetGameTimer() + 2500
+    while not HasCollisionLoadedAroundEntity(ped) and GetGameTimer() < timeout do
+        RequestCollisionAtCoord(destination[1],destination[2],destination[3])
+        Wait(50)
+    end
+
+    Wait(250)
+    DoScreenFadeIn(500)
 end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

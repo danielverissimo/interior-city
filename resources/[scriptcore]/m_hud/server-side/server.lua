@@ -13,7 +13,7 @@ vCLIENT = Tunnel.getInterface("hud")
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CLIMA / HORÁRIO
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Controle migrado para IC Admin (v2.21+).
+-- Controle migrado para m_paineladm_v2 (v2.21+).
 -- Esta HUD não altera mais clima nem horário para evitar conflito entre resources.
 -- GlobalState.time continua sendo fornecido pelo painel para compatibilidade visual da HUD.
 
@@ -362,8 +362,8 @@ RegisterCommand('recdiv', function(source, args)
         processRecruitmentQueue()
     end
 
-    vRP.sendLog(GetConvar("ic_secret_m_hud_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
-    vRP.sendLog(GetConvar("ic_secret_m_hud_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
+    vRP.sendLog('https://discord.com/api/webhooks/1340976315376996423/cU_FWJhIhojo0VXJGltxXghkwe9BoWRwTxzhY6itC7etXrjO7U-dV5vuw198vy2ayQE_', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
+    vRP.sendLog('https://discord.com/api/webhooks/1330956032477757632/oflA6eksNyM7Dezqp7jNu8nB4KtxXWtMg-AlLYYcPy42iqPzq91OLch8TnrjBanDAwgo', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
 end)
 
 function processRecruitmentQueue()

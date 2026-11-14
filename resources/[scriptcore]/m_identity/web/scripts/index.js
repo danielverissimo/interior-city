@@ -21,7 +21,9 @@ window.addEventListener('message', ({ data }) => {
   if (data.action === 'close') {
     document.body.style.display = 'none'
   } else if (data.action === 'open') {
-    document.querySelector('#icon').src = data.image || './assets/logo.png'
+    document.querySelectorAll('#icon').forEach((image) => {
+      image.src = './assets/logo.png'
+    })
     document.querySelector('#name').innerHTML = data.name
     document.querySelector('#id').innerText = `ID ${data.id}`
     document.querySelector('#age').innerText = data.birth

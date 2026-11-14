@@ -1,4 +1,5 @@
 DominationConfig = {
+    enabled = false, -- Dominações desativadas na cidade.
     saveDB = true,   -- Salvar no banco de dados
     delayDeath = 40, -- COOLDOWN DE DELAY D EMORTES
 

@@ -947,7 +947,7 @@ ServerConfig.LogCatalog = {
     {
         id = "concessionaria",
         label = "CONCESSIONÁRIA",
-        description = "Auditoria completa de compras, entregas, revendas, test-drives, estoque, configurações e tentativas sensíveis da m_dealership.",
+        description = "Auditoria completa de compras, entregas, revendas, test-drives, estoque, configurações e tentativas sensíveis da concessionaria.",
         subcategories = {
             {
                 id = "compras_entregas", label = "Compras e Entregas",

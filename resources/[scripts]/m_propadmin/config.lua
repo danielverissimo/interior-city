@@ -1,0 +1,9 @@
+Config = {}
+Config.Command = 'propadmin'
+Config.AcePermission = 'interior.propadmin'
+Config.MaxProps = 1500
+Config.MaxDistance = 25.0
+Config.StreamDistance = 140.0
+Config.RefreshMs = 2500
+Config.CatalogPageSize = 120
+Config.MaxModelLength = 90

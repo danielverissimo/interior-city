@@ -1,5 +1,6 @@
 -- shared_script '@likizao_ac/client/library.lua'
 
+-- Arquivo ausente (auditoria): shared_script "@vrp/lib/lib.lua" --Para remover esta pendencia de todos scripts, execute no console o comando "uninstall"
 
 fx_version 'adamant'
 game 'gta5'
@@ -15,4 +16,4 @@ ui_page 'web/index.html'
 files {
 	'web/index.html',
 	'web/**/*',
-}
+}              

@@ -1,5 +1,5 @@
 -- ============================================================================
--- dm_spawn - integração de spawn com m_mansions + IC Admin
+-- dm_spawn - integração de spawn com m_mansions + m_paineladm_v2
 --
 -- A integração é intencionalmente somente-leitura: o spawn consulta os JSONs
 -- persistidos pelos dois resources. Assim não precisamos alterar nem acoplar
@@ -87,16 +87,10 @@ local function ignoredFactionCategory(category)
 end
 
 local function getPanelLocations()
-    local provider = GetConvar("ic_admin_service_resource", "ic_admin")
-    local data
-    if GetResourceState(provider) == "started" then
-        local ok, locations = pcall(function() return exports[provider]:getLocations() end)
-        if ok and type(locations) == "table" then data = locations end
-    end
-    if not data and provider ~= "ic_admin" then
-        -- Compatibilidade apenas durante a coexistência, selecionada pelo operador.
-        data = readJsonResource(provider, Config.AdminPanelLocationsFile or "locations.json")
-    end
+    local data = readJsonResource(
+        Config.AdminPanelResource or "m_paineladm_v2",
+        Config.AdminPanelLocationsFile or "locations.json"
+    )
 
     if type(data) ~= "table" then return {} end
 
@@ -246,14 +240,10 @@ local function mansionBelongsToUser(mansion, userId)
 end
 
 local function resolveHomeSpawn(userId)
-    local provider=GetConvar('ic_mansions_resource',Config.MansionsResource or 'm_mansions')
-    local data
-    if provider=='ic_mansions' then
-        if GetResourceState(provider)~='started' then return nil end
-        local ok,rows=pcall(function()return exports[provider]:getUserMansions(userId)end)
-        if not ok or type(rows)~='table' then return nil end
-        data={mansions=rows}
-    else data=readJsonResource(provider,Config.MansionsDataFile or 'mansions.json') end
+    local data = readJsonResource(
+        Config.MansionsResource or "m_mansions",
+        Config.MansionsDataFile or "mansions.json"
+    )
     if not data then return nil end
 
     local mansions = data.mansions or data

@@ -88,8 +88,8 @@ Config.Drugs = {
         image = "cocaina",
         minQuantity = 1,
         maxQuantity = 3,
-        minPricePerUnit = 2500,
-        maxPricePerUnit = 2500,
+        minPricePerUnit = 1500,
+        maxPricePerUnit = 1500,
         refusalChance = 25
     },
 
@@ -100,8 +100,8 @@ Config.Drugs = {
         image = "metanfetamina",
         minQuantity = 1,
         maxQuantity = 3,
-        minPricePerUnit = 1000,
-        maxPricePerUnit = 1000,
+        minPricePerUnit = 1500,
+        maxPricePerUnit = 1500,
         refusalChance = 25
     },
 
@@ -112,8 +112,8 @@ Config.Drugs = {
         image = "malote-maconha",
         minQuantity = 1,
         maxQuantity = 3,
-        minPricePerUnit = 2500,
-        maxPricePerUnit = 2500,
+        minPricePerUnit = 1500,
+        maxPricePerUnit = 1500,
         refusalChance = 25
     }
 }

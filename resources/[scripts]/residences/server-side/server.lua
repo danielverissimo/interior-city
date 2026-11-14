@@ -19,7 +19,7 @@ local homesInterior = {}
 local homes = {}
 local chestOpen = {}
 ----------------------------
-local webhookbaucasas = GetConvar("ic_secret_residences_webhook", GetConvar("interior_city_webhook_logs", ""))
+local webhookbaucasas = "https://discord.com/api/webhooks/1101555813962756296/ZSOjXO_ue2qlQ0lN6Gm96Zt5oj5sZ9SEdvsVIOTflO69sbcdVVt7FIm_JFi04Nqghsg7"
 
 function SendWebhookMessage(webhook,message)
 	if webhook ~= nil and webhook ~= "" then
@@ -44,8 +44,9 @@ end)
 AddEventHandler("residences:panelConfigUpdated",function(updatedHomes,updatedInteriors,updatedTypes,settings)
     homes = updatedHomes or {}
     newInterior = updatedInteriors or {}
-    -- Keep the private Docker/convar destination independent of shared panel JSON.
-    webhookbaucasas = GetConvar("ic_secret_residences_webhook", GetConvar("interior_city_webhook_logs", ""))
+    if settings and settings.vaultWebhook then
+        webhookbaucasas = tostring(settings.vaultWebhook)
+    end
     vCLIENT.updateHomes(-1,homes)
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------

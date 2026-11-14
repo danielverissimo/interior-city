@@ -112,24 +112,3 @@
 		</Item>
 	</txdRelationships>
 </CVehicleModelInfo__InitDataList>
-
-
-
-
-
-
-
-
-
-  </InitDatas>
-  <txdRelationships>
-    <Item>
-      <parent>vehicles_dom_interior</parent>
-      <child>mcvors</child>
-    </Item>
-
-
-
-	
-  </txdRelationships>
-</CVehicleModelInfo__InitDataList>

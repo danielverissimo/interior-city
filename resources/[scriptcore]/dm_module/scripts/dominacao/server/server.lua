@@ -1,6 +1,22 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- QUERYS
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+if DominationConfig.enabled == false then
+    GlobalState.isDominationActive = false
+    GlobalState.Dominations = false
+    GlobalState.dominationOwner = false
+    GlobalState.dominationsStatus = {}
+    exports('GetUserDomination', function() return nil end)
+    -- Preserve the organization lookup used by other resources.
+    exports('GetGroupType', function(userId)
+        local groups = module('cfg/groups').groups
+        local group = groups[vRP.getUserGroupByType(userId, 'org')]
+        local config = group and group._config
+        return config and config.orgType or false, config and config.orgName or false
+    end)
+    return
+end
+
 vRP.prepare("dm_ranks/UpdateRank", "INSERT IGNORE INTO dm_ranks(org, orgType, wins) VALUES(@org, @orgType, @wins) ON DUPLICATE KEY UPDATE wins = wins + @wins")
 vRP.prepare("dm_ranks/TopRanks", "SELECT * FROM dm_ranks ORDER BY wins DESC")
 vRP.prepare("dm_ranks/SelectRanks", "SELECT * FROM dm_ranks WHERE orgType = @orgType ORDER BY wins DESC")

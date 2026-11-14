@@ -9,6 +9,222 @@ Tunnel.bindInterface("m_snippets",src)
 Proxy.addInterface("m_snippets",src)
 
 vCLIENT = Tunnel.getInterface("m_snippets")
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- ELEVADORES DINÂMICOS
+-----------------------------------------------------------------------------------------------------------------------------------------
+local ELEVATORS_FILE = "config/elevators.json"
+local ElevatorConfig = { elevators = {} }
+
+local function elevTrim(value)
+    return tostring(value or ""):gsub("^%s+",""):gsub("%s+$","")
+end
+
+local function elevClone(value)
+    if type(value) ~= "table" then return value end
+    local out = {}
+    for k,v in pairs(value) do out[k] = elevClone(v) end
+    return out
+end
+
+local function elevCoords(value)
+    if type(value) ~= "table" then return nil end
+    local x = tonumber(value.x or value[1])
+    local y = tonumber(value.y or value[2])
+    local z = tonumber(value.z or value[3])
+    local w = tonumber(value.w or value[4]) or 0.0
+    if not x or not y or not z then return nil end
+    return { x = x, y = y, z = z, w = w }
+end
+
+local function normalizeElevator(data, keepId)
+    if type(data) ~= "table" then
+        return nil, "Dados do elevador inválidos."
+    end
+
+    local id = elevTrim(keepId or data.id)
+    local name = elevTrim(data.name)
+    local permission = elevTrim(data.permission)
+    local drawDistance = tonumber(data.drawDistance) or 12.0
+    local interactionDistance = tonumber(data.interactionDistance) or 2.0
+
+    if id == "" then
+        return nil, "Informe o identificador do elevador."
+    end
+    if name == "" then
+        return nil, "Informe o nome do elevador."
+    end
+    if drawDistance < 2.0 then drawDistance = 2.0 end
+    if drawDistance > 50.0 then drawDistance = 50.0 end
+    if interactionDistance < 0.5 then interactionDistance = 0.5 end
+    if interactionDistance > 5.0 then interactionDistance = 5.0 end
+
+    local floors = {}
+    local names = {}
+
+    for _,floor in ipairs(type(data.floors) == "table" and data.floors or {}) do
+        local floorName = elevTrim(floor.name)
+        local coords = elevCoords(floor.coords)
+
+        if floorName == "" then
+            return nil, "Todos os andares precisam de um nome."
+        end
+        if names[floorName:lower()] then
+            return nil, "Existem andares com o mesmo nome."
+        end
+        if not coords then
+            return nil, ("Coordenadas inválidas no andar %s."):format(floorName)
+        end
+
+        names[floorName:lower()] = true
+        floors[#floors + 1] = { name = floorName, coords = coords }
+    end
+
+    if #floors < 2 then
+        return nil, "Cadastre pelo menos dois andares."
+    end
+
+    return {
+        id = id,
+        name = name,
+        permission = permission,
+        drawDistance = drawDistance,
+        interactionDistance = interactionDistance,
+        floors = floors
+    }
+end
+
+local function loadElevators()
+    local raw = LoadResourceFile(GetCurrentResourceName(), ELEVATORS_FILE)
+    local ok, data = pcall(json.decode, raw or "{}")
+
+    ElevatorConfig = ok and type(data) == "table" and data or { elevators = {} }
+    if type(ElevatorConfig.elevators) ~= "table" then ElevatorConfig.elevators = {} end
+
+    local clean = {}
+    for _,entry in ipairs(ElevatorConfig.elevators) do
+        local item = normalizeElevator(entry, entry.id)
+        if item then clean[#clean + 1] = item end
+    end
+    ElevatorConfig.elevators = clean
+end
+
+local function findElevator(id)
+    id = tostring(id or "")
+    for index,item in ipairs(ElevatorConfig.elevators) do
+        if tostring(item.id) == id then return index,item end
+    end
+end
+
+local function syncElevators(target)
+    TriggerClientEvent("m_snippets:syncElevators", target, ElevatorConfig.elevators)
+end
+
+local function saveElevators()
+    local encoded = json.encode(ElevatorConfig)
+    SaveResourceFile(GetCurrentResourceName(), ELEVATORS_FILE, encoded, -1)
+
+    local verifyRaw = LoadResourceFile(GetCurrentResourceName(), ELEVATORS_FILE)
+    local ok, verify = pcall(json.decode, verifyRaw or "")
+
+    if not ok or type(verify) ~= "table" or type(verify.elevators) ~= "table" then
+        return false, "Não foi possível salvar config/elevators.json."
+    end
+
+    syncElevators(-1)
+    return true
+end
+
+loadElevators()
+
+RegisterNetEvent("m_snippets:requestElevators", function()
+    syncElevators(source)
+end)
+
+AddEventHandler("vRP:playerSpawn", function(userId, playerSource)
+    if playerSource then syncElevators(playerSource) end
+end)
+
+function src.checkPermission(permission)
+    permission = elevTrim(permission)
+    if permission == "" then return true end
+
+    local playerSource = source
+    local userId = vRP.getUserId and vRP.getUserId(playerSource) or (vRP.Passport and vRP.Passport(playerSource))
+    if not userId then return false end
+
+    if vRP.hasPermission and vRP.hasPermission(userId, permission) then return true end
+    if vRP.HasPermission and vRP.HasPermission(userId, permission) then return true end
+    if vRP.hasGroup and vRP.hasGroup(userId, permission) then return true end
+    if vRP.HasGroup and vRP.HasGroup(userId, permission) then return true end
+
+    return false
+end
+
+exports("getElevators", function()
+    return elevClone(ElevatorConfig.elevators)
+end)
+
+exports("upsertElevator", function(originalId, data)
+    originalId = elevTrim(originalId)
+    data = type(data) == "table" and data or {}
+
+    local desiredId = elevTrim(data.id)
+    if desiredId == "" then desiredId = originalId end
+
+    local item, err = normalizeElevator(data, desiredId)
+    if not item then return false, err end
+
+    local existingIndex = originalId ~= "" and findElevator(originalId) or nil
+    local collisionIndex = findElevator(item.id)
+
+    if collisionIndex and collisionIndex ~= existingIndex then
+        return false, "Já existe um elevador com este identificador."
+    end
+
+    local old
+    if existingIndex then
+        old = ElevatorConfig.elevators[existingIndex]
+        ElevatorConfig.elevators[existingIndex] = item
+    else
+        ElevatorConfig.elevators[#ElevatorConfig.elevators + 1] = item
+    end
+
+    local ok, msg = saveElevators()
+    if not ok then
+        if existingIndex then
+            ElevatorConfig.elevators[existingIndex] = old
+        else
+            table.remove(ElevatorConfig.elevators, #ElevatorConfig.elevators)
+        end
+        return false, msg
+    end
+
+    return true, existingIndex and "Elevador atualizado com sucesso." or "Elevador criado com sucesso."
+end)
+
+exports("removeElevator", function(id)
+    local index = findElevator(id)
+    if not index then return false, "Elevador não encontrado." end
+
+    local old = table.remove(ElevatorConfig.elevators, index)
+    local ok, msg = saveElevators()
+
+    if not ok then
+        table.insert(ElevatorConfig.elevators, index, old)
+        return false, msg
+    end
+
+    return true, "Elevador removido."
+end)
+
+exports("reloadElevators", function()
+    loadElevators()
+    syncElevators(-1)
+    return true
+end)
+
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local trancas = {}
 

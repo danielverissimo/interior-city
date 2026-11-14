@@ -57,6 +57,8 @@ local VIP = {
     packagesStore = { packages = {} },
     assignmentsStore = { nextId = 1, active = {} },
     tests = {},
+    choiceLocks = {},
+    lastAssignments = {},
     durationSeconds = 30 * 24 * 60 * 60,
     testCenter = { x = -1291.34, y = -2980.99, z = 13.93, h = 330.0 },
     testRadius = 150.0,
@@ -257,7 +259,9 @@ local function normalizeVehicleCatalogEntry(entry)
     if #spawn > 80 then spawn = spawn:sub(1, 80) end
     if name == "" then name = spawn end
     if #name > 80 then name = name:sub(1, 80) end
-    return { spawn = spawn, name = name }
+    local image = tostring(entry.image or "")
+    if not image:match("^imgs/vehicles/[%w_%.%-]+%.png$") then image = nil end
+    return { spawn = spawn, name = name, image = image }
 end
 
 local function seedGameVehicles()
@@ -312,6 +316,7 @@ local function publicVehicles()
                 index = index,
                 spawn = vehicle.spawn,
                 name = vehicle.name or vehicle.spawn,
+                image = vehicle.image,
                 category = category
             }
         end
@@ -341,6 +346,16 @@ function VIP.loadStores()
     local ok, decoded = pcall(json.decode, raw or "{}")
     if ok and type(decoded) == "table" then VIP.packagesStore = decoded end
     if type(VIP.packagesStore.packages) ~= "table" then VIP.packagesStore.packages = {} end
+    if type(VIP.packagesStore.aliases) ~= "table" then VIP.packagesStore.aliases = {} end
+    -- Compatibilidade com pacotes antigos salvos por nome do cargo diretamente
+    -- na raiz do JSON (antes da introdução de packages = {}).
+    if next(VIP.packagesStore.packages) == nil then
+        for key,value in pairs(VIP.packagesStore) do
+            if key ~= "packages" and type(value) == "table" and (value.items or value.vehicles or value.vehicleChoices) then
+                VIP.packagesStore.packages[key] = value
+            end
+        end
+    end
 
     local rawAssignments = LoadResourceFile(GetCurrentResourceName(), VIP.assignmentsFile)
     local okAssignments, decodedAssignments = pcall(json.decode, rawAssignments or "{}")
@@ -363,6 +378,11 @@ function VIP.loadStores()
                 local assignmentId = math.max(1, math.floor(tonumber(value.id) or VIP.assignmentsStore.nextId))
                 value.id = assignmentId
                 value.userId = userId
+                local renamedTo = VIP.packagesStore.aliases[tostring(value.group or "")]
+                if renamedTo and renamedTo ~= value.group then value.group = renamedTo end
+                value.vehicles = VIP.normalizeVehicles(value.vehicles)
+                value.selectedVehicles = type(value.selectedVehicles) == "table" and value.selectedVehicles or {}
+                value.remainingChoices = math.max(0, tonumber(value.remainingChoices) or (tonumber(value.totalChoices) or 0) - #value.selectedVehicles)
                 normalizedActive[tostring(userId)] = normalizedActive[tostring(userId)] or {}
                 normalizedActive[tostring(userId)][tostring(assignmentId)] = value
                 highestId = math.max(highestId, assignmentId)
@@ -375,6 +395,11 @@ function VIP.loadStores()
                     local assignmentId = math.max(1, math.floor(tonumber(record.id) or tonumber(assignmentKey) or VIP.assignmentsStore.nextId))
                     record.id = assignmentId
                     record.userId = userId
+                    local renamedTo = VIP.packagesStore.aliases[tostring(record.group or "")]
+                    if renamedTo and renamedTo ~= record.group then record.group = renamedTo migrated = true end
+                    record.vehicles = VIP.normalizeVehicles(record.vehicles)
+                    record.selectedVehicles = type(record.selectedVehicles) == "table" and record.selectedVehicles or {}
+                    record.remainingChoices = math.max(0, tonumber(record.remainingChoices) or (tonumber(record.totalChoices) or 0) - #record.selectedVehicles)
                     normalizedActive[tostring(userId)][tostring(assignmentId)] = record
                     highestId = math.max(highestId, assignmentId)
                 end
@@ -384,8 +409,12 @@ function VIP.loadStores()
 
     VIP.assignmentsStore.active = normalizedActive
     VIP.assignmentsStore.nextId = math.max(VIP.assignmentsStore.nextId, highestId + 1)
+    -- Sempre persiste a normalização das pendências. Não substitui os
+    -- cadastros antigos por listas vazias quando o catálogo muda.
     if migrated then
-        SaveResourceFile(GetCurrentResourceName(), VIP.assignmentsFile, json.encode(VIP.assignmentsStore), -1)
+        if not SaveResourceFile(GetCurrentResourceName(), VIP.assignmentsFile, json.encode(VIP.assignmentsStore), -1) then
+            print("^3[m_paineladm_v2 VIP]^7 Não foi possível persistir a migração das pendências.")
+        end
     end
 end
 
@@ -475,13 +504,14 @@ function VIP.findManaged(groupName)
     end
 end
 
+-- Itens/veículos já salvos NÃO podem sumir apenas porque o catálogo atual
+-- mudou. O catálogo serve para novos cadastros; o pacote é a fonte persistida.
 function VIP.normalizeItems(sourceItems)
-    local activeItems = vRP.getAllItens() or {}
     local out, seen = {}, {}
     for _,entry in ipairs(type(sourceItems) == "table" and sourceItems or {}) do
-        local item = VIP.trim(type(entry) == "table" and (entry.item or entry.index) or entry, 100)
-        local amount = math.floor(tonumber(type(entry) == "table" and entry.amount or 1) or 0)
-        if item ~= "" and amount > 0 and amount <= 100000 and activeItems[item] and not seen[item] then
+        local item = VIP.trim(type(entry) == "table" and (entry.item or entry.index or entry.name) or entry, 100)
+        local amount = math.floor(tonumber(type(entry) == "table" and (entry.amount or entry.quantity or entry.qtd) or 1) or 0)
+        if item ~= "" and amount > 0 and amount <= 100000 and not seen[item] then
             seen[item] = true
             out[#out+1] = { item = item, amount = amount }
         end
@@ -501,14 +531,17 @@ function VIP.normalizeVehicles(sourceVehicles)
     local catalog = VIP.vehicleCatalogLookup()
     local out, seen = {}, {}
     for _,entry in ipairs(type(sourceVehicles) == "table" and sourceVehicles or {}) do
-        local spawn = VIP.trim(type(entry) == "table" and (entry.spawn or entry.vehicle) or entry, 100):lower()
+        local spawn = VIP.trim(type(entry) == "table" and (entry.spawn or entry.vehicle or entry.model) or entry, 100):lower()
         local vehicle = catalog[spawn]
-        if spawn ~= "" and vehicle and not seen[spawn] then
+        if spawn ~= "" and not seen[spawn] and spawn:match("^[%w_%-]+$") then
             seen[spawn] = true
             out[#out+1] = {
                 spawn = spawn,
-                name = tostring(vehicle.name or spawn),
-                category = tostring(vehicle.category or "game")
+                name = tostring((type(entry) == "table" and entry.name) or (vehicle and vehicle.name) or spawn),
+                category = tostring((type(entry) == "table" and entry.category) or (vehicle and vehicle.category) or "addon"),
+                -- Informativo: permite ao administrador reparar um spawn antigo
+                -- sem excluir/recriar o VIP inteiro.
+                unavailable = vehicle == nil
             }
         end
     end
@@ -526,15 +559,20 @@ function VIP.packageFor(group)
         -- O limite base pertence à concessionária (5 por padrão) e cada VIP
         -- ativo soma seu próprio bônus de forma cumulativa.
         garageSlots = math.max(0, math.min(1000, math.floor(tonumber(stored.garageSlots) or 0))),
+        title = VIP.trim(stored.title, 80),
+        salary = math.max(0, math.floor(tonumber(stored.salary) or 0)),
+        permissions = type(stored.permissions) == "table" and stored.permissions or {},
         updatedAt = tonumber(stored.updatedAt) or 0
     }
 end
 
 function VIP.publicAdminData()
-    local vips = {}
+    local vips, listed = {}, {}
     for _,entry in ipairs(VIP.managedGroups()) do
         local cfgData = type(entry.config) == "table" and entry.config or {}
-        local package = VIP.packageFor(tostring(entry.name or ""))
+        local groupKey = tostring(entry.name or "")
+        listed[groupKey] = true
+        local package = VIP.packageFor(groupKey)
         package.vehicleChoices = math.min(package.vehicleChoices, #package.vehicles)
         vips[#vips+1] = {
             group = tostring(entry.name or ""),
@@ -548,6 +586,26 @@ function VIP.publicAdminData()
             durationDays = 30
         }
     end
+    -- Pacotes antigos podem permanecer em vip_packages.json mesmo após a vRP
+    -- ter perdido o cargo. Exibi-los para REPARAR em vez de fazê-los desaparecer.
+    for groupName,stored in pairs(VIP.packagesStore.packages) do
+        if type(stored) == "table" and not listed[groupName] then
+            local package = VIP.packageFor(groupName)
+            vips[#vips+1] = {
+                group = groupName,
+                title = package.title ~= "" and package.title or groupName,
+                salary = package.salary,
+                permissions = package.permissions,
+                items = package.items,
+                vehicles = package.vehicles,
+                vehicleChoices = math.min(package.vehicleChoices, #package.vehicles),
+                garageSlots = package.garageSlots,
+                orphaned = true,
+                durationDays = 30
+            }
+        end
+    end
+    table.sort(vips, function(a,b) return tostring(a.title):lower() < tostring(b.title):lower() end)
     return {
         vips = vips,
         items = getItems(),
@@ -571,6 +629,7 @@ function VIP.choicePayload(userId, notice, preferredAssignmentId)
         totalChoices = math.max(0, math.floor(tonumber(record.totalChoices) or remaining)),
         vehicles = type(record.vehicles) == "table" and record.vehicles or {},
         selectedVehicles = type(record.selectedVehicles) == "table" and record.selectedVehicles or {},
+        pendingVehicle = tostring(record.pendingVehicle or ""),
         images = Config.Images or {},
         notice = notice or ""
     }
@@ -630,6 +689,17 @@ function VIP.ensureChoiceVisible(userId, notice, preferredAssignmentId)
         end
     end)
 end
+
+-- Emergência de test-drive: só age no próprio source e somente no bucket
+-- conhecido deste módulo; não interfere nas dimensões de outros recursos.
+RegisterNetEvent("m_paineladm_v2:vipEmergencyExit", function()
+    local playerSource = tonumber(source)
+    if not playerSource then return end
+    local ended = VIP.endVehicleTest(playerSource, false)
+    if not ended and GetPlayerRoutingBucket(playerSource) == VIP.testBucketFor(playerSource) then
+        SetPlayerRoutingBucket(playerSource, 0)
+    end
+end)
 
 function VIP.testBucketFor(playerSource)
     -- Source é único entre jogadores conectados, portanto cada teste simultâneo
@@ -698,7 +768,10 @@ CreateThread(function()
                 if targetSource then
                     for assignmentKey,record in pairs(bucket) do
                         local stillHasVip = vRP.hasGroup(userId, tostring(record.group or ""))
-                        if not stillHasVip then
+                        -- Se o cargo desapareceu do groups.json, a pendência é
+                        -- preservada para reparo pela administração. Só descarta
+                        -- ao confirmar a perda de um cargo VIP que ainda existe.
+                        if not stillHasVip and VIP.findManaged(tostring(record.group or "")) then
                             if VIP.tests[targetSource] and tonumber(VIP.tests[targetSource].assignmentId) == tonumber(record.id) then
                                 local ended = VIP.endVehicleTest(targetSource, false)
                                 if ended and ended.returnPosition then
@@ -4421,6 +4494,33 @@ function API.vipAdmin(data)
         return result(true, "VIPs atualizados.", VIP.publicAdminData())
     end
 
+    if mode == "repair" then
+        local actorId = requireAction(playerSource, "edit_vip")
+        if not actorId then return result(false, "Sem permissão.") end
+        local groupName = VIP.trim(data.group, 80)
+        local stored = VIP.packagesStore.packages[groupName]
+        if groupName == "" or type(stored) ~= "table" then return result(false, "Pacote VIP não encontrado no armazenamento.") end
+        if VIP.findManaged(groupName) then return result(true, "O cargo VIP já está ativo.", VIP.publicAdminData()) end
+        for _,entry in ipairs(VIP.managedGroupsRaw()) do
+            if tostring(entry.name) == groupName then
+                return result(false, "O nome deste VIP está ocupado por um cargo de outro tipo. Corrija-o na vRP.")
+            end
+        end
+        local permissions = type(stored.permissions) == "table" and stored.permissions or {}
+        if #permissions == 0 then permissions = { VIP.defaultPermission(groupName) } end
+        local success,ok,msg = pcall(function()
+            return exports["vrp"]:saveManagedGroup("", {
+                name = groupName,
+                config = { gtype = "vip", title = VIP.trim(stored.title, 80) ~= "" and stored.title or groupName,
+                    salario = math.max(0, tonumber(stored.salary) or 0) },
+                permissions = permissions
+            })
+        end)
+        if not success or ok ~= true then return result(false, "Não foi possível recuperar o cargo: " .. tostring(msg or ok)) end
+        webhookLog(actorId, "edit_vip", "Cargo VIP recuperado: " .. groupName)
+        return result(true, "Cargo VIP recuperado. Benefícios antigos preservados.", VIP.publicAdminData())
+    end
+
     if mode == "save" then
         local permission = VIP.trim(data.originalGroup) == "" and "create_vip" or "edit_vip"
         local actorId = requireAction(playerSource, permission)
@@ -4462,9 +4562,56 @@ function API.vipAdmin(data)
             return result(false, message or "Não foi possível salvar o cargo VIP na vRP.")
         end
 
+        -- O arquivo JSON é a fonte dos benefícios. Não descartamos o anterior
+        -- quando uma gravação falha e não apagamos escolhas já atribuídas.
+        local previousPackage = VIP.packagesStore.packages[groupName]
+        local previousOriginal = originalGroup ~= "" and VIP.packagesStore.packages[originalGroup] or nil
+        local previousAlias = VIP.packagesStore.aliases[originalGroup]
         if originalGroup ~= "" and originalGroup ~= groupName then
-            VIP.packagesStore.packages[groupName] = VIP.packagesStore.packages[originalGroup]
+            VIP.packagesStore.aliases[originalGroup] = groupName
+            -- Reencaminha renomeações ainda mais antigas para o último nome.
+            for fromName,toName in pairs(VIP.packagesStore.aliases) do
+                if toName == originalGroup then VIP.packagesStore.aliases[fromName] = groupName end
+            end
+        end
+        VIP.packagesStore.packages[groupName] = {
+            title = title,
+            salary = salary,
+            permissions = permissions,
+            items = items,
+            vehicles = vehicles,
+            vehicleChoices = choices,
+            garageSlots = garageSlots,
+            updatedAt = os.time()
+        }
+        if originalGroup ~= "" and originalGroup ~= groupName then
             VIP.packagesStore.packages[originalGroup] = nil
+        end
+        if not VIP.savePackages() then
+            VIP.packagesStore.packages[groupName] = previousPackage
+            if originalGroup ~= "" then
+                VIP.packagesStore.packages[originalGroup] = previousOriginal
+                VIP.packagesStore.aliases[originalGroup] = previousAlias
+            end
+            -- Evita deixar um cargo vazio na vRP quando a criação falha no JSON.
+            local rollbackOk, rollbackResult = pcall(function()
+                if originalGroup == "" then
+                    return exports["vrp"]:removeManagedGroup(groupName)
+                elseif existing then
+                    return exports["vrp"]:saveManagedGroup(groupName, {
+                        name = originalGroup,
+                        config = existing.config or {},
+                        permissions = existing.permissions or {}
+                    })
+                end
+                return false
+            end)
+            local suffix = (rollbackOk and rollbackResult == true) and " Alteração na vRP revertida." or " ATENÇÃO: confira o cargo na vRP para corrigir a atualização parcial."
+            return result(false, "Não foi possível salvar os benefícios no vip_packages.json." .. suffix)
+        end
+
+        if originalGroup ~= "" and originalGroup ~= groupName then
+            -- A vRP migrou o grupo no datatable; migramos também as pendências.
             for _,bucket in pairs(VIP.assignmentsStore.active) do
                 if type(bucket) == "table" then
                     for _,record in pairs(bucket) do
@@ -4474,17 +4621,11 @@ function API.vipAdmin(data)
                     end
                 end
             end
-            VIP.saveAssignments()
+            if not VIP.saveAssignments() then
+                print("^1[m_paineladm_v2 VIP]^7 Não foi possível gravar pendências após renomear " .. originalGroup .. " para " .. groupName)
+                return result(false, "VIP alterado, mas houve falha ao salvar as escolhas pendentes. Verifique permissões de gravação do JSON.")
+            end
         end
-
-        VIP.packagesStore.packages[groupName] = {
-            items = items,
-            vehicles = vehicles,
-            vehicleChoices = choices,
-            garageSlots = garageSlots,
-            updatedAt = os.time()
-        }
-        if not VIP.savePackages() then return result(false, "Cargo salvo na vRP, mas não foi possível salvar os benefícios do VIP.") end
 
         webhookLog(actorId, permission, ("VIP %s | Cargo %s | Salário R$ %d | +%d vagas na garagem | %d itens | %d veículos | escolhe %d"):format(title, groupName, salary, garageSlots, #items, #vehicles, choices))
         return result(true, originalGroup == "" and "VIP criado e carregado em tempo real." or "VIP atualizado em tempo real.", VIP.publicAdminData())
@@ -4549,6 +4690,10 @@ function API.vipAdmin(data)
         if not targetId or not vip then return result(false, "ID ou VIP inválido.") end
 
         local targetSource = vRP.getUserSource(targetId)
+        local assignmentFingerprint = tostring(targetId) .. ":" .. groupName
+        if os.time() - (VIP.lastAssignments[assignmentFingerprint] or 0) < 4 then
+            return result(false, "Este VIP acabou de ser entregue a este jogador. Aguarde alguns segundos para não duplicar benefícios.")
+        end
         if not targetSource then
             return result(false, "O jogador precisa estar online para escolher o veiculo do vip!")
         end
@@ -4573,10 +4718,9 @@ function API.vipAdmin(data)
             return result(false, "O VIP foi setado, mas não foi possível registrar a validade de 30 dias.")
         end
 
-        for _,reward in ipairs(package.items) do
-            vRP.giveInventoryItem(targetId, reward.item, reward.amount, true)
-        end
-
+        -- As escolhas precisam estar persistidas ANTES de entregar os itens;
+        -- se o arquivo não puder ser gravado, a operação não prossegue como
+        -- se o jogador já pudesse escolher um veículo.
         if choices > 0 then
             local assignmentId = VIP.assignmentsStore.nextId
             VIP.assignmentsStore.nextId = assignmentId + 1
@@ -4593,8 +4737,29 @@ function API.vipAdmin(data)
                 vehicles = package.vehicles,
                 selectedVehicles = {}
             }
-            VIP.saveAssignments()
+            if not VIP.saveAssignments() then
+                bucket[tostring(assignmentId)] = nil
+                if next(bucket) == nil then VIP.assignmentsStore.active[tostring(targetId)] = nil end
+                VIP.assignmentsStore.nextId = assignmentId
+                return result(false, "Cargo VIP atribuído, porém as escolhas não puderam ser gravadas no vip_assignments.json. Nenhum item foi entregue; corrija a gravação antes de repetir.")
+            end
         end
+
+        local activeItems = vRP.getAllItens() or {}
+        local missingItems = {}
+        for _,reward in ipairs(package.items) do
+            if activeItems[reward.item] then
+                local deliveredOk, delivered = pcall(function()
+                    return vRP.giveInventoryItem(targetId, reward.item, reward.amount, true)
+                end)
+                if not deliveredOk or delivered == false then
+                    missingItems[#missingItems+1] = tostring(reward.item)
+                end
+            else
+                missingItems[#missingItems+1] = tostring(reward.item)
+            end
+        end
+        VIP.lastAssignments[assignmentFingerprint] = os.time()
 
         notify(targetSource, "sucesso", ("Você recebeu o VIP %s por 30 dias."):format(tostring(cfgData.title or groupName)), 8000)
         if choices > 0 then
@@ -4603,11 +4768,83 @@ function API.vipAdmin(data)
             VIP.ensureChoiceVisible(targetId)
         end
 
+        if #missingItems > 0 then
+            print(("^3[m_paineladm_v2 VIP]^7 Itens não encontrados para %s: %s"):format(groupName, table.concat(missingItems, ", ")))
+        end
         webhookLog(actorId, "assign_vip", ("VIP %s | Expira %s | Itens %d | Veículos a escolher %d"):format(groupName, os.date("%d/%m/%Y %H:%M", expiresAt), #package.items, choices), targetId)
-        return result(true, choices > 0 and "VIP setado. O jogador recebeu os itens e já pode escolher os veículos." or "VIP setado e benefícios entregues.", VIP.publicAdminData())
+        local message = choices > 0 and "VIP setado. O jogador já pode escolher os veículos." or "VIP setado e benefícios entregues."
+        if #missingItems > 0 then message = message .. " ATENÇÃO: itens indisponíveis no inventário: " .. table.concat(missingItems, ", ") end
+        return result(true, message, VIP.publicAdminData())
     end
 
     return result(false, "Operação de VIP inválida.")
+end
+
+-- Confirma a gravação no banco de dados antes de consumir uma escolha.
+-- O vRP.execute nesta base é assíncrono, por isso não serve para confirmar
+-- entrega: ele retorna antes de o MySQL concluir a inserção.
+function VIP.vehicleOwned(userId, spawn)
+    local ok, rows = pcall(function()
+        return vRP.query("vRP/get_veiculos_status", { user_id = userId, veiculo = spawn })
+    end)
+    if not ok then
+        print("^1[m_paineladm_v2 VIP]^7 Falha de consulta à garagem: " .. tostring(rows))
+        return nil
+    end
+    return type(rows) == "table" and rows[1] ~= nil
+end
+
+function VIP.insertVehicle(userId, spawn)
+    -- Consulta síncrona aguardada por oxmysql na mesma tabela de vRP/inserir_veh.
+    local ok, response = pcall(function()
+        return exports["oxmysql"]:query_async(
+            "INSERT IGNORE INTO vrp_user_veiculos (user_id,veiculo,ipva,expired) VALUES (?,?,?,?)",
+            { userId, spawn, os.time(), "{}" }
+        )
+    end)
+    if not ok then
+        print("^1[m_paineladm_v2 VIP]^7 Falha ao inserir veículo " .. tostring(spawn) .. ": " .. tostring(response))
+    end
+    -- Mesmo que a resposta se perca, a leitura do estado real é definitiva.
+    local owned = VIP.vehicleOwned(userId, spawn)
+    return owned == true, owned == nil and "Falha ao consultar o banco de dados." or "A garagem não confirmou o veículo."
+end
+
+function VIP.finishPendingChoice(userId, record, recordKey)
+    local spawn = VIP.trim(record.pendingVehicle, 100):lower()
+    if spawn == "" then return false, "Nenhuma escolha em andamento." end
+    local owned = VIP.vehicleOwned(userId, spawn)
+    if owned ~= true then return false, owned == nil and "Banco de dados indisponível." or "O veículo ainda não consta na garagem." end
+
+    local oldSelected = record.selectedVehicles
+    local oldRemaining = record.remainingChoices
+    local oldPending = record.pendingVehicle
+    record.selectedVehicles = {}
+    for _,existing in ipairs(type(oldSelected) == "table" and oldSelected or {}) do
+        record.selectedVehicles[#record.selectedVehicles+1] = existing
+    end
+    local alreadySelected = false
+    for _,selected in ipairs(record.selectedVehicles) do
+        if tostring(selected):lower() == spawn then alreadySelected = true break end
+    end
+    if not alreadySelected then record.selectedVehicles[#record.selectedVehicles+1] = spawn end
+    record.remainingChoices = math.max(0, math.floor(tonumber(oldRemaining) or 0) - (alreadySelected and 0 or 1))
+    record.pendingVehicle = nil
+    if not VIP.saveAssignments() then
+        record.pendingVehicle = oldPending
+        record.remainingChoices = oldRemaining
+        record.selectedVehicles = oldSelected
+        return false, "Veículo entregue, mas não foi possível registrar a escolha no arquivo JSON. Tente escolher novamente para recuperar."
+    end
+    if record.remainingChoices <= 0 then
+        VIP.removeAssignment(userId, record.id or recordKey)
+        if not VIP.saveAssignments() then
+            -- Conclusão já persistida; o registro permanecerá com 0 escolhas
+            -- e será removido da próxima vez, sem atribuição extra.
+            print("^3[m_paineladm_v2 VIP]^7 Não foi possível limpar registro concluído: " .. tostring(record.id))
+        end
+    end
+    return true
 end
 
 function API.vipPlayer(data)
@@ -4655,8 +4892,10 @@ function API.vipPlayer(data)
     end
 
     if mode == "status" then
-        local payload = VIP.choicePayload(userId)
-        return result(payload ~= nil, payload and "Escolha pendente." or "Nenhuma escolha pendente.", payload)
+        -- Retorna o VIP EXATO que o cliente solicitou, se ainda pendente.
+        -- Isso impede reabrir a escolha de outro pacote após um clique tardio.
+        local payload = VIP.choicePayload(userId, nil, requestedAssignmentId)
+        return result(payload ~= nil, payload and "Escolha pendente." or "Nenhuma escolha pendente.", payload or { completed = true })
     end
 
     local spawn = VIP.trim(data.vehicle, 100):lower()
@@ -4670,45 +4909,88 @@ function API.vipPlayer(data)
 
     if mode == "choose" then
         if VIP.tests[playerSource] then return result(false, "Encerre o teste do veículo antes de confirmar sua escolha.") end
-        if (tonumber(record.remainingChoices) or 0) <= 0 then return result(false, "Você já utilizou todas as escolhas deste VIP.", { completed = true }) end
-        for _,selected in ipairs(type(record.selectedVehicles) == "table" and record.selectedVehicles or {}) do
-            if tostring(selected):lower() == spawn then return result(false, "Você já escolheu este veículo. Escolha outro.") end
+        local lockKey = tostring(userId)
+        if VIP.choiceLocks[lockKey] then return result(false, "Uma escolha VIP já está sendo processada. Aguarde a confirmação.") end
+        VIP.choiceLocks[lockKey] = true
+
+        local ok, response = pcall(function()
+            local remaining = math.max(0, tonumber(record.remainingChoices) or 0)
+            if remaining <= 0 then return result(false, "Este VIP já foi concluído.", { completed = true }) end
+            local pending = VIP.trim(record.pendingVehicle, 100):lower()
+            if pending ~= "" and pending ~= spawn then
+                return result(false, "Existe uma escolha anterior em confirmação. Selecione " .. pending .. " para recuperá-la.", VIP.choicePayload(userId, nil, record.id))
+            end
+            for _,selected in ipairs(type(record.selectedVehicles) == "table" and record.selectedVehicles or {}) do
+                if tostring(selected):lower() == spawn then
+                    return result(false, "Você já escolheu este veículo. Escolha outro.")
+                end
+            end
+
+            if pending == "" then
+                local owned = VIP.vehicleOwned(userId, spawn)
+                if owned == nil then return result(false, "Não foi possível consultar sua garagem. Tente novamente.") end
+                if owned then return result(false, "Você já possui este veículo na garagem. Escolha outro.") end
+                record.pendingVehicle = spawn
+                record.pendingAt = os.time()
+                if not VIP.saveAssignments() then
+                    record.pendingVehicle = nil
+                    record.pendingAt = nil
+                    return result(false, "Não foi possível gravar a escolha no vip_assignments.json. Verifique permissões de escrita.")
+                end
+            end
+
+            -- Se o MySQL terminou antes do retorno e o player repetiu o clique,
+            -- a confirmação retoma a transação sem criar veículo/benefício duplo.
+            local owned = VIP.vehicleOwned(userId, spawn)
+            if owned ~= true then
+                local delivered, deliveryError = VIP.insertVehicle(userId, spawn)
+                if not delivered then
+                    if owned == false then
+                        record.pendingVehicle = nil
+                        record.pendingAt = nil
+                        VIP.saveAssignments()
+                    end
+                    return result(false, deliveryError or "Falha ao entregar veículo. Tente novamente.", VIP.choicePayload(userId, nil, record.id))
+                end
+            end
+
+            local finalized, finalizeError = VIP.finishPendingChoice(userId, record, recordKey)
+            if not finalized then
+                return result(false, finalizeError, VIP.choicePayload(userId, nil, record.id))
+            end
+
+            webhookLog(userId, "vip_vehicle_choose", ("VIP %s | Veículo: %s | Restantes: %d"):format(
+                tostring(record.title or record.group or "VIP"), tostring(allowedVehicle.name or spawn), tonumber(record.remainingChoices) or 0
+            ))
+
+            if record.remainingChoices > 0 then
+                local notice = record.remainingChoices == 1 and "Você pode escolher mais um veículo!" or ("Você ainda pode escolher mais %d veículos!"):format(record.remainingChoices)
+                notify(playerSource, "sucesso", ("%s foi adicionado à sua garagem. %s"):format(tostring(allowedVehicle.name or spawn), notice), 8000)
+                return result(true, notice, VIP.choicePayload(userId, notice, record.id or recordKey))
+            end
+            local nextPayload = VIP.choicePayload(userId, "Escolhas deste VIP concluídas. Você ainda tem outro VIP pendente!")
+            if nextPayload then
+                notify(playerSource, "sucesso", ("%s recebido! Agora escolha o veículo do próximo VIP."):format(tostring(allowedVehicle.name or spawn)), 9000)
+                return result(true, "Escolhas concluídas. Próximo VIP disponível.", nextPayload)
+            end
+            notify(playerSource, "sucesso", ("%s foi adicionado à sua garagem. Escolhas VIP concluídas!"):format(tostring(allowedVehicle.name or spawn)), 9000)
+            return result(true, "Veículo entregue. Todas as escolhas concluídas.", { completed = true })
+        end)
+        VIP.choiceLocks[lockKey] = nil
+        if not ok then
+            print("^1[m_paineladm_v2 VIP]^7 Erro interno na escolha: " .. tostring(response))
+            return result(false, "Erro ao processar a escolha; seu progresso foi preservado. Abra novamente /vipveiculos.")
         end
-
-        local owned = vRP.query("vRP/get_veiculos_status", { user_id = userId, veiculo = spawn }) or {}
-        if owned[1] then
-            return result(false, "Você já possui este veículo na garagem. Escolha outro para não perder sua escolha.")
-        end
-
-        vRP.execute("vRP/inserir_veh", { user_id = userId, veiculo = spawn, ipva = os.time(), expired = "{}" })
-        record.selectedVehicles = type(record.selectedVehicles) == "table" and record.selectedVehicles or {}
-        record.selectedVehicles[#record.selectedVehicles+1] = spawn
-        record.remainingChoices = math.max(0, math.floor(tonumber(record.remainingChoices) or 0) - 1)
-        VIP.saveAssignments()
-        webhookLog(userId, "vip_vehicle_choose", ("VIP %s | Veículo: %s | Restantes: %d"):format(
-            tostring(record.title or record.group or "VIP"), tostring(allowedVehicle.name or spawn), tonumber(record.remainingChoices) or 0
-        ))
-
-        if record.remainingChoices > 0 then
-            local notice = record.remainingChoices == 1 and "Você pode escolher mais um veículo!" or ("Você ainda pode escolher mais %d veículos!"):format(record.remainingChoices)
-            notify(playerSource, "sucesso", ("%s foi adicionado à sua garagem. %s"):format(tostring(allowedVehicle.name or spawn), notice), 8000)
-            return result(true, notice, VIP.choicePayload(userId, notice, record.id or recordKey))
-        end
-
-        VIP.removeAssignment(userId, record.id or recordKey)
-        VIP.saveAssignments()
-
-        local nextPayload = VIP.choicePayload(userId, "As escolhas deste VIP foram concluídas. Você ainda possui outro VIP pendente!")
-        if nextPayload then
-            notify(playerSource, "sucesso", ("%s foi adicionado à sua garagem. Agora escolha o benefício do seu próximo VIP."):format(tostring(allowedVehicle.name or spawn)), 9000)
-            return result(true, "Escolhas deste VIP concluídas. Próximo VIP disponível.", nextPayload)
-        end
-
-        notify(playerSource, "sucesso", ("%s foi adicionado à sua garagem. Todas as escolhas de VIP foram concluídas!"):format(tostring(allowedVehicle.name or spawn)), 9000)
-        return result(true, "Veículo adicionado à garagem. Todas as escolhas concluídas.", { completed = true })
+        return response
     end
 
     if mode == "startTest" then
+        if VIP.choiceLocks[tostring(userId)] then
+            return result(false, "Aguarde a confirmação da entrega anterior.")
+        end
+        if VIP.trim(record.pendingVehicle, 100) ~= "" then
+            return result(false, "Finalize a entrega de veículo pendente antes de iniciar um teste.")
+        end
         if VIP.tests[playerSource] then return result(false, "Você já está testando um veículo.") end
         if (tonumber(record.remainingChoices) or 0) <= 0 then return result(false, "Você já utilizou todas as escolhas deste VIP.", { completed = true }) end
         for _,selected in ipairs(type(record.selectedVehicles) == "table" and record.selectedVehicles or {}) do

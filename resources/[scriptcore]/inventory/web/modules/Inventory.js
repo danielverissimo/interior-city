@@ -559,7 +559,8 @@ class Inventory {
 						? globalThis.SelectedItem.amount
 						: inputValue;
 
-				const action = event.target.dataset.route;
+				const action = event.target.closest(".action-button")?.dataset.route;
+				if (!action) return;
 				const itemType = globalThis.Config[item]?.type;
 
 				if (action === "USE_ITEM" && (itemType === "equip" || itemType === "recharge")) {

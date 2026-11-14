@@ -1,48 +1,61 @@
 $(function (){
-    var actionContainer = $("#actionmenu");
+    const actionContainer = $("#actionmenu");
+    const resourceName = typeof GetParentResourceName === "function" ? GetParentResourceName() : "m_snippets";
 
-    window.addEventListener('message',function(event){
-        var data = event.data;
+    function post(endpoint, data){
+        return $.post(`https://${resourceName}/${endpoint}`, JSON.stringify(data || {}));
+    }
 
-        if (data.showmenu){
-            $("#botoes").empty()
-            $("#andar").html("<p id='numeroandar'> "+ data.andar +" </p>");
+    window.addEventListener("message", function(event){
+        const data = event.data || {};
 
-            let andares = data.elevador
-            for (let item in andares) {
-                $("#botoes").append(`
-                    <button id="botaoEsquerda" onclick="setFloorNumber('${data.tipo}', '${item}') ">${item}</button>
-                  `)
-            }
+        if(data.showmenu){
+            $("#botoes").empty();
+            $("#andar").html(`<p id="numeroandar">${String(data.andar || "")}</p>`);
+
+            const floors = Array.isArray(data.elevador)
+                ? data.elevador
+                : Object.keys(data.elevador || {}).map(name => ({ name }));
+
+            floors.forEach(floor => {
+                const name = String(floor.name || "");
+                if(!name) return;
+
+                const current = name === String(data.andar || "");
+                const button = $("<button>", {
+                    class: `floor-button${current ? " current" : ""}`,
+                    text: name,
+                    disabled: current
+                });
+
+                if(!current){
+                    button.on("click", () => setFloorNumber(String(data.tipo || ""), name));
+                }
+
+                $("#botoes").append(button);
+            });
 
             actionContainer.show();
         }
 
-        if (data.hidemenu){
-            actionContainer.hide();
-        }
+        if(data.hidemenu) actionContainer.hide();
     });
 
     document.onkeyup = function(data){
-        if (data.which == 27){
-            if (actionContainer.is(":visible")){
-                actionContainer.hide();
-                $.post('http://m_snippets/closeNui',JSON.stringify({}))
-            }
+        if(data.which === 27 && actionContainer.is(":visible")){
+            actionContainer.hide();
+            post("closeNui", {});
         }
     };
 
-})
+    window.setFloorNumber = function(nameElevador, floorNumber){
+        const audio = new Audio("sounds/click.ogg");
+        audio.play().catch(()=>{});
 
-//Botões
-function setFloorNumber(nameElevador, floorNumber){
-    var audio = new Audio();
-    audio.src = "sounds/click.ogg";
-    audio.play();
-    $("#andar").html("<p id='numeroandar'>" + floorNumber + "</p>");
-
-    $.post('http://m_snippets/elevadorInit', JSON.stringify({
-        elevador: nameElevador,
-        andar: floorNumber
-    }))
-};
+        $("#andar").html(`<p id="numeroandar">${String(floorNumber)}</p>`);
+        post("elevadorInit", {
+            elevador: nameElevador,
+            andar: floorNumber
+        });
+    };
+});

@@ -1,1 +1,320 @@
-local v0=tonumber;local v1=string.byte;local v2=string.char;local v3=string.sub;local v4=string.gsub;local v5=string.rep;local v6=table.concat;local v7=table.insert;local v8=math.ldexp;local v9=getfenv or function() return _ENV;end ;local v10=setmetatable;local v11=pcall;local v12=select;local v13=unpack or table.unpack ;local v14=tonumber;local function v15(v16,v17,...) local v18=1;local v19;v16=v4(v3(v16,5),"..",function(v30) if (v1(v30,2)==81) then v19=v0(v3(v30,1,1));return "";else local v86=0;local v87;while true do if (v86==0) then v87=v2(v0(v30,16));if v19 then local v119=v5(v87,v19);v19=nil;return v119;else return v87;end break;end end end end);local function v20(v31,v32,v33) if v33 then local v88=(v31/((5 -3)^(v32-(2 -1))))%((3 -1)^(((v33-(2 -1)) -(v32-(620 -(555 + 64)))) + (932 -(135 + 722 + 74)))) ;return v88-(v88%(569 -(367 + 201))) ;else local v89=927 -(214 + 713) ;local v90;while true do if (v89==0) then v90=2^(v32-(1 + 0)) ;return (((v31%(v90 + v90))>=v90) and 1) or 0 ;end end end end local function v21() local v34=v1(v16,v18,v18);v18=v18 + 1 ;return v34;end local function v22() local v35,v36=v1(v16,v18,v18 + (879 -(282 + 595)) );v18=v18 + (1639 -(1523 + 114)) ;return (v36 * (231 + 25)) + v35 ;end local function v23() local v37,v38,v39,v40=v1(v16,v18,v18 + (3 -0) );v18=v18 + (1069 -(68 + 997)) ;return (v40 * (16778486 -(226 + 1044))) + (v39 * ((279666 + 5704) -219834)) + (v38 * (373 -(8 + 24 + (1042 -(892 + 65))))) + v37 ;end local function v24() local v41=v23();local v42=v23();local v43=2 -1 ;local v44=(v20(v42,2 -1 ,36 -16 ) * ((3 -1)^(382 -(87 + 263)))) + v41 ;local v45=v20(v42,201 -(67 + 113) ,23 + 8 );local v46=((v20(v42,78 -46 )==(1 + 0)) and  -1) or 1 ;if (v45==(0 -0)) then if (v44==(952 -(802 + 150))) then return v46 * (0 -0) ;else local v107=0;while true do if (v107==0) then v45=1 -0 ;v43=(0 -0) + 0 + 0 ;break;end end end elseif (v45==(3044 -((2001 -1086) + 82))) then return ((v44==((0 + 0) -0)) and (v46 * (1/(0 + 0)))) or (v46 * NaN) ;end return v8(v46,v45-(3214 -2191) ) * (v43 + (v44/((2 -0)^(1239 -(1069 + 118))))) ;end local function v25(v47) local v48;if  not v47 then v47=v23();if (v47==0) then return "";end end v48=v3(v16,v18,(v18 + v47) -(19 -(10 + 8)) );v18=v18 + v47 ;local v49={};for v65=3 -2 , #v48 do v49[v65]=v2(v1(v3(v48,v65,v65)));end return v6(v49);end local v26=v23;local function v27(...) return {...},v12("#",...);end local function v28() local v50=(function() return function(v91,v92,v93,v94,v95,v96,v97,v98) local v91=(function() return 971 -(140 + 831) ;end)();local v92=(function() return;end)();local v94=(function() return;end)();while true do if ((1850 -(1409 + 441))==v91) then local v112=(function() return 718 -(15 + 703) ;end)();local v113=(function() return;end)();while true do if (v112==0) then v113=(function() return 0;end)();while true do if (v113~=(0 + 0)) then else v92=(function() return v93();end)();v94=(function() return nil;end)();v113=(function() return 1;end)();end if (v113==(439 -(262 + 176))) then v91=(function() return  #"~";end)();break;end end break;end end end if (v91== #"!") then if (v92== #"|") then v94=(function() return v93()~=0 ;end)();elseif (v92==(1723 -(345 + 1376))) then v94=(function() return v95();end)();elseif (v92~= #"-19") then else v94=(function() return v96();end)();end v97[v98]=(function() return v94;end)();break;end end return v91,v92,v93,v94,v95,v96,v97,v98;end;end)();local v51=(function() return function(v99,v100,v101) local v102=(function() return 0;end)();local v103=(function() return;end)();while true do if (v102~=(688 -(198 + 490))) then else v103=(function() return 0;end)();while true do if ((0 -0)~=v103) then else local v120=(function() return 0;end)();while true do if (v120==0) then local v158=(function() return 0;end)();while true do if (v158~=(0 -0)) then else v99[v100-#"<" ]=(function() return v101();end)();return v99,v100,v101;end end end end end end break;end end end;end)();local v52=(function() return {};end)();local v53=(function() return {};end)();local v54=(function() return {};end)();local v55=(function() return {v52,v53,nil,v54};end)();local v56=(function() return v23();end)();local v57=(function() return {};end)();for v67= #">",v56 do FlatIdent_10BCC,Type,v21,Cons,v24,v25,v57,v67=(function() return v50(FlatIdent_10BCC,Type,v21,Cons,v24,v25,v57,v67);end)();end v55[ #"19("]=(function() return v21();end)();for v68= #"\\",v23() do local v69=(function() return 0 -0 ;end)();local v70=(function() return;end)();while true do if (v69~=(1262 -(1091 + 171))) then else v70=(function() return v21();end)();if (v20(v70, #"\\", #".")~=0) then else local v115=(function() return 0;end)();local v116=(function() return;end)();local v117=(function() return;end)();local v118=(function() return;end)();while true do if (v115==(0 + 0)) then local v128=(function() return 0;end)();local v129=(function() return;end)();while true do if (v128==0) then v129=(function() return 0 -0 ;end)();while true do if ((3 -2)~=v129) then else v115=(function() return 1;end)();break;end if (v129==(374 -(123 + 251))) then local v194=(function() return 0;end)();while true do if (v194==(0 -0)) then v116=(function() return v20(v70,700 -(208 + 490) , #"asd");end)();v117=(function() return v20(v70, #".com",1 + 5 );end)();v194=(function() return 1;end)();end if (v194~=1) then else v129=(function() return 1;end)();break;end end end end break;end end end if (v115~=(1 + 0)) then else local v130=(function() return 836 -(660 + 176) ;end)();while true do if (v130~=1) then else v115=(function() return 1 + 1 ;end)();break;end if (v130==(202 -(14 + 188))) then v118=(function() return {v22(),v22(),nil,nil};end)();if (v116==0) then local v192=(function() return 675 -(534 + 141) ;end)();local v193=(function() return;end)();while true do if (v192==(0 + 0)) then v193=(function() return 0 + 0 ;end)();while true do if (v193==(0 + 0)) then v118[ #"nil"]=(function() return v22();end)();v118[ #".com"]=(function() return v22();end)();break;end end break;end end elseif (v116== #"]") then v118[ #"91("]=(function() return v23();end)();elseif (v116==2) then v118[ #"xnx"]=(function() return v23() -((3 -1)^16) ;end)();elseif (v116== #"91(") then local v203=(function() return 0 -0 ;end)();local v204=(function() return;end)();while true do if (v203==(0 -0)) then v204=(function() return 0 + 0 ;end)();while true do if (0==v204) then v118[ #"xxx"]=(function() return v23() -((2 + 0)^(412 -(115 + 281))) ;end)();v118[ #".com"]=(function() return v22();end)();break;end end break;end end end v130=(function() return 1;end)();end end end if (v115==(4 -2)) then if (v20(v117, #"!", #" ")~= #"!") then else v118[2 + 0 ]=(function() return v57[v118[4 -2 ]];end)();end if (v20(v117,2,7 -5 )== #"!") then v118[ #"xnx"]=(function() return v57[v118[ #"nil"]];end)();end v115=(function() return 3;end)();end if (3==v115) then if (v20(v117, #"91(", #"-19")~= #">") then else v118[ #"0836"]=(function() return v57[v118[ #"asd1"]];end)();end v52[v68]=(function() return v118;end)();break;end end end break;end end end for v71= #",",v23() do v53,v71,v28=(function() return v51(v53,v71,v28);end)();end return v55;end local function v29(v59,v60,v61) local v62=v59[868 -(550 + 317) ];local v63=v59[2];local v64=v59[3 -0 ];return function(...) local v72=v62;local v73=v63;local v74=v64;local v75=v27;local v76=1 -0 ;local v77= -(2 -1);local v78={};local v79={...};local v80=v12("#",...) -(1666 -(970 + 695)) ;local v81={};local v82={};for v104=0 -0 ,v80 do if (v104>=v74) then v78[v104-v74 ]=v79[v104 + (1991 -(582 + (4670 -3262))) ];else v82[v104]=v79[v104 + ((3 + 0) -2) ];end end local v83=(v80-v74) + (1 -0) ;local v84;local v85;while true do v84=v72[v76];v85=v84[3 -(1 + 1) ];if ((2683>=2460) and (v85<=(1830 -(1195 + 629)))) then if ((3912==3912) and (v85<=(2 -0))) then if (v85<=(241 -(187 + 54))) then local v121=v73[v84[783 -((327 -165) + 618) ]];local v122;local v123={};v122=v10({},{__index=function(v132,v133) local v134=0;local v135;while true do if (v134==(0 + 0)) then v135=v123[v133];return v135[1 + 0 ][v135[3 -1 ]];end end end,__newindex=function(v136,v137,v138) local v139=0 -0 ;local v140;while true do if (v139==(0 + 0)) then v140=v123[v137];v140[1][v140[2]]=v138;break;end end end});for v141=1637 -(1373 + 263) ,v84[(691 + 313) -(451 + 549) ] do v76=v76 + 1 + 0 ;local v142=v72[v76];if (v142[1]==(5 -1)) then v123[v141-(1 -0) ]={v82,v142[3]};else v123[v141-(1 -0) ]={v60,v142[3 + 0 ]};end v81[ #v81 + 1 + 0 ]=v123;end v82[v84[562 -(306 + 254) ]]=v29(v121,v122,v61);elseif (v85==(1 + 0)) then for v164=v84[2],v84[5 -2 ] do v82[v164]=nil;end elseif ((2821<=4824) and (v82[v84[1469 -(899 + 568) ]]==v84[(1260 -(1043 + 214)) + (3 -2) ])) then v76=v76 + (2 -1) ;else v76=v84[(1818 -(323 + 889)) -(268 + 335) ];end elseif ((1738<=2195) and (v85<=(294 -(60 + 230)))) then if ((41<=3018) and (v85>(575 -(426 + (392 -246))))) then v82[v84[1 + 1 ]]=v82[v84[3]];elseif (v82[v84[(2038 -(361 + 219)) -(282 + 1174) ]]~=v84[(1135 -(53 + 267)) -(569 + 242) ]) then v76=v76 + (2 -1) ;else v76=v84[3];end elseif ((2145<=4104) and (v85==(1 + 4))) then local v146=v84[1026 -(160 + 546 + 318) ];v82[v146]=v82[v146]();else do return;end end elseif (v85<=(1260 -(721 + (943 -(15 + 398))))) then if ((v85<=(1278 -(945 + 326))) or (1804>=3275)) then local v125=0 -0 ;local v126;local v127;while true do if ((2689<4845) and (v125==(0 + 0))) then v126=v84[2];v127={};v125=1;end if (v125==(701 -(271 + 429))) then for v172=1 + 0 , #v81 do local v173=v81[v172];for v174=1500 -(1408 + 92) , #v173 do local v175=v173[v174];local v176=v175[1087 -(461 + 625) ];local v177=v175[1290 -((1975 -(18 + 964)) + 295) ];if ((v176==v82) and (v177>=v126)) then local v195=0 + 0 ;while true do if ((0==v195) or (1417>3629) or (2322>2622)) then v127[v177]=v176[v177];v175[(4411 -3239) -(418 + 436 + 317) ]=v127;break;end end end end end break;end end elseif (v85>(4 + 4)) then v82[v84[2]]=v60[v84[1 + 2 ]];else local v150=v84[1 + 0 + (851 -(20 + 830)) ];v82[v150](v82[v150 + 1 + 0 ]);end elseif (((4795>402) and (v85<=(540 -(406 + 123)))) or (4534==2082)) then if (v85==(1779 -(1749 + 20))) then v82[v84[1 + 1 ]]=v84[1325 -(1249 + 73) ];else local v153=0 + 0 ;local v154;while true do if (v153==(1146 -(466 + 679))) then v76=v76 + (2 -1) ;v84=v72[v76];v82[v84[5 -3 ]]=v82[v84[1903 -(106 + 1794) ]];v153=1 + 1 ;end if (v153==4) then v76=v76 + 1 + 0 ;v84=v72[v76];v76=v84[8 -(4 + 1) ];break;end if ((129 -(116 + 10))==v153) then v76=v76 + ((1 + 1) -1) ;v84=v72[v76];v82[v84[116 -(4 + 110) ]]=v84[3];v153=588 -(57 + 527) ;end if ((4813>3565) and (v153==(1429 -(41 + 1386)))) then v76=v76 + (104 -(17 + 86)) ;v84=v72[v76];v82[v84[2 + 0 ]]=v84[3];v153=3;end if (v153==(0 -0)) then v154=nil;v154=v84[(743 -(542 + 196)) -3 ];v82[v154]=v82[v154]();v153=1;end end end elseif (v85==(178 -(122 + 44))) then v76=v84[5 -2 ];else v82[v84[2]]=v61[v84[3]];end v76=v76 + (1 -0) ;end end;end return v29(v28(),{},v17)(...);end return v15("LOL!053Q00028Q00026Q00F03F030C3Q0043726561746554687265616403163Q0047657443752Q72656E745265736F757263654E616D6503093Q006D616E736F6573763100253Q00120A3Q00014Q0001000100033Q0026023Q00070001000100040C3Q0007000100120A000100014Q0001000200023Q00120A3Q00023Q0026023Q00020001000200040C3Q000200012Q0001000300033Q002602000100110001000200040C3Q0011000100120D000400033Q00062Q00053Q000100012Q00043Q00024Q000800040002000100040C3Q002300010026020001000A0001000100040C3Q000A000100120A000400013Q002602000400180001000200040C3Q0018000100120A000100023Q00040C3Q000A0001002602000400140001000100040C3Q0014000100120D000500044Q000B0005000100024Q000200053Q00122Q000300053Q00122Q000400023Q00044Q0014000100040C3Q000A000100040C3Q0023000100040C3Q000200012Q00078Q00063Q00013Q00013Q00013Q00030A3Q006D5F6D616E73696F6E7300054Q00097Q0026033Q00040001000100040C3Q000400012Q00063Q00014Q00063Q00017Q00",v9(),...);
+local Tunnel = module('vrp','lib/Tunnel')
+local Server = Tunnel.getInterface(GetCurrentResourceName())
+
+local mansions = {}
+local blips = {}
+local purchaseBusy = false
+
+local function money(value)
+    local s=tostring(math.floor(tonumber(value) or 0))
+    local rev=s:reverse():gsub('(%d%d%d)','%1.'):reverse()
+    if rev:sub(1,1)=='.' then rev=rev:sub(2) end
+    return rev
+end
+
+local function clearBlips()
+    for _,b in pairs(blips) do
+        if DoesBlipExist(b) then RemoveBlip(b) end
+    end
+    blips={}
+end
+
+local function rebuildBlips()
+    clearBlips()
+    for _,m in ipairs(mansions) do
+        local c=m.purchaseCoords
+        if c then
+            local b=AddBlipForCoord(c.x+0.0,c.y+0.0,c.z+0.0)
+            SetBlipSprite(b,Config.BlipSprite)
+            SetBlipColour(b,Config.BlipColor)
+            SetBlipScale(b,Config.BlipScale)
+            SetBlipAsShortRange(b,true)
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentSubstringPlayerName(tostring(m.name or 'Mansão'))
+            EndTextCommandSetBlipName(b)
+            blips[m.id]=b
+        end
+    end
+end
+
+RegisterNetEvent('m_mansions:sync',function(data)
+    mansions=type(data)=='table' and data or {}
+    rebuildBlips()
+end)
+
+local function drawText3D(x,y,z,text,scale,r,g,b)
+    local onScreen,sx,sy=World3dToScreen2d(x,y,z)
+    if not onScreen then return end
+    SetTextScale(0.0,scale or 0.30)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextColour(r or 255,g or 255,b or 255,235)
+    SetTextCentre(true)
+    SetTextOutline()
+    BeginTextCommandDisplayText('STRING')
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(sx,sy)
+end
+
+CreateThread(function()
+    Wait(1200)
+    TriggerServerEvent('m_mansions:requestSync')
+
+    while true do
+        local sleep=700
+        local ped=PlayerPedId()
+        local p=GetEntityCoords(ped)
+
+        for _,m in ipairs(mansions) do
+            if not m.occupied and m.purchaseCoords then
+                local c=m.purchaseCoords
+                local dist=#(p-vec3(c.x+0.0,c.y+0.0,c.z+0.0))
+                if dist <= Config.MarkerDrawDistance then
+                    sleep=0
+                    DrawMarker(1,c.x,c.y,c.z-1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.15,1.15,0.35,55,180,90,120,false,false,2,false,nil,nil,false)
+                    drawText3D(c.x,c.y,c.z+0.65,('Pressione ~g~[E]~s~ para comprar a %s'):format(m.name),0.31,255,255,255)
+                    drawText3D(c.x,c.y,c.z+0.48,('~g~R$ %s'):format(money(m.price)),0.30,90,220,130)
+                    drawText3D(c.x,c.y,c.z+0.31,('x%d moradores'):format(tonumber(m.maxResidents) or 1),0.27,230,230,230)
+
+                    if dist <= Config.PurchaseDistance and IsControlJustPressed(0,38) and not purchaseBusy then
+                        purchaseBusy=true
+                        local r=Server.requestPurchase(m.id)
+                        if not r or not r.ok then
+                            TriggerEvent('Notify','negado',(r and r.message) or 'Não foi possível comprar esta mansão.',5000)
+                            purchaseBusy=false
+                        else
+                            local bought=Server.confirmPurchase(r.id)
+                            if bought and not bought.ok and not bought.cancelled then
+                                TriggerEvent('Notify','negado',bought.message or 'Não foi possível comprar esta mansão.',5000)
+                            end
+                            purchaseBusy=false
+                        end
+                    end
+                end
+            end
+        end
+        Wait(sleep)
+    end
+end)
+
+RegisterNetEvent('m_mansions:unlockPurchase',function()
+    purchaseBusy=false
+end)
+
+AddEventHandler('onResourceStop',function(resource)
+    if resource==GetCurrentResourceName() then clearBlips(); deleteFurnitureObjects(); SetNuiFocus(false,false) end
+end)
+
+
+-- ============================================================
+-- MOBÍLIAS - NUI, PREVIEW 3D, EDIÇÃO E SINCRONIZAÇÃO
+-- ============================================================
+local furnitureObjects={}
+local furnitureRecords={}
+local furnitureUi=false
+local furnitureContext=nil
+local placement=nil
+local editMode=false
+
+local function requestModelSafe(model)
+    local hash=joaat(model)
+    if not IsModelInCdimage(hash) or not IsModelValid(hash) then return nil end
+    RequestModel(hash)
+    local timeout=GetGameTimer()+5000
+    while not HasModelLoaded(hash) and GetGameTimer()<timeout do Wait(0) end
+    if not HasModelLoaded(hash) then return nil end
+    return hash
+end
+
+local function deleteFurnitureObjects()
+    for _,obj in pairs(furnitureObjects) do if DoesEntityExist(obj) then DeleteEntity(obj) end end
+    furnitureObjects={}
+end
+
+local function spawnFurnitureRecord(f)
+    if not f or not f.id or not f.model or not f.x then return end
+    local hash=requestModelSafe(f.model)
+    if not hash then return end
+    local obj=CreateObjectNoOffset(hash,f.x+0.0,f.y+0.0,f.z+0.0,false,false,false)
+    if obj and obj~=0 then
+        SetEntityHeading(obj,(f.heading or 0.0)+0.0)
+        FreezeEntityPosition(obj,true)
+        SetEntityInvincible(obj,true)
+        furnitureObjects[f.id]=obj
+    end
+    SetModelAsNoLongerNeeded(hash)
+end
+
+local function rebuildFurnitureObjects(data)
+    deleteFurnitureObjects()
+    furnitureRecords={}
+    for _,f in ipairs(data or {}) do furnitureRecords[f.id]=f; spawnFurnitureRecord(f) end
+end
+
+RegisterNetEvent('m_mansions:furnitureSync',function(data) rebuildFurnitureObjects(data) end)
+
+local function setUi(open)
+    furnitureUi=open
+    SetNuiFocus(open,open)
+    SendNUIMessage({action=open and 'open' or 'close'})
+end
+
+local function openFurniture()
+    if placement or editMode then return end
+    local ctx=Server.getFurnitureContext()
+    if not ctx or not ctx.ok then return TriggerEvent('Notify','negado',(ctx and ctx.message) or 'Não foi possível abrir o catálogo.',6000) end
+    furnitureContext=ctx
+    furnitureUi=true
+    SetNuiFocus(true,true)
+    SendNUIMessage({action='open',context=ctx})
+end
+RegisterNetEvent('m_mansions:openFurniture',openFurniture)
+
+RegisterNUICallback('close',function(_,cb) setUi(false); cb({ok=true}) end)
+RegisterNUICallback('refresh',function(_,cb) cb(Server.getFurnitureContext()) end)
+RegisterNUICallback('savePrices',function(data,cb) cb(Server.saveFurniturePrices(data and data.prices or {})) end)
+
+local function rotationToDirection(rot)
+    local z=math.rad(rot.z); local x=math.rad(rot.x); local num=math.abs(math.cos(x))
+    return vec3(-math.sin(z)*num,math.cos(z)*num,math.sin(x))
+end
+local function cameraRay(distance)
+    local cam=GetGameplayCamCoord(); local rot=GetGameplayCamRot(2); local dir=rotationToDirection(rot); local dest=cam+dir*distance
+    local ray=StartShapeTestRay(cam.x,cam.y,cam.z,dest.x,dest.y,dest.z,-1,PlayerPedId(),7)
+    local _,hit,endCoords=GetShapeTestResult(ray)
+    if hit==1 then return endCoords end
+    return dest
+end
+
+local function drawHelp(lines)
+    local x,y=0.035,0.69
+    local lineHeight=0.027
+    local height=(#lines*lineHeight)+0.022
+    DrawRect(0.175,y+(height/2)-0.006,0.300,height,12,12,14,205)
+    DrawRect(0.026,y+(height/2)-0.006,0.004,height,190,151,92,235)
+    for i,line in ipairs(lines) do
+        SetTextFont(i==1 and 4 or 0)
+        SetTextScale(0.0,i==1 and 0.37 or 0.32)
+        SetTextColour(255,255,255,245)
+        SetTextCentre(false)
+        SetTextOutline()
+        BeginTextCommandDisplayText('STRING')
+        AddTextComponentSubstringPlayerName(line)
+        EndTextCommandDisplayText(x,y+((i-1)*lineHeight))
+    end
+end
+
+local function endPlacement(reopen)
+    if placement and placement.object and DoesEntityExist(placement.object) then DeleteEntity(placement.object) end
+    if placement and placement.originalObject and DoesEntityExist(placement.originalObject) then SetEntityVisible(placement.originalObject,true,false) end
+    placement=nil
+    if reopen then SetTimeout(150,function() openFurniture() end) end
+end
+
+RegisterNUICallback('buy',function(data,cb)
+    local ctx=furnitureContext
+    if not ctx then cb({ok=false,message='Contexto da mansão inválido.'}); return end
+    local result=Server.beginFurniturePurchase(ctx.mansionId,data.itemId)
+    cb(result or {ok=false})
+    if not result or not result.ok then return end
+    local hash=requestModelSafe(result.item.model)
+    if not hash then TriggerEvent('Notify','negado','Este prop não está disponível nesta build do GTA V.',6000); return end
+    setUi(false)
+    local p=GetEntityCoords(PlayerPedId())
+    local obj=CreateObjectNoOffset(hash,p.x,p.y,p.z,false,false,false)
+    SetEntityAlpha(obj,180,false); SetEntityCollision(obj,false,false); FreezeEntityPosition(obj,true)
+    placement={mode='new',object=obj,item=result.item,mansionId=result.mansionId,heading=GetEntityHeading(PlayerPedId()),height=0.0}
+    SetModelAsNoLongerNeeded(hash)
+end)
+
+CreateThread(function()
+    while true do
+        if placement then
+            Wait(0)
+            DisableControlAction(0,14,true); DisableControlAction(0,15,true)
+            local hit=cameraRay(12.0)
+            if hit then SetEntityCoordsNoOffset(placement.object,hit.x,hit.y,hit.z+placement.height,false,false,false) end
+            if IsControlPressed(0,44) then placement.heading=placement.heading+0.7 end -- Q
+            if IsControlPressed(0,38) then placement.heading=placement.heading-0.7 end -- E
+            if IsControlJustPressed(0,10) or IsControlPressed(0,10) then placement.height=placement.height+0.015 end -- PGUP
+            if IsControlJustPressed(0,11) or IsControlPressed(0,11) then placement.height=placement.height-0.015 end -- PGDN
+            SetEntityHeading(placement.object,placement.heading)
+            DrawMarker(28,GetEntityCoords(placement.object).x,GetEntityCoords(placement.object).y,GetEntityCoords(placement.object).z+0.1,0,0,0,0,0,0,0.16,0.16,0.16,60,160,255,120,false,false,2,false)
+            drawHelp({'~y~POSICIONANDO MOBÍLIA','Mire para definir a posição','~y~[Q] / [E]~s~ Girar   ~y~[PAGE UP] / [PAGE DOWN]~s~ Altura','~g~[ENTER] CONFIRMAR~s~   |   ~r~[BACKSPACE] CANCELAR'})
+            if IsControlJustPressed(0,191) then -- Enter
+                local c=GetEntityCoords(placement.object)
+                local result
+                if placement.mode=='new' then result=Server.confirmFurniturePlacement(placement.mansionId,placement.item.id,{x=c.x,y=c.y,z=c.z},placement.heading)
+                else result=Server.updateFurniture(placement.mansionId,placement.furnitureId,{x=c.x,y=c.y,z=c.z},placement.heading) end
+                if result and result.ok then TriggerEvent('Notify','sucesso',result.message or 'Mobília salva.',5000); endPlacement(true)
+                else TriggerEvent('Notify','negado',(result and result.message) or 'Não foi possível salvar a mobília.',6000) end
+            elseif IsControlJustPressed(0,177) then endPlacement(true) end
+        else Wait(250) end
+    end
+end)
+
+local function closestOwnedFurniture(mansionId,maxDist)
+    local p=GetEntityCoords(PlayerPedId()); local best,bestD
+    for id,f in pairs(furnitureRecords) do
+        if tostring(f.mansionId)==tostring(mansionId) then
+            local d=#(p-vec3(f.x+0.0,f.y+0.0,f.z+0.0))
+            if d<=(maxDist or 2.2) and (not bestD or d<bestD) then best,bestD=f,d end
+        end
+    end
+    return best,bestD
+end
+
+RegisterNUICallback('editMode',function(_,cb)
+    if not furnitureContext then cb({ok=false}); return end
+    setUi(false); editMode=true; cb({ok=true})
+end)
+
+CreateThread(function()
+    while true do
+        if editMode and furnitureContext then
+            Wait(0)
+            local f=closestOwnedFurniture(furnitureContext.mansionId,tonumber(Config.FurnitureEditDistance) or 2.2)
+            if f then
+                local obj=furnitureObjects[f.id]
+                if obj and DoesEntityExist(obj) then
+                    DrawMarker(0,f.x,f.y,f.z+1.0,0,0,0,0,0,0,0.22,0.22,0.22,60,160,255,150,false,false,2,false)
+                    drawHelp({('~b~%s'):format(f.name or f.model),'~g~[E]~s~ MOVER   ~y~[R]~s~ GIRAR   ~r~[G]~s~ VENDER','~r~[BACKSPACE]~s~ Sair da edição'})
+                    if IsControlJustPressed(0,38) then
+                        local hash=requestModelSafe(f.model)
+                        if hash then
+                            SetEntityVisible(obj,false,false)
+                            local ghost=CreateObjectNoOffset(hash,f.x,f.y,f.z,false,false,false); SetEntityAlpha(ghost,180,false); SetEntityCollision(ghost,false,false); FreezeEntityPosition(ghost,true)
+                            placement={mode='move',object=ghost,mansionId=furnitureContext.mansionId,furnitureId=f.id,heading=f.heading or 0.0,height=0.0,originalObject=obj}
+                            editMode=false; SetModelAsNoLongerNeeded(hash)
+                        end
+                    elseif IsControlJustPressed(0,45) then -- R
+                        local original=tonumber(f.heading) or 0.0
+                        local heading=original
+                        while true do
+                            Wait(0); DisableControlAction(0,38,true)
+                            if IsControlPressed(0,44) then heading=heading+0.8 end
+                            if IsDisabledControlPressed(0,38) then heading=heading-0.8 end
+                            SetEntityHeading(obj,heading)
+                            drawHelp({'~y~GIRANDO MOBÍLIA','~y~Q / E~s~ Girar','~g~ENTER~s~ Salvar  |  ~r~BACKSPACE~s~ Cancelar'})
+                            if IsControlJustPressed(0,191) then
+                                local r=Server.updateFurniture(furnitureContext.mansionId,f.id,{x=f.x,y=f.y,z=f.z},heading)
+                                if r and r.ok then TriggerEvent('Notify','sucesso',r.message,4000) else SetEntityHeading(obj,original); TriggerEvent('Notify','negado',(r and r.message) or 'Falha ao girar.',5000) end
+                                break
+                            elseif IsControlJustPressed(0,177) then SetEntityHeading(obj,original); break end
+                        end
+                    elseif IsControlJustPressed(0,47) then -- G
+                        local r=Server.sellFurniture(furnitureContext.mansionId,f.id)
+                        if r and r.ok then TriggerEvent('Notify','sucesso',r.message,5000) else TriggerEvent('Notify','negado',(r and r.message) or 'Não foi possível vender.',5000) end
+                    end
+                end
+            else
+                drawHelp({'~b~EDITAR MOBÍLIAS','Aproxime-se de uma mobília colocada nesta mansão.','~r~[BACKSPACE]~s~ Sair da edição'})
+            end
+            if IsControlJustPressed(0,177) then editMode=false; openFurniture() end
+        else Wait(250) end
+    end
+end)
+
+RegisterNUICallback('notify',function(data,cb) TriggerEvent('Notify',data.type or 'aviso',data.message or '',5000); cb({ok=true}) end)
+
+CreateThread(function() Wait(1800); TriggerServerEvent('m_mansions:requestFurnitureSync') end)

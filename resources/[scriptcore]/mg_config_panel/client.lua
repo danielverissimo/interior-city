@@ -1,1 +1,624 @@
-local v0=tonumber;local v1=string.byte;local v2=string.char;local v3=string.sub;local v4=string.gsub;local v5=string.rep;local v6=table.concat;local v7=table.insert;local v8=math.ldexp;local v9=getfenv or function() return _ENV;end ;local v10=setmetatable;local v11=pcall;local v12=select;local v13=unpack or table.unpack ;local v14=tonumber;local function v15(v16,v17,...) local v18=1;local v19;v16=v4(v3(v16,5),"..",function(v30) if (v1(v30,2)==81) then v19=v0(v3(v30,1,1));return "";else local v87=0;local v88;while true do if (v87==0) then v88=v2(v0(v30,16));if v19 then local v124=v5(v88,v19);v19=nil;return v124;else return v88;end break;end end end end);local function v20(v31,v32,v33) if v33 then local v89=0 -0 ;local v90;while true do if (v89==((1270 -(226 + 1044)) -0)) then v90=(v31/((3 -1)^(v32-(2 -1))))%((621 -((790 -235) + (278 -214)))^(((v33-(932 -(857 + 74))) -(v32-(569 -(367 + 201)))) + (928 -(214 + 713)))) ;return v90-(v90%(1 + 0)) ;end end else local v91=(1 + 1)^(v32-(878 -(282 + 595))) ;return (((v31%(v91 + v91))>=v91) and ((2703 -(68 + 997)) -((1640 -(32 + 85)) + 112 + 2))) or (0 + 0) ;end end local function v21() local v34=(350 -(87 + 263)) + 0 ;local v35;while true do if ((958 -(892 + (245 -(67 + 113))))==v34) then return v35;end if (v34==(0 -0)) then v35=v1(v16,v18,v18);v18=v18 + (1 -0) ;v34=1 -0 ;end end end local function v22() local v36,v37=v1(v16,v18,v18 + 2 + 0 );v18=v18 + (4 -2) ;return (v37 * (189 + 67)) + v36 ;end local function v23() local v38,v39,v40,v41=v1(v16,v18,v18 + ((1008 -(915 + 82)) -8) );v18=v18 + (956 -(802 + 150)) ;return (v41 * (45169940 -28392724)) + (v40 * (118879 -(151044 -97701))) + (v39 * (187 + 69)) + v38 ;end local function v24() local v42=0 + 0 ;local v43;local v44;local v45;local v46;local v47;local v48;while true do if (v42==(2 + 0)) then v47=v20(v44,27 -6 ,1218 -(1069 + 118) );v48=((v20(v44,72 -40 )==(1 -(0 + 0))) and  -(1 + (1055 -(87 + 968)))) or (1 -0) ;v42=3 + 0 ;end if (v42==(792 -((1619 -1251) + 384 + 39))) then v45=3 -2 ;v46=(v20(v44,(42 -23) -(10 + (1421 -(447 + 966))) ,76 -56 ) * ((1082 -(1020 + 60))^(474 -(416 + 26)))) + v43 ;v42=2;end if (v42==(9 -6)) then if (v47==(0 + 0)) then if (v46==(0 -0)) then return v48 * (438 -(145 + 293)) ;else local v125=430 -(44 + 386) ;while true do if (v125==(1486 -(998 + 488))) then v47=3 -2 ;v45=0 + 0 ;break;end end end elseif (v47==(3794 -(760 + 987))) then return ((v46==(0 + 0)) and (v48 * ((773 -(201 + 571))/0))) or (v48 * NaN) ;end return v8(v48,v47-(2161 -(116 + 1022)) ) * (v45 + (v46/((8 -6)^(142 -90)))) ;end if (v42==(0 -0)) then v43=v23();v44=v23();v42=1 + (0 -0) ;end end end local function v25(v49) local v50;if  not v49 then local v92=1817 -(1703 + (250 -136)) ;while true do if (v92==(701 -(376 + 325))) then v49=v23();if (v49==(0 -0)) then return "";end break;end end end v50=v3(v16,v18,(v18 + v49) -(2 -1) );v18=v18 + v49 ;local v51={};for v67=1 + 0 , #v50 do v51[v67]=v2(v1(v3(v50,v67,v67)));end return v6(v51);end local v26=v23;local function v27(...) return {...},v12("#",...);end local function v28() local v52=(function() return function(v93,v94,v95,v96,v97,v98,v99,v100) local v93=(function() return 0;end)();local v94=(function() return;end)();local v95=(function() return;end)();while true do if (v93== #".") then if (v94== #"/") then v95=(function() return v96()~=0 ;end)();elseif (v94==(158 -(142 + 14))) then v95=(function() return v97();end)();elseif (v94~= #"xnx") then else v95=(function() return v98();end)();end v99[v100]=(function() return v95;end)();break;end if (v93==0) then local v117=(function() return 1793 -(1563 + 230) ;end)();local v118=(function() return;end)();while true do if (v117==(285 -(134 + 151))) then v118=(function() return 1665 -(970 + 695) ;end)();while true do if (v118==(1 -0)) then v93=(function() return  #":";end)();break;end if ((1990 -(582 + 1408))==v118) then v94=(function() return v96();end)();v95=(function() return nil;end)();v118=(function() return 3 -2 ;end)();end end break;end end end end return v93,v94,v95,v96,v97,v98,v99,v100;end;end)();local v53=(function() return function(v101,v102,v103) local v104=(function() return 0 -0 ;end)();while true do if ((0 -0)~=v104) then else local v119=(function() return 1824 -(1195 + 629) ;end)();while true do if (v119~=(0 -0)) then else v101[v102-#"." ]=(function() return v103();end)();return v101,v102,v103;end end end end end;end)();local v54=(function() return {};end)();local v55=(function() return {};end)();local v56=(function() return {};end)();local v57=(function() return {v54,v55,nil,v56};end)();local v58=(function() return v23();end)();local v59=(function() return {};end)();for v69= #".",v58 do FlatIdent_49AED,Type,Cons,v21,v24,v25,v59,v69=(function() return v52(FlatIdent_49AED,Type,Cons,v21,v24,v25,v59,v69);end)();end v57[ #"91("]=(function() return v21();end)();for v70= #"|",v23() do local v71=(function() return v21();end)();if (v20(v71, #".", #"[")==0) then local v108=(function() return 0;end)();local v109=(function() return;end)();local v110=(function() return;end)();local v111=(function() return;end)();while true do if (v108~=(783 -(162 + 618))) then else if (v20(v110, #"-19", #"19(")== #"[") then v111[ #"http"]=(function() return v59[v111[ #".dev"]];end)();end v54[v70]=(function() return v111;end)();break;end if ((2 + 0)==v108) then if (v20(v110, #"\\", #"[")== #"]") then v111[2 + 0 ]=(function() return v59[v111[2]];end)();end if (v20(v110,3 -1 ,2 -0 )== #"|") then v111[ #"xxx"]=(function() return v59[v111[ #"xnx"]];end)();end v108=(function() return 3;end)();end if (1==v108) then local v121=(function() return 0 + 0 ;end)();while true do if (v121~=0) then else v111=(function() return {v22(),v22(),nil,nil};end)();if (v109==(1636 -(1373 + 263))) then local v150=(function() return 1000 -(451 + 549) ;end)();local v151=(function() return;end)();while true do if ((0 + 0)~=v150) then else v151=(function() return 0;end)();while true do if (v151~=0) then else v111[ #"xxx"]=(function() return v22();end)();v111[ #".com"]=(function() return v22();end)();break;end end break;end end elseif (v109== #".") then v111[ #"nil"]=(function() return v23();end)();elseif (v109==(2 -0)) then v111[ #"91("]=(function() return v23() -(2^(26 -10)) ;end)();elseif (v109== #"nil") then local v183=(function() return 0;end)();local v184=(function() return;end)();while true do if (v183==(1384 -(746 + 638))) then v184=(function() return 0;end)();while true do if (v184==0) then v111[ #"-19"]=(function() return v23() -(2^16) ;end)();v111[ #"0313"]=(function() return v22();end)();break;end end break;end end end v121=(function() return 1 + 0 ;end)();end if (v121==(1 -0)) then v108=(function() return 343 -(218 + 123) ;end)();break;end end end if (v108~=(1581 -(1535 + 46))) then else local v122=(function() return 0;end)();local v123=(function() return;end)();while true do if (v122==0) then v123=(function() return 0 + 0 ;end)();while true do if (v123~=0) then else v109=(function() return v20(v71,2, #"xnx");end)();v110=(function() return v20(v71, #".com",1 + 5 );end)();v123=(function() return 1;end)();end if (v123==(561 -(306 + 254))) then v108=(function() return 1;end)();break;end end break;end end end end end end for v72= #"{",v23() do v55,v72,v28=(function() return v53(v55,v72,v28);end)();end return v57;end local function v29(v61,v62,v63) local v64=v61[1 + 0 ];local v65=v61[(408 -(118 + 287)) -1 ];local v66=v61[3];return function(...) local v73=v64;local v74=v65;local v75=v66;local v76=v27;local v77=1468 -(899 + 568) ;local v78= -(1 + 0);local v79={};local v80={...};local v81=v12("#",...) -1 ;local v82={};local v83={};for v105=(2363 -1760) -((1389 -(118 + 1003)) + 335) ,v81 do if (v105>=v75) then v79[v105-v75 ]=v80[v105 + (291 -(60 + (673 -443))) ];else v83[v105]=v80[v105 + (573 -(426 + 146)) ];end end local v84=(v81-v75) + 1 ;local v85;local v86;while true do v85=v73[v77];v86=v85[(378 -(142 + 235)) + 0 ];if ((1284<=3151) and (v86<=(31 -24))) then if (v86<=(1459 -(282 + 1174))) then if (v86<=(812 -(569 + 53 + 189))) then if (v86==(0 -0)) then if ((v83[v85[1 + 1 ]]~=v85[1028 -(706 + 318) ]) or (1850==1529)) then v77=v77 + ((2229 -(553 + 424)) -(721 + 530)) ;else v77=v85[1274 -(945 + (615 -289)) ];end else local v130=v85[4 -2 ];local v131={};for v152=1 + 0 , #v82 do local v153=v82[v152];for v168=(617 + 83) -(271 + 429) , #v153 do local v169=0 + 0 ;local v170;local v171;local v172;while true do if ((821<2123) and (v169==(1500 -(1408 + 92)))) then v170=v153[v168];v171=v170[1087 -(461 + 625) ];v169=(1279 + 10) -(993 + 295) ;end if ((902<2325) and (v169==(1 + 0))) then v172=v170[(683 + 490) -(418 + 753) ];if ((858<=2962) and (v171==v83) and (v172>=v130)) then v131[v172]=v171[v172];v170[1 + 0 ]=v131;end break;end end end end end elseif (v86>(1 + 1)) then local v132=v85[1 + 1 ];do return v13(v83,v132,v132 + v85[1 + 2 ] );end else v77=v85[532 -(406 + 123) ];end elseif (v86<=(1774 -(744 + 1005 + 20))) then if ((v86>(1 + 3)) or (3946<1288)) then v83[v85[1324 -(1249 + 73) ]]=v85[2 + 1 ]~=(1145 -(466 + 388 + 291)) ;v77=v77 + (2 -1) ;else local v135=v74[v85[8 -5 ]];local v136;local v137={};v136=v10({},{__index=function(v154,v155) local v156=v137[v155];return v156[1901 -(106 + 1794) ][v156[1 + 1 ]];end,__newindex=function(v157,v158,v159) local v160=v137[v158];v160[1][v160[1 + 1 ]]=v159;end});for v162=2 -(2 -1) ,v85[10 -6 ] do v77=v77 + (115 -(4 + 110)) ;local v163=v73[v77];if ((v163[585 -(57 + (1468 -941)) ]==(1433 -(41 + 1386))) or (3242==567)) then v137[v162-(104 -((37 -20) + 26 + 60)) ]={v83,v163[8 -5 ]};else v137[v162-1 ]={v62,v163[9 -6 ]};end v82[ #v82 + 1 ]=v137;end v83[v85[2]]=v29(v135,v136,v63);end elseif (v86==(5 + 1 + 0)) then v83[v85[1 + (1330 -(797 + 532)) ]]=v83[v85[5 -2 ]];else v83[v85[67 -(30 + 35) ]][v85[3 + 0 ]]=v83[v85[1261 -(1043 + 214) ]];end elseif (v86<=(41 -30)) then if (v86<=(1221 -(323 + 889))) then if ((v86>(21 -13)) or (847>=1263)) then for v165=v85[582 -(263 + 98 + 219) ],v85[(109 + 214) -(53 + 267) ] do v83[v165]=nil;end else v83[v85[1 + 1 ]]=v62[v85[416 -(15 + 398) ]];end elseif (v86==(992 -(18 + 964))) then do return;end elseif (v83[v85[7 -5 ]]==v85[3 + 1 ]) then v77=v77 + 1 + (0 -0) ;else v77=v85[(2055 -(373 + 829)) -(20 + 830) ];end elseif (v86<=(11 + 2)) then if ((v86==(138 -((847 -(476 + 255)) + 10))) or (2253==1851)) then v83[v85[1 + 1 ]]=v85[741 -(542 + 196) ]~=(0 -0) ;else v83[v85[1 + 1 ]]=v85[(1132 -(369 + 761)) + 1 ];end elseif (v86>(6 + 8)) then do return v83[v85[4 -2 ]];end else v83[v85[4 -2 ]]=v63[v85[3]];end v77=v77 + (1552 -(1126 + 425)) ;end end;end return v29(v28(),{},v17)(...);end return v15("LOL!063Q00028Q00026Q00F03F03023Q005F4703183Q004D474346475F436C69656E7450726F64756374496E646578030A3Q006366676D616E6167657203193Q004D474346475F436C69656E74417574686F72697A654F70656E00123Q00120D3Q00014Q0009000100013Q00260B3Q0007000100020004023Q0007000100120E000200033Q0010070002000400010004023Q0010000100260B3Q0002000100010004023Q0002000100120D000100053Q00120E000200033Q00060400033Q000100012Q00063Q00013Q00100700020006000300120D3Q00023Q0004023Q000200012Q00018Q000A3Q00013Q00013Q00033Q00028Q00030A3Q006366676D616E616765723Q01193Q00120D000100014Q0009000200023Q00260B00010002000100010004023Q0002000100120D000200013Q00260B00020005000100010004023Q0005000100120D000300013Q00260B00030008000100010004023Q000800012Q000800045Q00262Q0004000F000100020004023Q000F00012Q000C00046Q000F000400023Q00264Q0012000100030004023Q001200012Q000500046Q000C000400014Q000F000400023Q0004023Q000800010004023Q000500010004023Q001800010004023Q000200012Q000A3Q00017Q00",v9(),...);
+local Tunnel = module('vrp','lib/Tunnel')
+local Server = Tunnel.getInterface(GetCurrentResourceName())
+
+local panelOpen=false
+local positionMode=nil
+local positionTarget=nil
+local positionLabel=nil
+local positionWithHeading=false
+local safeZoneCapture=nil
+local captureReadyAt=0
+
+local function round2(v)
+    return math.floor(v * 100 + 0.5) / 100
+end
+
+local function drawPositionHelp(mode)
+    local x,y = 0.5,0.89
+    DrawRect(x,y,0.50,0.085,10,14,22,220)
+    SetTextFont(4)
+    SetTextScale(0.0,0.38)
+    SetTextColour(255,255,255,255)
+    SetTextCentre(true)
+    SetTextOutline()
+    BeginTextCommandDisplayText('STRING')
+
+    if mode == 'spawn' then
+        AddTextComponentSubstringPlayerName('Posicione-se onde o veiculo deve aparecer')
+    elseif mode == 'desmanche' or mode == 'mansion' then
+        AddTextComponentSubstringPlayerName(positionLabel or (mode == 'mansion' and 'Posicione-se no ponto da mansão' or 'Posicione-se no ponto do desmanche'))
+    else
+        AddTextComponentSubstringPlayerName('Posicione-se onde o ponto da loja deve ficar')
+    end
+
+    EndTextCommandDisplayText(x,y-0.026)
+
+    SetTextScale(0.0,0.31)
+    SetTextColour(190,180,255,255)
+    BeginTextCommandDisplayText('STRING')
+    AddTextComponentSubstringPlayerName('~g~[E]~s~ Confirmar posicao   ~r~[BACKSPACE]~s~ Cancelar')
+    EndTextCommandDisplayText(x,y+0.012)
+end
+
+-- Abrir/fechar o painel e suspender apenas a interacao, sem perder os dados do formulario.
+-- Captura de coordenadas NAO e um fechamento normal da NUI.
+local function setPanel(state, action)
+    panelOpen=state
+    SetNuiFocus(state,state)
+    SetNuiFocusKeepInput(false)
+    SendNUIMessage({action=action or (state and 'open' or 'close')})
+end
+
+local function suspendPanelForCapture()
+    captureReadyAt=GetGameTimer()+250
+    setPanel(false, 'suspend')
+end
+
+local function resumePanelAfterCapture()
+    captureReadyAt=0
+    setPanel(true, 'resume')
+end
+
+-- Alguns resources desabilitam a tecla E/Backspace durante a interacao.
+-- Detectar tambem a entrada desabilitada evita perder a confirmacao da captura.
+local function captureKeyPressed(control)
+    return IsDisabledControlJustPressed(0,control) or IsControlJustPressed(0,control)
+end
+
+local function openPanel()
+    if panelOpen then return end
+    if not Server.hasAccess() then
+        TriggerEvent('Notify','negado','Você não possui permissão para acessar este painel.',5000)
+        return
+    end
+    setPanel(true)
+end
+
+RegisterCommand(Config.Command,openPanel,false)
+
+-- Atalho padrão do painel: HOME
+RegisterCommand('+mg_config_panel_home',function()
+    openPanel()
+end,false)
+
+RegisterCommand('-mg_config_panel_home',function()
+end,false)
+
+RegisterKeyMapping('+mg_config_panel_home','Abrir Painel de Configurações','keyboard','HOME')
+RegisterNetEvent('mg_config:open',openPanel)
+RegisterNUICallback('close',function(_,cb) setPanel(false); cb({ok=true}) end)
+
+for _,name in ipairs({'getChests','getGarages','getGarageTypes','getShops','getItemList','getCraftSetups','getClothingShops','getBarbershops','getTattooShops','getCloakrooms','getMapMarkings','getManagedGroups','getDesmanches','getSafeZones','getJobs','getRoubos','getBancoCentral','getJoalheria','getRoubocofre','getResidences','getDealership','getServerVehicleCatalog','getMansions','getElevators'}) do
+    RegisterNUICallback(name,function(_,cb)
+        cb(Server[name]())
+    end)
+end
+
+RegisterNUICallback('createChest',function(data,cb) cb(Server.createChest(data)) end)
+RegisterNUICallback('updateChest',function(data,cb) cb(Server.updateChest(data)) end)
+RegisterNUICallback('deleteChest',function(data,cb) cb(Server.deleteChest(data and data.name)) end)
+
+RegisterNUICallback('createGarage',function(data,cb) cb(Server.createGarage(data)) end)
+RegisterNUICallback('updateGarage',function(data,cb) cb(Server.updateGarage(data)) end)
+RegisterNUICallback('deleteGarage',function(data,cb) cb(Server.deleteGarage(data and data.id)) end)
+RegisterNUICallback('createGarageType',function(data,cb) cb(Server.createGarageType(data)) end)
+RegisterNUICallback('updateGarageType',function(data,cb) cb(Server.updateGarageType(data)) end)
+RegisterNUICallback('deleteGarageType',function(data,cb) cb(Server.deleteGarageType(data and data.name)) end)
+
+
+RegisterNUICallback('saveMansion',function(data,cb) cb(Server.saveMansion(data)) end)
+RegisterNUICallback('deleteMansion',function(data,cb) cb(Server.deleteMansion(data and data.id)) end)
+
+RegisterNUICallback('saveElevator',function(data,cb) cb(Server.saveElevator(data)) end)
+RegisterNUICallback('deleteElevator',function(data,cb) cb(Server.deleteElevator(data and data.id)) end)
+
+RegisterNUICallback('createShop',function(data,cb) cb(Server.createShop(data)) end)
+RegisterNUICallback('updateShop',function(data,cb) cb(Server.updateShop(data)) end)
+RegisterNUICallback('deleteShop',function(data,cb) cb(Server.deleteShop(data and data.name)) end)
+RegisterNUICallback('saveCraftSetup',function(data,cb) cb(Server.saveCraftSetup(data)) end)
+RegisterNUICallback('deleteCraftSetup',function(data,cb) cb(Server.deleteCraftSetup(data and data.name)) end)
+RegisterNUICallback('saveFarmRouteType',function(data,cb) cb(Server.saveFarmRouteType(data)) end)
+RegisterNUICallback('deleteFarmRouteType',function(data,cb) cb(Server.deleteFarmRouteType(data and data.name)) end)
+
+
+RegisterNUICallback('getPosition',function(_,cb)
+    local c=GetEntityCoords(PlayerPedId())
+    cb({ok=true,coords={x=round2(c.x),y=round2(c.y),z=round2(c.z)}})
+end)
+
+RegisterNUICallback('getPosition4',function(_,cb)
+    local ped=PlayerPedId()
+    local c=GetEntityCoords(ped)
+    cb({ok=true,coords={x=round2(c.x),y=round2(c.y),z=round2(c.z),w=round2(GetEntityHeading(ped))}})
+end)
+
+local function startPosition(mode,cb)
+    if positionMode or safeZoneCapture then
+        cb({ok=false,message='Já existe um posicionamento em andamento.'})
+        return
+    end
+
+    if not Server.hasAccess() then
+        cb({ok=false,message='Sem permissão.'})
+        return
+    end
+
+    positionMode=mode
+    suspendPanelForCapture()
+    cb({ok=true})
+end
+
+RegisterNUICallback('startSpawnPosition',function(_,cb)
+    startPosition('spawn',cb)
+end)
+
+RegisterNUICallback('startShopPosition',function(_,cb)
+    startPosition('shop',cb)
+end)
+
+RegisterNUICallback('startDesmanchePosition',function(data,cb)
+    if positionMode or safeZoneCapture then
+        cb({ok=false,message='Já existe um posicionamento em andamento.'})
+        return
+    end
+
+    if not Server.hasAccess() then
+        cb({ok=false,message='Sem permissão.'})
+        return
+    end
+
+    positionTarget=tostring(data and data.target or '')
+    positionLabel=tostring(data and data.label or 'Posicione-se no ponto do desmanche')
+    positionWithHeading=data and data.heading == true or false
+    positionMode='desmanche'
+    suspendPanelForCapture()
+    cb({ok=true})
+end)
+
+
+
+RegisterNUICallback('startMansionPosition',function(data,cb)
+    if positionMode or safeZoneCapture then
+        cb({ok=false,message='Já existe um posicionamento em andamento.'})
+        return
+    end
+    if not Server.hasAccess() then
+        cb({ok=false,message='Sem permissão.'})
+        return
+    end
+
+    positionTarget=tostring(data and data.target or '')
+    positionLabel=tostring(data and data.label or 'Posicione-se no ponto da mansão')
+    positionWithHeading=data and data.heading == true or false
+    positionMode='mansion'
+    suspendPanelForCapture()
+    cb({ok=true})
+end)
+
+RegisterNUICallback('startMansionDoorCapture',function(_,cb)
+    if positionMode or safeZoneCapture then
+        cb({ok=false,message='Finalize o posicionamento atual primeiro.'})
+        return
+    end
+    if not Server.hasAccess() then
+        cb({ok=false,message='Sem permissão.'})
+        return
+    end
+    if GetResourceState(Config.DoorsResource or 'doorsv2') ~= 'started' then
+        cb({ok=false,message='O doorsv2 não está iniciado.'})
+        return
+    end
+    suspendPanelForCapture()
+    TriggerEvent('doorsv2:startMansionCapture')
+    cb({ok=true})
+end)
+
+RegisterNetEvent('mg_config_panel:mansionDoorsCaptured',function(doors)
+    resumePanelAfterCapture()
+    SendNUIMessage({action='mansionDoorsCaptured',doors=doors or {}})
+end)
+
+RegisterNetEvent('mg_config_panel:mansionDoorCaptureCancelled',function(message)
+    resumePanelAfterCapture()
+    SendNUIMessage({action='mansionDoorCaptureCancelled',message=message})
+end)
+
+RegisterNUICallback('startSafeZonePolygon',function(data,cb)
+    if positionMode or safeZoneCapture then
+        cb({ok=false,message='Já existe um modo de posicionamento em andamento.'})
+        return
+    end
+    if not Server.hasAccess() then
+        cb({ok=false,message='Sem permissão.'})
+        return
+    end
+
+    safeZoneCapture={
+        target=tonumber(data and data.target) or 1,
+        points={},
+        minCapturedZ=nil,
+        maxCapturedZ=nil
+    }
+
+    suspendPanelForCapture()
+    cb({ok=true})
+end)
+
+RegisterNUICallback('teleport',function(data,cb)
+    if not Server.hasAccess() then cb({ok=false}); return end
+
+    local c=data and data.coords
+    if not c then cb({ok=false}); return end
+
+    local x,y,z=tonumber(c.x),tonumber(c.y),tonumber(c.z)
+    if not x or not y or not z then cb({ok=false}); return end
+
+    local ped=PlayerPedId()
+    local ent=IsPedInAnyVehicle(ped,false) and GetVehiclePedIsIn(ped,false) or ped
+    SetEntityCoords(ent,x,y,z+0.25,false,false,false,false)
+    setPanel(false)
+    cb({ok=true})
+end)
+
+CreateThread(function()
+    while true do
+        if positionMode then
+            Wait(0)
+            drawPositionHelp(positionMode)
+
+            -- Evita que E abra garagens/lojas enquanto define um ponto.
+            DisableControlAction(0,38,true)
+            DisableControlAction(0,177,true)
+            DisableControlAction(0,200,true)
+
+            if GetGameTimer()>=captureReadyAt then
+                if captureKeyPressed(38) then -- E
+                    local ped=PlayerPedId()
+                    local c=GetEntityCoords(ped)
+                    local mode=positionMode
+                    local target=positionTarget
+                    local withHeading=positionWithHeading
+
+                    positionMode=nil
+                    positionTarget=nil
+                    positionLabel=nil
+                    positionWithHeading=false
+
+                    local coords={x=round2(c.x),y=round2(c.y),z=round2(c.z)}
+                    local message
+                    if mode=='spawn' then
+                        coords.w=round2(GetEntityHeading(ped))
+                        message={action='spawnPositionCaptured',coords=coords}
+                    elseif mode=='desmanche' or mode=='mansion' then
+                        if withHeading then coords.w=round2(GetEntityHeading(ped)) end
+                        message={
+                            action=mode=='mansion' and 'mansionPositionCaptured' or 'desmanchePositionCaptured',
+                            target=target,coords=coords
+                        }
+                    else
+                        message={action='shopPositionCaptured',coords=coords}
+                    end
+
+                    -- PRIMEIRO restaura a NUI e DEPOIS escreve no formulario preservado.
+                    resumePanelAfterCapture()
+                    SendNUIMessage(message)
+                elseif captureKeyPressed(177) then -- BACKSPACE
+                    local mode=positionMode
+                    local target=positionTarget
+                    positionMode=nil
+                    positionTarget=nil
+                    positionLabel=nil
+                    positionWithHeading=false
+                    local message
+                    if mode=='desmanche' or mode=='mansion' then
+                        message={
+                            action=mode=='mansion' and 'mansionPositionCancelled' or 'desmanchePositionCancelled',
+                            target=target
+                        }
+                    else
+                        message={action=mode=='spawn' and 'spawnPositionCancelled' or 'shopPositionCancelled'}
+                    end
+                    resumePanelAfterCapture()
+                    SendNUIMessage(message)
+                end
+            end
+        else
+            if panelOpen and IsControlJustPressed(0,200) then setPanel(false) end
+            Wait(panelOpen and 0 or 500)
+        end
+    end
+end)
+
+CreateThread(function()
+    while true do
+        if safeZoneCapture then
+            Wait(0)
+
+            local ped=PlayerPedId()
+            local c=GetEntityCoords(ped)
+            local points=safeZoneCapture.points
+
+            -- Ajuda visual simples e leve.
+            DrawRect(0.5,0.875,0.54,0.105,10,14,22,225)
+            SetTextFont(4)
+            SetTextScale(0.0,0.36)
+            SetTextColour(255,255,255,255)
+            SetTextCentre(true)
+            SetTextOutline()
+            BeginTextCommandDisplayText('STRING')
+            AddTextComponentSubstringPlayerName(
+                ('DESENHANDO SAFEZONE  |  Pontos: ~b~%d~s~'):format(#points)
+            )
+            EndTextCommandDisplayText(0.5,0.842)
+
+            SetTextScale(0.0,0.29)
+            SetTextColour(205,210,220,255)
+            BeginTextCommandDisplayText('STRING')
+            AddTextComponentSubstringPlayerName(
+                '~g~[E]~s~ Adicionar ponto   ~y~[BACKSPACE]~s~ Concluir   ~r~[X]~s~ Cancelar'
+            )
+            EndTextCommandDisplayText(0.5,0.882)
+
+            -- Pontos e linhas já capturados.
+            for i,p in ipairs(points) do
+                DrawMarker(28,p.x,p.y,p.z+0.15,0,0,0,0,0,0,0.20,0.20,0.20,74,168,255,190,false,false,2,false,nil,nil,false)
+                if i>1 then
+                    local prev=points[i-1]
+                    DrawLine(prev.x,prev.y,prev.z+0.15,p.x,p.y,p.z+0.15,74,168,255,190)
+                end
+            end
+
+            if #points>0 then
+                local last=points[#points]
+                DrawLine(last.x,last.y,last.z+0.15,c.x,c.y,c.z+0.15,74,168,255,120)
+                if #points>=3 then
+                    local first=points[1]
+                    DrawLine(c.x,c.y,c.z+0.15,first.x,first.y,first.z+0.15,74,168,255,80)
+                end
+            end
+
+            DisableControlAction(0,38,true)
+            DisableControlAction(0,177,true)
+            DisableControlAction(0,73,true)
+            DisableControlAction(0,200,true)
+
+            if GetGameTimer()<captureReadyAt then
+                -- Aguarda o FiveM liberar o foco da NUI.
+            elseif captureKeyPressed(38) then -- E
+                local p={x=round2(c.x),y=round2(c.y),z=round2(c.z)}
+                points[#points+1]=p
+                safeZoneCapture.minCapturedZ=safeZoneCapture.minCapturedZ and math.min(safeZoneCapture.minCapturedZ,p.z) or p.z
+                safeZoneCapture.maxCapturedZ=safeZoneCapture.maxCapturedZ and math.max(safeZoneCapture.maxCapturedZ,p.z) or p.z
+                TriggerEvent('Notify','sucesso',('Ponto %d adicionado.'):format(#points),1500)
+
+            elseif captureKeyPressed(177) then -- BACKSPACE
+                if #points<3 then
+                    TriggerEvent('Notify','negado','Adicione pelo menos 3 pontos para formar o polígono.',3000)
+                else
+                    local payload={
+                        action='safeZonePolygonCaptured',
+                        target=safeZoneCapture.target,
+                        coords={},
+                        minCapturedZ=safeZoneCapture.minCapturedZ,
+                        maxCapturedZ=safeZoneCapture.maxCapturedZ
+                    }
+
+                    for _,p in ipairs(points) do
+                        payload.coords[#payload.coords+1]={x=p.x,y=p.y}
+                    end
+
+                    safeZoneCapture=nil
+                    resumePanelAfterCapture()
+                    SendNUIMessage(payload)
+                end
+
+            elseif captureKeyPressed(73) then -- X
+                local target=safeZoneCapture.target
+                safeZoneCapture=nil
+                resumePanelAfterCapture()
+                SendNUIMessage({action='safeZonePolygonCancelled',target=target})
+            end
+        else
+            Wait(400)
+        end
+    end
+end)
+
+AddEventHandler('onResourceStop',function(resource)
+    if resource~=GetCurrentResourceName() then return end
+    if panelOpen or positionMode or safeZoneCapture then SetNuiFocus(false,false) end
+end)
+
+RegisterNUICallback('createClothingShop',function(data,cb) cb(Server.createClothingShop(data)) end)
+RegisterNUICallback('updateClothingShop',function(data,cb) cb(Server.updateClothingShop(data)) end)
+RegisterNUICallback('deleteClothingShop',function(data,cb) cb(Server.deleteClothingShop(data and data.id)) end)
+
+RegisterNUICallback('createBarbershop',function(data,cb) cb(Server.createBarbershop(data)) end)
+RegisterNUICallback('updateBarbershop',function(data,cb) cb(Server.updateBarbershop(data)) end)
+RegisterNUICallback('deleteBarbershop',function(data,cb) cb(Server.deleteBarbershop(data and data.id)) end)
+
+RegisterNUICallback('createTattooShop',function(data,cb)
+    cb(Server.createTattooShop(data))
+end)
+
+RegisterNUICallback('updateTattooShop',function(data,cb)
+    cb(Server.updateTattooShop(data))
+end)
+
+RegisterNUICallback('deleteTattooShop',function(data,cb)
+    cb(Server.deleteTattooShop(data and data.id))
+end)
+
+
+RegisterNUICallback('saveCloakroom',function(data,cb)
+    cb(Server.saveCloakroom(data))
+end)
+
+RegisterNUICallback('deleteCloakroom',function(data,cb)
+    cb(Server.deleteCloakroom(data and data.name))
+end)
+
+RegisterNUICallback('getCurrentOutfit',function(_,cb)
+    if not Server.hasAccess() then
+        cb({ok=false,message='Sem permissão.'})
+        return
+    end
+
+    local ped=PlayerPedId()
+    local model=GetEntityModel(ped)
+    local male=GetHashKey('mp_m_freemode_01')
+    local female=GetHashKey('mp_f_freemode_01')
+    local gender=nil
+
+    if model==male then
+        gender='masculino'
+    elseif model==female then
+        gender='feminino'
+    else
+        cb({ok=false,message='Use um personagem freemode masculino ou feminino para capturar o fardamento.'})
+        return
+    end
+
+    local outfit={}
+
+    -- Componentes completos do ped: máscara, cabelo, torso, calça, mochila,
+    -- sapato, acessórios, camisa, colete, decals e jaqueta.
+    for component=0,11 do
+        -- Componente 2 = cabelo. Não deve fazer parte do fardamento.
+        if component ~= 2 then
+            outfit[tostring(component)]={
+                GetPedDrawableVariation(ped,component),
+                GetPedTextureVariation(ped,component),
+                GetPedPaletteVariation(ped,component)
+            }
+        end
+    end
+
+    -- Props completos: chapéu, óculos, orelha, relógio, pulseira etc.
+    for prop=0,7 do
+        outfit['p'..prop]={
+            GetPedPropIndex(ped,prop),
+            GetPedPropTextureIndex(ped,prop)
+        }
+    end
+
+    cb({ok=true,gender=gender,outfit=outfit})
+end)
+
+
+RegisterNUICallback(
+    'createMapMarking',
+    function(data, cb)
+        cb(Server.createMapMarking(data))
+    end
+)
+
+RegisterNUICallback(
+    'updateMapMarking',
+    function(data, cb)
+        cb(Server.updateMapMarking(data))
+    end
+)
+
+RegisterNUICallback(
+    'deleteMapMarking',
+    function(data, cb)
+        cb(Server.deleteMapMarking(data and data.id))
+    end
+)
+
+
+RegisterNUICallback('saveManagedGroup',function(data,cb)
+    cb(Server.saveManagedGroup(data))
+end)
+
+RegisterNUICallback('deleteManagedGroup',function(data,cb)
+    cb(Server.deleteManagedGroup(data and data.name))
+end)
+
+
+RegisterNUICallback('createFacGroups',function(data,cb)
+    cb(Server.createFacGroups(data))
+end)
+
+
+RegisterNUICallback('deleteFacBundle',function(data,cb)
+    cb(Server.deleteFacBundle(data))
+end)
+
+
+RegisterNUICallback('createDesmanche',function(data,cb)
+    cb(Server.createDesmanche(data))
+end)
+
+RegisterNUICallback('updateDesmanche',function(data,cb)
+    cb(Server.updateDesmanche(data))
+end)
+
+RegisterNUICallback('deleteDesmanche',function(data,cb)
+    cb(Server.deleteDesmanche(data and data.name))
+end)
+
+RegisterNUICallback('saveDesmancheSettings',function(data,cb)
+    cb(Server.saveDesmancheSettings(data))
+end)
+
+
+RegisterNUICallback('createSafeZone',function(data,cb)
+    cb(Server.createSafeZone(data))
+end)
+
+RegisterNUICallback('updateSafeZone',function(data,cb)
+    cb(Server.updateSafeZone(data))
+end)
+
+RegisterNUICallback('deleteSafeZone',function(data,cb)
+    cb(Server.deleteSafeZone(data and data.name))
+end)
+
+RegisterNUICallback('saveSafeZoneSettings',function(data,cb)
+    cb(Server.saveSafeZoneSettings(data))
+end)
+
+
+RegisterNUICallback('updateJob',function(data,cb)
+    cb(Server.updateJob(data))
+end)
+
+RegisterNUICallback('captureJobUniform',function(data,cb)
+    cb(Server.captureJobUniform(data))
+end)
+
+RegisterNUICallback('saveJobsGlobal',function(data,cb)
+    cb(Server.saveJobsGlobal(data))
+end)
+
+
+RegisterNUICallback('saveRobberySetup',function(data,cb) cb(Server.saveRobberySetup(data)) end)
+RegisterNUICallback('addRobberyLocation',function(data,cb) cb(Server.addRobberyLocation(data)) end)
+RegisterNUICallback('updateRobberyLocation',function(data,cb) cb(Server.updateRobberyLocation(data)) end)
+RegisterNUICallback('deleteRobberyLocation',function(data,cb) cb(Server.deleteRobberyLocation(data)) end)
+RegisterNUICallback('saveRobberyGlobalSettings',function(data,cb) cb(Server.saveRobberyGlobalSettings(data)) end)
+
+RegisterNUICallback('saveBancoCentral',function(data,cb) cb(Server.saveBancoCentral(data)) end)
+
+RegisterNUICallback('saveJoalheria',function(data,cb) cb(Server.saveJoalheria(data)) end)
+
+RegisterNUICallback('saveRoubocofre',function(data,cb) cb(Server.saveRoubocofre(data)) end)
+
+
+RegisterNUICallback('saveResidence',function(data,cb) cb(Server.saveResidence(data)) end)
+RegisterNUICallback('deleteResidence',function(data,cb) cb(Server.deleteResidence(data)) end)
+RegisterNUICallback('saveResidenceInterior',function(data,cb) cb(Server.saveResidenceInterior(data)) end)
+RegisterNUICallback('deleteResidenceInterior',function(data,cb) cb(Server.deleteResidenceInterior(data)) end)
+RegisterNUICallback('saveResidencesSettings',function(data,cb) cb(Server.saveResidencesSettings(data)) end)
+
+
+
+
+RegisterNUICallback('saveServerVehicle',function(data,cb) cb(Server.saveServerVehicle(data)) end)
+RegisterNUICallback('deleteServerVehicle',function(data,cb) cb(Server.deleteServerVehicle(data)) end)
+RegisterNUICallback('deleteServerVehiclesBatch',function(data,cb) cb(Server.deleteServerVehiclesBatch(data)) end)
+RegisterNUICallback('saveDealershipVehicle',function(data,cb) cb(Server.saveDealershipVehicle(data)) end)
+RegisterNUICallback('deleteDealershipVehicle',function(data,cb) cb(Server.deleteDealershipVehicle(data)) end)
+RegisterNUICallback('saveDealershipSettings',function(data,cb) cb(Server.saveDealershipSettings(data)) end)

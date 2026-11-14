@@ -215,6 +215,7 @@ end
 --- @param userId integer
 --- @return number
 local function calculateDominationMultiplier(userId)
+    if not GlobalState.isDominationActive then return 1.0 end
     local multiplier = 1.0
     local _, orgName = exports['dm_module']:GetGroupType(userId)
     local domination = exports['dm_module']:GetUserDomination(userId)

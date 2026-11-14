@@ -109,8 +109,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -154,8 +154,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -199,8 +199,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -244,8 +244,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -289,8 +289,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -334,8 +334,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -379,8 +379,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -424,8 +424,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -469,8 +469,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -514,8 +514,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS
@@ -559,8 +559,8 @@ Config.Groups = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
-                amount = 2000, -- Valor que vai receber
-                time = 30, -- tempo em tempo que vai receber salario em minuto(s)
+                amount = Config.DefaultSallary.amount, -- Valor que vai receber
+                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
             },
 
             Goals = { -- METAS

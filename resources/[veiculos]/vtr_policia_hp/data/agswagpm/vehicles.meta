@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CVehicleModelInfo__InitDataList>
+  <residentTxd>vehshare</residentTxd>
+  <residentAnims />
+  <InitDatas>
+	    
+  </InitDatas>
+  <txdRelationships>
+      <Item>
+          <parent>vehshare</parent>
+          <child>ags_vehshare</child>
+      </Item>
+      <Item>
+          <parent>ags_vehshare</parent>
+          <child>ags_propstrunk</child>
+      </Item>
+      
+  </txdRelationships>
+</CVehicleModelInfo__InitDataList>

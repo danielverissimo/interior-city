@@ -50,5 +50,5 @@ function showNui(attr) {
     $('.container').hide();
     $('#container_' + attr).show();
     $('#container_' + attr).load(attr + '/nui/index.html');
-    $('#general').attr('href', attr + '/nui/styles/styles.css');
+    $('#general').attr('href', attr + '/nui/style.css');
 }

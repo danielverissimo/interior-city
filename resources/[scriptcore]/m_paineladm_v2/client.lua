@@ -14,6 +14,8 @@ local sectorFocusActive = false
 
 local punishmentState = { active = false, center = nil, radius = 10.0, endsAt = 0 }
 local vipChoiceOpen = false
+local vipDismissedUntil = 0
+local vipDismissedAssignment = 0
 local vipTestState = { active = false, exiting = false, vehicle = 0, returnPosition = nil, endsAt = 0, center = nil, radius = 150.0, session = 0 }
 
 local function playClick()
@@ -112,6 +114,7 @@ local function publicConfig(dynamicLocations, dynamicLocationCategories, dynamic
                 index = vehicle.index or index,
                 spawn = vehicle.spawn,
                 name = vehicle.name or vehicle.nome or vehicle.spawn,
+                image = vehicle.image,
                 category = vehicle.category == "addon" and "addon" or "game"
             }
         end
@@ -336,6 +339,35 @@ RegisterNUICallback("auditAction", function(data, cb)
     cb(SERVER.auditPanelAction(data))
 end)
 
+-- Permite adiar a escolha sem perder a pendência e sem prender o foco da NUI.
+RegisterNUICallback("vipDismiss", function(data, cb)
+    if not vipTestState.active then
+        vipDismissedAssignment = math.floor(tonumber(data and data.assignmentId) or 0)
+        vipDismissedUntil = GetGameTimer() + 4000
+        vipChoiceOpen = false
+        SendNUIMessage({ type = "vipChoiceClose" })
+        SetNuiFocus(nuiOpen == true, nuiOpen == true)
+    end
+    cb({ ok = true })
+end)
+
+RegisterCommand("vipveiculos", function()
+    if vipTestState.active then
+        notify("negado", "Encerre o teste de veículo primeiro (F7).", 5000)
+        return
+    end
+    local response = SERVER.vipPlayer({ mode = "status" })
+    if response and response.ok and response.data and not response.data.completed then
+        vipDismissedUntil = 0
+        if nuiOpen then closePanel() end
+        vipChoiceOpen = true
+        SetNuiFocus(true, true)
+        SendNUIMessage({ type = "vipChoiceOpen", payload = response.data })
+    else
+        notify("negado", "Você não possui escolhas de veículos VIP pendentes.", 5000)
+    end
+end, false)
+
 RegisterNUICallback("vipPlayer", function(data, cb)
     data = data or {}
     local mode = tostring(data.mode or "")
@@ -346,9 +378,9 @@ RegisterNUICallback("vipPlayer", function(data, cb)
     if mode ~= "status" and response and response.ok == false then
         notify("negado", response.message or "Não foi possível concluir a ação do VIP.", 6500)
     end
-    if mode == "choose" and response and response.data and response.data.completed == true then
+    if mode == "choose" and response and response.ok and response.data and response.data.completed == true then
         vipChoiceOpen = false
-        SetNuiFocus(false, false)
+        SetNuiFocus(nuiOpen == true, nuiOpen == true)
         SendNUIMessage({ type = "vipChoiceClose" })
     end
     cb(response)
@@ -1020,10 +1052,11 @@ local function finishVipVehicleTest()
 
     local response = SERVER.vipPlayer({ mode = "finishTest" })
     if not response or response.ok == false then
-        -- Se o Tunnel falhar, libera uma nova tentativa de saída em vez de
-        -- deixar o jogador preso na dimensão de teste.
-        vipTestState.exiting = false
-        notify("negado", response and response.message or "Não foi possível encerrar o teste. Tente F7 novamente.", 5000)
+        -- Em caso de restart/mismatch do servidor, permite sair da câmera sem
+        -- deixar uma dimensão privada presa para o jogador.
+        TriggerServerEvent("m_paineladm_v2:vipEmergencyExit")
+        restoreVipTestPlayer(vipTestState.returnPosition, nil)
+        notify("negado", "Teste encerrado em modo de recuperação. Use /vipveiculos para retomar.", 6000)
         return
     end
 
@@ -1043,6 +1076,9 @@ RegisterKeyMapping("m_paineladm_v2_viptest_exit", "Sair do teste de veículo VIP
 
 RegisterNetEvent("m_paineladm_v2:vipChoiceOpen", function(payload)
     if vipTestState.active then return end
+    local incomingId = math.floor(tonumber(type(payload) == "table" and payload.assignmentId) or 0)
+    if incomingId > 0 and incomingId == vipDismissedAssignment and GetGameTimer() < vipDismissedUntil then return end
+    if nuiOpen then closePanel() end
     clearVipTestOverlay(vipTestState.session)
     vipChoiceOpen = true
     SetNuiFocus(true, true)
@@ -1053,7 +1089,7 @@ RegisterNetEvent("m_paineladm_v2:vipChoiceClose", function(message)
     vipChoiceOpen = false
     if not vipTestState.active then
         clearVipTestOverlay(vipTestState.session)
-        SetNuiFocus(false, false)
+        SetNuiFocus(nuiOpen == true, nuiOpen == true)
     end
     SendNUIMessage({ type = "vipChoiceClose", message = tostring(message or "") })
 end)

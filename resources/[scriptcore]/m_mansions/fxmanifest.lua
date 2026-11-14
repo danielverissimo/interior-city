@@ -4,21 +4,15 @@ lua54 'yes'
 
 author 'MageLabs / OpenAI'
 description 'Sistema de mansoes integrado ao Config Manager'
-version '1.0.1'
+version '1.0.0'
 
 shared_scripts {
     '@vrp/lib/utils.lua',
     'config.lua'
 }
 
-client_scripts {
-    'client_config.lua',
-    'client.lua'
-}
-server_scripts {
-    'server_config.lua',
-    'server.lua'
-}
+client_scripts {'client.lua'}
+server_scripts {'server.lua'}
 
 ui_page 'web/index.html'
 

@@ -88,7 +88,7 @@ Citizen.CreateThread(function()
                             text3D(v.inicio[1], v.inicio[2], v.inicio[3]+0.1, '~y~[E] ~w~PARA COMEÇAR O DESMANCHE')
                             if IsControlJustPressed(0,38) then
 
-                                if vSERVER.CheckPerm(v.permissao) then
+                                if vSERVER.CheckPerm(v.permissao) then               
                                    
                                     veh = CheckVeiculo(v.local_veiculo[1], v.local_veiculo[2], v.local_veiculo[3])
                                     

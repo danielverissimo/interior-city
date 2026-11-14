@@ -4,7 +4,7 @@ lua54 "yes"
 
 author "MageLabs"
 description "m_paineladm_v2 - Painel administrativo modular para vRP"
-version "2.90.2"
+version "2.90.3"
 
 shared_scripts {
     "@vrp/lib/utils.lua",

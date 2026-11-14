@@ -17,7 +17,7 @@ files {
 	"audio/*",
 	"audio/**/*",
 }
-client_script "tuning.lua"
+-- Arquivo ausente (auditoria): client_script "tuning.lua"
 -- METAS
 data_file "HANDLING_FILE" "data/**/handling.meta"
 data_file "VEHICLE_LAYOUTS_FILE" "data/**/vehiclelayouts.meta"

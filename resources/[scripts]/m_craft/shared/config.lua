@@ -203,8 +203,8 @@ Config.CraftTemplate = {
             amount = 180000,
             time = 4,
             requires = {
-                { name = 'dirty_money', image = 'dirty_money', amount = 200000 },
-                { name = 'l-alvejante', image = 'l-alvejante', amount = 22 },
+                { name = 'dirty_money', image = 'dirty_money', amount = 10000 },
+                { name = 'l-alvejante', image = 'l-alvejante', amount = 10 },
             },
         },
         {

@@ -3,10 +3,21 @@ const resource=typeof GetParentResourceName==='function'?GetParentResourceName()
 
 let module='groups';
 let garageTab='points';
-let chests=[], garages=[], garageTypes=[], shops=[], craftSetups={benches:[],farm:{}}, clothingShops=[], barbershops=[], tattooShops=[], cloakrooms=[], mapMarkings=[], managedGroups=[], desmanches=[], desmancheSettings={}, safeZones=[], safeZoneSettings={}, safeZoneWhitelist=[], jobsData={jobs:{},extras:{},central:[],npc:[]}, robberiesData={locations:[],setups:{},webhooks:{},settings:{}}, bancoCentralData={name:'Banco Central',settings:{},banks:[]}, joalheriaData={name:'Joalheria',settings:{},rewards:[],displays:[]}, roubocofreData={name:'Roubo a Cofres',settings:{},banks:{}}, residencesData={settings:{},interiors:{},residences:[]}, dealershipData={settings:{},testDrive:{},categories:[],vips:[],vehicles:{}}, mansionsData={mansions:[]}, serverVehicleCatalog={}, dealershipView='dealership', serverVehicleBulkMode=false, serverVehicleBulkSelection=new Set(), serverVehicleVisibleSpawns=[];
+let chests=[], garages=[], garageTypes=[], shops=[], craftSetups={benches:[],farm:{}}, clothingShops=[], barbershops=[], tattooShops=[], cloakrooms=[], mapMarkings=[], elevators=[], managedGroups=[], desmanches=[], desmancheSettings={}, safeZones=[], safeZoneSettings={}, safeZoneWhitelist=[], jobsData={jobs:{},extras:{},central:[],npc:[]}, robberiesData={locations:[],setups:{},webhooks:{},settings:{}}, bancoCentralData={name:'Banco Central',settings:{},banks:[]}, joalheriaData={name:'Joalheria',settings:{},rewards:[],displays:[]}, roubocofreData={name:'Roubo a Cofres',settings:{},banks:{}}, residencesData={settings:{},interiors:{},residences:[]}, dealershipData={settings:{},testDrive:{},categories:[],vips:[],vehicles:{}}, mansionsData={mansions:[]}, serverVehicleCatalog={}, dealershipView='dealership', serverVehicleBulkMode=false, serverVehicleBulkSelection=new Set(), serverVehicleVisibleSpawns=[];
+// Disponibilidade real dos recursos; um m_roubos de comércio não implica
+// a presença dos módulos Banco Central, Joalheria e Cofres.
+let robberySources={
+    commerce:{available:false,resource:'m_roubos'},
+    central:{available:false,resource:'m_banco_central'},
+    jewelry:{available:false,resource:'m_joalheria'},
+    vault:{available:false,resource:'m_roubocofre'}
+};
 let serverItems=[], pickerSelection=new Set(), shopItemDraft={}, pickerContext=null;
+let craftClipboard=null;
 let editing=null, pending=null;
 let mansionDoorDraft=[];
+let pendingGarageSpawnId=null;
+let garageSpawnSerial=0;
 
 async function nui(event,data={}){
     try{
@@ -205,6 +216,18 @@ function enhanceInlineCoordinateRows(scope=document){
 function enhanceAllPanelCoordinates(scope=document){
     enhanceLabeledCoordinateGroups(scope);
     enhanceInlineCoordinateRows(scope);
+}
+
+// Atualiza imediatamente o campo unico quando coordenadas sao recebidas do jogo.
+// Tambem utilizado pelas vagas de garagem editadas e pela captura da SafeZone.
+function refreshCombinedCoordinateDisplay(scope=document){
+    scope.querySelectorAll('.coordinate-combined-input').forEach(input=>{
+        const sources=input._coordSources;
+        if(!sources)return;
+        input.value=panelCoordinateText(sources.x.value,sources.y.value,sources.z.value);
+        input.classList.remove('coord-invalid');
+        input.dataset.coordValid=input.value?'1':'0';
+    });
 }
 
 function validateCombinedCoordinates(scope){
@@ -755,7 +778,7 @@ function updateMapColorPreview(){
 
 async function loadAll(silent=false){
     loadMapBlipCatalog().then(()=>refreshMapBlipIcons());
-    const [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v]=await Promise.all([
+    const [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w]=await Promise.all([
         nui('getChests'),
         nui('getGarages'),
         nui('getGarageTypes'),
@@ -777,7 +800,8 @@ async function loadAll(silent=false){
         nui('getResidences'),
         nui('getDealership'),
         nui('getServerVehicleCatalog'),
-        nui('getMansions')
+        nui('getMansions'),
+        nui('getElevators')
     ]);
 
     if(a.ok) chests=a.data||[];
@@ -803,18 +827,14 @@ async function loadAll(silent=false){
     if(n.ok){
         jobsData=n.data||{jobs:{},extras:{},central:[],npc:[]};
     }
-    if(o.ok){
-        robberiesData=o.data||{locations:[],setups:{},webhooks:{},settings:{}};
-    }
-    if(p.ok){
-        bancoCentralData=p.data||{name:'Banco Central',settings:{},banks:[]};
-    }
-    if(q.ok){
-        joalheriaData=q.data||{name:'Joalheria',settings:{},rewards:[],displays:[]};
-    }
-    if(r.ok){
-        roubocofreData=r.data||{name:'Roubo a Cofres',settings:{},banks:{}};
-    }
+    robberySources.commerce={available:o?.ok===true,resource:'m_roubos'};
+    robberySources.central={available:p?.ok===true,resource:p?.resource||'m_banco_central'};
+    robberySources.jewelry={available:q?.ok===true,resource:q?.resource||'m_joalheria'};
+    robberySources.vault={available:r?.ok===true,resource:r?.resource||'m_roubocofre'};
+    robberiesData=o?.ok ? o.data||{locations:[],setups:{},webhooks:{},settings:{}} : {locations:[],setups:{},webhooks:{},settings:{}};
+    bancoCentralData=p?.ok ? p.data||{name:'Banco Central',settings:{},banks:[]} : {name:'Banco Central',settings:{},banks:[]};
+    joalheriaData=q?.ok ? q.data||{name:'Joalheria',settings:{},rewards:[],displays:[]} : {name:'Joalheria',settings:{},rewards:[],displays:[]};
+    roubocofreData=r?.ok ? r.data||{name:'Roubo a Cofres',settings:{},banks:{}} : {name:'Roubo a Cofres',settings:{},banks:{}};
     if(s.ok){
         residencesData=s.data||{settings:{},interiors:{},residences:[]};
     }
@@ -826,6 +846,9 @@ async function loadAll(silent=false){
     }
     if(v.ok){
         mansionsData=v.data||{mansions:[]};
+    }
+    if(w.ok){
+        elevators=w.data||[];
     }
 
 
@@ -840,7 +863,7 @@ async function loadAll(silent=false){
     updateModuleFilters(false);
     render();
 
-    const failed=[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v].find(x=>!x.ok);
+    const failed=[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w].find(x=>!x.ok);
     if(failed) toast(failed.message||'Algum módulo não pôde ser carregado.','error');
     else if(!silent) toast('Configurações atualizadas.');
 }
@@ -945,6 +968,17 @@ function updateModuleFilters(reset=false){
             ['free','Acesso livre'],
             ['restricted','Com permissão'],
             ['withuniform','Com uniformes cadastrados']
+        ];
+    }else if(module==='elevators'){
+        sortOptions=[
+            ['name','Ordenar por nome'],
+            ['floors','Ordenar por andares'],
+            ['permission','Ordenar por permissão']
+        ];
+        filterOptions=[
+            ['all','Todos os elevadores'],
+            ['public','Elevadores públicos'],
+            ['restricted','Com permissão']
         ];
     }else if(module==='mapmarkings'){
         sortOptions=[
@@ -1081,36 +1115,10 @@ function updateModuleFilters(reset=false){
     filterEl.classList.toggle('hidden',!showFilter);
 }
 
-function resetTransientUI(){
-    // Cada modulo deve abrir limpo. Um drawer/modal de outra aba nunca pode
-    // permanecer visivel ao trocar de categoria ou ao reabrir o painel.
-    const confirm=$('#confirm');
-    if(confirm && !confirm.classList.contains('hidden')){
-        const cancel=$('#confirm-cancel');
-        if(cancel && !cancel.disabled && typeof cancel.onclick==='function') cancel.click();
-        else{
-            confirm.classList.add('hidden');
-            pending=null;
-        }
-    }
-
-    if($('#item-picker') && !$('#item-picker').classList.contains('hidden')){
-        closeItemPicker();
-        restoreShopPickerHeader();
-        pickerSelection.clear();
-    }
-
-    closeMapPicker();
-    closeDrawer();
-    pending=null;
-    editing=null;
-    pickerContext=null;
-    mansionDoorDraft=[];
-}
-
 function setModule(m){
-    resetTransientUI();
+    if(module!==m && $('#drawer')?.classList.contains('open')) closeDrawer();
     module=m;
+    editing=null;
 
     if(m==='mapmarkings'){
         loadMapBlipCatalog().then(()=>refreshMapBlipIcons());
@@ -1132,6 +1140,7 @@ function currentKind(){
     if(module==='tattoo') return 'tattoo';
     if(module==='cloakroom') return 'cloakroom';
     if(module==='mapmarkings') return 'mapmarking';
+    if(module==='elevators') return 'elevator';
     if(module==='groups') return 'group';
     if(module==='desmanche') return 'desmanche';
     if(module==='safezone') return 'safezone';
@@ -1143,26 +1152,10 @@ function currentKind(){
     return garageTab==='points'?'garage':'type';
 }
 
-function handlePrimaryNewAction(){
-    // A ação do botão principal deve ser resolvida no MOMENTO DO CLIQUE.
-    // A concessionária troca dinamicamente o comportamento desse botão e,
-    // se o callback antigo ficar preso, ele abre o formulário de veículo em
-    // outras abas (ex.: Mansões). Centralizando aqui, a ação sempre respeita
-    // o módulo/visualização atualmente ativos.
-    if([].includes(module)){
-        return toast('Módulo preparado. Envie o resource correspondente para habilitarmos os cadastros.','error');
-    }
-
-    if(module==='dealership' && dealershipView==='server'){
-        return serverVehicleForm(null);
-    }
-
-    return openDrawer(currentKind());
-}
-
 function actions(kind,id,canTp=true){
     return `<div class="rowactions">
         ${canTp?`<button class="rowbtn" data-a="tp" data-k="${kind}" data-id="${enc(id)}" title="Teleportar">⌖</button>`:''}
+        ${kind==='craft'?`<button class="rowbtn" data-a="copy" data-k="${kind}" data-id="${enc(id)}" title="Copiar Craft + Farm">⧉</button>`:''}
         <button class="rowbtn" data-a="edit" data-k="${kind}" data-id="${enc(id)}" title="Editar">✎</button>
         <button class="rowbtn del" data-a="del" data-k="${kind}" data-id="${enc(id)}" title="Excluir">×</button>
     </div>`;
@@ -1240,6 +1233,9 @@ function syncGroupTopActions(){
     const newBtn=$('#new');
     if(!newBtn)return;
 
+    // Restaura sempre a ação padrão; módulos especiais podem sobrescrever abaixo.
+    newBtn.onclick=()=>openDrawer(currentKind());
+
     let facBtn=$('#new-fac');
     let deleteFacBtn=$('#delete-fac');
     let desSettingsBtn=$('#des-settings');
@@ -1252,6 +1248,7 @@ function syncGroupTopActions(){
     let serverVehicleListBtn=$('#server-vehicle-list');
     let serverVehicleBulkBtn=$('#server-vehicle-bulk');
     let serverVehicleBulkDeleteBtn=$('#server-vehicle-bulk-delete');
+    let craftRoutesBtn=$('#craft-route-types');
 
     if(module==='groups'){
         if(!facBtn){
@@ -1277,6 +1274,17 @@ function syncGroupTopActions(){
     }else{
         if(facBtn)facBtn.classList.add('hidden');
         if(deleteFacBtn)deleteFacBtn.classList.add('hidden');
+    }
+
+    if(module==='craft'){
+        if(!craftRoutesBtn){
+            newBtn.insertAdjacentHTML('afterend','<button id="craft-route-types" class="btn ghost">⌖ Tipos de rota</button>');
+            craftRoutesBtn=$('#craft-route-types');
+            craftRoutesBtn.onclick=()=>openDrawer('farmroutetypes');
+        }
+        craftRoutesBtn.classList.remove('hidden');
+    }else if(craftRoutesBtn){
+        craftRoutesBtn.classList.add('hidden');
     }
 
     if(module==='desmanche'){
@@ -1390,12 +1398,8 @@ function syncGroupTopActions(){
         serverVehicleBulkDeleteBtn.disabled=serverVehicleBulkSelection.size===0;
 
         newBtn.textContent=dealershipView==='server'?'＋ Cadastrar veículo servidor':'＋ Cadastrar veículo concessionária';
-        newBtn.onclick=handlePrimaryNewAction;
+        newBtn.onclick=dealershipView==='server'?()=>serverVehicleForm(null):()=>openDrawer('dealershipvehicle',null);
     }else{
-        // Nunca deixa o callback especial da concessionária escapar para
-        // outra categoria. O texto do botão será definido pelo render do
-        // módulo atual e a ação volta ao roteador central.
-        newBtn.onclick=handlePrimaryNewAction;
         dealershipView='dealership';
         serverVehicleBulkMode=false;
         serverVehicleBulkSelection.clear();
@@ -1696,6 +1700,50 @@ function render(){
             <td><span class="permission-count">${(g.permissions||[]).length}</span></td>
             <td class="actions">${actions('group',g.name,false)}</td>
         </tr>`).join('');
+    }else if(module==='elevators'){
+        $('#page-title').textContent='Elevadores';
+        $('#page-sub').textContent='Crie e edite elevadores, andares, posições e permissões diretamente no m_snippets.';
+        $('#new').textContent='＋ Novo elevador';
+
+        const totalFloors=elevators.reduce((sum,e)=>sum+(e.floors?.length||0),0);
+        const restricted=elevators.filter(e=>String(e.permission||'').trim()).length;
+
+        $('#stats').innerHTML=
+            stat('Elevadores',elevators.length,'cadastrados no m_snippets')+
+            stat('Andares',totalFloors,'pontos de acesso')+
+            stat('Restritos',restricted,'com permissão');
+
+        head='<tr><th>Elevador</th><th>Permissão</th><th>Andares</th><th>Distâncias</th><th class="actions">Ações</th></tr>';
+
+        const filter=$('#group-filter').value;
+        let arr=elevators.filter(e=>{
+            const permission=String(e.permission||'').trim();
+            const search=!q||
+                String(e.name||'').toLowerCase().includes(q)||
+                String(e.id||'').toLowerCase().includes(q)||
+                permission.toLowerCase().includes(q)||
+                (e.floors||[]).some(floor=>String(floor.name||'').toLowerCase().includes(q));
+
+            const contextual=filter==='all'||
+                (filter==='public'&&!permission)||
+                (filter==='restricted'&&!!permission);
+
+            return search&&contextual;
+        });
+
+        arr.sort((a,b)=>{
+            if(sort==='floors') return (b.floors?.length||0)-(a.floors?.length||0);
+            if(sort==='permission') return String(a.permission||'').localeCompare(String(b.permission||''))||String(a.name||'').localeCompare(String(b.name||''));
+            return String(a.name||'').localeCompare(String(b.name||''),undefined,{sensitivity:'base'});
+        });
+
+        html=arr.map(e=>`<tr>
+            <td><b>${esc(e.name||e.id)}</b><br><span class="muted mono">${esc(e.id)}</span></td>
+            <td>${e.permission?`<span class="pill">${esc(e.permission)}</span>`:'<span class="pill green">Público</span>'}</td>
+            <td>${e.floors?.length||0}<br><span class="muted">${(e.floors||[]).map(x=>esc(x.name)).join(' • ')}</span></td>
+            <td><span class="muted">Marker:</span> ${Number(e.drawDistance||12).toFixed(1)}m<br><span class="muted">Uso:</span> ${Number(e.interactionDistance||2).toFixed(1)}m</td>
+            <td class="actions">${actions('elevator',e.id,true)}</td>
+        </tr>`).join('');
     }else if(module==='mapmarkings'){
         $('#page-title').textContent='Marcações Mapa';
         $('#page-sub').textContent='Cadastre e edite os blips exibidos no mapa sem alterar código.';
@@ -1735,7 +1783,7 @@ function render(){
             <td class="actions">${actions('mapmarking',x.id,true)}</td>
         </tr>`).join('');
     }else if(module==='dealership'){
-        const imageBase=String(dealershipData.settings?.imagesDir||'http://127.0.0.1/vrp_images/');
+        const imageBase=String(dealershipData.settings?.imagesDir||'http://104.234.65.115/vrp_images/');
 
         if(dealershipView==='server'){
             $('#page-title').textContent='Veículos cadastrados servidor';
@@ -1938,67 +1986,46 @@ function render(){
         </tr>`).join('');
     }else if(module==='robberies'){
         $('#page-title').textContent='Roubos';
-        $('#page-sub').textContent='Configure separadamente cada sistema de roubo conectado ao painel.';
+        $('#page-sub').textContent='Configure os sistemas de roubo presentes neste servidor.';
         $('#new').classList.add('hidden');
 
         const locs=robberiesData.locations||[];
         const types=Object.keys(robberiesData.setups||{});
+        const connected=Object.values(robberySources).filter(x=>x.available).length;
         $('#stats').innerHTML=
-            stat('Scripts',4,'resources conectados')+
+            stat('Scripts',connected,'módulos conectados')+
             stat('Tipos',types.length,'tipos de roubo')+
             stat('Locais',locs.length,'pontos configurados');
 
         head='<tr><th>Sistema</th><th>Resource</th><th>Tipos</th><th>Locais</th><th>Status</th><th class="actions">Ações</th></tr>';
-        html=`<tr>
-            <td><b>Roubos de Comércio</b><div class="muted">Lojas, registradoras, caixas e AmmuNation</div></td>
-            <td class="mono">m_roubos</td>
-            <td>${types.length}</td>
-            <td>${locs.length}</td>
-            <td><span class="pill">Conectado</span></td>
-            <td class="actions"><button class="rowbtn edit" data-a="rob-open" title="Configurar">✎</button></td>
-        </tr>
-        <tr>
-            <td><b>Banco Central</b><div class="muted">Portas, cofres, dinheiro, hacking e itens</div></td>
-            <td class="mono">m_banco_central</td>
-            <td>${(bancoCentralData.banks||[]).length} banco</td>
-            <td>${(bancoCentralData.banks?.[0]?.doors||[]).length} portas</td>
-            <td><span class="pill">Conectado</span></td>
-            <td class="actions"><button class="rowbtn edit" data-a="bank-open" title="Configurar">✎</button></td>
-        </tr>
-        <tr>
-            <td><b>Joalheria</b><div class="muted">Hack, C4, vitrines, recompensas e polícia</div></td>
-            <td class="mono">m_joalheria</td>
-            <td>${(joalheriaData.displays||[]).length} vitrines</td>
-            <td>${(joalheriaData.rewards||[]).length} recompensas</td>
-            <td><span class="pill">Conectado</span></td>
-            <td class="actions"><button class="rowbtn edit" data-a="jewelry-open" title="Configurar">✎</button></td>
-        </tr>
-        <tr>
-            <td><b>Roubo a Cofres</b><div class="muted">Fleeca, cofres, hacking, recompensa e drops</div></td>
-            <td class="mono">m_roubocofre</td>
-            <td>${Object.keys(roubocofreData.banks||{}).length} bancos</td>
-            <td>${roubocofreData.settings?.rewardMin??0}–${roubocofreData.settings?.rewardMax??0}</td>
-            <td><span class="pill">Conectado</span></td>
-            <td class="actions"><button class="rowbtn edit" data-a="vault-open" title="Configurar">✎</button></td>
-        </tr>`;
+        const definitions=[
+            {key:'commerce',name:'Roubos de Comércio',description:'Lojas, registradoras, caixas e AmmuNation',count:types.length,detail:locs.length,action:'rob-open'},
+            {key:'central',name:'Banco Central',description:'Portas, cofres, dinheiro, hacking e itens',count:(bancoCentralData.banks||[]).length+' banco',detail:(bancoCentralData.banks?.[0]?.doors||[]).length+' portas',action:'bank-open'},
+            {key:'jewelry',name:'Joalheria',description:'Hack, C4, vitrines, recompensas e polícia',count:(joalheriaData.displays||[]).length+' vitrines',detail:(joalheriaData.rewards||[]).length+' recompensas',action:'jewelry-open'},
+            {key:'vault',name:'Roubo a Cofres',description:'Fleeca, cofres, hacking, recompensa e drops',count:Object.keys(roubocofreData.banks||{}).length+' bancos',detail:`${roubocofreData.settings?.rewardMin??0}–${roubocofreData.settings?.rewardMax??0}`,action:'vault-open'}
+        ];
 
         const robFilter=$('#group-filter').value;
-        const orderMap={
-            commerce:{name:'Roubos de Comércio',resource:'m_roubos'},
-            central:{name:'Banco Central',resource:'m_banco_central'},
-            jewelry:{name:'Joalheria',resource:'m_joalheria'},
-            vault:{name:'Roubo a Cofres',resource:'m_roubocofre'}
-        };
-        const temp=document.createElement('tbody');
-        temp.innerHTML=html;
-        const keys=['commerce','central','jewelry','vault'];
-        let rows=[...temp.querySelectorAll('tr')].map((row,i)=>({key:keys[i],row}));
-        if(robFilter!=='all')rows=rows.filter(x=>x.key===robFilter);
-        rows.sort((a,b)=>{
-            const prop=sort==='resource'?'resource':'name';
-            return orderMap[a.key][prop].localeCompare(orderMap[b.key][prop],undefined,{sensitivity:'base'});
-        });
-        html=rows.map(x=>x.row.outerHTML).join('');
+        const rows=definitions
+            .filter(x=>robFilter==='all'||robFilter===x.key)
+            .sort((a,b)=>{
+                const field=sort==='resource'?'resource':'name';
+                const first=field==='resource'?robberySources[a.key].resource:a.name;
+                const second=field==='resource'?robberySources[b.key].resource:b.name;
+                return String(first).localeCompare(String(second),undefined,{sensitivity:'base'});
+            });
+        html=rows.map(x=>{
+            const info=robberySources[x.key];
+            const available=info.available;
+            return `<tr>
+                <td><b>${esc(x.name)}</b><div class="muted">${esc(x.description)}</div></td>
+                <td class="mono">${esc(info.resource)}</td>
+                <td>${available?esc(x.count):'—'}</td>
+                <td>${available?esc(x.detail):'—'}</td>
+                <td><span class="pill">${available?'Conectado':'Não disponível'}</span></td>
+                <td class="actions"><button class="rowbtn edit" data-a="${esc(x.action)}" title="${available?'Configurar':'Recurso não disponível'}" ${available?'':'disabled'}>✎</button></td>
+            </tr>`;
+        }).join('');
     }else if(module==='jobs'){
         $('#page-title').textContent='Gerenciar Empregos';
         $('#page-sub').textContent='Edite níveis, pagamentos, locais, uniformes e configurações específicas em tempo real.';
@@ -2012,7 +2039,7 @@ function render(){
             stat('Níveis',totalLevels,'níveis configurados')+
             stat('Com uniforme',uniformCount,'uniformes definidos');
 
-        head='<tr><th>Emprego</th><th>Local inicial</th><th>Níveis</th><th>Pagamento</th><th>Uniforme</th><th class="actions">Ações</th></tr>';
+        head='<tr><th>Emprego</th><th>Local inicial</th><th>Níveis</th><th>XP/ação</th><th>Pagamento</th><th>Uniforme</th><th class="actions">Ações</th></tr>';
 
         const filter=$('#group-filter').value;
         let arr=entries.filter(x=>{
@@ -2041,6 +2068,7 @@ function render(){
                 <td><b>${esc(x.name)}</b></td>
                 <td class="mono">${f(x.data.inicio?.[0])}, ${f(x.data.inicio?.[1])}, ${f(x.data.inicio?.[2])}</td>
                 <td>${Number(x.data.total_nivel)||0}</td>
+                <td>${Number.isFinite(Number(x.data.xp_per_action))?Number(x.data.xp_per_action):1}</td>
                 <td>${hasPay?`${pays.length} níveis`:'<span class="muted">Específico do emprego</span>'}</td>
                 <td>${sexes?`<span class="pill">${sexes}</span>`:'<span class="muted">Não definido</span>'}</td>
                 <td class="actions">${actions('job',x.name,true)}</td>
@@ -2209,11 +2237,14 @@ function openDrawer(kind,item=null){
     if(kind==='type') typeForm(item);
     if(kind==='shop') shopForm(item);
     if(kind==='craft') craftForm(item);
+    if(kind==='farmroutetypes') farmRouteTypesForm();
+    if(kind==='farmroutetype') farmRouteTypeForm(item);
     if(kind==='clothing') clothingForm(item);
     if(kind==='barbershop') barbershopForm(item);
     if(kind==='tattoo') tattooForm(item);
     if(kind==='cloakroom') cloakroomForm(item);
     if(kind==='mapmarking') mapMarkingForm(item);
+    if(kind==='elevator') elevatorForm(item);
     if(kind==='group') groupForm(item);
     if(kind==='fac') facForm();
     if(kind==='desmanche') desmancheForm(item);
@@ -2246,6 +2277,7 @@ function bindPosition(prefix){
         $(`#${prefix}-x`).value=r.coords.x;
         $(`#${prefix}-y`).value=r.coords.y;
         $(`#${prefix}-z`).value=r.coords.z;
+        refreshCombinedCoordinateDisplay($('#drawer-body'));
     };
 }
 
@@ -2275,13 +2307,15 @@ function chestForm(c){
     };
 }
 
-function spawnRow(s={}){
-    return `<div class="spawnrow">
+function spawnRow(s={},isGarage=false){
+    const id=isGarage?++garageSpawnSerial:null;
+    return `<div class="spawnrow${isGarage?' garage-spawnrow':''}" ${isGarage?`data-garage-spawn-id="${id}"`:''}>
         <input class="sx" type="number" step="0.01" value="${s.x??''}" placeholder="X">
         <input class="sy" type="number" step="0.01" value="${s.y??''}" placeholder="Y">
         <input class="sz" type="number" step="0.01" value="${s.z??''}" placeholder="Z">
         <input class="sw" type="number" step="0.01" value="${s.w??''}" placeholder="Heading">
-        <button type="button" class="remove">×</button>
+        ${isGarage?'<button type="button" class="capture-existing-spawn" title="Redefinir esta vaga no jogo">⌖</button>':''}
+        <button type="button" class="remove" title="Excluir esta vaga">×</button>
     </div>`;
 }
 
@@ -2302,47 +2336,74 @@ function garageForm(g){
         <div class="sectiontitle">
             <div><b>Vagas de saída</b><span>Posição + direção em que o veículo aparecerá.</span></div>
             <div class="sectionbuttons">
-                <button type="button" id="capture-spawn" class="btn primary mini">⌖ Definir posição no jogo</button>
+                <button type="button" id="capture-spawn" class="btn primary mini">⌖ Adicionar vaga no jogo</button>
                 <button type="button" id="add-spawn" class="btn ghost mini">＋ Manual</button>
             </div>
         </div>
-        <div id="spawns">${(g?.spawnCoords||[]).map(spawnRow).join('')}</div>
-        <div class="hint">No modo de posicionamento, fique exatamente onde o veículo deve nascer, olhe para a direção desejada e pressione E.</div>
+        <div id="spawns">${(g?.spawnCoords||[]).map(s=>spawnRow(s,true)).join('')}</div>
+        <div class="hint">Para mover uma vaga existente, clique no botão <b>⌖</b> da própria vaga e pressione <b>E</b> no novo local. Para adicionar outra vaga, use "Adicionar vaga no jogo". O botão Backspace cancela a captura.</div>
         <div class="formactions"><button type="button" class="btn ghost cancel">Cancelar</button><button class="btn primary">Salvar garagem</button></div>
     </form>`;
 
     bindPosition('g');
     $('.cancel').onclick=closeDrawer;
 
-    const bindRemove=()=>$$('#spawns .remove').forEach(b=>b.onclick=()=>b.closest('.spawnrow').remove());
-    bindRemove();
+    pendingGarageSpawnId=null;
+    const startGarageSpawnCapture=async(targetId=null)=>{
+        // Grava o destino antes de aguardar a NUI, evitando perder capturas rápidas.
+        pendingGarageSpawnId=targetId;
+        const r=await nui('startSpawnPosition');
+        if(!r?.ok){
+            pendingGarageSpawnId=null;
+            return toast(r?.message||'Não foi possível iniciar o posicionamento.','error');
+        }
+    };
+    const bindGarageSpawns=()=>{
+        $$('#spawns .remove').forEach(b=>b.onclick=()=>b.closest('.spawnrow').remove());
+        $$('#spawns .capture-existing-spawn').forEach(b=>b.onclick=()=>{
+            const row=b.closest('.garage-spawnrow');
+            if(row)startGarageSpawnCapture(row.dataset.garageSpawnId);
+        });
+    };
+    bindGarageSpawns();
 
     $('#add-spawn').onclick=()=>{
-        $('#spawns').insertAdjacentHTML('beforeend',spawnRow());
-        bindRemove();
+        $('#spawns').insertAdjacentHTML('beforeend',spawnRow({},true));
+        bindGarageSpawns();
     };
 
-    $('#capture-spawn').onclick=async()=>{
-        const r=await nui('startSpawnPosition');
-        if(!r.ok)toast(r.message||'Não foi possível iniciar o posicionamento.','error');
-    };
+    $('#capture-spawn').onclick=()=>startGarageSpawnCapture();
 
     $('#form').onsubmit=async e=>{
         e.preventDefault();
-        const spawnCoords=$$('#spawns .spawnrow').map(r=>({
-            x:+r.querySelector('.sx').value,
-            y:+r.querySelector('.sy').value,
-            z:+r.querySelector('.sz').value,
-            w:+r.querySelector('.sw').value
-        })).filter(c=>Number.isFinite(c.x)&&Number.isFinite(c.y)&&Number.isFinite(c.z)&&Number.isFinite(c.w));
+        const markerField=$('#g-x')?.closest('.grid3')?.querySelector('.coordinate-combined-input');
+        const marker=markerField
+            ?parsePanelCoordinate(markerField.value)
+            :parsePanelCoordinate([$('#g-x').value,$('#g-y').value,$('#g-z').value].join(','));
+        if(!marker)return toast('Informe coordenadas válidas para o marker da garagem.','error');
+
+        const rows=$$('#spawns .spawnrow');
+        if(!rows.length)return toast('Cadastre ao menos uma vaga de saída.','error');
+        const spawnCoords=[];
+        for(const row of rows){
+            const combined=row.querySelector('.coordinate-combined-input');
+            const parsed=combined
+                ?parsePanelCoordinate(combined.value)
+                :parsePanelCoordinate(['.sx','.sy','.sz'].map(s=>row.querySelector(s).value).join(','));
+            const headingRaw=row.querySelector('.sw').value.trim();
+            if(!parsed||!headingRaw||!Number.isFinite(Number(headingRaw))){
+                return toast('Corrija as coordenadas e a direção (heading) de todas as vagas.','error');
+            }
+            spawnCoords.push({...parsed,w:Number(headingRaw)});
+        }
 
         const data={
             id:$('#g-id').value.trim(),
             originalId:g?.id,
             type:$('#g-type').value,
-            blipDistance:+$('#g-distance').value,
+            blipDistance:Number($('#g-distance').value),
             permiss:$('#g-perm').value.trim(),
-            coords:{x:+$('#g-x').value,y:+$('#g-y').value,z:+$('#g-z').value},
+            coords:marker,
             spawnCoords
         };
 
@@ -2434,7 +2495,7 @@ function shopPointRow(p={}){
     </div>`;
 }
 
-const ITEM_IMAGE_BASE = "http://127.0.0.1/images/";
+const ITEM_IMAGE_BASE = "http://104.234.65.115/images/";
 const ITEM_IMAGE_FALLBACK = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' +
     '<rect width="64" height="64" rx="12" fill="#141b27"/>' +
@@ -2779,8 +2840,8 @@ function recipeRow(r={}){
 function farmRewardRow(x={}){
     return `<div class="spawnrow">
         <input class="fitem" list="server-items-list" value="${esc(x.item||'')}" placeholder="Item">
-        <input class="fmin" type="number" min="1" value="${x.min??1}" placeholder="Min">
-        <input class="fmax" type="number" min="1" value="${x.max??1}" placeholder="Max">
+        <input class="fmin" type="number" min="0" step="1" value="${x.min??1}" placeholder="Min">
+        <input class="fmax" type="number" min="0" step="1" value="${x.max??1}" placeholder="Max">
         <button type="button" class="remove">×</button>
     </div>`;
 }
@@ -2791,17 +2852,196 @@ function itemName(index){
     return serverItems.find(i=>i.index===index)?.name||index;
 }
 
-async function craftForm(b){
+
+function clonePanelData(value){
+    return value==null?value:JSON.parse(JSON.stringify(value));
+}
+
+function getCraftFarmSnapshot(bench){
+    const farm=craftSetups.farm||{};
+    const route=(farm.Routes||[]).find(r=>r.rewardType===bench?.farmRewardType);
+    const rewards=(bench?.farmRewardType && farm.Rewards?.[bench.farmRewardType])||[];
+    return {
+        enabled:!!bench?.farmRewardType,
+        routeType:bench?.farmRouteType||route?.routeType||'',
+        permissions:clonePanelData(bench?.farmPermissions||route?.permissions||[]),
+        rewards:clonePanelData(rewards)
+    };
+}
+
+function copyCraftTemplate(bench){
+    if(!bench)return false;
+    craftClipboard={
+        sourceName:String(bench.name||'Craft'),
+        craftItems:clonePanelData(bench.craftItems||[]),
+        armazemItems:clonePanelData(bench.armazemItems||[]),
+        farm:getCraftFarmSnapshot(bench)
+    };
+    toast(`Craft de ${bench.name} copiado. Abra o destino e clique em “Colar craft”.`);
+    return true;
+}
+
+const FARM_ROUTE_REGIONS=[
+    ['South','Sul'],
+    ['North','Norte'],
+    ['Air','Aérea'],
+    ['Water','Marítima']
+];
+
+function farmRoutePointRow(point={},region='South'){
+    const c=point.coords||{};
+    return `<div class="farm-route-point" data-region="${esc(region)}">
+        <input class="fr-x" type="number" step="0.01" value="${c.x??''}" placeholder="X">
+        <input class="fr-y" type="number" step="0.01" value="${c.y??''}" placeholder="Y">
+        <input class="fr-z" type="number" step="0.01" value="${c.z??''}" placeholder="Z">
+        ${region==='Air'?`<input class="fr-blip" type="number" step="1" min="0" value="${point.blip??37}" title="Tipo do checkpoint aéreo" placeholder="Checkpoint">`:'<span class="farm-route-na">—</span>'}
+        <button type="button" class="rowbtn fr-tp" title="Teleportar">⌖</button>
+        <button type="button" class="rowbtn del fr-remove" title="Remover">×</button>
+    </div>`;
+}
+
+function farmRouteTypesForm(){
+    const routeTypes=craftSetups.farm?.RouteBlips||{};
+    const names=Object.keys(routeTypes).sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:'base'}));
+
+    $('#drawer-kicker').textContent='ROTAS DE FARM';
+    $('#drawer-title').textContent='Tipos e pontos de rota';
+    $('#drawer-body').innerHTML=`<div class="form">
+        <div class="hint">Cada tipo de rota pertence ao <b>m_farm</b>. Você pode criar novos tipos e editar todos os pontos de Sul, Norte, Aérea e Marítima sem tocar no JSON.</div>
+        <div class="sectiontitle">
+            <div><b>Tipos cadastrados</b><span>${names.length} tipos disponíveis para vincular aos crafts.</span></div>
+            <button type="button" id="fr-new-type" class="btn primary mini">＋ Novo tipo</button>
+        </div>
+        <div class="farm-route-type-list">${names.length?names.map(name=>{
+            const regions=routeTypes[name]||{};
+            const total=FARM_ROUTE_REGIONS.reduce((n,[key])=>n+(regions[key]?.length||0),0);
+            return `<div class="farm-route-type-card" data-name="${enc(name)}">
+                <div><b>${esc(name)}</b><span>${total} pontos • Sul ${regions.South?.length||0} • Norte ${regions.North?.length||0} • Aérea ${regions.Air?.length||0} • Marítima ${regions.Water?.length||0}</span></div>
+                <div class="sectionbuttons">
+                    <button type="button" class="btn ghost mini fr-edit">Editar</button>
+                    <button type="button" class="btn ghost mini danger-outline fr-delete">Excluir</button>
+                </div>
+            </div>`;
+        }).join(''):'<div class="hint">Nenhum tipo de rota cadastrado.</div>'}</div>
+        <div class="formactions"><button type="button" class="btn ghost fr-close">Voltar</button></div>
+    </div>`;
+
+    $('#fr-new-type').onclick=()=>farmRouteTypeForm(null);
+    $('.fr-close').onclick=closeDrawer;
+    $$('.farm-route-type-card').forEach(card=>{
+        const name=dec(card.dataset.name);
+        card.querySelector('.fr-edit').onclick=()=>farmRouteTypeForm({name,regions:clonePanelData(routeTypes[name]||{})});
+        card.querySelector('.fr-delete').onclick=()=>askDelete('farmroutetype',name);
+    });
+}
+
+function farmRouteTypeForm(item){
+    const routeTypes=craftSetups.farm?.RouteBlips||{};
+    const originalName=item?.name||'';
+    const regions=clonePanelData(item?.regions||routeTypes[originalName]||{});
+
+    $('#drawer-kicker').textContent=originalName?'EDITANDO ROTA':'NOVA ROTA';
+    $('#drawer-title').textContent=originalName?`Tipo • ${originalName}`:'Cadastrar tipo de rota';
+    $('#drawer-body').innerHTML=`<form id="form" class="form">
+        <label class="field"><span>Nome do tipo de rota</span><input id="fr-name" value="${esc(originalName)}" placeholder="Ex.: PecasMecanica" required></label>
+        ${originalName?'<div class="hint">Você pode renomear o tipo. Todos os farms vinculados a ele serão atualizados automaticamente.</div>':''}
+        <div class="hint">Sul/Norte usam coleta terrestre. Aérea permite definir o tipo do checkpoint (37 por padrão). Marítima usa a lógica de barco já existente no m_farm.</div>
+        ${FARM_ROUTE_REGIONS.map(([key,label])=>`<section class="farm-route-region" data-region="${key}">
+            <div class="sectiontitle">
+                <div><b>${label}</b><span><strong class="fr-count">${regions[key]?.length||0}</strong> pontos cadastrados.</span></div>
+                <div class="sectionbuttons">
+                    <button type="button" class="btn primary mini fr-current">⌖ Posição atual</button>
+                    <button type="button" class="btn ghost mini fr-manual">＋ Manual</button>
+                </div>
+            </div>
+            <div class="farm-route-point-head"><span>X</span><span>Y</span><span>Z</span><span>${key==='Air'?'Checkpoint':'Tipo'}</span><span>Ir</span><span></span></div>
+            <div class="fr-points">${(regions[key]||[]).map(point=>farmRoutePointRow(point,key)).join('')}</div>
+        </section>`).join('')}
+        <div class="formactions">
+            <button type="button" class="btn ghost fr-back">← Tipos de rota</button>
+            <button class="btn primary">Salvar tipo de rota</button>
+        </div>
+    </form>`;
+
+    const refreshRegionCount=section=>{
+        const count=section.querySelectorAll('.farm-route-point').length;
+        section.querySelector('.fr-count').textContent=String(count);
+    };
+    const bindRoutePoints=section=>{
+        section.querySelectorAll('.fr-remove').forEach(btn=>btn.onclick=()=>{
+            btn.closest('.farm-route-point').remove();
+            refreshRegionCount(section);
+        });
+        section.querySelectorAll('.fr-tp').forEach(btn=>btn.onclick=async()=>{
+            const row=btn.closest('.farm-route-point');
+            const coords={x:Number(row.querySelector('.fr-x').value),y:Number(row.querySelector('.fr-y').value),z:Number(row.querySelector('.fr-z').value)};
+            if(Object.values(coords).some(v=>!Number.isFinite(v)))return toast('Coordenadas inválidas neste ponto.','error');
+            const r=await nui('teleport',{coords});
+            if(!r?.ok)toast(r?.message||'Não foi possível teleportar.','error');
+        });
+        refreshRegionCount(section);
+    };
+
+    $$('.farm-route-region').forEach(section=>{
+        const region=section.dataset.region;
+        bindRoutePoints(section);
+        section.querySelector('.fr-manual').onclick=()=>{
+            section.querySelector('.fr-points').insertAdjacentHTML('beforeend',farmRoutePointRow({},region));
+            bindRoutePoints(section);
+        };
+        section.querySelector('.fr-current').onclick=async()=>{
+            const r=await nui('getPosition');
+            if(!r?.ok)return toast(r?.message||'Não foi possível capturar a posição.','error');
+            section.querySelector('.fr-points').insertAdjacentHTML('beforeend',farmRoutePointRow({coords:r.coords,blip:region==='Air'?37:undefined},region));
+            bindRoutePoints(section);
+        };
+    });
+
+    $('.fr-back').onclick=farmRouteTypesForm;
+    $('#form').onsubmit=async e=>{
+        e.preventDefault();
+        const name=$('#fr-name').value.trim();
+        if(!name)return toast('Informe o nome do tipo de rota.','error');
+
+        const payloadRegions={};
+        for(const [region] of FARM_ROUTE_REGIONS){
+            const section=$(`.farm-route-region[data-region="${region}"]`);
+            payloadRegions[region]=[...section.querySelectorAll('.farm-route-point')].map(row=>{
+                const point={coords:{x:Number(row.querySelector('.fr-x').value),y:Number(row.querySelector('.fr-y').value),z:Number(row.querySelector('.fr-z').value)}};
+                if(region==='Air')point.blip=Math.max(0,Math.floor(Number(row.querySelector('.fr-blip')?.value)||37));
+                return point;
+            }).filter(point=>Object.values(point.coords).every(Number.isFinite));
+        }
+
+        const total=Object.values(payloadRegions).reduce((n,list)=>n+list.length,0);
+        if(total<1)return toast('Cadastre pelo menos um ponto para este tipo de rota.','error');
+        await save('saveFarmRouteType',{originalName,name,regions:payloadRegions});
+    };
+}
+
+async function craftForm(b,pasteData=null){
     await ensureServerItems();
     const farm=craftSetups.farm||{};
     const route=(farm.Routes||[]).find(r=>r.rewardType===b?.farmRewardType);
-    const rewards=(b?.farmRewardType && farm.Rewards?.[b.farmRewardType])||[];
+    const pastedFarm=pasteData?.farm||null;
+    const rewards=pastedFarm?clonePanelData(pastedFarm.rewards||[]):((b?.farmRewardType && farm.Rewards?.[b.farmRewardType])||[]);
     const firstReward=rewards[0]||{};
-    const routeTypes=Object.keys(farm.RouteBlips||{});
+    const routeTypes=Object.keys(farm.RouteBlips||{}).sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:'base'}));
+    const selectedRouteType=pastedFarm?.routeType||b?.farmRouteType||route?.routeType||routeTypes[0]||'';
+    const farmEnabled=pastedFarm?!!pastedFarm.enabled:!!b?.farmRewardType;
+    const farmPermissions=pastedFarm?clonePanelData(pastedFarm.permissions||[]):clonePanelData(b?.farmPermissions||route?.permissions||[]);
     $('#drawer-title').textContent=b?`Editar ${b.name}`:'Cadastrar Craft + Farm';
     $('#drawer-body').innerHTML=`<form id="form" class="form">
         <datalist id="server-items-list">${serverItems.map(i=>`<option value="${esc(i.index)}">${esc(i.name)}</option>`).join('')}</datalist>
         <label class="field"><span>Nome da bancada / organização</span><input id="cf-name" value="${esc(b?.name||'')}" required></label>
+        <div class="craft-copybar">
+            <div><b>Copiar / colar configuração</b><span>${craftClipboard?`Na memória: ${esc(craftClipboard.sourceName)}`:'Nenhum craft copiado.'}</span></div>
+            <div class="sectionbuttons">
+                ${b?'<button type="button" id="cf-copy-craft" class="btn ghost mini">⧉ Copiar craft</button>':''}
+                <button type="button" id="cf-paste-craft" class="btn primary mini" ${craftClipboard?'':'disabled'}>▣ Colar craft</button>
+            </div>
+        </div>
+        <div class="hint">Ao colar, são copiados receitas, materiais, tipo de rota, permissões do farm, itens, quantidades, nome/imagem da rota e tempos. O destino mantém <b>nome, pontos da bancada, permissão de craft, permissão do armazém e identificador próprio do reward</b>, evitando transformar a Mafia em Verdes ou compartilhar o mesmo cadastro.</div>
         <div class="grid2">
             <label class="field"><span>Permissão de craft</span><input id="cf-craftperm" value="${esc(b?.craftPermission||'')}" placeholder="perm.lidermafia"></label>
             <label class="field"><span>Permissão do armazém</span><input id="cf-storeperm" value="${esc(b?.armazemPermission||'')}" placeholder="perm.mafia"></label>
@@ -2820,18 +3060,18 @@ async function craftForm(b){
             </button>
 
             <div class="sectiontitle"><div><b>Farm vinculado</b><span>Ao salvar, estes dados também são gravados no JSON do m_farm.</span></div></div>
-        <label class="checkrow"><input id="cf-farm-enabled" type="checkbox" ${b?.farmRewardType?'checked':''}> Criar/atualizar farm para esta bancada</label>
+        <label class="checkrow"><input id="cf-farm-enabled" type="checkbox" ${farmEnabled?'checked':''}> Criar/atualizar farm para esta bancada</label>
         <div id="cf-farm-fields">
             <div class="grid2">
-                <label class="field"><span>Tipo de rota</span><select id="cf-route">${routeTypes.map(x=>`<option value="${esc(x)}" ${(b?.farmRouteType||route?.routeType)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label>
+                <label class="field"><span>Tipo de rota</span><select id="cf-route">${routeTypes.map(x=>`<option value="${esc(x)}" ${selectedRouteType===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label>
                 <label class="field"><span>Identificador do reward</span><input id="cf-rewardtype" value="${esc(b?.farmRewardType||b?.name||'')}" placeholder="Mafia"></label>
             </div>
-            <label class="field"><span>Permissões do farm</span><input id="cf-farmperms" value="${esc((b?.farmPermissions||route?.permissions||[]).join(', '))}" placeholder="perm.mafia"></label>
+            <label class="field"><span>Permissões do farm</span><input id="cf-farmperms" value="${esc(farmPermissions.join(', '))}" placeholder="perm.mafia"></label>
             <div class="grid2">
                 <label class="field"><span>Nome exibido da rota</span><input id="cf-route-name" value="${esc(firstReward.name||'ROTA DE FARM')}"></label>
                 <label class="field"><span>Imagem da rota (index)</span><input id="cf-route-image" list="server-items-list" value="${esc(firstReward.image||'')}"></label>
             </div>
-            <div class="sectiontitle"><div><b>Itens recebidos no farm</b><span>Min/max por coleta.</span></div><button type="button" id="cf-addfarm" class="btn ghost mini">＋ Item</button></div>
+            <div class="sectiontitle"><div><b>Itens recebidos no farm</b><span>Min/max por coleta. Mínimo 0 = chance de não receber o item.</span></div><button type="button" id="cf-addfarm" class="btn ghost mini">＋ Item</button></div>
             <div id="cf-farmitems">${(firstReward.items||[]).map(farmRewardRow).join('')}</div>
         </div>
         </div>
@@ -2852,6 +3092,27 @@ async function craftForm(b){
     </form>`;
 
     $('.cancel').onclick=closeDrawer;
+    if($('#cf-copy-craft'))$('#cf-copy-craft').onclick=()=>{
+        copyCraftTemplate(b);
+        $('#cf-paste-craft').disabled=false;
+    };
+    $('#cf-paste-craft').onclick=async()=>{
+        if(!craftClipboard)return toast('Copie um craft primeiro.','error');
+        const destination=clonePanelData(b||{});
+        destination.name=$('#cf-name').value.trim();
+        destination.craftPermission=$('#cf-craftperm').value.trim();
+        destination.armazemPermission=$('#cf-storeperm').value.trim();
+        destination.coords=$$('#cf-positions .shopcoordrow').map(r=>({
+            x:Number(r.querySelector('.cx').value),
+            y:Number(r.querySelector('.cy').value),
+            z:Number(r.querySelector('.cz').value)
+        })).filter(c=>Object.values(c).every(Number.isFinite));
+        destination.farmRewardType=$('#cf-rewardtype').value.trim()||b?.farmRewardType||destination.name;
+        destination.craftItems=clonePanelData(craftClipboard.craftItems||[]);
+        destination.armazemItems=clonePanelData(craftClipboard.armazemItems||[]);
+        await craftForm(destination,{farm:clonePanelData(craftClipboard.farm)});
+        toast(`Configuração de ${craftClipboard.sourceName} aplicada ao formulário. Salve para confirmar.`);
+    };
     const showCraftView=(view)=>{
         const recipes=view==='recipes';
         $('#cf-general-view').classList.toggle('hidden',recipes);
@@ -2897,7 +3158,13 @@ async function craftForm(b){
         }).filter(r=>r.spawn);
         const materialMap={};
         craftItems.forEach(r=>r.requires.forEach(q=>{if(q.name!=='money')materialMap[q.name]={name:itemName(q.name),spawn:q.name,image:q.name};}));
-        const farmItems=$$('#cf-farmitems .spawnrow').map(r=>({item:r.querySelector('.fitem').value.trim(),min:+r.querySelector('.fmin').value||1,max:+r.querySelector('.fmax').value||1})).filter(x=>x.item);
+        const farmItems=$$('#cf-farmitems .spawnrow').map(r=>{
+            const minRaw=Number(r.querySelector('.fmin').value);
+            const maxRaw=Number(r.querySelector('.fmax').value);
+            const min=Number.isFinite(minRaw)?Math.max(0,Math.floor(minRaw)):0;
+            const max=Number.isFinite(maxRaw)?Math.max(min,Math.floor(maxRaw)):min;
+            return {item:r.querySelector('.fitem').value.trim(),min,max};
+        }).filter(x=>x.item);
         const rewardType=$('#cf-rewardtype').value.trim()||$('#cf-name').value.trim();
         const payload={
             originalName:b?.name,
@@ -3355,7 +3622,7 @@ function dealershipVehicleForm(vehicle){
     const spawn=vehicle?.spawn||'';
     const currentState=spawn?(dealershipData.vehicles?.[spawn]||{}):{};
     const currentMeta=spawn?(serverVehicleCatalog?.[spawn]||dealershipData.runtimeVehicles?.[spawn]||{}):{};
-    const imageBase=String(dealershipData.settings?.imagesDir||'http://127.0.0.1/vrp_images/');
+    const imageBase=String(dealershipData.settings?.imagesDir||'http://104.234.65.115/vrp_images/');
 
     $('#drawer-title').textContent=spawn?`Estoque: ${currentMeta.name||spawn}`:'Cadastrar veículo concessionária';
     $('#drawer-body').innerHTML=`<form id="form" class="form">
@@ -3547,7 +3814,7 @@ function dealershipSettingsForm(){
             <label class="field"><span>Comando administrativo</span><input id="deal-command" value="${esc(s.commandConce||'conce')}"></label>
         </div>
 
-        <label class="field"><span>Diretório das imagens</span><input id="deal-images" value="${esc(s.imagesDir||'http://127.0.0.1/vrp_images/')}"></label>
+        <label class="field"><span>Diretório das imagens</span><input id="deal-images" value="${esc(s.imagesDir||'http://104.234.65.115/vrp_images/')}"></label>
 
         <div class="grid3">
             <label class="field"><span>Cooldown compra (s)</span><input id="deal-buy-cool" type="number" min="0" value="${s.purchaseCooldown??5}"></label>
@@ -3608,7 +3875,7 @@ function dealershipSettingsForm(){
             sellVehicle:Number($('#deal-sell-percent').value)||0,
             maxCars:Number($('#deal-max-cars').value)||0,
             commandConce:$('#deal-command').value.trim()||'conce',
-            imagesDir:$('#deal-images').value.trim()||'http://127.0.0.1/vrp_images/',
+            imagesDir:$('#deal-images').value.trim()||'http://104.234.65.115/vrp_images/',
             purchaseCooldown:Number($('#deal-buy-cool').value)||0,
             sellCooldown:Number($('#deal-sell-cool').value)||0,
             purchaseLogWebhook:$('#deal-webhook').value.trim()
@@ -4179,7 +4446,7 @@ function roubocofreForm(){
         <div class="sectiontitle">
             <div><b>Configuração completa</b><span>${bankCount} bancos configurados. Edite portas, início, dinheiro, drops e horários.</span></div>
         </div>
-        <div class="hint">Abaixo está a configuração completa do <b>m_roubocofre</b>. Todas as posições dos bancos, portas dos cofres, pilhas de dinheiro, valores e spawns de Keycard podem ser alterados.</div>
+        <div class="hint">Abaixo está a configuração completa do <b>m_roubos</b>. Todas as posições dos bancos, portas dos cofres, pilhas de dinheiro, valores e spawns de Keycard podem ser alterados.</div>
         <label class="field"><span>JSON completo</span><textarea id="rc-json" class="job-json-editor" spellcheck="false">${esc(JSON.stringify(d,null,2))}</textarea></label>
 
         <div class="formactions">
@@ -4605,10 +4872,78 @@ function renderJobLevels(){
     box.innerHTML=jobLevelRows(current);
 }
 
+
+function jobDeliveryPointRows(points,kind){
+    const list=Array.isArray(points)?points:[];
+    return list.map((p,i)=>{
+        const x=Number(p?.x ?? p?.[0] ?? 0), y=Number(p?.y ?? p?.[1] ?? 0), z=Number(p?.z ?? p?.[2] ?? 0);
+        return `<div class="job-delivery-point-row" data-kind="${kind}">
+            <span class="job-delivery-row-index">${i+1}</span>
+            <input class="job-point-x" type="number" step="0.01" value="${Number.isFinite(x)?x:0}" placeholder="X">
+            <input class="job-point-y" type="number" step="0.01" value="${Number.isFinite(y)?y:0}" placeholder="Y">
+            <input class="job-point-z" type="number" step="0.01" value="${Number.isFinite(z)?z:0}" placeholder="Z">
+            <button type="button" class="btn ghost mini job-point-position">⌖ Posição</button>
+            <button type="button" class="btn dangerbtn mini job-row-remove">×</button>
+        </div>`;
+    }).join('');
+}
+
+function jobDeliveryItemRows(items,legacyProps){
+    let list=Array.isArray(items)?items:[];
+    if(!list.length){
+        const prop=Array.isArray(legacyProps)&&legacyProps[1]?legacyProps[1]:(Array.isArray(legacyProps)&&legacyProps[0]?legacyProps[0]:'prop_food_cb_bag_01');
+        list=[{item:'lanches',min:1,max:3,prop}];
+    }
+    return list.map((it,i)=>`<div class="job-delivery-item-row">
+        <span class="job-delivery-row-index">${i+1}</span>
+        <label class="field compact"><span>Item</span><input class="job-delivery-item" value="${esc(it?.item??it?.index??'lanches')}" placeholder="lanches"></label>
+        <label class="field compact"><span>Mín.</span><input class="job-delivery-min" type="number" min="1" step="1" value="${Math.max(1,Number(it?.min??it?.minimo??1)||1)}"></label>
+        <label class="field compact"><span>Máx.</span><input class="job-delivery-max" type="number" min="1" step="1" value="${Math.max(1,Number(it?.max??it?.maximo??3)||3)}"></label>
+        <label class="field compact"><span>Prop na mão</span><input class="job-delivery-prop" value="${esc(it?.prop??'prop_food_cb_bag_01')}" placeholder="prop_food_cb_bag_01"></label>
+        <button type="button" class="btn dangerbtn mini job-row-remove">×</button>
+    </div>`).join('');
+}
+
+function jobDeliveryEditor(extra){
+    const e=extra||{};
+    return `<div class="job-delivery-editor">
+        <div class="sectiontitle">
+            <div><b>Entregador • Configuração da rota</b><span>Esses campos controlam diretamente o ciclo coleta → entrega do m_empregos.</span></div>
+        </div>
+
+        <div class="grid2">
+            <label class="field"><span>Veículo de serviço</span><input id="job-delivery-vehicle" value="${esc(e.veiculo||'cg160')}" placeholder="cg160"></label>
+        </div>
+
+        <div class="sectiontitle">
+            <div><b>Itens de lanche</b><span>O servidor sorteia um item e uma quantidade entre mínimo e máximo a cada coleta.</span></div>
+            <button type="button" id="job-add-delivery-item" class="btn ghost mini">＋ Item</button>
+        </div>
+        <div class="job-delivery-items-head"><span>#</span><span>Item</span><span>Mín.</span><span>Máx.</span><span>Prop na mão</span><span></span></div>
+        <div id="job-delivery-items">${jobDeliveryItemRows(e.itens,e.objetos)}</div>
+        <div class="hint">Itens configurados aqui são tratados como itens de serviço: não podem ser usados, jogados fora, enviados, roubados, vendidos ou guardados em baús enquanto estiverem cadastrados.</div>
+
+        <div class="sectiontitle">
+            <div><b>Pontos de coleta</b><span>Depois de cada entrega, um destes locais será sorteado para retirar novos lanches.</span></div>
+            <button type="button" id="job-add-pickup-point" class="btn ghost mini">＋ Coleta</button>
+        </div>
+        <div class="job-delivery-points-head"><span>#</span><span>X</span><span>Y</span><span>Z</span><span></span><span></span></div>
+        <div id="job-pickup-points">${jobDeliveryPointRows(e.locais_retirada,'pickup')}</div>
+
+        <div class="sectiontitle">
+            <div><b>Pontos de entrega</b><span>Locais onde o jogador entrega o pedido e recebe XP/pagamento.</span></div>
+            <button type="button" id="job-add-dropoff-point" class="btn ghost mini">＋ Entrega</button>
+        </div>
+        <div class="job-delivery-points-head"><span>#</span><span>X</span><span>Y</span><span>Z</span><span></span><span></span></div>
+        <div id="job-dropoff-points">${jobDeliveryPointRows(e.locais_entrega,'dropoff')}</div>
+    </div>`;
+}
+
 function jobForm(entry){
     const name=entry?.name||'';
     const job=JSON.parse(JSON.stringify(entry?.data||{}));
     const extra=JSON.parse(JSON.stringify(entry?.extra||{}));
+    const deliveryHtml=name==='Entregador'?jobDeliveryEditor(extra):'';
 
     $('#drawer-title').textContent=`Editar ${name}`;
 
@@ -4618,11 +4953,23 @@ function jobForm(entry){
                 <span>Emprego</span>
                 <input value="${esc(name)}" disabled>
             </label>
+        </div>
+
+        <div class="sectiontitle">
+            <div><b>Experiência</b><span>Defina a progressão e quanto XP cada ação deste emprego entrega.</span></div>
+        </div>
+        <div class="grid2">
             <label class="field">
                 <span>Total de níveis</span>
                 <input id="job-total-levels" type="number" min="1" max="50" value="${job.total_nivel??1}" required>
             </label>
+            <label class="field">
+                <span>XP por ação</span>
+                <input id="job-xp-per-action" type="number" min="0" step="0.01" value="${job.xp_per_action??1}" required>
+                <small class="muted">Pode ser decimal. Ex.: 0.5 = duas ações para somar 1 XP.</small>
+            </label>
         </div>
+        <div class="hint"><b>Exemplo:</b> no Pescador, com XP por ação em <b>0.5</b>, cada peixe dá 0.5 XP. Dois peixes somam 1 XP.</div>
 
         <div class="sectiontitle">
             <div><b>Local inicial</b><span>Onde o jogador inicia este emprego.</span></div>
@@ -4648,6 +4995,8 @@ function jobForm(entry){
                 job.uniforme?.feminino?'Feminino definido':'Nenhum uniforme definido'
             }</span>
         </div>
+
+        ${deliveryHtml}
 
         <div class="sectiontitle">
             <div>
@@ -4694,6 +5043,45 @@ function jobForm(entry){
         toast(r.message||'Uniforme capturado.');
     };
 
+    if(name==='Entregador'){
+        const renumber=(box)=>{
+            [...box.children].forEach((row,i)=>{const n=row.querySelector('.job-delivery-row-index');if(n)n.textContent=String(i+1);});
+        };
+        const bindRemove=(box)=>{
+            box.addEventListener('click',async ev=>{
+                const remove=ev.target.closest('.job-row-remove');
+                if(remove){remove.closest('[class$=\"-row\"]')?.remove();renumber(box);return;}
+                const pos=ev.target.closest('.job-point-position');
+                if(pos){
+                    const r=await nui('getPosition');
+                    if(!r?.ok)return toast(r?.message||'Não foi possível capturar a posição.','error');
+                    const row=pos.closest('.job-delivery-point-row');
+                    row.querySelector('.job-point-x').value=r.coords.x;
+                    row.querySelector('.job-point-y').value=r.coords.y;
+                    row.querySelector('.job-point-z').value=r.coords.z;
+                }
+            });
+        };
+
+        const itemsBox=$('#job-delivery-items');
+        const pickupBox=$('#job-pickup-points');
+        const dropoffBox=$('#job-dropoff-points');
+        bindRemove(itemsBox);bindRemove(pickupBox);bindRemove(dropoffBox);
+
+        $('#job-add-delivery-item').onclick=()=>{
+            const holder=document.createElement('div');
+            holder.innerHTML=jobDeliveryItemRows([{item:'lanches',min:1,max:3,prop:'prop_food_cb_bag_01'}],[]);
+            itemsBox.appendChild(holder.firstElementChild);renumber(itemsBox);
+        };
+        const addPoint=(box,kind)=>{
+            const holder=document.createElement('div');
+            holder.innerHTML=jobDeliveryPointRows([{x:0,y:0,z:0}],kind);
+            box.appendChild(holder.firstElementChild);renumber(box);
+        };
+        $('#job-add-pickup-point').onclick=()=>addPoint(pickupBox,'pickup');
+        $('#job-add-dropoff-point').onclick=()=>addPoint(dropoffBox,'dropoff');
+    }
+
     $('#form').onsubmit=async e=>{
         e.preventDefault();
 
@@ -4702,6 +5090,44 @@ function jobForm(entry){
             parsedExtra=JSON.parse($('#job-extra-json').value||'{}');
         }catch(err){
             return toast('O JSON da configuração específica possui erro de sintaxe.','error');
+        }
+
+        if(name==='Entregador'){
+            const itemRows=$$('#job-delivery-items .job-delivery-item-row');
+            const itens=[];
+            for(const row of itemRows){
+                const item=String(row.querySelector('.job-delivery-item')?.value||'').trim();
+                const min=Math.max(1,Math.floor(Number(row.querySelector('.job-delivery-min')?.value)||1));
+                const max=Math.max(1,Math.floor(Number(row.querySelector('.job-delivery-max')?.value)||1));
+                const prop=String(row.querySelector('.job-delivery-prop')?.value||'').trim();
+                if(!item)return toast('Informe o index de todos os itens de lanche.','error');
+                if(max<min)return toast(`Quantidade máxima de ${item} não pode ser menor que a mínima.`,'error');
+                itens.push({item,min,max,prop:prop||'prop_food_cb_bag_01'});
+            }
+            if(!itens.length)return toast('Adicione pelo menos um item de lanche.','error');
+
+            const readPoints=(selector,label)=>{
+                const out=[];
+                for(const row of $$(selector)){
+                    const x=Number(row.querySelector('.job-point-x')?.value),y=Number(row.querySelector('.job-point-y')?.value),z=Number(row.querySelector('.job-point-z')?.value);
+                    if(!Number.isFinite(x)||!Number.isFinite(y)||!Number.isFinite(z))throw new Error(`Ponto de ${label} inválido.`);
+                    out.push({x,y,z});
+                }
+                return out;
+            };
+
+            let retiradas,entregas;
+            try{
+                retiradas=readPoints('#job-pickup-points .job-delivery-point-row','coleta');
+                entregas=readPoints('#job-dropoff-points .job-delivery-point-row','entrega');
+            }catch(err){return toast(err.message,'error');}
+            if(!retiradas.length)return toast('Cadastre pelo menos um ponto de coleta.','error');
+            if(!entregas.length)return toast('Cadastre pelo menos um ponto de entrega.','error');
+
+            parsedExtra.veiculo=String($('#job-delivery-vehicle')?.value||'cg160').trim()||'cg160';
+            parsedExtra.itens=itens;
+            parsedExtra.locais_retirada=retiradas;
+            parsedExtra.locais_entrega=entregas;
         }
 
         const total=Math.max(1,Number($('#job-total-levels').value)||1);
@@ -4717,10 +5143,14 @@ function jobForm(entry){
             else if((job.payment_for_level||[]).length)payment.push([0,0]);
         });
 
+        const xpPerAction=Number($('#job-xp-per-action').value);
+        if(!Number.isFinite(xpPerAction)||xpPerAction<0)return toast('XP por ação inválido.','error');
+
         const data={
             index:name,
             inicio:[Number($('#job-x').value),Number($('#job-y').value),Number($('#job-z').value)],
             total_nivel:total,
+            xp_per_action:xpPerAction,
             xp_for_level:xp,
             payment_for_level:payment,
             uniforme:job.uniforme||{}
@@ -5943,6 +6373,146 @@ function mapMarkingForm(x){
 }
 
 
+function elevatorFloorRow(floor={}){
+    const c=floor.coords||{};
+    return `<div class="elevator-floor-row spawnrow">
+        <input class="floor-name" value="${esc(floor.name||'')}" placeholder="Nome do andar" required>
+        <input class="sx" type="number" step="0.01" value="${c.x??''}" placeholder="X" required>
+        <input class="sy" type="number" step="0.01" value="${c.y??''}" placeholder="Y" required>
+        <input class="sz" type="number" step="0.01" value="${c.z??''}" placeholder="Z" required>
+        <input class="sw" type="number" step="0.01" value="${c.w??0}" placeholder="Heading">
+        <button type="button" class="floor-capture rowbtn" title="Usar minha posição">⌖</button>
+        <button type="button" class="remove" title="Remover andar">×</button>
+    </div>`;
+}
+
+function elevatorForm(elevator){
+    const restricted=!!String(elevator?.permission||'').trim();
+
+    $('#drawer-title').textContent=elevator?`Editar ${elevator.name||elevator.id}`:'Cadastrar elevador';
+    $('#drawer-body').innerHTML=`<form id="form" class="form">
+        <div class="grid2">
+            <label class="field"><span>Identificador</span><input id="el-id" value="${esc(elevator?.id||'')}" placeholder="HOSPITAL" required></label>
+            <label class="field"><span>Nome exibido</span><input id="el-name" value="${esc(elevator?.name||'')}" placeholder="Hospital" required></label>
+        </div>
+
+        <label class="checkrow"><input id="el-restricted" type="checkbox" ${restricted?'checked':''}> Exigir permissão para utilizar este elevador</label>
+        <label class="field" id="el-permission-field"><span>Permissão</span><input id="el-permission" value="${esc(elevator?.permission||'')}" placeholder="Ex.: perm.unizk"><small>Deixe desmarcado acima para tornar o elevador público.</small></label>
+
+        <div class="grid2">
+            <label class="field"><span>Distância para exibir marker</span><input id="el-draw" type="number" min="2" max="50" step="0.5" value="${Number(elevator?.drawDistance||12)}"></label>
+            <label class="field"><span>Distância para interagir</span><input id="el-use" type="number" min="0.5" max="5" step="0.1" value="${Number(elevator?.interactionDistance||2)}"></label>
+        </div>
+
+        <div class="sectiontitle">
+            <div><b>Andares</b><span>Cada andar também é um marker de acesso ao elevador.</span></div>
+            <button type="button" id="el-add-floor" class="btn primary mini">＋ Adicionar andar</button>
+        </div>
+        <div class="hint">Use o botão ⌖ de cada andar para capturar sua posição e direção atuais. Cadastre no mínimo dois andares.</div>
+        <div id="el-floors" class="elevator-floors">${(elevator?.floors||[]).map(elevatorFloorRow).join('')}</div>
+
+        <div class="formactions">
+            <button type="button" class="btn ghost cancel">Cancelar</button>
+            <button class="btn primary">Salvar elevador</button>
+        </div>
+    </form>`;
+
+    $('.cancel').onclick=closeDrawer;
+
+    const permissionToggle=()=>{
+        const enabled=$('#el-restricted').checked;
+        $('#el-permission-field').classList.toggle('hidden',!enabled);
+        $('#el-permission').required=enabled;
+        if(!enabled) $('#el-permission').value='';
+    };
+
+    const bindRows=()=>{
+        $$('#el-floors .remove').forEach(btn=>{
+            btn.onclick=()=>btn.closest('.elevator-floor-row').remove();
+        });
+
+        $$('#el-floors .floor-capture').forEach(btn=>{
+            btn.onclick=async()=>{
+                const row=btn.closest('.elevator-floor-row');
+                const r=await nui('getPosition4');
+                if(!r?.ok)return toast(r?.message||'Não foi possível capturar sua posição.','error');
+                row.querySelector('.sx').value=r.coords.x;
+                row.querySelector('.sy').value=r.coords.y;
+                row.querySelector('.sz').value=r.coords.z;
+                row.querySelector('.sw').value=r.coords.w??0;
+
+                const combined=row.querySelector('.coordinate-combined-input');
+                if(combined){
+                    combined.value=panelCoordinateText(r.coords.x,r.coords.y,r.coords.z);
+                    combined.dispatchEvent(new Event('input',{bubbles:true}));
+                }
+            };
+        });
+
+        enhanceAllPanelCoordinates($('#el-floors'));
+    };
+
+    $('#el-restricted').onchange=permissionToggle;
+    permissionToggle();
+
+    $('#el-add-floor').onclick=()=>{
+        $('#el-floors').insertAdjacentHTML('beforeend',elevatorFloorRow());
+        bindRows();
+    };
+
+    if(!(elevator?.floors||[]).length){
+        $('#el-floors').innerHTML=elevatorFloorRow({name:'Térreo'})+elevatorFloorRow({name:'1° Andar'});
+    }
+    bindRows();
+
+    $('#form').onsubmit=async ev=>{
+        ev.preventDefault();
+
+        const rows=$$('#el-floors .elevator-floor-row');
+        if(rows.length<2)return toast('Cadastre pelo menos dois andares.','error');
+
+        const floors=rows.map(row=>({
+            name:row.querySelector('.floor-name').value.trim(),
+            coords:{
+                x:+row.querySelector('.sx').value,
+                y:+row.querySelector('.sy').value,
+                z:+row.querySelector('.sz').value,
+                w:+row.querySelector('.sw').value||0
+            }
+        }));
+
+        if(floors.some(f=>!f.name)){
+            return toast('Todos os andares precisam de um nome.','error');
+        }
+
+        const names=floors.map(f=>f.name.toLowerCase());
+        if(new Set(names).size!==names.length){
+            return toast('Não é possível repetir o nome de um andar.','error');
+        }
+
+        const restrictedNow=$('#el-restricted').checked;
+        const permission=restrictedNow?$('#el-permission').value.trim():'';
+        if(restrictedNow&&!permission){
+            return toast('Informe a permissão do elevador.','error');
+        }
+
+        const data={
+            id:$('#el-id').value.trim(),
+            name:$('#el-name').value.trim(),
+            permission,
+            drawDistance:+$('#el-draw').value||12,
+            interactionDistance:+$('#el-use').value||2,
+            floors
+        };
+
+        await save('saveElevator',{
+            originalId:elevator?.id||'',
+            data
+        });
+    };
+}
+
+
 async function save(event,data){
     const r=await nui(event,data);
     if(!r.ok)return toast(r.message||'Falha ao salvar.','error');
@@ -5960,11 +6530,13 @@ function askDelete(kind,id){
         type:'Excluir este tipo?',
         shop:'Excluir esta loja?',
         craft:'Excluir esta bancada e o farm vinculado?',
+        farmroutetype:'Excluir este tipo de rota?',
         clothing:'Excluir este local da loja de roupa?',
         barbershop:'Excluir este local da barbearia?',
         tattoo:'Excluir este local do Estúdio Tattoo?',
         cloakroom:'Excluir este Blip Fardamento e todos os fardamentos dele?',
         mapmarking:'Excluir esta marcação do mapa?',
+        elevator:'Excluir este elevador e todos os andares?',
         group:'Excluir este cargo?',
         desmanche:'Excluir este desmanche?',
         safezone:'Excluir esta SafeZone?',
@@ -5977,6 +6549,8 @@ function askDelete(kind,id){
     $('#confirm-title').textContent=label||'Excluir cadastro?';
     $('#confirm-text').innerHTML=kind==='group'
         ?`O cargo <b>${esc(id)}</b> será removido do groups.json e também retirado dos usuários que o possuem.`
+        :kind==='farmroutetype'
+            ?`O tipo de rota <b>${esc(id)}</b> será removido do m_farm. A exclusão será bloqueada se algum farm ainda estiver usando esse tipo.`
         :kind==='servervehicle'
             ?`O veículo <b>${esc(serverVehicleCatalog?.[id]?.name||id)}</b> (<b>${esc(id)}</b>) será removido do catálogo do servidor e do <b>shared-side/listcars.json</b>.`
             :`O cadastro <b>${esc(id)}</b> será removido do JSON e a alteração será sincronizada imediatamente.`;
@@ -5996,8 +6570,13 @@ $('#sort').onchange=render;
 $('#group-filter').onchange=render;
 updateModuleFilters(true);
 $('#refresh').onclick=()=>loadAll();
-$('#new').onclick=handlePrimaryNewAction;
-$('#close').onclick=()=>{resetTransientUI();$('#app').classList.add('hidden');nui('close')};
+$('#new').onclick=()=>{
+    if([].includes(module)){
+        return toast('Módulo preparado. Envie o resource correspondente para habilitarmos os cadastros.','error');
+    }
+    openDrawer(currentKind());
+};
+$('#close').onclick=()=>{$('#app').classList.add('hidden');nui('close')};
 $('#drawer-close').onclick=closeDrawer;
 $('#overlay').onclick=closeDrawer;
 
@@ -6011,6 +6590,13 @@ $('#tbody').onclick=async e=>{
 
     if(a==='del')return askDelete(k,id);
 
+    if(a==='copy' && k==='craft'){
+        const bench=(craftSetups.benches||[]).find(x=>x.name===id);
+        if(!bench)return toast('Craft não encontrado.','error');
+        copyCraftTemplate(bench);
+        return;
+    }
+
     if(a==='edit'){
         if(k==='chest')openDrawer(k,chests.find(x=>x.name===id));
         if(k==='garage')openDrawer(k,garages.find(x=>String(x.id)===id));
@@ -6022,6 +6608,7 @@ $('#tbody').onclick=async e=>{
         if(k==='tattoo')openDrawer(k,tattooShops.find(x=>String(x.id)===id));
         if(k==='cloakroom')openDrawer(k,cloakrooms.find(x=>String(x.name)===id));
         if(k==='mapmarking')openDrawer(k,mapMarkings.find(x=>String(x.id)===id));
+        if(k==='elevator')openDrawer(k,elevators.find(x=>String(x.id)===id));
         if(k==='group')openDrawer(k,managedGroups.find(x=>String(x.name)===id));
         if(k==='desmanche')openDrawer(k,desmanches.find(x=>String(x.name)===id));
         if(k==='safezone')openDrawer(k,safeZones.find(x=>String(x.name)===id));
@@ -6047,6 +6634,7 @@ $('#tbody').onclick=async e=>{
         if(k==='tattoo')coords=tattooShops.find(x=>String(x.id)===id)?.coords;
         if(k==='cloakroom')coords=cloakrooms.find(x=>String(x.name)===id)?.coords;
         if(k==='mapmarking')coords=mapMarkings.find(x=>String(x.id)===id)?.coords;
+        if(k==='elevator')coords=elevators.find(x=>String(x.id)===id)?.floors?.[0]?.coords;
         if(k==='desmanche')coords=desmanches.find(x=>String(x.name)===id)?.inicio;
         if(k==='job'){const p=jobsData.jobs?.[id]?.inicio;if(p)coords={x:Number(p[0]),y:Number(p[1]),z:Number(p[2])};}
         if(k==='residence'){const h=(residencesData.residences||[]).find(x=>String(x.name)===id);if(h)coords={x:Number(h.x),y:Number(h.y),z:Number(h.z)};}
@@ -6086,11 +6674,13 @@ $('#confirm-ok').onclick=async()=>{
     if(deleting.kind==='type'){ev='deleteGarageType';data={name:deleting.id}}
     if(deleting.kind==='shop'){ev='deleteShop';data={name:deleting.id}}
     if(deleting.kind==='craft'){ev='deleteCraftSetup';data={name:deleting.id}}
+    if(deleting.kind==='farmroutetype'){ev='deleteFarmRouteType';data={name:deleting.id}}
     if(deleting.kind==='clothing'){ev='deleteClothingShop';data={id:deleting.id}}
     if(deleting.kind==='barbershop'){ev='deleteBarbershop';data={id:deleting.id}}
     if(deleting.kind==='tattoo'){ev='deleteTattooShop';data={id:deleting.id}}
     if(deleting.kind==='cloakroom'){ev='deleteCloakroom';data={name:deleting.id}}
     if(deleting.kind==='mapmarking'){ev='deleteMapMarking';data={id:deleting.id}}
+    if(deleting.kind==='elevator'){ev='deleteElevator';data={id:deleting.id}}
     if(deleting.kind==='group'){ev='deleteManagedGroup';data={name:deleting.id}}
     if(deleting.kind==='desmanche'){ev='deleteDesmanche';data={name:deleting.id}}
     if(deleting.kind==='safezone'){ev='deleteSafeZone';data={name:deleting.id}}
@@ -6154,25 +6744,27 @@ $('#confirm-ok').onclick=async()=>{
     }
 
     await loadAll(true);
+    if(deleting.kind==='farmroutetype' && module==='craft'){
+        farmRouteTypesForm();
+    }
 };
 
 window.addEventListener('message',e=>{
     const d=e.data||{};
 
     if(d.action==='open'){
-        resetTransientUI();
         $('#app').classList.remove('hidden');
         serverItems=[];
         loadAll(true);
     }
 
-    if(d.action==='close'){
-        resetTransientUI();
-        $('#app').classList.add('hidden');
-    }
+    // O modo de posicionamento oculta a NUI SEM descartar o formulario aberto.
+    if(d.action==='suspend'||d.action==='close')$('#app').classList.add('hidden');
+    if(d.action==='resume')$('#app').classList.remove('hidden');
 
     if(d.action==='mansionPositionCaptured'){
         applyMansionCapturedPosition(String(d.target||''),d.coords||{});
+        refreshCombinedCoordinateDisplay($('#drawer-body'));
     }
 
     if(d.action==='mansionPositionCancelled'){
@@ -6191,15 +6783,39 @@ window.addEventListener('message',e=>{
 
     if(d.action==='spawnPositionCaptured'){
         const box=$('#spawns');
+        const targetId=pendingGarageSpawnId;
+        pendingGarageSpawnId=null;
         if(box&&d.coords){
-            box.insertAdjacentHTML('beforeend',spawnRow(d.coords));
-            const row=box.lastElementChild;
-            row.querySelector('.remove').onclick=()=>row.remove();
-            toast('Posição de saída adicionada.');
+            let row=targetId?[...box.querySelectorAll('.garage-spawnrow')]
+                .find(r=>r.dataset.garageSpawnId===String(targetId)):null;
+            if(row){
+                row.querySelector('.sx').value=d.coords.x;
+                row.querySelector('.sy').value=d.coords.y;
+                row.querySelector('.sz').value=d.coords.z;
+                row.querySelector('.sw').value=d.coords.w;
+                refreshCombinedCoordinateDisplay(row);
+                toast('Coordenada da vaga atualizada. Salve a garagem para aplicar.');
+            }else{
+                box.insertAdjacentHTML('beforeend',spawnRow(d.coords,true));
+                row=box.lastElementChild;
+                row.querySelector('.remove').onclick=()=>row.remove();
+                row.querySelector('.capture-existing-spawn').onclick=async()=>{
+                    pendingGarageSpawnId=row.dataset.garageSpawnId;
+                    const r=await nui('startSpawnPosition');
+                    if(!r?.ok){
+                        pendingGarageSpawnId=null;
+                        toast(r?.message||'Não foi possível iniciar o posicionamento.','error');
+                    }
+                };
+                toast('Nova vaga adicionada. Salve a garagem para aplicar.');
+            }
         }
     }
 
-    if(d.action==='spawnPositionCancelled')toast('Posicionamento cancelado.','error');
+    if(d.action==='spawnPositionCancelled'){
+        pendingGarageSpawnId=null;
+        toast('Posicionamento cancelado.','error');
+    }
 
     if(d.action==='shopPositionCaptured'){
         const box=$('#shop-points');
@@ -6233,7 +6849,7 @@ window.addEventListener('message',e=>{
 
             const w=$(`#${prefix}-w`);
             if(w && c.w!=null)w.value=c.w;
-
+            refreshCombinedCoordinateDisplay($('#drawer-body'));
             toast('Posição do desmanche capturada.');
         }
     }
@@ -6320,7 +6936,7 @@ $('#item-picker-add').onclick=()=>{
 };
 
 document.addEventListener('keyup',e=>{
-    if(e.key!=='Escape')return;
+    if(e.key!=='Escape'||$('#app').classList.contains('hidden'))return;
 
     if(!$('#item-picker').classList.contains('hidden')){
         closeItemPicker();

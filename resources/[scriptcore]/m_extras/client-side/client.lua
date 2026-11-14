@@ -4,72 +4,10 @@ vRP = Proxy.getInterface("vRP")
 
 vSERVER = Tunnel.getInterface(GetCurrentResourceName())
 
-local inScreen = false
------------------------------------------------------------------------------------------------------------------------------------------
--- UPDATE DOMINATION
------------------------------------------------------------------------------------------------------------------------------------------
-exports("toggleDomination",function(status,name)
-    TriggerEvent('cupom:visible', status)
-    if status then 
-        SendNUIMessage({action = "open:domination"})
-        SendNUIMessage({
-            action = "update:domination",
-            informations = {
-                name = name,
-                enemies = 0,
-                organization = attackerName,
-                allies = totalAllies
-            }
-        })
-    else
-        SendNUIMessage({action = "close:domination"})
-    end
-end)
+-- Domination is disabled. Retain exports for compatibility with callers.
+exports('toggleDomination', function() end)
+exports('toggleDominationGeral', function() end)
 
-RegisterNetEvent("update:domination",function(dominationName,partnersInfos,attackerName,totalAllies)
-    SendNUIMessage({
-        action = "update:domination",
-        informations = {
-            name = dominationName,
-            enemies = partnersInfos,
-            organization = attackerName,
-            allies = totalAllies
-        }
-    })
-end)
-
-exports("toggleDominationGeral",function(status,name)
-    TriggerEvent('cupom:visible', status)
-    if status then 
-        SendNUIMessage({action = "open:domination"})
-        SendNUIMessage({
-            action = "update:domination",
-            informations = {
-                name = name,
-                enemies = 0,
-                points = 0,
-                allies = 0
-            }
-        })
-    else
-        SendNUIMessage({action = "close:domination"})
-    end
-end)
-
-RegisterNetEvent("update:dominationGeral",function(dominationName,partnersInfos,points,totalAllies)
-    SendNUIMessage({
-        action = "update:domination",
-        informations = {
-            name = dominationName,
-            enemies = partnersInfos,
-            points = points,
-            allies = totalAllies
-        }
-    })
-end)
------------------------------------------------------------------------------------------------------------------------------------------
--- DRAWTEXT3D
------------------------------------------------------------------------------------------------------------------------------------------
 function DrawText3D(x,y,z,text)
 	SetTextFont(4)
 	SetTextCentre(1)
