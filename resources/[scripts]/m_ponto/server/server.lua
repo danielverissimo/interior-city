@@ -37,6 +37,16 @@ local function formatClock(seconds)
 end
 
 local function validDutyRole(org, role)
+    if org == 'Policia' then
+        if type(role)~='string' or not role:match('PM$') then return false end
+        local groups=vRP.getGroups() or {}
+        if not groups[role] then return false end
+        -- Novos cargos PM tambem podem bater ponto. Equipamentos so sao
+        -- liberados quando existe um kit explicito para aquele cargo.
+        if Config.Orgs.Policia and not Config.Orgs.Policia.groups[role] then
+            Config.Orgs.Policia.groups[role]={WeaponsKit={}}
+        end
+    end
     return type(org) == "string"
         and type(role) == "string"
         and Config.Orgs[org] ~= nil
@@ -928,6 +938,7 @@ function API.updateUniform(org, group, new_preset)
 end
 
 function API.takeWeapon(org, weaponKey)
+    if Config.Orgs[org] and Config.Orgs[org].clockOnly then return { success = false, error = "Este painel serve apenas para bater ponto." } end
     local source = source
     local user_id = vRP.getUserId(source)
     if not user_id then return { success = false, error = "Usuário não encontrado." } end
@@ -952,6 +963,7 @@ function API.takeWeapon(org, weaponKey)
 end
 
 function API.equip(org)
+    if Config.Orgs[org] and Config.Orgs[org].clockOnly then return { success = false, error = "Este painel serve apenas para bater ponto." } end
     local source = source
     local user_id = vRP.getUserId(source)
     if not user_id then return { success = false, error = "Usuário não encontrado." } end

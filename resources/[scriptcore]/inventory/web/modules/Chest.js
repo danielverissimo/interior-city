@@ -35,6 +35,7 @@ class Chest extends Inventory {
 					return;
 				}
 				invInstance.items[to_slot].amount += amount;
+				mergeItemValidity(invInstance.items[to_slot], this.items[from_slot]);
 				this.items[from_slot].amount -= amount;
 				if (this.items[from_slot].amount <= 0) {
 					delete this.items[from_slot];
@@ -97,6 +98,7 @@ class Chest extends Inventory {
 					this.renderSlots("right");
 					return;
 				}
+				mergeItemValidity(this.items[to_slot], invInstance.items[from_slot]);
 				invInstance.items[from_slot].amount -= amount;
 				if (invInstance.items[from_slot].amount <= 0) {
 					delete invInstance.items[from_slot];

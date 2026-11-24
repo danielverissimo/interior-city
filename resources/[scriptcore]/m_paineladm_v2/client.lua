@@ -1277,6 +1277,10 @@ RegisterNetEvent("m_paineladm_v2:spawnVehicle", function(vehicleName)
     if vehicle and vehicle ~= 0 then
         SetEntityAsMissionEntity(vehicle, true, true)
         SetVehicleOnGroundProperly(vehicle)
+        if GetResourceState("carros_som_rebaixados") == "started"
+            and exports["carros_som_rebaixados"]:applySoundWall(vehicle) == false then
+            notify('aviso', 'O paredao nao carregou. Confira o pack de carros e reconecte.')
+        end
         SetVehicleEngineOn(vehicle, true, true, false)
         SetVehicleDirtLevel(vehicle, 0.0)
         SetPedIntoVehicle(ped, vehicle, -1)

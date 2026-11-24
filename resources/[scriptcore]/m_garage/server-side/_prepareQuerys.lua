@@ -4,5 +4,5 @@ vRP._prepare("bm_module/garages/getStatus", "SELECT status,ipva FROM vrp_user_ve
 vRP._prepare("bm_module/garages/updateFavorite", "UPDATE vrp_user_veiculos SET favorite = @favorite WHERE user_id = @user_id AND veiculo = @veiculo")
 vRP._prepare("bm_module/garages/updateStatus", "UPDATE vrp_user_veiculos SET status = @status WHERE user_id = @user_id AND veiculo = @veiculo")
 vRP._prepare("bm_module/garages/updateIpva", "UPDATE vrp_user_veiculos SET ipva = @ipva WHERE user_id = @user_id AND veiculo = @veiculo")
-vRP._prepare("bm_module/garages/updateVehicleInfos", "UPDATE vrp_user_veiculos SET motor = @motor, lataria = @lataria, gasolina = @gasolina WHERE user_id = @user_id AND veiculo = @veiculo")
+vRP._prepare("bm_module/garages/updateVehicleInfos", "UPDATE vrp_user_veiculos SET motor = @motor, lataria = @lataria, gasolina = COALESCE(NULLIF(@gasolina, -1), gasolina) WHERE user_id = @user_id AND veiculo = @veiculo")
 vRP._prepare("bm_module/garages/updateOwnerVehicle", "UPDATE vrp_user_veiculos SET user_id = @new_owner, portamalas = @portamalas WHERE user_id = @user_id AND veiculo = @veiculo")

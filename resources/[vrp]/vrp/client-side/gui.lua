@@ -131,11 +131,48 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- BLOQUEAR ARMAS QUANDO ESTIVER COM ANIMACAO
 -----------------------------------------------------------------------------------------------------------------------------------------
+local handsUpDict = "random@mugging3"
+local handsUpAnim = "handsup_standing_base"
+local handsUpPed, handsUpUntil
+
+local function clearHandsUpWeapon()
+    if handsUpPed and DoesEntityExist(handsUpPed) then
+        SetPedCurrentWeaponVisible(handsUpPed, true, false, false, false)
+    end
+    handsUpPed, handsUpUntil = nil, nil
+end
+
+Citizen.CreateThread(function()
+    while true do
+        local ped = PlayerPedId()
+        if handsUpPed and handsUpPed ~= ped then clearHandsUpWeapon() end
+        local playing = IsEntityPlayingAnim(ped, handsUpDict, handsUpAnim, 3)
+        if playing then handsUpUntil = nil end
+        local raising = handsUpUntil and GetGameTimer() < handsUpUntil
+        if not IsEntityDead(ped) and (raising or playing) then
+            handsUpPed = ped
+            SetPedCurrentWeaponVisible(ped, false, false, false, false)
+            DisablePlayerFiring(PlayerId(), true)
+            DisableControlAction(0, 24, true)
+            DisableControlAction(0, 25, true)
+            DisableControlAction(0, 257, true)
+            Citizen.Wait(0)
+        else
+            clearHandsUpWeapon()
+            Citizen.Wait(50)
+        end
+    end
+end)
+
+AddEventHandler("onResourceStop", function(resource)
+    if resource == GetCurrentResourceName() then clearHandsUpWeapon() end
+end)
+
 Citizen.CreateThread(function()
 	while true do
         local time = 1000
         local ped = PlayerPedId()
-        if IsEntityPlayingAnim(ped,"anim@amb@nightclub@peds@","rcmme_amanda1_stand_loop_cop",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intupperface_palm","idle_a",3) or IsEntityPlayingAnim(ped,"anim@heists@heist_corona@single_team","single_team_loop_boss",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intupperfinger","idle_a_fp",3) or IsEntityPlayingAnim(ped,"random@arrests@busted","idle_a",3) or IsEntityPlayingAnim(ped,"random@mugging3","handsup_standing_base",3) or IsEntityPlayingAnim(ped,"mini@strip_club@idles@bouncer@base","base",3) or IsEntityPlayingAnim(ped,"rcmnigel1c","hailing_whistle_waive_a",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intupperthumbs_up","enter",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intcelebrationmale@face_palm","face_palm",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intcelebrationmale@salute","salute",3) then
+        if IsEntityPlayingAnim(ped,"anim@amb@nightclub@peds@","rcmme_amanda1_stand_loop_cop",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intupperface_palm","idle_a",3) or IsEntityPlayingAnim(ped,"anim@heists@heist_corona@single_team","single_team_loop_boss",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intupperfinger","idle_a_fp",3) or IsEntityPlayingAnim(ped,"random@arrests@busted","idle_a",3) or IsEntityPlayingAnim(ped,"mini@strip_club@idles@bouncer@base","base",3) or IsEntityPlayingAnim(ped,"rcmnigel1c","hailing_whistle_waive_a",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intupperthumbs_up","enter",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intcelebrationmale@face_palm","face_palm",3) or IsEntityPlayingAnim(ped,"anim@mp_player_intcelebrationmale@salute","salute",3) then
             time = 500
             SetCurrentPedWeapon(ped,GetHashKey("WEAPON_UNARMED"),true)
         end
@@ -216,7 +253,7 @@ local resultTask = nil
 	end
 end ]]
 
-function tvRP.taskBar(settings)
+function tvRP.taskBar(duration, skillGap, speedMultiplier)
 	Citizen.Wait(100)
 
 	if taskInProcess then
@@ -224,7 +261,7 @@ function tvRP.taskBar(settings)
 	end
 
 	taskInProcess = true
-	openGui(settings)
+	openGui(nil, nil, nil, nil, speedMultiplier)
 	activeTasks = 1
 	resultTask = nil
 
@@ -246,9 +283,9 @@ function tvRP.taskBar(settings)
 	end ]]
 end
 
-function openGui(settings)
+function openGui(sentLength,taskID,chancesent,skillGapSent,speedMultiplier)
 	SetNuiFocus(true,false)
-	SendNUIMessage({ action = 'createTask', settings = type(settings) == 'table' and settings or nil })
+	SendNUIMessage({ action = 'createTask', speedMultiplier = tonumber(speedMultiplier) or 1.0 })
 	-- SendNUIMessage({ create = true, Length = sentLength, Task = taskID, chance = chancesent, skillGap = skillGapSent })
 end
 
@@ -410,11 +447,13 @@ RegisterCommand('emote', function(source,args)
 						tvRP.playAnim(true,{{"random@arrests@busted","idle_a"}},true)
 					end
 				elseif args[1] == "levantarmao" then
-					SetCurrentPedWeapon(ped,GetHashKey("WEAPON_UNARMED"),true)
-					if IsEntityPlayingAnim(ped,"random@mugging3","handsup_standing_base",3) then
+					if handsUpUntil or IsEntityPlayingAnim(ped, handsUpDict, handsUpAnim, 3) then
 						tvRP.DeletarObjeto()
+						clearHandsUpWeapon()
 					else
-						tvRP.playAnim(true,{{"random@mugging3","handsup_standing_base"}},true)
+						handsUpPed, handsUpUntil = ped, GetGameTimer() + 500
+						SetPedCurrentWeaponVisible(ped, false, false, false, false)
+						tvRP.playAnim(true,{{handsUpDict,handsUpAnim}},true)
 					end
 				elseif args[1] == "apontar" then
 					tvRP.CarregarAnim("anim@mp_point")

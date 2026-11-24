@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="pt-BR" class="no-js">
 
 <head>
   <meta charset="UTF-8" />
@@ -163,8 +163,8 @@
   </style>
 
  
-<video autoplay muted loop playsinline id="myVideo" height="100vw">
-  <source src="intro/intro.mp4" type="video/mp4">
+<video autoplay muted loop playsinline preload="auto" id="myVideo" poster="loadscreen-intc1-poster.jpg">
+  <source src="loadscreen-intc1-vp9.webm" type='video/webm; codecs="vp9"'>
 </video>
 
 <audio id="music" preload="auto" >
@@ -185,9 +185,17 @@
 
     </div>
       <div class="button-row">
-        <button class="button | button--toggle | button--mute">
+        <div class="volume-control">
+        <button class="button button--volume" aria-label="Abrir controle de volume" aria-expanded="false" aria-controls="volume-panel">
           <i class="ph-speaker-none"></i>
         </button>
+        <div id="volume-panel" class="volume-panel" hidden>
+          <div class="volume-heading"><label for="music-volume">Volume</label><output id="volume-value" for="music-volume">50%</output></div>
+          <input id="music-volume" type="range" min="0" max="100" step="1" value="50" aria-label="Volume da música">
+          <div class="volume-limits"><span>0</span><span>100</span></div>
+          <button type="button" class="volume-mute" aria-pressed="false">Mutar música</button>
+        </div>
+        </div>
         <button class="button">
           <i class="ph-skip-back"></i>
         </button>
@@ -245,6 +253,11 @@
 
 
 
+  <div class="city-loading">
+    <div class="city-loading-caption"><span>Preparando sua chegada</span><output id="loading-percent">0%</output></div>
+    <div id="city-progress" class="city-progress" role="progressbar" aria-label="Carregando a cidade" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="city-progress-fill"></div></div>
+  </div>
+
   <script>
   
 
@@ -263,7 +276,7 @@
     var playerStatus = true
 
     function load() {
-      music[0].src = "http://127.0.0.1/loading/musicas/musica.mp3";
+      music[0].src = "interior-city-music-oficial.mp3";
       music[0].load();
       music[0].play();
       music[0].volume = 0.5;
@@ -287,7 +300,7 @@
       timer.innerHTML = "0:00";
       music[0].innerHTML = "";
       currentSong = 0;
-      music[0].src = "http://131.196.198.155/loading/musicas/Abertura_Alemao_01.mp3";
+      music[0].src = "interior-city-music-oficial.mp3";
 
       music[0].load();
       music[0].play();
@@ -383,20 +396,6 @@ for (let button of buttons) {
 	});
 }
 
-var mute = false
-$('.button--mute').on('click', () => {
-  if(mute){
-      $('.button--mute').removeClass('is-active')
-      $('.button--mute').html('<i class="ph-speaker-none"></i>')
-      music[0].volume = 0.5
-      mute = false
-    }else{
-      $('.button--mute').addClass('is-active')
-      $('.button--mute').html('<i class="ph-speaker-x"></i>')
-      music[0].volume = 0
-      mute = true
-    }
-})
 
 
 // checkbox.addEventListener("keydown", function () {
@@ -443,6 +442,7 @@ window.onload = (event) => {
   
   </script>
 
+  <script src="js/loading-ui.js"></script>
 </body>
 
 </html>

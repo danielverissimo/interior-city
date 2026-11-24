@@ -15,6 +15,19 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CRIAR ITENS
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function vRP.getItemExpiry(item, expiresAt)
+    local duration = itemExpiryDuration(item)
+    if not duration then return nil end
+
+    local latestExpiry = os.time() + duration
+    return math.min(tonumber(expiresAt) or latestExpiry, latestExpiry)
+end
+
+function vRP.isInventoryItemExpired(entry)
+    local expiresAt = type(entry) == "table" and tonumber(entry.expiresAt) or nil
+    return expiresAt ~= nil and expiresAt <= os.time()
+end
+
 local tn = tonumber
 local ts = tostring
 
@@ -224,7 +237,7 @@ function vRP.getInventoryItemAmount(user_id,idname)
 	local data = vRP.getInventory(user_id)
 	if data then
 		for k in pairs(data) do
-			if data[k].item == idname then
+			if data[k].item == idname and not vRP.isInventoryItemExpired(data[k]) then
 				-- vRP.checkInventoryWeightAndBan(user_id)
 				return parseInt(data[k].amount)
 			end
@@ -331,7 +344,7 @@ end
 -- FUNÇÕES DO INVENTARIO
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-function vRP.giveInventoryItem(user_id,idname,amount,notify,slot)
+function vRP.giveInventoryItem(user_id,idname,amount,notify,slot,expiresAt)
     local source = vRP.getUserSource(user_id)
     local data = vRP.getInventory(user_id)
     amount = parseInt(amount)
@@ -350,30 +363,41 @@ function vRP.giveInventoryItem(user_id,idname,amount,notify,slot)
         return false
     end
 
+    expiresAt = vRP.getItemExpiry(idname, expiresAt)
     local finalSlot = slot
+    local expired = expiresAt and expiresAt <= os.time()
+    local destination = finalSlot and data[ts(finalSlot)]
+    if expiresAt and destination and destination.item == idname
+        and expired ~= vRP.isInventoryItemExpired(destination) then
+        finalSlot = nil
+    end
     if not finalSlot then
         local initial = 5
         repeat
             initial = initial + 1
-        until data[ts(initial)] == nil or (data[ts(initial)] and data[ts(initial)].item == idname)
+        until data[ts(initial)] == nil or (data[ts(initial)] and data[ts(initial)].item == idname
+            and (not expiresAt or expired == vRP.isInventoryItemExpired(data[ts(initial)])))
         initial = ts(initial)
         finalSlot = initial
         if data[initial] == nil then
-            data[initial] = { item = idname, amount = amount }
+            data[initial] = { item = idname, amount = amount, expiresAt = expiresAt }
         elseif data[initial] and data[initial].item == idname then
             data[initial].amount = tn(data[initial].amount) + amount
+            if expiresAt then data[initial].expiresAt = math.min(data[initial].expiresAt or expiresAt, expiresAt) end
         end
     else
         finalSlot = ts(finalSlot)
         if data[finalSlot] then
             if data[finalSlot].item == idname then
                 local oldAmount = tn(data[finalSlot].amount)
-                data[finalSlot] = { item = idname, amount = tn(oldAmount) + amount }
+                local previousExpiry = data[finalSlot].expiresAt
+                data[finalSlot] = { item = idname, amount = tn(oldAmount) + amount,
+                    expiresAt = expiresAt and math.min(previousExpiry or expiresAt, expiresAt) }
             else
-                data[finalSlot] = { item = idname, amount = amount }
+                data[finalSlot] = { item = idname, amount = amount, expiresAt = expiresAt }
             end
         else
-            data[finalSlot] = { item = idname, amount = amount }
+            data[finalSlot] = { item = idname, amount = amount, expiresAt = expiresAt }
         end
     end
 
@@ -432,7 +456,11 @@ function vRP.tryGetInventoryItem(user_id,idname,amount,notify,slot)
 	end  
 end
 
-function vRP.tryGetInventoryItem(user_id,idname,amount,notify,slot)
+function vRP.tryGetInventoryItem(user_id,idname,amount,notify,slot,allowExpired)
+    if type(notify) == "string" then
+        slot = notify
+        notify = true
+    end
     local requestedAmount = tonumber(amount) or 0
     amount = parseInt(amount)
     if amount <= 0 then
@@ -450,7 +478,8 @@ function vRP.tryGetInventoryItem(user_id,idname,amount,notify,slot)
     local removedSlot = nil
     if not slot then
         for k,v in pairs(data) do
-            if v.item == idname and parseInt(v.amount) >= amount then
+            if v.item == idname and parseInt(v.amount) >= amount
+                and (allowExpired or not vRP.isInventoryItemExpired(v)) then
                 v.amount = parseInt(v.amount) - amount
                 if parseInt(v.amount) <= 0 then data[k] = nil end
                 removedSlot = k
@@ -459,7 +488,8 @@ function vRP.tryGetInventoryItem(user_id,idname,amount,notify,slot)
         end
     else
         slot = tostring(slot)
-        if data[slot] and data[slot].item == idname and parseInt(data[slot].amount) >= amount then
+        if data[slot] and data[slot].item == idname and parseInt(data[slot].amount) >= amount
+            and (allowExpired or not vRP.isInventoryItemExpired(data[slot])) then
             data[slot].amount = parseInt(data[slot].amount) - amount
             if parseInt(data[slot].amount) <= 0 then data[slot] = nil end
             removedSlot = slot

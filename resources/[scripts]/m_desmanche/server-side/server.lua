@@ -49,7 +49,13 @@ function sun.CheckItem(pditem,item,qtd)
     local source = source
     local user_id = vRP.getUserId(source)
     if pditem then
-        if vRP.tryGetInventoryItem(user_id,item,qtd) then
+        local consumed
+        if item == "lockpick" then
+            consumed = vRP.useLockpick(user_id)
+        else
+            consumed = vRP.tryGetInventoryItem(user_id,item,qtd)
+        end
+        if consumed then
             return true
         else
             TriggerClientEvent('Notify',source, 'negado', 'Você necessita de x'..qtd..' '..item..' para desmanchar o veiculo.')

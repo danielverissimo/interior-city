@@ -256,16 +256,6 @@ ServerConfig.LogCatalog = {
                 }
             },
             {
-                id = "verdes",
-                label = "Verdes",
-                description = "Logs próprias do craft Verdes. Integração associada ao farm Armas.",
-                logs = {
-                    { key = "craft_verdes_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Verdes, incluindo item, quantidade, tempo e materiais consumidos." },
-                    { key = "craft_verdes_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Verdes, incluindo item, quantidade e responsável pela coleta." },
-                    { key = "craft_verdes_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
-                }
-            },
-            {
                 id = "cartel",
                 label = "Cartel",
                 description = "Logs próprias do craft Cartel. Integração associada ao farm Municao.",
@@ -273,16 +263,6 @@ ServerConfig.LogCatalog = {
                     { key = "craft_cartel_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Cartel, incluindo item, quantidade, tempo e materiais consumidos." },
                     { key = "craft_cartel_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Cartel, incluindo item, quantidade e responsável pela coleta." },
                     { key = "craft_cartel_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
-                }
-            },
-            {
-                id = "vermelhos",
-                label = "Vermelhos",
-                description = "Logs próprias do craft Vermelhos. Integração associada ao farm Municao.",
-                logs = {
-                    { key = "craft_vermelhos_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Vermelhos, incluindo item, quantidade, tempo e materiais consumidos." },
-                    { key = "craft_vermelhos_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Vermelhos, incluindo item, quantidade e responsável pela coleta." },
-                    { key = "craft_vermelhos_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
                 }
             },
             {
@@ -306,23 +286,23 @@ ServerConfig.LogCatalog = {
                 }
             },
             {
-                id = "motoclube",
-                label = "Motoclube",
-                description = "Logs próprias do craft Motoclube. Integração associada ao farm Desmanche.",
+                id = "vermelhos",
+                label = "Vermelhos",
+                description = "Logs próprias do craft Vermelhos. Integração associada ao farm Desmanche.",
                 logs = {
-                    { key = "craft_motoclube_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Motoclube, incluindo item, quantidade, tempo e materiais consumidos." },
-                    { key = "craft_motoclube_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Motoclube, incluindo item, quantidade e responsável pela coleta." },
-                    { key = "craft_motoclube_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
+                    { key = "craft_vermelhos_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Vermelhos, incluindo item, quantidade, tempo e materiais consumidos." },
+                    { key = "craft_vermelhos_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Vermelhos, incluindo item, quantidade e responsável pela coleta." },
+                    { key = "craft_vermelhos_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
                 }
             },
             {
-                id = "franca",
-                label = "Franca",
-                description = "Logs próprias do craft Franca. Integração associada ao farm Desmanche.",
+                id = "azul",
+                label = "Azul",
+                description = "Logs próprias do craft Azul. Integração associada ao farm Desmanche.",
                 logs = {
-                    { key = "craft_franca_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Franca, incluindo item, quantidade, tempo e materiais consumidos." },
-                    { key = "craft_franca_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Franca, incluindo item, quantidade e responsável pela coleta." },
-                    { key = "craft_franca_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
+                    { key = "craft_azul_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Azul, incluindo item, quantidade, tempo e materiais consumidos." },
+                    { key = "craft_azul_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Azul, incluindo item, quantidade e responsável pela coleta." },
+                    { key = "craft_azul_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
                 }
             },
             {
@@ -346,13 +326,13 @@ ServerConfig.LogCatalog = {
                 }
             },
             {
-                id = "colombia",
-                label = "Colombia",
-                description = "Logs próprias do craft Colombia. Integração associada ao farm Maconha.",
+                id = "verdes",
+                label = "Verdes",
+                description = "Logs próprias do craft Verdes. Integração associada ao farm Maconha.",
                 logs = {
-                    { key = "craft_colombia_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Colombia, incluindo item, quantidade, tempo e materiais consumidos." },
-                    { key = "craft_colombia_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Colombia, incluindo item, quantidade e responsável pela coleta." },
-                    { key = "craft_colombia_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
+                    { key = "craft_verdes_started", name = "Fabricação iniciada", description = "Registrou o início de uma fabricação no craft Verdes, incluindo item, quantidade, tempo e materiais consumidos." },
+                    { key = "craft_verdes_collected", name = "Item fabricado coletado", description = "Registrou o resgate de uma fabricação concluída no craft Verdes, incluindo item, quantidade e responsável pela coleta." },
+                    { key = "craft_verdes_storage_deposit", name = "Item depositado no armazém", description = "Registrou um depósito no armazém deste craft, incluindo jogador, item(ns), quantidade(s) depositada(s) e saldo resultante no armazém." }
                 }
             },
             {
@@ -373,16 +353,14 @@ ServerConfig.LogCatalog = {
         description = "Uma webhook independente para cada farm/facção configurada. Cada ponto coletado gera uma ocorrência com os itens e quantidades recebidas.",
         logs = {
             { key = "farm_mafia_collect", name = "Farm Mafia — Armas", description = "Registrou uma coleta em um ponto do farm da facção Mafia, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
-            { key = "farm_verdes_collect", name = "Farm Verdes — Armas", description = "Registrou uma coleta em um ponto do farm da facção Verdes, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
             { key = "farm_cartel_collect", name = "Farm Cartel — Municao", description = "Registrou uma coleta em um ponto do farm da facção Cartel, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
-            { key = "farm_vermelhos_collect", name = "Farm Vermelhos — Municao", description = "Registrou uma coleta em um ponto do farm da facção Vermelhos, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
             { key = "farm_vanilla_collect", name = "Farm Vanilla — Lavagem", description = "Registrou uma coleta em um ponto do farm da facção Vanilla, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
             { key = "farm_bahamas_collect", name = "Farm Bahamas — Lavagem", description = "Registrou uma coleta em um ponto do farm da facção Bahamas, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
-            { key = "farm_motoclube_collect", name = "Farm Motoclube — Desmanche", description = "Registrou uma coleta em um ponto do farm da facção Motoclube, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
-            { key = "farm_franca_collect", name = "Farm Franca — Desmanche", description = "Registrou uma coleta em um ponto do farm da facção Franca, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
+            { key = "farm_vermelhos_collect", name = "Farm Vermelhos — Desmanche", description = "Registrou uma coleta em um ponto do farm da facção Vermelhos, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
+            { key = "farm_azul_collect", name = "Farm Azul — Desmanche", description = "Registrou uma coleta em um ponto do farm da facção Azul, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
             { key = "farm_roxos_collect", name = "Farm Roxos — Cocaina", description = "Registrou uma coleta em um ponto do farm da facção Roxos, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
             { key = "farm_laranjas_collect", name = "Farm Laranjas — Metanfetamina", description = "Registrou uma coleta em um ponto do farm da facção Laranjas, incluindo rota, região, ponto e todos os itens efetivamente recebidos." },
-            { key = "farm_colombia_collect", name = "Farm Colombia — Maconha", description = "Registrou uma coleta em um ponto do farm da facção Colombia, incluindo rota, região, ponto e todos os itens efetivamente recebidos." }
+            { key = "farm_verdes_collect", name = "Farm Verdes — Maconha", description = "Registrou uma coleta em um ponto do farm da facção Verdes, incluindo rota, região, ponto e todos os itens efetivamente recebidos." }
         }
     },
 

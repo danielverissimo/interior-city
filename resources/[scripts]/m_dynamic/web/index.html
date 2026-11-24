@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
@@ -10,14 +10,16 @@
 
 <body>
   <div class="wrapper">
-    <img onclick="app.goBack(this)" class="status" draggable="false" style="cursor: pointer;" src="./assets/close.svg"
-      alt="close" status="close">
+    <div class="menu-header">
+      <div><p class="menu-title">Ações rápidas</p><span class="menu-hint">Escolha uma opção · ESC para fechar</span></div>
+      <button class="status-button" aria-label="Fechar" onclick="app.goBack(this.querySelector('img'))"><img class="status" draggable="false" src="./assets/close.svg" alt="Fechar" status="close"></button>
+    </div>
     <div class="list"></div>
   </div>
-  <div class="modal">
-    <p>Salvar outfit</p>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Salvar roupa">
+    <p>Salvar roupa</p>
     <div class="input">
-      <input type="text" placeholder="Nome do outfit">
+      <input type="text" maxlength="60" aria-label="Nome da roupa" placeholder="Dê um nome para esta roupa">
       <svg width="11" height="13" viewBox="0 0 11 13" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clip-path="url(#clip0_1430_354)">
           <path

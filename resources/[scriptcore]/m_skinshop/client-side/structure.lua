@@ -51,6 +51,9 @@ function openShopTableCloths()
                     end
                 end
                 clothing_items[indexCloth]["type"] = categoryParameter["type"]
+                local isProp = categoryParameter["type"] == "prop"
+                clothing_items[indexCloth]["model"]["value"] = isProp and GetPedPropIndex(playerPed, categoryParameter.id) or GetPedDrawableVariation(playerPed, categoryParameter.id)
+                clothing_items[indexCloth]["texture"]["value"] = isProp and math.max(0, GetPedPropTextureIndex(playerPed, categoryParameter.id)) or GetPedTextureVariation(playerPed, categoryParameter.id)
             end 
         end
     end
@@ -61,6 +64,10 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- UPDATE LIMIT CLOTH SPECIFIED
 -----------------------------------------------------------------------------------------------------------------------------------------
+
+function getShopCloth(index)
+    return clothing_items[index]
+end
 
 function getNewLimitCloth(tablePos, cloth) -- array
     local playerPed = PlayerPedId()
@@ -74,9 +81,7 @@ function getNewLimitCloth(tablePos, cloth) -- array
         clothTable["model"]["value"] = clothTable["model"]["max"]
     end
 
-    if  clothTable["texture"]["value"] > clothTable["texture"]["max"] then
-        clothTable["texture"]["value"] = clothTable["texture"]["max"]
-    end
+
 
     if (cloth["type"] == "variation" or cloth["type"] == "mask") then
         clothTable["model"]["max"] = GetNumberOfPedDrawableVariations(playerPed, cloth["id"]) - 1
@@ -95,7 +100,7 @@ function getNewLimitCloth(tablePos, cloth) -- array
 
         clothTable["model"]["max"] = GetNumberOfPedPropDrawableVariations(playerPed, categoryId) - 1
 
-        clothTable["texture"]["max"] = GetNumberOfPedPropTextureVariations(playerPed, categoryId, cloth["model"]["value"]) - 1
+        clothTable["texture"]["max"] = cloth["model"]["value"] < 0 and 0 or GetNumberOfPedPropTextureVariations(playerPed, categoryId, cloth["model"]["value"]) - 1
 
         if clothTable["texture"]["max"] <= 0 then
             clothTable["texture"]["max"] = 0
@@ -127,52 +132,42 @@ skinData = {
 	["decals"] = { item = 0, texture = 0 },
 }
 
-function changeCloth(cloth) -- array
-
-    local playerPed = PlayerPedId()
-
-    local isAlive = GetEntityHealth(playerPed) > 101
-
-    local valueModel = cloth["model"]["value"]
-    local valueTexture = cloth["texture"]["value"]
-    
-    local clothCategory = cloth["index_name"]
-
-    local typeVariation = cloth["type"]
-    local idCloth = cloth["id"]
-
-    if isAlive then
-        if valueModel <= 0 then
-            SetPedComponentVariation(playerPed,idCloth,0,0,2)
-            skinData[clothCategory]["texture"] = 0
-            skinData[clothCategory]["item"] = 0
-        else
-            -- local isNotCustomPed = ((GetEntityModel(playerPed) == GetHashKey("mp_m_freemode_01")) or (GetEntityModel(playerPed) == GetHashKey("mp_f_freemode_01")))
-
-            -- if isNotCustomPed then
-                if typeVariation == "prop" then
-
-                    local categoryId = clothingCategorys[clothCategory]["id"]
-
-                    SetPedPropIndex(playerPed, categoryId, parseInt(valueModel), parseInt(valueTexture), 2)
-                else
-                    SetPedComponentVariation(playerPed, idCloth, parseInt(valueModel), parseInt(valueTexture), 2)
-                end
-
-                skinData[clothCategory]["texture"] = parseInt(valueModel)
-                skinData[clothCategory]["item"] = parseInt(valueModel)
-            -- end
-        end
+function changeCloth(cloth)
+    local ped = PlayerPedId()
+    if GetEntityHealth(ped) <= 101 then return false end
+    local category = clothingCategorys[cloth.index_name]
+    if not category then return false end
+    local model = math.floor(tonumber(cloth.model.value) or 0)
+    local texture = math.floor(tonumber(cloth.texture.value) or 0)
+    local isProp = category.type == "prop"
+    local count = isProp and GetNumberOfPedPropDrawableVariations(ped, category.id) or GetNumberOfPedDrawableVariations(ped, category.id)
+    model = math.max(isProp and -1 or 0, math.min(model, count - 1))
+    local textures = 0
+    if model >= 0 then
+        textures = isProp and GetNumberOfPedPropTextureVariations(ped, category.id, model) or GetNumberOfPedTextureVariations(ped, category.id, model)
     end
+    texture = math.max(0, math.min(texture, textures - 1))
+    if isProp then
+        if model < 0 then ClearPedProp(ped, category.id)
+        else SetPedPropIndex(ped, category.id, model, texture, true) end
+    else
+        SetPedComponentVariation(ped, category.id, model, texture, 2)
+    end
+    cloth.model.value = model
+    cloth.texture.value = texture
+    skinData[cloth.index_name].item = model
+    skinData[cloth.index_name].texture = texture
+    return true
 end
-
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- SAVE CLOTHS
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 function clientFunctions.saveClothInServer()
-    serverFunctions.saveCloths(vRP.getCustomization())
+    local ok, message = serverFunctions.purchaseClothes(vRP.getCustomization())
+    if not ok then return false, message end
     clientFunctions.closeNuiShop()
+    return true
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -220,6 +215,11 @@ function changeCamPosition(camPos)
         ['shirt'] = function()
             local playerCoords = GetOffsetFromEntityInWorldCoords(playerPed, 0, 1.0, 0)
             SetCamCoord(cam, playerCoords.x, playerCoords.y, playerCoords.z + 0.2)
+        end,
+
+        ['body'] = function()
+            local playerCoords = GetOffsetFromEntityInWorldCoords(playerPed, -0.3, 2.0, 0)
+            SetCamCoord(cam, playerCoords.x, playerCoords.y, playerCoords.z + 0.5)
         end,
 
         ['shoes'] = function()
@@ -272,23 +272,43 @@ end
 -- OPEN NUI
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-function clientFunctions.openNuiShop()
+local usingIntcUi = false
 
+local function hideShopUi()
+    if usingIntcUi and GetResourceState("intc_lojaroupas") == "started" then
+        exports.intc_lojaroupas:hide()
+    end
+    usingIntcUi = false
+    SendNUIMessage({ action = 'close' })
+    SetNuiFocus(false, false)
+end
+
+function clientFunctions.openNuiShop()
+    local ped = PlayerPedId()
+    local model = GetEntityModel(ped)
+    if skinshopOpen or IsPedInAnyVehicle(ped, false) or GetEntityHealth(ped) <= 101
+        or (model ~= GetHashKey('mp_f_freemode_01') and model ~= GetHashKey('mp_m_freemode_01'))
+        or (skinshopIsCapturingThumbnails and skinshopIsCapturingThumbnails()) then return end
+    skinshopOpen = true
     customCamLocation = nil
     oldData = vRP.getCustomization()
-    TriggerEvent('flaviin:toggleHud', false) -- close hud
-
-    SendNUIMessage({
-        ['action'] = 'open',
-        ['data'] = {
-            ['customs'] = openShopTableCloths()
-        }
-    })
-    SetNuiFocus(true, true)
-    SetCursorLocation(0.9,0.25)
+    TriggerEvent('flaviin:toggleHud', false)
+    local data = {
+        customs = openShopTableCloths(),
+        gender = model == GetHashKey('mp_f_freemode_01') and 'female' or 'male',
+        heading = GetEntityHeading(ped),
+        price = SkinshopPurchasePrice
+    }
+    usingIntcUi = GetResourceState("intc_lojaroupas") == "started"
+    if usingIntcUi then
+        exports.intc_lojaroupas:show(data)
+    else
+        SendNUIMessage({action = 'open', data = data})
+        SetNuiFocus(true, true)
+        SetCursorLocation(0.9, 0.25)
+    end
     prepareCamera()
     vRP.playAnim(false,{{"mp_sleep","bind_pose_180"}},true)
-
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -296,13 +316,13 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 function clientFunctions.closeNuiShopAndReset()
+    skinshopOpen = false
     if oldData and next(oldData) then
         vRP.setCustomization(oldData)
     end
 
     TriggerEvent("flaviin:toggleHud",true)
-    SendNUIMessage({ ['action'] = 'close' })
-    SetNuiFocus(false, false)
+    hideShopUi()
     RenderScriptCams(false,true,250,1,0)
 	DestroyCam(cam,false)
     oldData = {}
@@ -310,9 +330,9 @@ function clientFunctions.closeNuiShopAndReset()
 end
 
 function clientFunctions.closeNuiShop()
+    skinshopOpen = false
     TriggerEvent("flaviin:toggleHud",true)
-    SendNUIMessage({ ['action'] = 'close' })
-    SetNuiFocus(false, false)
+    hideShopUi()
     RenderScriptCams(false,true,250,1,0)
 	DestroyCam(cam,false)
     oldData = {}
@@ -324,8 +344,17 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 function updateNuiLimitCloths(index, custom)
-    SendNUIMessage({
-        ['action'] = 'UPDATE_CUSTOM',
-        ['data'] = getNewLimitCloth(index, custom)
-    })
+    local customs = getNewLimitCloth(index, custom)
+    if usingIntcUi and GetResourceState("intc_lojaroupas") == "started" then
+        exports.intc_lojaroupas:updateLimits(customs)
+    else
+        SendNUIMessage({action = 'UPDATE_CUSTOM', data = customs})
+    end
 end
+
+-- Release focus and camera if the resource is restarted with the fitting room open.
+AddEventHandler("onResourceStop", function(resource)
+    if skinshopOpen and (resource == GetCurrentResourceName() or (resource == "intc_lojaroupas" and usingIntcUi)) then
+        clientFunctions.closeNuiShopAndReset()
+    end
+end)

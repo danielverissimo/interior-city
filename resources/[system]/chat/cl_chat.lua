@@ -40,6 +40,7 @@ AddEventHandler('chatMessage', function(data)
   if not data or type(data) ~= 'table' or not next(data) then return end
 
   local typeMessage = data.type
+  if typeMessage == 'store' then return end
 
   if not typeMessage or typeMessage == '' then typeMessage = 'default' end
 

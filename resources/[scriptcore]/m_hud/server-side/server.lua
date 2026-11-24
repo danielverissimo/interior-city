@@ -362,8 +362,8 @@ RegisterCommand('recdiv', function(source, args)
         processRecruitmentQueue()
     end
 
-    vRP.sendLog('https://discord.com/api/webhooks/1340976315376996423/cU_FWJhIhojo0VXJGltxXghkwe9BoWRwTxzhY6itC7etXrjO7U-dV5vuw198vy2ayQE_', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
-    vRP.sendLog('https://discord.com/api/webhooks/1330956032477757632/oflA6eksNyM7Dezqp7jNu8nB4KtxXWtMg-AlLYYcPy42iqPzq91OLch8TnrjBanDAwgo', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
+    vRP.sendLog('', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
+    vRP.sendLog('', 'ID: '..userId..' | ORG: '..org..' | MENSAGEM: '..message)
 end)
 
 function processRecruitmentQueue()

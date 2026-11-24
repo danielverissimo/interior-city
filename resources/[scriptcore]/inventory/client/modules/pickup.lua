@@ -30,11 +30,21 @@ function API.getPickups()
         local distance = #(plyCds - v.coords)
         if distance < 7.0 then 
             response[#response + 1] = v
-            response[#response].id = k
+            response[#response].id = id
         end
     end
     return response
 end
+
+RegisterNetEvent('inventory:syncGroundItems', function(pickups)
+    PICKUPS = pickups or {}
+    SendNUIMessage({ route = 'UPDATE_PICKUP' })
+end)
+
+CreateThread(function()
+    Wait(1000)
+    TriggerServerEvent('inventory:requestGroundItems')
+end)
 
 
 CreateThread(function() 

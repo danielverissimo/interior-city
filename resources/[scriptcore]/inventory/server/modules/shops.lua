@@ -39,7 +39,8 @@ local function shopForClient(data)
             text = tostring(data.blip.text or "Loja"),
             index = tonumber(data.blip.index) or 52,
             color = tonumber(data.blip.color) or 0,
-            scale = tonumber(data.blip.scale) or 0.5
+            scale = tonumber(data.blip.scale) or 0.5,
+            shortRange = data.blip.shortRange ~= false
         }
     end
 
@@ -136,7 +137,8 @@ local function normalizeShop(name,data)
             text = trim(data.blip.text) ~= "" and trim(data.blip.text) or name,
             index = tonumber(data.blip.index) or 52,
             color = tonumber(data.blip.color) or 0,
-            scale = tonumber(data.blip.scale) or 0.5
+            scale = tonumber(data.blip.scale) or 0.5,
+            shortRange = data.blip.shortRange ~= false
         }
     end
 
@@ -188,6 +190,29 @@ function API.shopAction(store_index, item, amount, slot)
 
             return { notify = "Compra realizada com sucesso!", money = total }
         elseif shopData.mode == "sell" then
+            local price = shopData.items[item]
+            if not user_id or not math.tointeger(amount) or not math.tointeger(price) or price <= 0 then
+                return { error = "Venda inválida." }
+            end
+            if shopData.perm and not vRP.hasPermission(user_id, shopData.perm) then
+                return { error = "Você não tem acesso a esta loja." }
+            end
+
+            local ped = GetPlayerPed(source)
+            local nearShop = false
+            if ped ~= 0 and GetEntityHealth(ped) > 101 then
+                local position = GetEntityCoords(ped)
+                for _, point in ipairs(shopData.coords or {}) do
+                    if #(position - point.coords) <= 2.5 then
+                        nearShop = true
+                        break
+                    end
+                end
+            end
+            if not nearShop then
+                return { error = "Aproxime-se do balcão para vender." }
+            end
+
             if HotbarWeapons and HotbarWeapons.IsDutyWeaponSlot(user_id, tostring(slot), item) then
                 return { error = "Você não pode vender uma arma temporária de serviço." }
             end
@@ -198,9 +223,16 @@ function API.shopAction(store_index, item, amount, slot)
                 end
             end
 
+            local total = math.tointeger(price * (amount + 0.0))
+            if not total or total <= 0 then
+                return { error = "Valor de venda inválido." }
+            end
+            local stack = vRP.getSlotItem(user_id, tostring(slot))
             if vRP.tryGetInventoryItem(user_id,item,amount,true,tostring(slot)) then
-                local total = shopData.items[item] * amount
-                vRP.giveMoney(user_id,total)
+                if not vRP.giveMoney(user_id,total) then
+                    vRP.giveInventoryItem(user_id,item,amount,true,nil,stack and stack.expiresAt)
+                    return { error = "Falha no pagamento. O item foi devolvido." }
+                end
 
                 if InventoryAudit then
                     InventoryAudit.Log("inventory_shop_sell", {
@@ -282,6 +314,9 @@ exports("updateShopConfig",function(originalName,name,data)
     if not shop then return false,err end
 
     local old = Shops[originalName]
+    if shop.blip and old.blip and data.blip.shortRange == nil then
+        shop.blip.shortRange = old.blip.shortRange
+    end
     Shops[originalName] = nil
     Shops[name] = shop
 

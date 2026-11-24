@@ -1192,9 +1192,9 @@ function groupOrgSortKey(group){
         Fallback para cargos antigos sem orgName.
         Remove prefixos hierárquicos comuns e usa o restante como
         identificador da organização. Ex:
-        RecrutadorColombia -> Colombia
-        NovatoColombia -> Colombia
-        GerenteColombia -> Colombia
+        RecrutadorVerdes -> Verdes
+        NovatoVerdes -> Verdes
+        GerenteVerdes -> Verdes
         SoldadoPM -> PM
     */
     let name=String(group?.name||'').trim();

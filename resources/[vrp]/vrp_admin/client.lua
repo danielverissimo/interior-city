@@ -423,30 +423,51 @@ end
 RegisterNetEvent('spawnarveiculopp')
 AddEventHandler('spawnarveiculopp',function(name)
     if GetInvokingResource() then
-        while true do 
-        
-        end
+        return
+    end
+    if type(name) ~= 'string' or name == '' then
+        TriggerEvent('Notify', 'erro', 'Informe o nome do modelo do veiculo.', 5)
         return
     end
     local mhash = GetHashKey(name)
+    if not IsModelInCdimage(mhash) or not IsModelAVehicle(mhash) then
+        TriggerEvent('Notify', 'erro', 'Modelo indisponivel: ' .. name .. '. Verifique o pack e os arquivos do veiculo.', 5)
+        return
+    end
+    local loadStarted = GetGameTimer()
     while not HasModelLoaded(mhash) do
         RequestModel(mhash)
         Citizen.Wait(10)
+        if GetGameTimer() - loadStarted >= 15000 then
+            SetModelAsNoLongerNeeded(mhash)
+            TriggerEvent('Notify', 'erro', 'Tempo esgotado ao carregar o veiculo: ' .. name, 5)
+            return
+        end
     end
 
     if HasModelLoaded(mhash) then
         if vSERVER.getPlate() then
             local ped = PlayerPedId()
             local nveh = CreateVehicle(mhash,GetEntityCoords(ped),GetEntityHeading(ped),true,true)
+            if nveh == 0 or not DoesEntityExist(nveh) then
+                SetModelAsNoLongerNeeded(mhash)
+                TriggerEvent('Notify', 'erro', 'Nao foi possivel criar o veiculo: ' .. name, 5)
+                return
+            end
             SetVehicleNumberPlateText(nveh,188511)
 
             SetVehicleOnGroundProperly(nveh)
+            -- A F250 usa o slot de escapamento; S10/Saveiro usam chassis.
+            if GetResourceState("carros_som_rebaixados") == "started"
+                and exports["carros_som_rebaixados"]:applySoundWall(nveh) == false then
+                TriggerEvent('Notify', 'aviso', 'O paredao nao carregou. Confira o recurso carros_som_rebaixados e reconecte.', 5000)
+            end
             --SetVehicleNumberPlateText(nveh, math.random(10000,30000))
             SetEntityAsMissionEntity(nveh,true,true)
             TaskWarpPedIntoVehicle(ped,nveh,-1)
 
-            SetModelAsNoLongerNeeded(mhash)
         end
+        SetModelAsNoLongerNeeded(mhash)
     end
 end)
 
@@ -1291,7 +1312,8 @@ ClientAudit.RegisterCommand("guardarroupas",function(source,args,rawCommand)
 		delay = true
 
 		local ped = PlayerPedId()
-	    local clothes = vSERVER.getClothes()
+	    if GetEntityHealth(ped) <= 101 then delay = false return end
+        local clothes = vSERVER.getClothes() or {}
 
 		if GetEntityHealth(ped) > 101 then
 			local myOutfits = {}
@@ -1316,20 +1338,20 @@ ClientAudit.RegisterCommand("guardarroupas",function(source,args,rawCommand)
 				{
 					["name"] = "Carregar Ombros",
 					["image"] = "carry",
-					["description"] = "Carregar Jogador Próximo",
+					["description"] = "Precisa de corda; jogador consciente confirma.",
 					["trigger"] = {
 						["type"] = "command",
 						["name"] = "carregar",
 					}
 				},
 
-				["Outifits"] = {
+				["Outfits"] = {
 					["description"] = "Gerencie suas roupas.",
 					["image"] = "clothe",
 					["options"] = {
 						["Ver Outfits"] = {
 							["image"] = "clothe",
-							["description"] = "Deletar uma roupa salva.",
+							["description"] = "Vestir ou excluir uma roupa salva.",
 							["options"] = myOutfits
 						},
 						{
@@ -1356,9 +1378,9 @@ ClientAudit.RegisterCommand("guardarroupas",function(source,args,rawCommand)
 					}
 				},
 				{
-					["name"] = "Colocar",
+					["name"] = "Colocar no porta-malas",
 					["image"] = "vehicle",
-					["description"] = "Colocar proximo ao porta-malas",
+					["description"] = "Colocar uma pessoa no porta-malas",
 					["trigger"] = {
 						["name"] = "novak:server:insertUserInTrunkin",
 						["isServer"] = true,
@@ -1368,7 +1390,7 @@ ClientAudit.RegisterCommand("guardarroupas",function(source,args,rawCommand)
 				{
 					["name"] = "Desbugar",
 					["image"] = "debug",
-					["description"] = "Desbugar",
+					["description"] = "Restabelecer animações e movimentos.",
 					["trigger"] = {
 						["isServer"] = true,
 						["name"] = "desbugplayer",
@@ -1376,9 +1398,9 @@ ClientAudit.RegisterCommand("guardarroupas",function(source,args,rawCommand)
 				},
 
 				{
-					["name"] = "Retirar",
+					["name"] = "Retirar do porta-malas",
 					["image"] = "vehicle",
-					["description"] = "Remover proximo do porta-malas",
+					["description"] = "Retirar uma pessoa do porta-malas",
 					["trigger"] = {
 						["name"] = "novak:server:removerUserInTrunkin",
 						["isServer"] = true,
@@ -1386,7 +1408,7 @@ ClientAudit.RegisterCommand("guardarroupas",function(source,args,rawCommand)
 				},
 			}
 			exports['m_dynamic']:createMenu(createMenu)
-			SetTimeout(5000, function() delay = false end)
+			SetTimeout(750, function() delay = false end)
 		end
 	end
 end, false)
@@ -1399,7 +1421,8 @@ RegisterKeyMapping("guardarroupas","Abrir menu principal.","keyboard","F9")
 -- 		delay = true
 
 -- 		local ped = PlayerPedId()
--- 	    local clothes = vSERVER.getClothes()
+-- 	    if GetEntityHealth(ped) <= 101 then delay = false return end
+        local clothes = vSERVER.getClothes() or {}
 
 -- 		if GetEntityHealth(ped) > 101 then
 -- 			exports["dynamic"]:AddButton("Salvar","Guardar as roupas do corpo.","player:outfitFunctions","salvar","outfit",true)
@@ -1415,7 +1438,7 @@ RegisterKeyMapping("guardarroupas","Abrir menu principal.","keyboard","F9")
 --                 end
 --             end
 
--- 			SetTimeout(5000, function() delay = false end)
+-- 			SetTimeout(750, function() delay = false end)
 -- 		end
 -- 	end
 -- end)
@@ -1560,41 +1583,9 @@ local function pretty_dbg(tbl)
 end
 
 
-CreateThread(function()
-	while true do
-		local dicas = {
-			{ title = 'DICA', message = 'Para saber quantos cidadãos estão acordados, digite /status', type = 'tip' },
-			{ title = 'DICA', message = 'Para ganhar premiação gratuitamente, digite /box', type = 'tip' },
-			{ title = 'DICA', message = 'Para melhorar seu FPS, digite /fps on', type = 'tip' },
-			{ title = 'DICA', message = 'Para mudar a altura do VOIP, use o botão Home', type = 'tip' },
-			{ title = 'DICA', message = 'Para trocar o HUD, digite /trocarhud', type = 'tip' },
-			{ title = 'DICA', message = 'Para desligar notificações, digite /notoff', type = 'tip' },
-			{ title = 'DICA', message = 'Para guardar suas armas digite o comando /garmas', type = 'tip' },
-			{ title = 'DICA', message = 'VOCÊ PODE RESGATAR PREMIAÇÕES DIARIAS NO DAILY EM SEU ESC', type = 'tip' },
-			-- { title = 'DICA', message = 'QUER TER BENEFÍCIOS VIPS E EXCLUSIVOS DENTRO DO SERVIDOR? DIGITE /LOJA E ACESSE JÁ!', type = 'store' },
-		}
+-- Dicas automaticas do chat removidas a pedido da administracao.
 
-		local randomDicas = dicas[math.random(1, #dicas)]
-		TriggerEvent('chatMessage', {
-			type = randomDicas.type,
-			title = randomDicas.title,
-			message = randomDicas.message
-		})
-		Wait(60000 * math.random(2, 10))
-	end
-end)
-
-CreateThread(function()
-	local SLEEP = 5 * 60 * 1000
-	while true do
-		TriggerEvent('chatMessage', {
-			type = 'store',
-			title = 'ACESSE NOSSA LOJA',
-			message = 'QUER TER BENEFÍCIOS VIPS E EXCLUSIVOS DENTRO DO SERVIDOR? DIGITE /LOJA E ACESSE JÁ!'
-		})
-		Wait(SLEEP)
-	end
-end)
+-- Publicidade automatica da loja removida do HUD.
 
 ClientAudit.RegisterCommand("checkdriver", function() 
 	
@@ -1784,7 +1775,8 @@ function src.getVehicleName(vehicle)
 end
 
 function src.inDomination()
-	return exports.dominacao:inDomination() or exports.dm_module:inDomination() or exports['01_dominacao_pistol']:inDomination()
+	if not GlobalState.isDominationActive then return false end
+	return exports.dm_module:inDomination()
 end
 
 local hudStatus = true
@@ -1978,75 +1970,9 @@ CreateThread(function()
 end)
 
 RegisterNetEvent('checkIsInDomination', function()
-	print('status dominacao', (exports.dm_module:inDomination() or exports.dominacao:inDomination()))
-	if exports.dm_module:inDomination() or exports.dominacao:inDomination() then
+	if GlobalState.isDominationActive and exports.dm_module:inDomination() then
 		SetEntityCoords(PlayerPedId(), 218.87,-808.39,30.7)
 	end
-end)
-
-local cooldownMecanico = 0
-
-function DrawText3DVeh(x, y, z, text)
-    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
-
-    if onScreen then
-        local width = 0.12
-        local height = 0.03
-        local boxX = _x
-        local boxY = _y + 0.012
-
-        DrawRect(boxX, boxY, width, height, 0, 0, 0, 150)
-
-        SetTextScale(0.4, 0.4)
-        SetTextFont(4)
-        SetTextProportional(1)
-        SetTextColour(255, 255, 255, 215)
-        SetTextCentre(1)
-        SetTextEntry("STRING")
-        AddTextComponentString("[~g~E~w~] - CHAMAR MECÂNICO")
-        DrawText(_x, _y)
-    end
-end
-
-CreateThread(function()
-    while true do
-        local playerPed = PlayerPedId()
-        local playerCoords = GetEntityCoords(playerPed)
-        local vehicles = GetGamePool("CVehicle")
-        local closestVehicle = nil
-        local closestDistance = 10.0
-        local sleepTime = 4000
-
-        for _, vehicle in ipairs(vehicles) do
-            local vehicleCoords = GetEntityCoords(vehicle)
-            local distance = #(playerCoords - vehicleCoords)
-
-            if distance < 10.0 then
-                local engineHealth = GetVehicleEngineHealth(vehicle)
-                local bodyHealth = GetVehicleBodyHealth(vehicle)
-
-                if engineHealth <= 0 or bodyHealth < 100 or IsEntityOnFire(vehicle) then
-                    if distance < closestDistance then
-                        closestVehicle = vehicle
-                        closestDistance = distance
-                    end
-                end
-            end
-        end
-
-        if closestVehicle then
-            local vehicleCoords = GetEntityCoords(closestVehicle)
-            DrawText3DVeh(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z + 1.2, "[E] - CHAMAR MECÂNICO")
-            sleepTime = 0
-
-            if IsControlJustReleased(0, 38) and GetGameTimer() > cooldownMecanico then
-                cooldownMecanico = GetGameTimer() + (1000 * 60)
-                TriggerServerEvent("hub:sendCallType", nil, "mecanico", "Meu veículo está danificado, preciso de um mecânico.")
-            end
-        end
-
-        Wait(sleepTime)
-    end
 end)
 
 local inAutoPilot = false

@@ -19,6 +19,7 @@ local function clone(value)
 end
 
 local function saveAll(sync)
+    MigrateLegacyHospitalVehicles(GarageTypesRaw)
     SaveResourceFile(GetCurrentResourceName(), "shared-side/garages.json", json.encode(GarageConfigRaw), -1)
     SaveResourceFile(GetCurrentResourceName(), "shared-side/typeGarages.json", json.encode(GarageTypesRaw), -1)
     ApplyGarageDynamicConfig(GarageConfigRaw, GarageTypesRaw)

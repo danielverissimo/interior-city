@@ -12,6 +12,7 @@ lua54 'yes'
 shared_scripts {
     '@vrp/lib/utils.lua',
     'shared/shared.main.lua',
+    'shared/shared.vanilla.lua',
     'shared/shared.locations.lua',
     'shared/shared.vips.lua'
 }

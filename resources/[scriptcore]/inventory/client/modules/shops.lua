@@ -36,7 +36,8 @@ local function normalizeClientShops(raw)
                 text = data.blip.text or "Loja",
                 index = tonumber(data.blip.index) or 52,
                 color = tonumber(data.blip.color) or 0,
-                scale = tonumber(data.blip.scale) or 0.5
+                scale = tonumber(data.blip.scale) or 0.5,
+                shortRange = data.blip.shortRange ~= false
             }
         end
 
@@ -62,7 +63,7 @@ local function createSystemBlips()
                     SetBlipSprite(b,shop.blip.index)
                     SetBlipColour(b,shop.blip.color)
                     SetBlipScale(b,shop.blip.scale or 0.5)
-                    SetBlipAsShortRange(b,true)
+                    SetBlipAsShortRange(b,shop.blip.shortRange)
                     BeginTextCommandSetBlipName("STRING")
                     AddTextComponentString(shop.blip.text)
                     EndTextCommandSetBlipName(b)
@@ -130,6 +131,7 @@ CreateThread(function()
         if GetEntityHealth(ped) > 101 then
             local pcoords = GetEntityCoords(ped)
             local nearestShop,nearestDistance = nil,99999.0
+            local nearestPoint
 
             for name,shop in pairs(Shops or {}) do
                 for _,point in ipairs(shop.coords or {}) do
@@ -142,9 +144,15 @@ CreateThread(function()
                         if distance < nearestDistance then
                             nearestShop = name
                             nearestDistance = distance
+                            nearestPoint = point
                         end
                     end
                 end
+            end
+
+            if nearestShop == "Loja de Penhores" and nearestDistance <= 1.3 and not shopOpen then
+                local coords = nearestPoint.coords
+                DrawText3D(coords.x, coords.y, coords.z, "Pressione ~g~[E] ~w~para vender")
             end
 
             if nearestShop and nearestDistance <= 1.3 and IsControlJustPressed(0,38) and not shopOpen then

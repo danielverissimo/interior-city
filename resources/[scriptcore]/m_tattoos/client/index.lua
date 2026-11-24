@@ -16,7 +16,7 @@ vSERVER = Tunnel.getInterface("vrp_tattos")
 local cam = nil
 local atualShop = {}
 local atualTattoo = {}
-local old_custom = nil
+local outfitBeforePreview = nil
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- THREADFOCUS
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -1133,10 +1133,8 @@ end)
 -- OPENTATTOOSHOP
 -----------------------------------------------------------------------------------------------------------------------------------------
 function openTattooShop()
-
-   
-  vSERVER.sgetCustomization()
-  
+  if outfitBeforePreview then return end
+  outfitBeforePreview = vRP.getCustomization()
 
   setCameraCoords()
   SetNuiFocus(true, true)
@@ -1210,45 +1208,53 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- CLOSE
 -----------------------------------------------------------------------------------------------------------------------------------------
-RegisterNUICallback("CLOSE", function(data, cb)
+local function restorePreviewOutfit()
+  local outfit = outfitBeforePreview
+  outfitBeforePreview = nil
+  local ped = PlayerPedId()
+  if not outfit or GetEntityModel(ped) ~= outfit.pedModel then return end
+
+  for component = 1, 11 do
+    local variation = outfit[component]
+    if variation then
+      SetPedComponentVariation(ped, component, variation[1], variation[2], variation[3])
+    end
+  end
+
+  for prop = 0, 7 do
+    local variation = outfit["p" .. prop]
+    if variation and variation[1] >= 0 then
+      SetPedPropIndex(ped, prop, variation[1], variation[2], true)
+    else
+      ClearPedProp(ped, prop)
+    end
+  end
+end
+
+local function finishTattooShop(_, cb)
+  if not outfitBeforePreview then
+    cb(false)
+    return
+  end
+
+  restorePreviewOutfit()
   RenderScriptCams(false, true, 250, 1, 0)
+  DestroyCam(cam, false)
+  cam = nil
 
   SetNuiFocus(false, false)
-  TriggerEvent("flaviin:toggleHud",true)
-  SendNUIMessage({ action = 'close' })
-  DestroyCam(cam, false)
-  -- vSERVER._setInstance(false)
-  vSERVER.updateTattoo(atualTattoo)
+  TriggerEvent("flaviin:toggleHud", true)
   TriggerEvent('chat:close', false)
-  -- TriggerEvent("Character:UpdateClothes", old_custom)
-
-
-    vSERVER.setClothes(old_custom)
-
-  cam = nil
-end)
-
-RegisterNUICallback('SAVE', function(data, cb)
-  --[[
-		Realizar um sistema para ver se ele tem dinheiro para comprar as tatuagens
-	 ]]
-  
-
-  RenderScriptCams(false, true, 250, 1, 0)
-
-  SetNuiFocus(false, false)
-  TriggerEvent("flaviin:toggleHud",true)
-  DestroyCam(cam, false)
-  -- vSERVER._setInstance(false)
-  vSERVER.updateTattoo(atualTattoo)
-  -- TriggerEvent("Character:UpdateClothes", old_custom)
-
-  vSERVER.setClothes(old_custom)
-
-  TriggerEvent('chat:close', false)
-
   SendNUIMessage({ action = 'close' })
-  cam = nil
+  vSERVER.updateTattoo(atualTattoo)
+  cb(true)
+end
+
+RegisterNUICallback("CLOSE", finishTattooShop)
+RegisterNUICallback("SAVE", finishTattooShop)
+
+AddEventHandler("onResourceStop", function(resource)
+  if resource == GetCurrentResourceName() then restorePreviewOutfit() end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- BLIPS MARKERS
@@ -1293,7 +1299,6 @@ Citizen.CreateThread(function()
 
           if distance <= 2 then
             if IsControlJustPressed(0, 38) then
-              old_custom = vRP.getCustom()
               openTattooShop()
               -- vSERVER._setInstance(true)
             end

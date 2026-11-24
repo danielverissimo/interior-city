@@ -1,0 +1,148 @@
+/* Interior City: visual alinhado ao painel administrativo. */
+html, body { background: transparent; }
+#app {
+  --city-panel: #101219;
+  --city-surface: #171b24;
+  --city-line: #ffffff12;
+  --city-text: #f2f5fa;
+  --city-muted: #8e98aa;
+  --city-accent: #4aa8ff;
+  color: var(--city-text);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+#app * { font-family: inherit; }
+#app .max-w-4xl { max-width: 900px; }
+#app .bg-panel-gradient {
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+  background: var(--city-panel);
+  border: 1px solid #ffffff18;
+  border-radius: 16px;
+  box-shadow: 0 24px 80px #0006;
+}
+#app .bg-header-gradient {
+  flex-shrink: 0;
+  padding: 22px 26px;
+  background: #141821;
+  border-bottom: 1px solid var(--city-line);
+}
+#app .bg-header-gradient h1 { font-size: 19px; font-weight: 600; letter-spacing: -.3px; }
+#app .bg-header-gradient h1::before {
+  content: "INTERIOR CITY / ADMINISTRAÇÃO";
+  display: block;
+  margin-bottom: 5px;
+  color: var(--city-muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+}
+#app .bg-header-gradient .justify-between { gap: 18px; }
+#app .bg-header-gradient .justify-between > :first-child { gap: 14px; }
+#app .bg-header-gradient .justify-between > :first-child > svg {
+  box-sizing: content-box;
+  flex-shrink: 0;
+  padding: 11px;
+  color: var(--city-accent);
+  background: #4aa8ff12;
+  border: 1px solid #4aa8ff24;
+  border-radius: 12px;
+}
+#app .bg-header-gradient .justify-between > :last-child {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--city-line);
+  border-radius: 7px;
+  background: #ffffff03;
+}
+#app .bg-header-gradient .text-sm { font-size: 11px; color: #abb5c4; }
+#app .bg-header-gradient .bg-red-400 { background: #919bad; }
+#app .bg-header-gradient .w-2 { width: 6px; height: 6px; }
+#app .bg-panel-gradient > .border-b { padding: 20px 26px; border-color: var(--city-line); flex-shrink: 0; }
+#app .bg-panel-gradient > .p-5:not(.border-b) { padding: 24px 26px; overflow-y: auto; min-height: 0; }
+#app .bg-panel-gradient::after {
+  content: "ESC para fechar";
+  flex-shrink: 0;
+  padding: 11px 26px;
+  border-top: 1px solid var(--city-line);
+  color: #737f93;
+  font-size: 10px;
+  text-align: right;
+  letter-spacing: .2px;
+}
+#app input.bg-input-bg {
+  background: #0d1017;
+  border: 1px solid #ffffff14;
+  border-radius: 8px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  font-size: 13px;
+  color: var(--city-text);
+  user-select: text;
+}
+#app input::placeholder { color: #758196; }
+#app input.bg-input-bg:focus {
+  border-color: #4aa8ff80;
+  outline: none;
+  box-shadow: 0 0 0 3px #4aa8ff12;
+}
+#app .relative > .absolute { top: 13px; }
+#app .text-blue-300, #app .text-blue-400 { color: var(--city-accent); }
+#app .bg-button-gradient {
+  background: #318ee1;
+  border: 1px solid #6cb7ff33;
+  border-radius: 8px;
+  box-shadow: none;
+  min-width: 100px;
+  font-size: 12px;
+  font-weight: 600;
+}
+#app .bg-button-gradient:hover { background: #409ef2; opacity: 1; }
+#app .py-16 { min-height: 230px; padding: 40px 12px; }
+#app .py-16 > svg {
+  box-sizing: content-box;
+  width: 34px;
+  height: 34px;
+  padding: 18px;
+  margin-bottom: 20px;
+  background: #4aa8ff08;
+  border: 1px solid #4aa8ff1a;
+  border-radius: 18px;
+  color: #6e91b5;
+  opacity: 1;
+}
+#app .py-16 > p { font-size: 14px; color: var(--city-muted); font-weight: 400; }
+#app .bg-avatar-gradient { background: #4aa8ff18; border: 1px solid #4aa8ff30; border-radius: 10px; color: var(--city-accent); }
+#app .bg-avatar-gradient svg { color: inherit; }
+#app h2.text-xl { font-size: 19px; }
+#app .bg-card-bg { background: var(--city-surface); border-color: var(--city-line); min-height: 54px; gap: 12px; border-radius: 9px; }
+#app .bg-card-bg > span { font-size: 12px; overflow-wrap: anywhere; min-width: 0; }
+#app .bg-card-bg:hover { background: #202634; border-color: #4aa8ff38; }
+#app .bg-card-bg button { flex-shrink: 0; padding: 4px; border-radius: 5px; }
+#app .bg-card-bg button:hover { background: #ef74741a; }
+#app .bg-green-gradient {
+  background: #4aa8ff16;
+  border: 1px solid #4aa8ff38;
+  color: #8ac7ff;
+  box-shadow: none;
+  font-size: 12px;
+}
+#app .bg-green-gradient:hover { background: #4aa8ff28; opacity: 1; }
+#app .bg-modal-gradient { background: #131720; border: 1px solid #ffffff1c; border-radius: 14px; box-shadow: 0 24px 80px #0008; max-height: 88vh; display: flex; flex-direction: column; margin: 16px; }
+#app .bg-modal-gradient h3 { font-size: 17px; }
+#app .bg-modal-gradient .custom-scrollbar { min-height: 0; }
+#app .bg-modal-gradient button.text-left { font-size: 12px; gap: 12px; }
+#app .bg-modal-gradient button.text-left > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+#app .bg-modal-gradient button:disabled { cursor: not-allowed; }
+#app .bg-modal-gradient button.text-left:not(:disabled):hover { background: #4aa8ff16; border-color: #4aa8ff38; }
+#app button:focus-visible { outline: 2px solid var(--city-accent); outline-offset: 3px; }
+#app .custom-scrollbar, #app .bg-panel-gradient > .p-5 { scrollbar-width: thin; scrollbar-color: #374254 transparent; }
+#app .custom-scrollbar::-webkit-scrollbar-thumb { background: #374254; }
+@media (max-width: 640px) {
+  #app .bg-header-gradient { padding: 18px; }
+  #app .bg-header-gradient .justify-between { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+  #app .bg-header-gradient h1 { font-size: 16px; }
+  #app .bg-header-gradient h1::before { font-size: 8px; letter-spacing: 1px; }
+  #app .bg-panel-gradient > .p-5 { padding: 18px; }
+  #app .bg-panel-gradient .grid-cols-2 { grid-template-columns: 1fr; }
+}

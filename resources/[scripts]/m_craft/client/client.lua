@@ -130,6 +130,17 @@ local function closeMenu()
     })
 end
 
+-- Independent of React: a render failure must never trap the player in NUI.
+RegisterCommand('fecharcraft', function()
+    closeMenu()
+end, false)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource == GetCurrentResourceName() then
+        SetNuiFocus(false, false)
+    end
+end)
+
 local function getNearestBlip(coords)
     local nearestBlip = nil
     local nearestDistance = 10.0
@@ -188,7 +199,7 @@ RegisterNUICallback('ProduceItem', function(data, cb)
     SetNuiFocus(false, false)
     Wait(math.random(50, 500))
     local status = ServerAPI.produceItem(blipIdOpen, data)
-    SetNuiFocus(true, true)
+    if isMenuOpen then SetNuiFocus(true, true) end
     pendingCallbacks["produceItem"] = false
     if not status then
         cb(false)

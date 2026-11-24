@@ -5,7 +5,7 @@ game "gta5"
 
 ui_page "web-side/build/index.html"
 files {
-    "web-side/**/*",
+    "web-side/build/**/*",
     "shared-side/garages.json",
     "shared-side/typeGarages.json",
     "shared-side/listcars.json"

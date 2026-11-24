@@ -10,7 +10,7 @@ import { observe } from '../hooks/observe'
 import { emit } from '../utils/emit'
 import { useNui } from '@/store/useNui'
 
-interface VisibilityProviderValue {}
+interface VisibilityProviderValue { clockOnly: boolean }
 
 const VisibilityContext = createContext<VisibilityProviderValue | null>(null)
 
@@ -18,9 +18,11 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [visible, setVisible] = useState(isEnvBrowser())
+  const [clockOnly, setClockOnly] = useState(isEnvBrowser())
   const { setPointStart } = useNui()
 
   observe('open', (data) => {
+    setClockOnly(data.clockOnly === true)
     setPointStart(data.point)
     setVisible(true)
   })
@@ -44,7 +46,7 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [visible])
 
   return (
-    <VisibilityContext.Provider value={{}}>
+    <VisibilityContext.Provider value={{ clockOnly }}>
       {visible && children}
     </VisibilityContext.Provider>
   )

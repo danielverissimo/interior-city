@@ -214,17 +214,6 @@
   height: 5.5rem;
 }
 
-#activationScreen #logo {
-  position: absolute;
-  top: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 5rem;
-  height: 5rem;
-  flex-shrink: 0;
-  aspect-ratio: 1/1;
-}
-
 #activationScreen .content footer {
   text-align: center;
   font-size: 0.6875rem;

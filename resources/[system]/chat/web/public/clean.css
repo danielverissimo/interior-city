@@ -1,0 +1,25 @@
+.city-chat-message {
+  background: rgba(18, 20, 23, .88) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .09) !important;
+  border-radius: 5px;
+  padding: 10px 12px;
+  gap: 10px;
+  align-items: flex-start;
+}
+.city-chat-message > img {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  opacity: .65;
+  filter: grayscale(1);
+}
+.city-chat-message > div { min-width: 0; }
+.city-chat-message p { overflow-wrap: anywhere; }
+.city-chat-message .uppercase {
+  color: #e5e7eb;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .025em !important;
+}
+.city-chat-message span p { color: #b6bbc2; line-height: 1.45; }
+.city-chat-message > div > div > p:last-child { color: #747b85; font-size: 9px; }

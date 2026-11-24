@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Posto de combustível | Interior City</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <button id="demo-horn" type="button" hidden>Buzinar</button>
+  <main id="panel" aria-labelledby="title" hidden>
+    <header>
+      <span class="station-icon" aria-hidden="true"><span></span></span>
+      <div>
+        <p class="city">Interior City</p>
+        <h1 id="title">Posto de combustível</h1>
+      </div>
+      <button id="dismiss" type="button" class="dismiss" aria-label="Fechar">×</button>
+    </header>
+    <section class="dialogue">
+      <p>Frentista</p>
+      <h2 id="message">Quanto você quer abastecer?</h2>
+    </section>
+    <form id="order">
+      <div class="order-heading">
+        <label for="amount">Valor do abastecimento</label>
+        <span id="limit"></span>
+      </div>
+      <div class="amount-field"><span aria-hidden="true">R$</span>
+        <input id="amount" type="number" min="1" step="1" placeholder="0" inputmode="numeric" required aria-describedby="limit">
+      </div>
+      <div class="receipt">
+        <div><span>Preço por litro</span><strong id="price"></strong></div>
+        <div><span>Combustível</span><strong id="liters"></strong></div>
+      </div>
+      <p id="error" role="alert" hidden></p>
+      <button class="primary" type="submit">Confirmar abastecimento</button>
+    </form>
+    <section id="status" aria-live="polite" hidden>
+      <div class="receipt"><div><span>Valor</span><strong id="total"></strong></div><div><span>Combustível</span><strong id="delivered"></strong></div></div>
+      <div id="progress-section" class="progress-section" hidden>
+        <div class="progress-heading"><span>Progresso do abastecimento</span><strong id="percent">0%</strong></div>
+        <div id="progress" class="progress" role="progressbar" aria-label="Progresso do abastecimento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+      </div>
+      <button id="status-close" class="primary" type="button">Cancelar</button>
+    </section>
+  </main>
+</body>
+</html>

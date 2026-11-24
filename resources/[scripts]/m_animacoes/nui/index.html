@@ -1,60 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR" style="background: transparent !important; background-color: transparent !important;">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>mg_animacoes by IgorWinchester Toca do Mago FiveM</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>m_animacoes</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-    <div id="app">
-        <div id="box" v-if="show">
-            <header id="text_top">Painel de animações<br></header>
-            <button id="close_btn" @click="close()">X</button>
-            <div id="box_middle">
-                <div id="boxes" v-for="k in table" @click="confirm_an(k.nome)"><div id="text_box">{{ k.nome }}</div></div>
+<body style="background: transparent !important; background-color: transparent !important;">
+    <main id="app" aria-live="polite">
+        <div id="panelLayer" class="layer is-hidden">
+            <div class="backdrop"></div>
+
+            <section class="panel" role="dialog" aria-modal="true" aria-label="Painel de animações">
+                <aside class="sidebar">
+                    <nav class="nav" aria-label="Categorias">
+                        <button class="nav-item is-active" data-filter="all">
+                            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg></span>
+                            <span>Todos</span><b id="allCount">0</b>
+                        </button>
+                        <button class="nav-item" data-filter="favourites">
+                            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m12 3 2.75 5.57 6.15.9-4.45 4.33 1.05 6.12L12 17.02l-5.5 2.9 1.05-6.12L3.1 9.47l6.15-.9L12 3Z"/></svg></span>
+                            <span>Favoritos</span><b id="favCount">0</b>
+                        </button>
+                        <button class="nav-item" data-filter="dance">
+                            <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="m9 9 3-2 3 2 2 4M12 7v6l-3 4M12 13l4 5M8 10l-3 3"/></svg></span>
+                            <span>Danças</span>
+                        </button>
+                        <button class="nav-item" data-filter="props">
+                            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m4 8 8-4 8 4-8 4-8-4Zm0 0v8l8 4 8-4V8M12 12v8"/></svg></span>
+                            <span>Com objetos</span>
+                        </button>
+                        <button class="nav-item" data-filter="photo">
+                            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 7h4l1.4-2h5.2L16 7h4v12H4V7Z"/><circle cx="12" cy="13" r="3.4"/></svg></span>
+                            <span>Poses</span>
+                        </button>
+                        <button class="nav-item" data-filter="vehicle">
+                            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m5 11 2-5h10l2 5M4 11h16v7H4v-7Z"/><circle cx="7" cy="16" r="1"/><circle cx="17" cy="16" r="1"/></svg></span>
+                            <span>Veículo</span>
+                        </button>
+                    </nav>
+
+                    <div class="favourites-box">
+                        <div class="favourites-title">
+                            <span>ROLETINHA RÁPIDA</span>
+                            <strong><span id="favSlotsCount">0</span>/<span id="favSlotsMax">8</span></strong>
+                        </div>
+                        <div id="favoriteSlots" class="favorite-slots"></div>
+                        <div class="wheel-hint">
+                            <kbd>O</kbd>
+                            <div><strong>Pressione para abrir</strong></div>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="content">
+                    <header class="topbar">
+                        <div class="heading">
+                            <h1 id="sectionTitle">Animações</h1>
+                            <p>Escolha uma animação ou salve suas preferidas para acessar instantaneamente pela roleta.</p>
+                        </div>
+
+                        <div class="top-actions">
+                            <label class="search" for="searchInput">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+                                <input id="searchInput" type="text" autocomplete="off" placeholder="Pesquisar animação..." />
+                                <span>CTRL + F</span>
+                            </label>
+                        </div>
+                    </header>
+
+                    <div class="content-meta">
+                        <span><strong id="resultCount">0</strong> animações encontradas</span>
+                        <span class="tip"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4 12.75V19h8v-3.25A7 7 0 0 0 12 3Z"/><path d="M9 22h6"/></svg>Clique na estrela para favoritar</span>
+                    </div>
+
+                    <section id="animationGrid" class="animation-grid"></section>
+
+                    <div id="emptyState" class="empty-state is-hidden">
+                        <div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4M8 11h6"/></svg></div>
+                        <strong>Nenhuma animação encontrada</strong>
+                        <span>Tente pesquisar por outro nome ou escolha outra categoria.</span>
+                    </div>
+
+                </div>
+            </section>
+
+            <div id="removeFavouriteDialog" class="remove-favourite-backdrop is-hidden" aria-hidden="true">
+                <section class="remove-favourite-dialog" role="alertdialog" aria-modal="true" aria-labelledby="removeFavouriteHeading" aria-describedby="removeFavouriteQuestion">
+                    <div class="remove-favourite-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 7h16M10 7V4h4v3m-7 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
+                    </div>
+                    <h2 id="removeFavouriteHeading">Remover favorito</h2>
+                    <p id="removeFavouriteQuestion"></p>
+                    <div class="remove-favourite-actions">
+                        <button id="removeFavouriteCancel" type="button" class="remove-favourite-cancel">Cancelar</button>
+                        <button id="removeFavouriteConfirm" type="button" class="remove-favourite-confirm">Remover</button>
+                    </div>
+                </section>
             </div>
-            <header id="text_bottom">Para cancelar a animação pressione F6</header>
         </div>
-    </div>
+
+        <div id="wheelLayer" class="wheel-layer is-hidden">
+            <div class="wheel-backdrop"></div>
+            <div class="wheel-shell" id="wheelShell">
+                <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 640 640" aria-hidden="true"></svg>
+                <div id="wheelLabels" class="wheel-labels"></div>
+                <div class="wheel-center">
+                    <div class="wheel-center-key wheel-center-star" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="m12 3 2.75 5.57 6.15.9-4.45 4.33 1.05 6.12L12 17.02l-5.5 2.9 1.05-6.12L3.1 9.47l6.15-.9L12 3Z"/></svg>
+                    </div>
+                    <strong id="wheelCenterTitle">Favoritos</strong>
+                </div>
+            </div>
+            <button id="wheelAllButton" class="wheel-all-button" type="button" aria-label="Abrir todas as animações">
+                <!-- <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
+                </svg> -->
+                <span>TODAS ANIMAÇÕES</span>
+            </button>
+            <div class="wheel-help"><span>Passe o cursor e clique em uma animação</span><b>•</b><span><kbd>ESC</kbd> para fechar</span></div>
+        </div>
+
+        <div id="toast" class="toast is-hidden">
+            <div class="toast-icon"><svg viewBox="0 0 24 24"><path d="M12 3a8 8 0 1 0 8 8"/><path d="m12 7 .1 5M12 16h.01M17 3h4v4"/></svg></div>
+            <div><strong id="toastTitle">Animações</strong><span id="toastMessage"></span></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
 </body>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-    <script type="text/javascript" src="script.js"></script>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

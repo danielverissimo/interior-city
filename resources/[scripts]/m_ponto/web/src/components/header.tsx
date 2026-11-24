@@ -10,7 +10,7 @@ interface IUser {
   isDeveloper: boolean,
 }
 
-export default function Header() {
+export default function Header({ clockOnly }: { clockOnly: boolean }) {
   const [user, setUser] = useState<IUser>({
     name: 'Joaoasdadssadsa',
     group: "Sub-tenente",
@@ -39,13 +39,13 @@ export default function Header() {
             </p>
           </div>
         </div>
-        <div className="w-[25.375rem] h-[2.125rem] bg-white/5 rounded-[2.375rem] grid place-items-center ml-8">
+        {!clockOnly && <div className="w-[25.375rem] h-[2.125rem] bg-white/5 rounded-[2.375rem] grid place-items-center ml-8">
           <p className="text-white/60 text-sm">
             www.{user.org.toLowerCase().replaceAll(' ', '')}.011.com/
             <span className="text-white/40">index</span>
           </p>
-        </div>
-          {user.isDeveloper && 
+        </div>}
+          {!clockOnly && user.isDeveloper && 
             <div className="w-[2.125rem] h-[2.125rem] grid place-items-center bg-white/5 rounded ml-[8rem]">
               <Config>
                 <Settings size={16} className="text-white/50" />

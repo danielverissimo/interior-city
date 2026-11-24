@@ -1,0 +1,5 @@
+#lockpick-game { position:fixed; bottom:7vh; left:50%; transform:translateX(-50%); z-index:1000; width:200px; text-align:center; color:#fff; font:600 11px Arial,sans-serif; background:rgba(10,12,15,.88); border:1px solid #ffffff30; border-radius:12px; padding:10px; }
+#lockpick-game[hidden] { display:none; }
+#lockpick-game canvas { display:block; width:178px; height:178px; margin:auto; }
+#lockpick-game p { margin:6px 0; }
+#lockpick-game small { color:#b6bdc5; font-size:10px; }

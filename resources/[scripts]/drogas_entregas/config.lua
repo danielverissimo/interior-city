@@ -87,9 +87,9 @@ Config.Drugs = {
         description = "Venda de cocaína nas rotas clandestinas.",
         image = "cocaina",
         minQuantity = 1,
-        maxQuantity = 3,
-        minPricePerUnit = 1500,
-        maxPricePerUnit = 1500,
+        maxQuantity = 5,
+        minPricePerUnit = 100,
+        maxPricePerUnit = 100,
         refusalChance = 25
     },
 
@@ -99,9 +99,9 @@ Config.Drugs = {
         description = "Venda de metanfetamina nas rotas clandestinas.",
         image = "metanfetamina",
         minQuantity = 1,
-        maxQuantity = 3,
-        minPricePerUnit = 1500,
-        maxPricePerUnit = 1500,
+        maxQuantity = 5,
+        minPricePerUnit = 100,
+        maxPricePerUnit = 100,
         refusalChance = 25
     },
 
@@ -111,9 +111,9 @@ Config.Drugs = {
         description = "Venda de malotes de maconha nas rotas clandestinas.",
         image = "malote-maconha",
         minQuantity = 1,
-        maxQuantity = 3,
-        minPricePerUnit = 1500,
-        maxPricePerUnit = 1500,
+        maxQuantity = 5,
+        minPricePerUnit = 120,
+        maxPricePerUnit = 120,
         refusalChance = 25
     }
 }

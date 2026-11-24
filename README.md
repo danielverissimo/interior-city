@@ -122,3 +122,7 @@ git diff --check
 ```
 
 Os testes cobrem separação, SQL sem dados, remoção de credenciais, arquivos originais preservados, hashes, pacote determinístico, rejeição de corrupção/alteração, links e caminhos inseguros. Validação de bytes não comprova execução do jogo, segurança dos scripts ou direitos de redistribuição.
+
+## Revisão da base local de 24/11/2026
+
+Esta versão está em revisão e ainda não está pronta para deploy. O catálogo contém 67 pacotes de recursos pendentes de publicação no armazenamento privado. A pasta de trabalho original continua sendo a fonte desses arquivos. Os arquivos de configuração privada e os dados do banco são provisionados separadamente.

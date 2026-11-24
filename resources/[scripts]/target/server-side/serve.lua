@@ -445,6 +445,22 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- PORTA-MALAS / SEQUESTRO
 -----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent('target:vehicleAction')
+AddEventHandler('target:vehicleAction', function(netId, action)
+    local player = source
+    if not userId(player) or not actionAllowed(player, 1) then return end
+    if type(action) ~= 'string' or not (action:match('^door[0-5]$') or action == 'allDoors' or action == 'windows') then return end
+    netId = tonumber(netId) or 0
+    if netId <= 0 then return end
+    local vehicle = NetworkGetEntityFromNetworkId(netId)
+    if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) or GetEntityType(vehicle) ~= 2 then return end
+    if GetPlayerRoutingBucket(player) ~= GetEntityRoutingBucket(vehicle) then return end
+    if distance(getCoords(player), GetEntityCoords(vehicle)) > 4.0 then return end
+    local owner = NetworkGetEntityOwner(vehicle)
+    if not owner or owner <= 0 then owner = player end
+    TriggerClientEvent('target:applyVehicleAction', owner, netId, action)
+end)
+
 RegisterNetEvent("target:trunkin")
 AddEventHandler("target:trunkin",function(payload)
     local source = source
@@ -499,7 +515,10 @@ local function startRepair(source,uid,netId,mode,consumeItem,refundOnCancel)
             if consumeItem and refundOnCancel then vRP.giveInventoryItem(uid,consumeItem,1,true) end
             return notify(currentSource,"negado","Reparo cancelado: o veículo não está mais próximo.")
         end
-        TriggerClientEvent("target:clientRepairVehicle",currentSource,netId,mode)
+        local entity = NetworkGetEntityFromNetworkId(netId)
+        local owner = entity and entity ~= 0 and NetworkGetEntityOwner(entity) or currentSource
+        if not owner or owner <= 0 then owner = currentSource end
+        TriggerClientEvent("target:clientRepairVehicle",owner,netId,mode)
         vRPclient._stopAnim(currentSource,false)
         notify(currentSource,"sucesso","Reparo concluído.")
     end)
@@ -542,7 +561,10 @@ AddEventHandler("target:adminFix",function(payload)
     if not ok or not actionAllowed(source,1) then return end
     local netId = validVehicle(source,payload,12.0)
     if not netId then return notify(source,"negado","Veículo inválido ou muito distante.") end
-    TriggerClientEvent("target:clientRepairVehicle",source,netId,"full")
+    local entity = NetworkGetEntityFromNetworkId(netId)
+    local owner = entity and entity ~= 0 and NetworkGetEntityOwner(entity) or source
+    if not owner or owner <= 0 then owner = source end
+    TriggerClientEvent("target:clientRepairVehicle",owner,netId,"full")
     notify(source,"sucesso","Veículo reparado.")
 end)
 
@@ -554,6 +576,8 @@ AddEventHandler("target:adminDeleteVehicle",function(payload)
     local netId = validVehicle(source,payload,12.0)
     if not netId then return notify(source,"negado","Veículo inválido ou muito distante.") end
     TriggerClientEvent("target:clientDeleteEntity",-1,netId)
+    local entity = NetworkGetEntityFromNetworkId(netId)
+    if entity and entity ~= 0 and DoesEntityExist(entity) then DeleteEntity(entity) end
     notify(source,"sucesso","Veículo removido.")
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------

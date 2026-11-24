@@ -17,7 +17,7 @@ Config.BarbershopResource = 'm_barbershop'
 
 Config.TattooResource = 'm_tattoos'
 
-Config.CloakroomResource = 'm_cloakroom'
+Config.CloakroomResource = 'loja_roupas_intc'
 
 Config.SnippetsResource = 'm_snippets'
 

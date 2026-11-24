@@ -109,13 +109,10 @@ function serverFunctions.storeProximityVehicle(distance)
         local vehicleData = allSpawnedCars[vehicle]
 
         if vehicleData and vehicleData[1] and vehicleData[2] then
-            local plate = vehicleData[1]
-            local user_id = vehicleData[2]
-            local vehName = vehicleData[3] or "unknown"
+            local user_id, name, netID = table.unpack(vehicleData)
+            SaveVehicleInfos(user_id, name, netID, entity, src)
 
-            SaveVehicleInfos(plate, user_id, vehName, entity, src)
-
-            local key = user_id..":"..plate
+            local key = name..":"..user_id
             if userPersonalCar[key] then
                 userPersonalCar[key] = nil
             end
@@ -140,6 +137,10 @@ function serverFunctions.garageGetUserVehicles()
     local identity = vRP.getUserIdentity(user_id)
     if user_id then
         local query = vRP.query("bm_module/garages/getAllUserVehicles", { user_id = user_id })
+        local ok, premiumVehicles = pcall(function()
+            return exports.luxurymotors:getPremiumVehicles(user_id)
+        end)
+        premiumVehicles = ok and premiumVehicles or {}
 
         local t = {}
 
@@ -149,10 +150,10 @@ function serverFunctions.garageGetUserVehicles()
                 ['plate'] = identity.registro,
                 ['engine'] = query[i].motor,
                 ['body'] = query[i].lataria,
-                ['fuel'] = 100,
+                ['fuel'] = tonumber(query[i].gasolina) or 100,
                 ['custom'] = json.decode(query[i].tunagem),
                 ['status'] = (query[i].status > 0),
-                ['ipva'] = (query[i].ipva+main['ipvaVencimento']*24*60*60 <= os.time())
+                ['ipva'] = not premiumVehicles[query[i].veiculo:lower()] and (query[i].ipva+main['ipvaVencimento']*24*60*60 <= os.time())
             }
         end
         
@@ -165,16 +166,21 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function SaveVehicleInfos(user_id, name, netID, vehicle, source)
-    if vehicle then
+    if vehicle and DoesEntityExist(vehicle) then
         local body = GetVehicleBodyHealth(vehicle) or 1000.0
         local engine = GetVehicleEngineHealth(vehicle) or 1000.0
-        local fuel = clientFunctions.garageGetVehicleFuel(source, netID) or 100.0
+        local owner = NetworkGetEntityOwner(vehicle)
+        local fuel
+        if owner and owner > 0 then fuel = tonumber(clientFunctions.garageGetVehicleFuel(owner, netID)) end
+        if fuel == nil and source and source > 0 and source ~= owner then
+            fuel = tonumber(clientFunctions.garageGetVehicleFuel(source, netID))
+        end
+        fuel = fuel and fuel == fuel and math.floor(math.max(0, math.min(100, fuel)) + 0.5) or -1
 
         if engine <= 100 then engine = 1000 end
 		if body <= 100 then body = 1000 end
-		if fuel == nil or fuel >= 100 then fuel = 100 end
-        
-        vRP._execute("bm_module/garages/updateVehicleInfos", { lataria = body, motor = engine, gasolina = 100, user_id = user_id, veiculo = name })
+
+        vRP._execute("bm_module/garages/updateVehicleInfos", { lataria = body, motor = engine, gasolina = fuel, user_id = user_id, veiculo = name })
     end
 end
 
@@ -289,14 +295,17 @@ function serverFunctions.garageTryPaymentVehicle(name)
                     if vRP.tryFullPayment(user_id, payment) then
                         vRP._execute("bm_module/garages/updateStatus", { status = 0, user_id = user_id, veiculo = name })
                         TriggerClientEvent("Notify",source,"sucesso","Você Pagou $ "..vRP.format(payment).." para tirar o veiculo da retenção.", 5)
-                        vRP.sendLog('https://discord.com/api/webhooks/1315817948069232691/xposEjhb58o_02T9HwIT14rZlc5U6QaFGn3dGVds7jIA1Q4uryBmfuX5TS3cUkrUSiOW', 'USUARIO '..user_id..' RETIROU O VEICULO '..name..' DA RETENÇÃO')
+                        vRP.sendLog('', 'USUARIO '..user_id..' RETIROU O VEICULO '..name..' DA RETENÇÃO')
                     else
                         TriggerClientEvent("Notify",source,"negado","Você não possui dinheiro.", 5)
                     end
                 end
             end
 
-            if (query[1].ipva+main['ipvaVencimento']*24*60*60 <= os.time()) then
+            local available, access = pcall(function()
+                return exports.luxurymotors:getVehicleAccess(user_id, name)
+            end)
+            if available and access and not access.premium and (query[1].ipva+main['ipvaVencimento']*24*60*60 <= os.time()) then
                 local payment = parseInt(vehPrice * main['ipvaValue'])
 
                 
@@ -316,7 +325,7 @@ function serverFunctions.garageTryPaymentVehicle(name)
                     if vRP.tryFullPayment(user_id, payment) then
                         vRP._execute("bm_module/garages/updateIpva", { ipva = os.time(), user_id = user_id, veiculo = name })
                         TriggerClientEvent("Notify",source,"sucesso","Você Pagou $ "..vRP.format(payment).." para deixar o ipva de seu veiculo em dia.", 5)
-                        vRP.sendLog('https://discord.com/api/webhooks/1315817948069232691/xposEjhb58o_02T9HwIT14rZlc5U6QaFGn3dGVds7jIA1Q4uryBmfuX5TS3cUkrUSiOW', 'ID '..user_id..' PAGOU O IPVA DO VEICULO '..name)
+                        vRP.sendLog('', 'ID '..user_id..' PAGOU O IPVA DO VEICULO '..name)
                     else
                         TriggerClientEvent("Notify",source,"negado","Você não possui dinheiro.", 5)
                     end
@@ -416,8 +425,35 @@ RegisterServerEvent('garage:registerBlockedVehicle', function(name, netId, liver
     vehiclesBlockeds[newName].total = vehiclesBlockeds[newName].total + 1
 end)
 
+local renewalRequests = {}
+local function canWithdrawPremiumVehicle(player, user, vehicle)
+    local available, access = pcall(function()
+        return exports.luxurymotors:getVehicleAccess(user, vehicle)
+    end)
+    if not available or not access then
+        TriggerClientEvent('Notify', player, 'negado', 'A validação da garagem está indisponível. Tente novamente.', 5)
+        return false
+    end
+    if not access.premium or access.expiresAt > os.time() then return true end
+    if renewalRequests[user] then return false end
+
+    renewalRequests[user] = true
+    local ok, renewed, message = pcall(function()
+        local prompt = ('O acesso da Luxur Motors venceu. Pagar %s diamantes para liberar o veículo por mais 30 dias?'):format(access.price)
+        if vRP.request(player, prompt, 30) and vRP.getUserId(player) == user then
+            return exports.luxurymotors:renewVehicleAccess(user, vehicle, access.reference)
+        end
+    end)
+    renewalRequests[user] = nil
+    if not ok then message = 'Não foi possível renovar o veículo. Tente novamente.' end
+    if message and vRP.getUserId(player) == user then
+        TriggerClientEvent('Notify', player, renewed and 'sucesso' or 'negado', message, 8)
+    end
+    return false
+end
+
 RegisterNetEvent("garage:garageTrySpawnVehicle",function(isPersonal, name, spawnLoc, types, opennedGarageId, opennedGarageType)
-    if not name then return end
+    if type(name) ~= 'string' or name == '' then return end
     local source = source
     local user_id = vRP.getUserId(source)
     local identity = vRP.getUserIdentity(user_id)
@@ -451,6 +487,7 @@ RegisterNetEvent("garage:garageTrySpawnVehicle",function(isPersonal, name, spawn
         if isPersonal then
             local query = vRP.query("bm_module/garages/getSpawnVehInfo", { user_id = user_id, veiculo = name })
             if #query > 0 then
+                if not canWithdrawPremiumVehicle(source, user_id, query[1].veiculo) then return end
                 if userPersonalCar[name..":"..user_id] then
                     if (DoesEntityExist(NetworkGetEntityFromNetworkId(userPersonalCar[name..":"..user_id])) == 1) then
                         TriggerClientEvent("Notify",source,"negado","Você já possui um veiculo desse fora da garagem.", 5)
@@ -477,7 +514,7 @@ RegisterNetEvent("garage:garageTrySpawnVehicle",function(isPersonal, name, spawn
                             plate = identity.registro,
                             engine = query[1].motor or 1000,
                             body = query[1].lataria or 1000,
-                            fuel = 100,
+                            fuel = tonumber(query[1].gasolina) or 100,
                             custom = json.decode(query[1].tunagem) or {}
                         }, true, spawnLoc)
                     end
@@ -528,12 +565,12 @@ RegisterNetEvent("garage:garageTrySpawnVehicle",function(isPersonal, name, spawn
                             if not vehOwner then print("Problemas Aqui!!!") return end
 
                             SetVehicleNumberPlateText(entity, plate)
-                            SetVehicleDoorsLocked(entity, 2)
+                            SetVehicleDoorsLocked(entity, 1)
 
                             TriggerClientEvent("garage:updateVehicle", vehOwner, netid, {
                                 engine = query[1].motor or 1000,
                                 body = query[1].lataria or 1000,
-                                fuel = 100,
+                                fuel = tonumber(query[1].gasolina) or 100,
                                 custom = json.decode(query[1].tunagem) or {}
                             }, true)
                         end)
@@ -666,7 +703,7 @@ RegisterNetEvent("garage:garageTrySpawnVehicle",function(isPersonal, name, spawn
                         if not vehOwner then print("Problemas Aqui!!!") return end
 
                         SetVehicleNumberPlateText(entity, plate)
-                        SetVehicleDoorsLocked(entity, 2)
+                        SetVehicleDoorsLocked(entity, 1)
 
                         TriggerClientEvent("garage:updateVehicle", vehOwner, netid, {
                             engine = 1000,

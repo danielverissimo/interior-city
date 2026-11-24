@@ -75,8 +75,10 @@ RegisterKeyMapping('lockvehicle', 'Trancar/Destrancar Veiculo', 'keyboard', 'L')
 -- VEHICLE FUEL
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function clientFunctions.garageGetVehicleFuel(veh)
-    if IsEntityAVehicle(NetToVeh(veh)) then
-        return GetVehicleFuelLevel(NetToVeh(veh))
+    local vehicle = NetToVeh(veh)
+    if IsEntityAVehicle(vehicle) then
+        local capacity = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
+        if capacity > 0 then return math.max(0, math.min(100, GetVehicleFuelLevel(vehicle) / capacity * 100)) end
     end
 end
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -667,6 +667,15 @@ function Dealership:sellVehicle(user_id, source, vehicle)
     local saleRemoved, salePaid, salePaymentAccount, salePrice = false, false, nil, 0
     local saleUncertain = false
     local ok, result = xpcall(function()
+        local available, access = pcall(function()
+            return exports.luxurymotors:getVehicleAccess(user_id, vehicle)
+        end)
+        if not available or not access or access.premium then
+            local message = access and available and 'Veículos comprados com diamantes não podem ser revendidos por dinheiro.'
+                or 'Validação da garagem indisponível. Tente novamente.'
+            notify(source, 'negado', message)
+            return response(false, message)
+        end
         local car = self:getCar(vehicle)
         if not car then
             DealershipAudit.Log("dealership_security_invalid_sale", {

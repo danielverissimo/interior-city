@@ -1,0 +1,55 @@
+{
+  "minimumPercentage": 70,
+  "questions": [
+    {
+      "prompt": "O que é o ID do personagem e quando ele é recebido na Interior City?",
+      "options": ["É o número da conta do Discord", "É o passaporte do jogo, gerado no primeiro acesso à cidade após a aprovação", "É um número que o jogador escolhe para fazer a prova"],
+      "answer": 1
+    },
+    {
+      "prompt": "Qual destas opções é adequada como nome do personagem?",
+      "options": ["O nome de um personagem com um insulto", "Um apelido ofensivo usado para provocar alguém", "Um nome e sobrenome escolhidos por você, sem termos ofensivos"],
+      "answer": 2
+    },
+    {
+      "prompt": "O que significa OOC no GTA RP?",
+      "options": ["Agir ou falar fora do personagem", "Interpretar o personagem dentro de uma cena", "Mover a cena para uma zona segura"],
+      "answer": 0
+    },
+    {
+      "prompt": "O que é combat logging?",
+      "options": ["Registrar o que aconteceu para relatar à equipe", "Sair intencionalmente do jogo no meio de uma ação para fugir das consequências", "Desconectar após a cena ter terminado"],
+      "answer": 1
+    },
+    {
+      "prompt": "O que é RDM?",
+      "options": ["Matar outro jogador em uma cena com motivo e contexto de RP", "Relatar uma infração à equipe", "Matar outro jogador sem motivo ou contexto de RP que justifique a ação"],
+      "answer": 2
+    },
+    {
+      "prompt": "O que é VDM?",
+      "options": ["Usar um veículo para matar outro jogador sem motivo ou contexto de RP", "Abandonar um carro no meio de uma perseguição", "Levar um personagem ferido de carro ao hospital"],
+      "answer": 0
+    },
+    {
+      "prompt": "O que é metagaming?",
+      "options": ["Usar uma informação que o personagem descobriu durante uma cena", "Usar no jogo informações externas que o personagem não descobriu", "Compartilhar uma informação que o personagem ouviu dentro do jogo"],
+      "answer": 1
+    },
+    {
+      "prompt": "O que é uma safe zone?",
+      "options": ["Uma área em que roubar é permitido se não houver polícia", "Um local onde qualquer confronto é permitido", "Uma área onde matar, roubar e agredir outros jogadores é proibido"],
+      "answer": 2
+    },
+    {
+      "prompt": "Qual situação é um exemplo de powergaming?",
+      "options": ["Explorar a física do jogo para forçar uma ação irreal, como aterrissar de um salto absurdo e seguir normalmente", "Reduzir a velocidade antes de uma curva perigosa", "Interpretar os ferimentos do personagem depois de uma batida"],
+      "answer": 0
+    },
+    {
+      "prompt": "Como a Interior City trata ações de racismo ou assédio classificadas como Dark RP?",
+      "options": ["São permitidas quando apenas os envolvidos estão presentes", "São proibidas e podem levar a banimento", "São permitidas quando o jogador diz que era apenas interpretação"],
+      "answer": 1
+    }
+  ]
+}

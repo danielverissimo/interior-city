@@ -11,7 +11,7 @@ Config.Drugs = {
         },
         reward = {
             item = "cocaina",
-            amount = 2
+            amount = 10
         },
         locations = {
             producePasteBase = {

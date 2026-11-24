@@ -386,6 +386,7 @@ function Dealership:buyVehicle(user_id, source, vehicle, rgba)
     local purchasedPrice, purchasedStock = nil, nil
 
     local function paidMessage()
+        if paymentMethod == 'diamonds' then return ('Pago com %s diamantes.'):format(formatReais(purchasedPrice)) end
         local origin = paymentMethod == "bank" and "o dinheiro do banco" or "dinheiro da carteira"
         return ("Pago com %s no valor de R$ %s."):format(origin, formatReais(chargedAmount))
     end
@@ -461,6 +462,34 @@ function Dealership:buyVehicle(user_id, source, vehicle, rgba)
         -- A categoria VIP é apenas classificatória: qualquer veículo
         -- cadastrado com estoque e preço válidos pode ser comprado.
         -- Continuam ativas as verificações de propriedade, garagem e pagamento.
+
+        if carBuy.currency == 'diamonds' then
+            local price = tonumber(carBuy.diamondPrice)
+            -- Reservar o estoque persistido antes do pagamento. Em resposta
+            -- indeterminada do banco, manter a reserva para nao vender a mais.
+            purchasedStock = math.max(0, stock - 1)
+            if self:updateVehicleState(vehicle, {stock=purchasedStock}) ~= true then
+                return response(false, 'Nao foi possivel reservar o estoque. Nenhum diamante foi cobrado.')
+            end
+            local receipt = LuxuryDiamonds.purchase(user_id, vehicle, price, os.time(), json.encode(createTunagem(rgba)))
+            if not receipt.ok then
+                deliveryUncertain = receipt.pendingVerification == true
+                if not deliveryUncertain then self:updateVehicleState(vehicle, {stock=stock}) end
+                notify(source, 'negado', receipt.message)
+                return receipt
+            end
+            deliveryConfirmed = true
+            paymentMethod, purchasedPrice = 'diamonds', price
+            LuxuryDiamonds.publish(user_id,price,carBuy.name or vehicle)
+            local saved = self:updateVehicleState(vehicle, {stock=purchasedStock, amountSell=(tonumber(carBuy.amountSell) or 0)+1})
+            exports['vrp']:setCooldown(user_id, 'dealership:buy', math.max(0, tonumber(Default.purchaseCooldown) or 5))
+            DealershipAudit.Log('dealership_vehicle_purchase', {
+                actorId=user_id, details=('Compra em diamantes: %s | Quantidade: %s | Recibo: %s | Estoque persistido: %s'):format(vehicle,price,receipt.reference,tostring(saved))
+            })
+            paidNotificationSent = true
+            receipt.stock, receipt.vehicle = purchasedStock, vehicle
+            return receipt
+        end
 
         local highestDiscount = getHighestDiscount(user_id)
         local basePrice = math.max(0, tonumber(carBuy.price) or 0)
@@ -700,6 +729,10 @@ function Dealership:sellVehicle(user_id, source, vehicle)
             return response(false, message)
         end
 
+        local premiumHistory = exports.oxmysql:query_async("SELECT reference FROM luxury_diamond_ledger WHERE user_id=? AND vehicle=? AND kind='purchase' LIMIT 1",{user_id,vehicle})
+        if car.currency == 'diamonds' or premiumHistory and premiumHistory[1] then
+            return response(false, 'Veiculos adquiridos com diamantes nao podem ser revendidos por dinheiro.')
+        end
         if car.vip == true or car.category == "vips" then
             DealershipAudit.Log("dealership_security_invalid_sale", {
                 actorId = user_id,

@@ -1,5 +1,6 @@
 import Equipement from '@/components/Equipement'
 import Header from '@/components/header'
+import { useVisibility } from '@/providers/Visibility'
 import Point from '@/components/Point'
 import Ranking from '@/components/Ranking'
 import Uniform from '../assets/uniform.png'
@@ -10,6 +11,7 @@ import { emit } from '@/utils/emit'
 import { useState } from 'react'
 
 export default function Home() {
+  const { clockOnly } = useVisibility()
   const { showEditModal } = useNui()
   const [equipping, setEquipping] = useState(false)
 
@@ -23,14 +25,14 @@ export default function Home() {
     }
   }
   return (
-    <div>
-      <Header />
+    <div id="interface" className={clockOnly ? "clock-only" : "clock-legacy"}>
+      <Header clockOnly={clockOnly} />
       <div className="flex gap-3 mt-[.81rem]">
         <div className="">
           <Point />
           <Ranking />
         </div>
-        <div className="flex flex-col w-[33.25rem] h-[26.375rem] rounded-[0.5rem] muted">
+        {!clockOnly && <div className="flex flex-col w-[33.25rem] h-[26.375rem] rounded-[0.5rem] muted">
           <Equipement />
           <div
             className="flex items-center gap-3 w-[34.25rem] h-[6.125rem] foreground p-3 mt-3 ml-4 rounded"
@@ -64,9 +66,9 @@ export default function Home() {
           >
             {equipping ? 'EQUIPANDO...' : 'EQUIPAR TUDO'}
           </button>
-        </div>
+        </div>}
       </div>
-      {showEditModal && <EditUniform />}
+      {!clockOnly && showEditModal && <EditUniform />}
     </div>
   )
 }

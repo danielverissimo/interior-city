@@ -1,4 +1,4 @@
-plocal Tunnel = module("vrp","lib/Tunnel")
+local Tunnel = module("vrp","lib/Tunnel")
 local Proxy = module("vrp","lib/Proxy")
 
 vRP = Proxy.getInterface("vRP")
@@ -37,6 +37,6 @@ AddEventHandler("playerDropped", function(reason)
     local user_id = vRP.getUserId(source)
     if user_id then
         TriggerClientEvent("anticl", -1, user_id, coords, reason )
-        vRP.sendLog('https://discord.com/api/webhooks/1315826526603706468/rsqtnRqUE1LNCxD0RDEvPAo-G-hkGUmKmI6i5F6KWT8sCOtCVKDAFrQ1VrvlFVVJ2oaY', 'ID '..user_id..' deslogou em '..json.encode(coords))
+        vRP.sendLog('', 'ID '..user_id..' deslogou em '..json.encode(coords))
     end
 end)

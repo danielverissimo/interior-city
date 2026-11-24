@@ -1,307 +1,312 @@
------------------------------------------------------------------------------------------------------------------------------------------
--- VRP
------------------------------------------------------------------------------------------------------------------------------------------
+local resource = GetCurrentResourceName()
 local Tunnel = module("vrp", "lib/Tunnel")
 local Proxy = module("vrp", "lib/Proxy")
-local Tools = module("vrp", "lib/Tools")
-vRP = Proxy.getInterface("vRP")
-vRPclient = Tunnel.getInterface("vRP")
-vKEYBOARD = Tunnel.getInterface("keyboard")
-vTASKBAR = Tunnel.getInterface("taskbar")
+local vRP = Proxy.getInterface("vRP")
+local client = Tunnel.getInterface(resource)
 
------------------------------------------------------------------------------------------------------------------------------------------
--- CONNECTION
------------------------------------------------------------------------------------------------------------------------------------------
-src = {}
-Tunnel.bindInterface(GetCurrentResourceName(), src)
-vCLIENT = Tunnel.getInterface(GetCurrentResourceName())
+local doors, byId, locks = {}, {}, {}
+local syncRequests, lockRequests = {}, {}
 
-local encodedFunction = string.reverse('ecruoseRpotS')  
-RegisterNetEvent('h3x_29a')
-AddEventHandler('h3x_29a', function(foxzin)
-    if not foxzin then
-        _G[string.reverse(encodedFunction)](GetCurrentResourceName())  
-    else
+local function notify(player, kind, message)
+    TriggerClientEvent('Notify', player, kind, message, 5000)
+end
+
+local function modelHash(hash)
+    hash = math.tointeger(tonumber(hash))
+    return hash and (hash & 0xffffffff)
+end
+
+local function doorId(door)
+    return ('%d:%.4f:%.4f:%.4f'):format(modelHash(door.hash), door.x, door.y, door.z)
+end
+
+local function setCatalog(catalog)
+    local nextIndex, nextLocks = {}, {}
+    for _, door in ipairs(catalog) do
+        local id = doorId(door)
+        nextIndex[id] = door
+        local state = locks[id]
+        if state == nil then state = door.lock ~= false end
+        nextLocks[id] = state
     end
-end)
------------------------------------------------------------------------------------------------------------------------------------------
--- VARIABLES
------------------------------------------------------------------------------------------------------------------------------------------
-local doorslock = {}
-local doors = {}
+    doors, byId, locks = catalog, nextIndex, nextLocks
+end
 
-----------------------------------------------------------------------------------------------------------------------------------------
--- tryLockDoor
-----------------------------------------------------------------------------------------------------------------------------------------
-RegisterServerEvent("tryLockDoor")
-AddEventHandler("tryLockDoor", function(id)
-    local source = source
-    local user_id = vRP.getUserId(source)
-    if user_id then
-        if doors[id] ~= nil then
-            local door = doors[id]
-            if vRP.hasPermission(user_id, "admin.permissao") or vRP.hasPermission(user_id, doors[id].perm) then
-                local state = doors[id].lock
-
-                if doorslock[id] ~= nil then
-                    state = doorslock[id]
-                end
-
-                doorslock[id] = not state
-
-                TriggerClientEvent("door", -1, id, doorslock[id])
-                return
-            end
-
-            local consultItem = vRP.getInventoryItemAmount(user_id, "lockpick")
-            if consultItem >= 1 then
-                if math.random(100) >= 80 then
-                    vRP.tryGetInventoryItem(user_id, "lockpick", 1, true)
-                end
-                local taskResult = vTASKBAR.taskDoors(source)
-                if taskResult then
-                    vRPclient.PlaySound(source, "ATM_WINDOW", "HUD_FRONTEND_DEFAULT_SOUNDSET")
-                    TriggerClientEvent("Notify", source, "aviso", "Você conseguiu abrir a porta, mas a polícia foi acionada.", 5000)
-                    TriggerClientEvent("door", -1, id, doorslock[id])
-                end
-            else
-                TriggerClientEvent("Notify", source, "negado", "Você não tem chave ou lockpick para abrir a porta.", 5000)
-            end
-        end
+local function sendCatalog(player)
+    local snapshot = {}
+    for id, door in pairs(byId) do
+        local data = {}
+        for key, value in pairs(door) do data[key] = value end
+        data.lock = locks[id]
+        snapshot[id] = data
     end
-end)
------------------------------------------------------------------------------------------------------------------------------------------
--- vRP:playerSpawn
------------------------------------------------------------------------------------------------------------------------------------------
-AddEventHandler("vRP:playerSpawn", function(user_id, source, first_spawn)
-    TriggerClientEvent("doors:loadall", -1, doors)
-    Wait(500)
-    TriggerClientEvent("doors:load", -1, doorslock)
-end)
+    TriggerClientEvent('doorsv2:state', player, snapshot)
+end
 
------------------------------------------------------------------------------------------------------------------------------------------
--- reloaddoors
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterCommand("reloaddoors", function(source, ...)
-    local user_id = vRP.getUserId(source)
-    if user_id and vRP.hasPermission(user_id, "admin.permissao") then
-        TriggerClientEvent("doors:load", -1, doorslock)
-        TriggerClientEvent("Notify", source, "sucesso", "Você atualizou os portões com sucesso", 5000)
-        print("Portões recarregados com sucesso para o usuário " .. user_id)
+local function saveCatalog(catalog, forceLockedId)
+    if not SaveResourceFile(resource, 'doors.json', json.encode(catalog, {indent = true}), -1) then
+        return false, 'Não foi possível salvar doors.json.'
     end
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- debugport
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterCommand("debugport", function(source)
-    local user_id = vRP.getUserId(source)
-    if user_id and vRP.hasPermission(user_id, "admin.permissao") then
-        local data = vCLIENT.rayCastDoor(source)
-        if data and data.hash and data.coords then
-            for id, door in pairs(doors) do
-                if door.hash == data.hash and 
-                   math.abs(door.x - data.coords.x) < 0.01 and 
-                   math.abs(door.y - data.coords.y) < 0.01 and 
-                   math.abs(door.z - data.coords.z) < 0.01 then
-                    TriggerClientEvent("Notify", source, "sucesso", "ID da porta: " .. id, 5000)
-                    print("ID da porta: " .. id)
-                    return
-                end
-            end
-            TriggerClientEvent("Notify", source, "negado", "Nenhuma porta encontrada.", 5000)
-        else
-            TriggerClientEvent("Notify", source, "negado", "Nenhuma porta detectada no local.", 5000)
-        end
-    else
-        TriggerClientEvent("Notify", source, "negado", "Permissão insuficiente.", 5000)
-    end
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- delport
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterCommand("delport", function(source)
-    local user_id = vRP.getUserId(source)
-    if user_id and vRP.hasPermission(user_id, "admin.permissao") then
-        local data = vCLIENT.rayCastDoor(source)
-        if data and data.hash and data.coords then
-            for id, door in pairs(doors) do
-                if door.hash == data.hash and 
-                   math.abs(door.x - data.coords.x) < 0.01 and 
-                   math.abs(door.y - data.coords.y) < 0.01 and 
-                   math.abs(door.z - data.coords.z) < 0.01 then
-                    doors[id] = nil -- Remove a porta usando a chave
-                    local success = SaveResourceFile(GetCurrentResourceName(), "doors.json", json.encode(doors, {indent = true}), -1)
-                    if success then
-                        TriggerClientEvent("doors:loadall", -1, doors)
-                        Wait(500)
-                        TriggerClientEvent("doors:load", -1, doorslock)
-                        TriggerClientEvent("Notify", source, "sucesso", "Porta removida com sucesso.", 5000)
-                        print("Porta removida com sucesso: " .. id)
-                    else
-                        print("Erro ao salvar doors.json.")
-                    end
-                    return
-                end
-            end
-            TriggerClientEvent("Notify", source, "negado", "Nenhuma porta encontrada para deletar.", 5000)
-        else
-            TriggerClientEvent("Notify", source, "negado", "Nenhuma porta detectada no local.", 5000)
-        end
-    else
-        TriggerClientEvent("Notify", source, "negado", "Permissão insuficiente.", 5000)
-    end
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- addport
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterCommand("addport", function(source)
-    local user_id = vRP.getUserId(source)
-    if user_id and vRP.hasPermission(user_id, "admin.permissao") then
-        local data = vCLIENT.rayCastDoor(source)
-        if data and data.hash and data.coords then
-            local perm = vRP.prompt(source, "Digite a permissão para a porta:", "")
-            if perm and perm ~= "" then
-                local doorsFile = LoadResourceFile(GetCurrentResourceName(), "doors.json")
-                local existingDoors = json.decode(doorsFile) or {}
-                local newDoor = {
-                    isGate = false,
-                    dist = 5.0,
-                    text = true,
-                    hash = data.hash,
-                    x = data.coords.x,
-                    y = data.coords.y,
-                    z = data.coords.z,
-                    perm = perm,
-                    lock = true -- Inicializa o estado da porta como fechada
-                }
-                table.insert(existingDoors, newDoor)
-                local success = SaveResourceFile(GetCurrentResourceName(), "doors.json", json.encode(existingDoors, {indent = true}), -1)
-                if success then
-                    doors = existingDoors -- Atualiza a tabela de portas
-                    TriggerClientEvent("doors:loadall", -1, doors)
-                    Wait(500)
-                    TriggerClientEvent("doors:load", -1, doorslock)
-                    print("Porta adicionada com sucesso: " .. json.encode(newDoor))
-                else
-                    print("Erro ao salvar doors.json.")
-                end
-            else
-                TriggerClientEvent("Notify", source, "negado", "Permissão inválida ou não inserida.", 5000)
-            end
-        else
-            TriggerClientEvent("Notify", source, "negado", "Nenhuma porta detectada no local.", 5000)
-        end
-    else
-        TriggerClientEvent("Notify", source, "negado", "Permissão insuficiente.", 5000)
-    end
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- Load Doors from JSON on Resource Start
------------------------------------------------------------------------------------------------------------------------------------------
-CreateThread(function()
-    local doorsFile = LoadResourceFile(GetCurrentResourceName(), "doors.json")
-    if doorsFile then
-        doors = json.decode(doorsFile) or {}
-        for _, door in ipairs(doors) do
-            door.lock = true -- Inicializa o estado da porta como fechada
-        end
-        Wait(500)
-        TriggerClientEvent("doors:loadall", -1, doors)
-        Wait(500)
-        TriggerClientEvent("doors:load", -1, doorslock)
-        print("Portas carregadas com sucesso.")
-    end
-end)
-
------------------------------------------------------------------------------------------------------------------------------------------
--- MANSION INTEGRATION
--- Mantem as portas de mansoes no proprio doors.json e permite ao Config Manager
--- substituir/remover somente as portas vinculadas a uma mansao.
------------------------------------------------------------------------------------------------------------------------------------------
-local function saveAndReloadDoors()
-    local success = SaveResourceFile(GetCurrentResourceName(), "doors.json", json.encode(doors, {indent = true}), -1)
-    if not success then return false,"Nao foi possivel salvar doors.json." end
-
-    doorslock = {}
-    TriggerClientEvent("doors:loadall", -1, doors)
-    Wait(100)
-    TriggerClientEvent("doors:load", -1, doorslock)
+    if forceLockedId then locks[forceLockedId] = true end
+    setCatalog(catalog)
+    sendCatalog(-1)
     return true
 end
 
-exports("replaceMansionDoors", function(mansionId, permission, newDoors)
-    mansionId = tostring(mansionId or "")
-    permission = tostring(permission or "")
-    if mansionId == "" then return false,"Identificador da mansao invalido." end
-    if permission == "" then return false,"Permissao da mansao invalida." end
-    if type(newDoors) ~= "table" then newDoors = {} end
-
-    local rebuilt = {}
-    for _,door in ipairs(doors or {}) do
-        if tostring(door.mansionId or "") ~= mansionId then
-            rebuilt[#rebuilt+1] = door
+local function findDoor(hash, coords)
+    if not hash or type(coords) ~= 'table' then return end
+    local x, y, z = tonumber(coords.x), tonumber(coords.y), tonumber(coords.z)
+    if not x or not y or not z then return end
+    local nearest, best = nil, 0.25 * 0.25
+    for index, door in ipairs(doors) do
+        if modelHash(door.hash) == modelHash(hash) then
+            local dx, dy, dz = door.x - x, door.y - y, door.z - z
+            local distance = dx*dx + dy*dy + dz*dz
+            if distance < best then nearest, best = index, distance end
         end
     end
+    return nearest
+end
 
-    for _,data in ipairs(newDoors) do
-        local x,y,z = tonumber(data.x),tonumber(data.y),tonumber(data.z)
+local function isAdmin(player)
+    local userId = player ~= 0 and vRP.getUserId(player)
+    return userId and vRP.hasPermission(userId, 'admin.permissao')
+end
+
+local function isOwner(userId)
+    return userId and vRP.hasGroup(userId, 'dono')
+end
+
+local raw = LoadResourceFile(resource, 'doors.json')
+local ok, decoded = pcall(json.decode, raw or '')
+if ok and type(decoded) == 'table' then
+    local ordered = {}
+    for key, door in pairs(decoded) do
+        local index = math.tointeger(tonumber(key))
+        if index and type(door) == 'table' and modelHash(door.hash)
+            and tonumber(door.x) and tonumber(door.y) and tonumber(door.z) then
+            door.hash = tonumber(door.hash)
+            door.x, door.y, door.z = tonumber(door.x), tonumber(door.y), tonumber(door.z)
+            ordered[#ordered+1] = {index = index, door = door}
+        end
+    end
+    table.sort(ordered, function(a,b) return a.index < b.index end)
+    local catalog = {}
+    for _, row in ipairs(ordered) do catalog[#catalog+1] = row.door end
+    setCatalog(catalog)
+else
+    print('[doorsv2] Não foi possível carregar doors.json.')
+end
+
+RegisterNetEvent('doors:requestState', function()
+    local player, now = source, GetGameTimer()
+    if syncRequests[player] and now - syncRequests[player] < 1500 then return end
+    syncRequests[player] = now
+    sendCatalog(player)
+end)
+
+AddEventHandler('playerDropped', function()
+    syncRequests[source], lockRequests[source] = nil, nil
+end)
+
+RegisterNetEvent('tryLockDoor', function(id, desired)
+    local player = source
+    if type(id) ~= 'string' or type(desired) ~= 'boolean' then return end
+    local door = byId[id]
+    if not door then return end
+    local now = GetGameTimer()
+    if lockRequests[player] and now - lockRequests[player] < 250 then return end
+    lockRequests[player] = now
+
+    local userId = vRP.getUserId(player)
+    if not userId then return end
+    local permission = type(door.perm) == 'string' and door.perm:match('^%s*(.-)%s*$') or ''
+    local allowed
+    if door.ownerOnly then
+        allowed = isOwner(userId)
+    else
+        allowed = vRP.hasPermission(userId, 'admin.permissao')
+            or (permission ~= '' and vRP.hasPermission(userId, permission))
+    end
+    if not allowed then
+        notify(player, 'negado', 'Você não possui a chave desta porta.')
+        return
+    end
+    if byId[id] ~= door then return end
+
+    local ped = GetPlayerPed(player)
+    if not ped or ped == 0 then return end
+    local position = GetEntityCoords(ped)
+    local dx, dy, dz = position.x-door.x, position.y-door.y, position.z-door.z
+    local maxDistance = math.min(tonumber(door.dist) or 5.0, 10.0) + 0.75
+    if dx*dx + dy*dy + dz*dz > maxDistance*maxDistance then return end
+
+    if locks[id] == desired then
+        TriggerClientEvent('doorsv2:lock', player, id, desired)
+        return
+    end
+    locks[id] = desired
+    TriggerClientEvent('doorsv2:lock', -1, id, desired)
+end)
+
+AddEventHandler('vRP:playerSpawn', function(_, player)
+    sendCatalog(player)
+end)
+
+RegisterCommand('reloaddoors', function(player)
+    if not isAdmin(player) then return end
+    sendCatalog(-1)
+    notify(player, 'sucesso', 'Estados das portas sincronizados.')
+end, false)
+
+RegisterCommand('debugport', function(player)
+    if not isAdmin(player) then return end
+    local data = client.rayCastDoor(player)
+    local index = data and findDoor(data.hash, data.coords)
+    if not index then return notify(player, 'negado', 'Nenhuma porta cadastrada encontrada.') end
+    notify(player, 'sucesso', 'ID da porta: ' .. index)
+end, false)
+
+RegisterCommand('travarporta', function(player)
+    local userId = player ~= 0 and vRP.getUserId(player)
+    if not isOwner(userId) then return end
+
+    notify(player, 'importante', 'Aponte para a porta e clique com o botão esquerdo. Botão direito cancela.')
+    local data = client.rayCastDoor(player)
+    if not data or vRP.getUserId(player) ~= userId or not isOwner(userId) then return end
+    local hash, coords = modelHash(data.hash), data.coords
+    local ped = GetPlayerPed(player)
+    if not hash or type(coords) ~= 'table' or ped == 0 then return end
+    local x, y, z = tonumber(coords.x), tonumber(coords.y), tonumber(coords.z)
+    if not x or not y or not z then return end
+    local pos = GetEntityCoords(ped)
+    local dx, dy, dz = pos.x - x, pos.y - y, pos.z - z
+    if not (dx * dx + dy * dy + dz * dz <= 64) then
+        return notify(player, 'negado', 'Aproxime-se da porta e tente novamente.')
+    end
+
+    local catalog = {table.unpack(doors)}
+    local index = findDoor(hash, {x = x, y = y, z = z})
+    local updated = {hash = hash, x = x, y = y, z = z, dist = 5.0, text = true, iconCoords = data.iconCoords}
+    if index then
+        for key, value in pairs(doors[index]) do updated[key] = value end
+    end
+    updated.ownerOnly, updated.lock = true, true
+    catalog[index or (#catalog + 1)] = updated
+    local saved, err = saveCatalog(catalog, doorId(updated))
+    notify(player, saved and 'sucesso' or 'negado', err or 'Porta trancada. Somente donos podem abrir e fechar.')
+end, false)
+
+RegisterCommand('ajustarcadeado', function(player)
+    if not isAdmin(player) then return end
+    local data = client.rayCastDoor(player)
+    local index = data and data.iconCoords and findDoor(data.hash, data.coords)
+    if not index then return notify(player, 'negado', 'Esta porta não possui tranca cadastrada.') end
+
+    local catalog = {table.unpack(doors)}
+    local updated = {}
+    for key, value in pairs(doors[index]) do updated[key] = value end
+    updated.iconCoords = data.iconCoords
+    catalog[index] = updated
+    local saved, err = saveCatalog(catalog)
+    notify(player, saved and 'sucesso' or 'negado', err or 'Cadeado posicionado no ponto selecionado.')
+end, false)
+
+RegisterCommand('delport', function(player)
+    local userId = player ~= 0 and vRP.getUserId(player)
+    if not isOwner(userId) and not isAdmin(player) then return end
+    local data = client.rayCastDoor(player)
+    local index = data and findDoor(data.hash, data.coords)
+    if not index then return notify(player, 'negado', 'Nenhuma porta cadastrada encontrada.') end
+    if doors[index].ownerOnly and not isOwner(userId) then
+        return notify(player, 'negado', 'Somente donos podem remover esta tranca.')
+    end
+    if not doors[index].ownerOnly and not isAdmin(player) then return end
+
+    local catalog = {table.unpack(doors)}
+    table.remove(catalog, index)
+    local saved, err = saveCatalog(catalog)
+    notify(player, saved and 'sucesso' or 'negado', err or 'Porta removida com sucesso.')
+end, false)
+
+RegisterCommand('addport', function(player)
+    if not isAdmin(player) then return end
+    local data = client.rayCastDoor(player)
+    if not data or not data.hash or not data.coords then
+        return notify(player, 'negado', 'Nenhuma porta detectada no local.')
+    end
+    local permission = vRP.prompt(player, 'Digite a permissão para a porta:', '')
+    if type(permission) ~= 'string' or not permission:find('%S') then return end
+    if findDoor(data.hash, data.coords) then
+        return notify(player, 'negado', 'Esta porta já possui uma tranca.')
+    end
+    local catalog = {table.unpack(doors)}
+    catalog[#catalog+1] = {
+        hash = data.hash, x = data.coords.x, y = data.coords.y, z = data.coords.z,
+        perm = permission:match('^%s*(.-)%s*$'), lock = true, isGate = false, dist = 5.0, text = true,
+    }
+    local saved, err = saveCatalog(catalog)
+    notify(player, saved and 'sucesso' or 'negado', err or 'Porta adicionada com sucesso.')
+end, false)
+
+exports('replaceMansionDoors', function(mansionId, permission, newDoors)
+    mansionId, permission = tostring(mansionId or ''), tostring(permission or '')
+    if mansionId == '' then return false, 'Identificador da mansão inválido.' end
+    if permission == '' then return false, 'Permissão da mansão inválida.' end
+
+    local catalog, ids = {}, {}
+    local function append(door)
+        local id = doorId(door)
+        if ids[id] then return false end
+        ids[id] = true
+        catalog[#catalog+1] = door
+        return true
+    end
+    for _, door in ipairs(doors) do
+        if door.ownerOnly or tostring(door.mansionId or '') ~= mansionId then append(door) end
+    end
+    for _, data in ipairs(type(newDoors) == 'table' and newDoors or {}) do
         local hash = tonumber(data.hash)
-        if x and y and z and hash then
-            rebuilt[#rebuilt+1] = {
-                isGate = data.isGate == true,
-                dist = tonumber(data.dist) or 5.0,
-                text = data.text ~= false,
-                hash = hash,
-                x = x,
-                y = y,
-                z = z,
-                perm = permission,
-                lock = true,
-                mansionId = mansionId
+        local x, y, z = tonumber(data.x), tonumber(data.y), tonumber(data.z)
+        if modelHash(hash) and x and y and z then
+            if not append({
+                hash = hash, x = x, y = y, z = z, perm = permission, lock = true,
+                isGate = data.isGate == true, dist = tonumber(data.dist) or 5.0,
+                text = data.text ~= false, mansionId = mansionId,
+            }) then
+                return false, 'Uma das portas já possui uma tranca.'
+            end
+        end
+    end
+    return saveCatalog(catalog)
+end)
+
+exports('removeMansionDoors', function(mansionId)
+    mansionId = tostring(mansionId or '')
+    if mansionId == '' then return false, 'Identificador da mansão inválido.' end
+    local catalog = {}
+    for _, door in ipairs(doors) do
+        if door.ownerOnly or tostring(door.mansionId or '') ~= mansionId then catalog[#catalog+1] = door end
+    end
+    local removed = #doors - #catalog
+    local saved, err = saveCatalog(catalog)
+    if not saved then return false, err end
+    return true, ('%d tranca(s) da mansão removida(s).'):format(removed)
+end)
+
+exports('getMansionDoors', function(mansionId)
+    mansionId = tostring(mansionId or '')
+    if mansionId == '' then return {} end
+    local result = {}
+    for _, door in ipairs(doors) do
+        if tostring(door.mansionId or '') == mansionId then
+            result[#result+1] = {
+                hash = door.hash, x = door.x, y = door.y, z = door.z,
+                isGate = door.isGate == true, dist = tonumber(door.dist) or 5.0,
+                text = door.text ~= false, lock = true,
             }
         end
     end
-
-    doors = rebuilt
-    return saveAndReloadDoors()
+    return result
 end)
 
-exports("removeMansionDoors", function(mansionId)
-    mansionId = tostring(mansionId or "")
-    if mansionId == "" then return false,"Identificador da mansao invalido." end
-
-    local rebuilt,removed = {},0
-    for _,door in ipairs(doors or {}) do
-        if tostring(door.mansionId or "") == mansionId then
-            removed = removed + 1
-        else
-            rebuilt[#rebuilt+1] = door
-        end
-    end
-    doors = rebuilt
-    local ok,msg = saveAndReloadDoors()
-    if not ok then return false,msg end
-    return true,("%d tranca(s) da mansao removida(s)."):format(removed)
-end)
-
-exports("getMansionDoors", function(mansionId)
-    mansionId = tostring(mansionId or "")
-    local out = {}
-    for _,door in ipairs(doors or {}) do
-        if tostring(door.mansionId or "") == mansionId then
-            out[#out+1] = {
-                isGate=door.isGate == true,
-                dist=tonumber(door.dist) or 5.0,
-                text=door.text ~= false,
-                hash=tonumber(door.hash),
-                x=tonumber(door.x),y=tonumber(door.y),z=tonumber(door.z),
-                lock=true
-            }
-        end
-    end
-    return out
-end)

@@ -1,0 +1,498 @@
+[
+    {
+        "id":  "weapon_combatpistol",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Glock",
+        "image":  "./images/weapon_combatpistol.png"
+    },
+    {
+        "id":  "ammo_combatpistol",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Glock",
+        "image":  "./images/ammo_combatpistol.png"
+    },
+    {
+        "id":  "weapon_pistol_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Five-Seven",
+        "image":  "./images/weapon_pistol_mk2.png"
+    },
+    {
+        "id":  "ammo_pistol_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Five-Seven",
+        "image":  "./images/ammo_pistol_mk2.png"
+    },
+    {
+        "id":  "weapon_pistol",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Pistol",
+        "image":  "./images/weapon_pistol.png"
+    },
+    {
+        "id":  "ammo_pistol",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Pistol"
+    },
+    {
+        "id":  "weapon_heavypistol",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "HeavyPistol",
+        "image":  "./images/weapon_heavypistol.png"
+    },
+    {
+        "id":  "ammo_heavypistol",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-HeavyPistol"
+    },
+    {
+        "id":  "weapon_appistol",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Ap Pistol",
+        "image":  "./images/weapon_appistol.png"
+    },
+    {
+        "id":  "ammo_appistol",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Ap Pistol"
+    },
+    {
+        "id":  "weapon_pistol50",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Desert Eagle",
+        "image":  "./images/weapon_pistol50.png"
+    },
+    {
+        "id":  "ammo_pistol50",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Desert",
+        "image":  "./images/ammo_pistol50.png"
+    },
+    {
+        "id":  "weapon_revolver_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Revolver",
+        "image":  "./images/weapon_revolver_mk2.png"
+    },
+    {
+        "id":  "ammo_revolver_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Revolver"
+    },
+    {
+        "id":  "weapon_carbinerifle",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "M4",
+        "image":  "./images/weapon_carbinerifle.png"
+    },
+    {
+        "id":  "ammo_carbinerifle",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-M4",
+        "image":  "./images/ammo_carbinerifle.png"
+    },
+    {
+        "id":  "weapon_carbinerifle_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "M4MK2",
+        "image":  "./images/weapon_carbinerifle_mk2.png"
+    },
+    {
+        "id":  "ammo_carbinerifle_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "Municao M4 MK2",
+        "image":  "./images/ammo_carbinerifle_mk2.png"
+    },
+    {
+        "id":  "weapon_specialcarbine",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "G36",
+        "image":  "./images/weapon_specialcarbine.png"
+    },
+    {
+        "id":  "ammo_specialcarbine",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "Municao G36",
+        "image":  "./images/ammo_specialcarbine.png"
+    },
+    {
+        "id":  "weapon_specialcarbine_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "G3 MK2",
+        "image":  "./images/weapon_specialcarbine_mk2.png"
+    },
+    {
+        "id":  "ammo_specialcarbine_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-G3",
+        "image":  "./images/ammo_specialcarbine_mk2.png"
+    },
+    {
+        "id":  "weapon_tacticalrifle",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Rifle Tatico",
+        "image":  "./images/weapon_tacticalrifle.png"
+    },
+    {
+        "id":  "ammo_tacticalrifle",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Rifle Tatico"
+    },
+    {
+        "id":  "weapon_heavyrifle",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Heavy Rifle",
+        "image":  "./images/weapon_heavyrifle.png"
+    },
+    {
+        "id":  "ammo_heavyrifle",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Heavy Rifle"
+    },
+    {
+        "id":  "weapon_militaryrifle",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "MilitaryRifle",
+        "image":  "./images/weapon_militaryrifle.png"
+    },
+    {
+        "id":  "ammo_militaryrifle",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-MilitaryRifle"
+    },
+    {
+        "id":  "weapon_advancedrifle",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Aug",
+        "image":  "./images/weapon_advancedrifle.png"
+    },
+    {
+        "id":  "ammo_advancedrifle",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Aug",
+        "image":  "./images/ammo_advancedrifle.png"
+    },
+    {
+        "id":  "weapon_parafal",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "PARAFAL",
+        "image":  "./images/weapon_parafal.png"
+    },
+    {
+        "id":  "ammo_parafal",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "Municao Parafal"
+    },
+    {
+        "id":  "weapon_combatpdw",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Combat Pdw",
+        "image":  "./images/weapon_combatpdw.png"
+    },
+    {
+        "id":  "ammo_combatpdw",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Pdw",
+        "image":  "./images/ammo_combatpdw.png"
+    },
+    {
+        "id":  "weapon_smg",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "SMG",
+        "image":  "./images/weapon_smg.png"
+    },
+    {
+        "id":  "ammo_smg",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-SMG",
+        "image":  "./images/ammo_smg.png"
+    },
+    {
+        "id":  "weapon_smg_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Smg MK2",
+        "image":  "./images/weapon_smg_mk2.png"
+    },
+    {
+        "id":  "ammo_smg_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Smg MK2",
+        "image":  "./images/ammo_smg_mk2.png"
+    },
+    {
+        "id":  "weapon_pumpshotgun",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Pump Shotgun",
+        "image":  "./images/weapon_pumpshotgun.png"
+    },
+    {
+        "id":  "ammo_pumpshotgun",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Pump Shotgun"
+    },
+    {
+        "id":  "weapon_pumpshotgun_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Pump Shotgun",
+        "image":  "./images/weapon_pumpshotgun_mk2.png"
+    },
+    {
+        "id":  "ammo_pumpshotgun_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Pump Shotgun",
+        "image":  "./images/ammo_pumpshotgun_mk2.png"
+    },
+    {
+        "id":  "weapon_heavysniper",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "SNIPER",
+        "image":  "./images/weapon_heavysniper.png"
+    },
+    {
+        "id":  "ammo_heavysniper",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-SNIPER"
+    },
+    {
+        "id":  "weapon_heavysniper_mk2",
+        "category":  "armas",
+        "maxQuantity":  1,
+        "unit":  "unidade",
+        "name":  "Sniper Pesada",
+        "image":  "./images/weapon_heavysniper_mk2.png"
+    },
+    {
+        "id":  "ammo_heavysniper_mk2",
+        "category":  "municoes",
+        "maxQuantity":  250,
+        "unit":  "municao",
+        "name":  "M-Sniper Pesada"
+    },
+    {
+        "id":  "weapon_stungun",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Taser",
+        "image":  "./images/weapon_stungun.png"
+    },
+    {
+        "id":  "weapon_nightstick",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Cassetete",
+        "image":  "./images/weapon_nightstick.png"
+    },
+    {
+        "id":  "weapon_flashlight",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Lanterna",
+        "image":  "./images/weapon_flashlight.png"
+    },
+    {
+        "id":  "weapon_bzgas",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Gas",
+        "image":  "./images/weapon_bzgas.png"
+    },
+    {
+        "id":  "algemas",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Algemas",
+        "image":  "./images/algemas.png"
+    },
+    {
+        "id":  "chave_algemas",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Chave de algemas"
+    },
+    {
+        "id":  "distintivopolicial",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Distintivo Policial"
+    },
+    {
+        "id":  "body_armor",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Colete",
+        "image":  "./images/body_armor.png"
+    },
+    {
+        "id":  "radio",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Radio",
+        "image":  "./images/radio.png"
+    },
+    {
+        "id":  "rastreador",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Rastreador"
+    },
+    {
+        "id":  "rastreador_carro",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Radar Veicular",
+        "image":  "./images/rastreador_carro.png"
+    },
+    {
+        "id":  "gadget_parachute",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Paraquedas",
+        "image":  "./images/gadget_parachute.png"
+    },
+    {
+        "id":  "scubagear",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Kit de Mergulho"
+    },
+    {
+        "id":  "repairkit3",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Kit Reparo",
+        "image":  "./images/repairkit3.png"
+    },
+    {
+        "id":  "pneus",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Pneus",
+        "image":  "./images/pneus.png"
+    },
+    {
+        "id":  "mochila",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Mochila",
+        "image":  "./images/mochila.png"
+    },
+    {
+        "id":  "bandagem",
+        "category":  "equipamentos",
+        "maxQuantity":  10,
+        "unit":  "unidade",
+        "name":  "Bandagem",
+        "image":  "./images/bandagem.png"
+    },
+    {
+        "id":  "ammo_bzgas",
+        "category":  "municoes",
+        "maxQuantity":  20,
+        "unit":  "carga",
+        "name":  "M-Gas"
+    }
+]

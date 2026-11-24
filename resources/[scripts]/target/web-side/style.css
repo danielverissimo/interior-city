@@ -47,6 +47,9 @@ body {
 }
 
 .target-label {
+	max-height: calc(50vh - 40px);
+	overflow-y: auto;
+	pointer-events: auto;
 	font-size: 13px;
 	list-style: none;
 	user-select: none;
@@ -54,6 +57,7 @@ body {
 }
 
 .target-label div {
+	cursor: pointer;
 	position: relative;
 	display: flex;
 	font-size: 10px;

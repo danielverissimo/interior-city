@@ -8,13 +8,13 @@ Config.mainCommand = 'mdt'
 Config.staffCommand = 'mdtadm'
 
 Config.Webhooks = {
-    contract = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
-    demote = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
-    promote = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
-    dismiss = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
-    prison = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
-    arrestVehicles = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
-    fine = 'https://discord.com/api/webhooks/1330992896500957296/XmISGK53vqbV0ID5ZALv6tog65WpR_DMgi-wbm-FzAS7sDzb5EpR524oyl-25wpdhKtq',
+    contract = '',
+    demote = '',
+    promote = '',
+    dismiss = '',
+    prison = '',
+    arrestVehicles = '',
+    fine = '',
 }
 
 Config.prisonCoord = vec3(1716.85,2525.78,45.54)

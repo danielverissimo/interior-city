@@ -78,38 +78,24 @@ end)
 --     end
 -- end)
 
-RegisterServerEvent('desbugplayer', function()
-	local source = source
-	local user_id = vRP.getUserId(source)
-	
-	-- if mModules.inDomination(source) or mDomination.inDomination(source) then 
-	-- 	return false 
-	-- end
-	
-	if vCLIENT.isInDomination(source) then
-		return
-	end
-	
-    if exports["vrp"]:checkCommand(user_id) and GetEntityHealth(GetPlayerPed(source)) > 105 then
-		local status,time = exports['vrp']:getCooldown(user_id, "cr")
-		if status then 
-			if not vRPclient.isInVehicle(source) then
-				if not vRP.checkFarda(user_id) then
-					Wait(2000)
-					exports['vrp']:setCooldown(user_id, "cr", 10)
-					vRPclient.setCustomization(source, vRP.getUserApparence(user_id).clothes)
-				else
-					TriggerClientEvent("Notify",source,"negado","Você não pode utilizar esse comando fardado.",5)
-				end
-			end
-		else
-			TriggerClientEvent("Notify",source,"negado","Você so pode utilizar esse comando em <b>".. time .." segundo(s)</b>",5)
-		end
+RegisterNetEvent('desbugplayer', function()
+    local player = source
+    local userId = vRP.getUserId(player)
+    if not userId then return end
+    if GetEntityHealth(GetPlayerPed(player)) <= 105 or vRPclient.isHandcuffed(player) or vRPclient.isMalas(player) then
+        return TriggerClientEvent("Notify", player, "negado", "Você não pode desbugar nesta situação.", 5000)
     end
+    if vCLIENT.isInDomination(player) then
+        return TriggerClientEvent("Notify", player, "negado", "Indisponível durante a dominação.", 5000)
+    end
+    if not exports["vrp"]:checkCommand(userId) then return end
+    local available, remaining = exports["vrp"]:getCooldown(userId, "cr")
+    if not available then
+        return TriggerClientEvent("Notify", player, "negado", "Aguarde " .. tostring(remaining) .. " segundos.", 5000)
+    end
+    exports["vrp"]:setCooldown(userId, "cr", 10)
+    TriggerClientEvent("vrp_player:unstuck", player)
 end)
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- STATUS
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('status',function(source,args)
     local user_id = vRP.getUserId(source)
     if user_id then 
@@ -157,7 +143,7 @@ RegisterCommand('911',function(source,args,rawCommand)
 						message = identity.nome.." "..identity.sobrenome.." ["..user_id.."] "..rawCommand:sub(4) ,
 					})
 
-					vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")),'O ID: '..user_id..' enviou um aviso de emergência para o chat de emergência descrição: '..rawCommand:sub(4)..' nas coords: '..vec3(GetEntityCoords(GetPlayerPed(source))))
+					vRP.sendLog('','O ID: '..user_id..' enviou um aviso de emergência para o chat de emergência descrição: '..rawCommand:sub(4)..' nas coords: '..vec3(GetEntityCoords(GetPlayerPed(source))))
 				end
 			end
 		end
@@ -345,7 +331,7 @@ RegisterCommand('ilegal', function(source, args, rawCommand)
                 TriggerClientEvent("Notify", source, "sucesso", "Você não possui 5000.0 para anunciar.", 5)
             end
             
-            vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), "```prolog\n[ID: "..user_id.."]\n[Mensagem:] "..message.."```")
+            vRP.sendLog("", "```prolog\n[ID: "..user_id.."]\n[Mensagem:] "..message.."```")
             exports["vrp_admin"]:generateLog({
                 category = "ilegal",
                 room = "ilegal",
@@ -468,7 +454,7 @@ function SendStatusFac2Log()
 
     messageContent = messageContent .. string.format("\n*Atualizado em %s*", os.date("%d/%m/%Y %H:%M:%S"))
 
-    vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), messageContent)
+    vRP.sendLog('', messageContent)
 end
 
 RegisterCommand('statusfac2', function(source, args)
@@ -589,7 +575,7 @@ CreateThread(function()
             end
         end
 
-        vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")),
+        vRP.sendLog('', 
         formatText .. "\n**🏘️ Total de jogadores Online:** " .. onlinePlayers .. ".")
     end
 end)
@@ -743,104 +729,129 @@ exports("checktrunk",function(status)
 	intrunk = status
 end)
 
-local PlayersInTrunk = {}
+local PlayersInTrunk, trunkAssignments = {}, {}
+local shoulderPartners, shoulderApprovals = {}, {}
 
-RegisterNetEvent("novak:server:insertUserInTrunkin")
-AddEventHandler("novak:server:insertUserInTrunkin", function()
-    local sourceTarget = vRPclient.getNearestPlayer(source,1.5)
+local function stopShoulderCarry(player)
+    local partner = shoulderPartners[player]
+    shoulderPartners[player], shoulderApprovals[player] = nil, nil
+    TriggerClientEvent('cmg2_animations:cl_stop', player)
+    if partner then
+        shoulderPartners[partner] = nil
+        TriggerClientEvent('cmg2_animations:cl_stop', partner)
+    end
+end
 
-	if not sourceTarget then
-		return TriggerClientEvent("Notify",source,"negado","Nenhum jogador por perto.", 8000)
-	end
+local function playersNear(actor, target, radius)
+    if not target or target == actor or not vRP.getUserId(target) then return false end
+    if GetPlayerRoutingBucket(actor) ~= GetPlayerRoutingBucket(target) then return false end
+    local a, b = GetPlayerPed(actor), GetPlayerPed(target)
+    return a ~= 0 and b ~= 0 and #(GetEntityCoords(a)-GetEntityCoords(b)) <= radius
+end
 
-	local user_id = vRP.getUserId(sourceTarget)
-	if user_id then
+local function removeTrunkAssignment(target)
+    local assigned = trunkAssignments[target]
+    if not assigned then return end
+    local list = PlayersInTrunk[assigned.plate] or {}
+    for index=#list,1,-1 do
+        if list[index] == target then table.remove(list,index) end
+    end
+    totalVehicle[assigned.plate] = math.max(0,(totalVehicle[assigned.plate] or 0)-1)
+    if #list == 0 then PlayersInTrunk[assigned.plate] = nil end
+    trunkAssignments[target] = nil
+end
 
-		local mPlaca,mName,mNet,mPortaMalas,mPrice,mLock,_,_,mVeh = vRPclient.ModelName(source, 5)
+local function nearbyTrunk(player)
+    local plate, _, net, _, _, locked = vRPclient.ModelName(player, 5)
+    if not net or not plate then
+        TriggerClientEvent("Notify",player,"negado","Aproxime-se de um veículo com porta-malas.",5000)
+        return
+    end
+    local vehicle = NetworkGetEntityFromNetworkId(net)
+    if vehicle == 0 or not DoesEntityExist(vehicle) or #(GetEntityCoords(GetPlayerPed(player))-GetEntityCoords(vehicle)) > 6.0 then return end
+    if locked or GetVehicleDoorLockStatus(vehicle) >= 2 then
+        TriggerClientEvent("Notify",player,"negado","O veículo está trancado.",5000)
+        return
+    end
+    return plate, net, vehicle
+end
 
-		if not mVeh then
-			TriggerClientEvent("Notify",source,"negado","Nenhum veiculo por perto.", 5)
-			return
-		end
-
-		if mLock then
-			TriggerClientEvent("Notify",source,"negado","Veiculo Trancado.", 5)
-			return
-		end
-
-		if not totalVehicle[mPlaca] then
-			totalVehicle[mPlaca] = 0
-		end
-
-		if not PlayersInTrunk[mPlaca] then
-			PlayersInTrunk[mPlaca] = {}
-		end
-
-		if totalVehicle[mPlaca] >= 2 then
-			TriggerClientEvent("Notify",source,"negado","Veiculo Cheio.", 5)
-			return
-		end
-
-		local isDead = not (vRPclient.getHealth(sourceTarget) > 101)
-		local isHandcuffed = vRPclient.isHandcuffed(sourceTarget)
-
-		local function insertPlayerInTrunk(target)
-			TriggerClientEvent("novak:client:insertUserInTrunkin", target, mNet)
-			table.insert(PlayersInTrunk[mPlaca], target)
-			totalVehicle[mPlaca] += 1
-		end
-
-		if isDead or isHandcuffed then
-			insertPlayerInTrunk(sourceTarget)
-		else
-			local requestJoinInTrunk = vRP.request(sourceTarget, "Deseja entrar no porta-malas?", 15)
-
-			if requestJoinInTrunk then
-				insertPlayerInTrunk(sourceTarget)
-			else
-				TriggerClientEvent("Notify",source,"negado","O jogador recusou a entrada no porta-malas.",8000)
-			end
-		end
-	else
-		TriggerClientEvent("Notify",source,"negado","Nenhum jogador por perto.",8000)
-	end
-
+RegisterNetEvent("novak:server:insertUserInTrunkin", function()
+    local player = source
+    if not vRP.getUserId(player) or GetEntityHealth(GetPlayerPed(player)) <= 101 or vRPclient.isHandcuffed(player) then return end
+    local target = shoulderPartners[player] or vRPclient.getNearestPlayer(player,3.0)
+    if not playersNear(player,target,3.0) then
+        return TriggerClientEvent("Notify",player,"negado","Nenhum jogador próximo.",5000)
+    end
+    local plate, net, vehicle = nearbyTrunk(player)
+    if not plate then return end
+    if trunkAssignments[target] or vRPclient.isMalas(target) then
+        return TriggerClientEvent("Notify",player,"negado","Esse jogador já está no porta-malas.",5000)
+    end
+    local accepted = GetEntityHealth(GetPlayerPed(target)) <= 101 or vRPclient.isHandcuffed(target)
+    if not accepted then accepted = vRP.request(target,"Deseja entrar no porta-malas?",15) end
+    if not accepted then
+        return TriggerClientEvent("Notify",player,"negado","O jogador recusou a entrada.",5000)
+    end
+    -- Recheck after the consent dialog: either player or the car may have moved.
+    if not playersNear(player,target,3.0) or not DoesEntityExist(vehicle) or GetVehicleDoorLockStatus(vehicle) >= 2 or
+        #(GetEntityCoords(GetPlayerPed(player))-GetEntityCoords(vehicle)) > 6.0 or trunkAssignments[target] then return end
+    if (totalVehicle[plate] or 0) >= 2 then
+        return TriggerClientEvent("Notify",player,"negado","O porta-malas está cheio.",5000)
+    end
+    stopShoulderCarry(target)
+    trunkAssignments[target] = {plate=plate,net=net,actor=player,pending=true}
+    PlayersInTrunk[plate] = PlayersInTrunk[plate] or {}
+    table.insert(PlayersInTrunk[plate],target)
+    totalVehicle[plate] = (totalVehicle[plate] or 0)+1
+    local assignment = trunkAssignments[target]
+    TriggerClientEvent("novak:client:insertUserInTrunkin",target,net)
+    SetTimeout(5000,function()
+        if trunkAssignments[target] == assignment and assignment.pending then
+            removeTrunkAssignment(target)
+            TriggerClientEvent("novak:client:removeUserInTrunkin",target,net)
+            TriggerClientEvent("Notify",player,"negado","Não foi possível colocar o jogador no porta-malas.",5000)
+        end
+    end)
 end)
 
-RegisterNetEvent("novak:server:removerUserInTrunkin", function()
-	local mPlaca,mName,mNet,mPortaMalas,mPrice,mLock,_,_,mVeh = vRPclient.ModelName(source, 5)
-
-	if not mVeh then
-		TriggerClientEvent("Notify",source,"negado","Nenhum veiculo por perto.", 5)
-		return
-	end
-
-	if mLock then
-		TriggerClientEvent("Notify",source,"negado","Veiculo Trancado.", 5)
-		return
-	end
-
-	if not PlayersInTrunk[mPlaca] then
-		return TriggerClientEvent("Notify",source,"negado","Nenhum jogador no porta malas.", 5)
-	end
-
-	local target = PlayersInTrunk[mPlaca][#PlayersInTrunk[mPlaca]]
-
-	local user_id = vRP.getUserId(target)
-
-	if not user_id then
-		PlayersInTrunk[mPlaca][#PlayersInTrunk[mPlaca]] = nil
-		return TriggerClientEvent("Notify",source,"negado","Jogador desconectou-se.", 5)
-	end
-
-	totalVehicle[mPlaca] = totalVehicle[mPlaca] - 1
-
-	TriggerClientEvent("novak:client:removeUserInTrunkin", target)
+RegisterNetEvent("novak:server:trunkResult",function(success)
+    local target = source
+    local assigned = trunkAssignments[target]
+    if not assigned or not assigned.pending then return end
+    assigned.pending = false
+    if success == true then
+        TriggerClientEvent("Notify",assigned.actor,"sucesso","Jogador colocado no porta-malas.",5000)
+    else
+        TriggerClientEvent("Notify",assigned.actor,"negado","Este veículo não permite entrar no porta-malas.",5000)
+        removeTrunkAssignment(target)
+    end
 end)
 
------------------------------------------------------------------------------------------------------------------------------------------
--- PLACA
------------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent("novak:server:trunkLeft",function() removeTrunkAssignment(source) end)
+
+RegisterNetEvent("novak:server:removerUserInTrunkin",function()
+    local player = source
+    if not vRP.getUserId(player) or GetEntityHealth(GetPlayerPed(player)) <= 101 or vRPclient.isHandcuffed(player) then return end
+    local plate, net = nearbyTrunk(player)
+    if not plate then return end
+    local list = PlayersInTrunk[plate] or {}
+    local target = list[#list]
+    while target and not vRP.getUserId(target) do
+        removeTrunkAssignment(target)
+        list = PlayersInTrunk[plate] or {}
+        target = list[#list]
+    end
+    if not target then return TriggerClientEvent("Notify",player,"negado","Nenhum jogador no porta-malas.",5000) end
+    removeTrunkAssignment(target)
+    TriggerClientEvent("novak:client:removeUserInTrunkin",target,net)
+    TriggerClientEvent("Notify",player,"sucesso","Jogador retirado do porta-malas.",5000)
+end)
+
+AddEventHandler('playerDropped',function()
+    removeTrunkAssignment(source)
+    stopShoulderCarry(source)
+end)
 RegisterCommand('placa', function(source,args)
     local user_id = vRP.getUserId(source)
 	if user_id then
@@ -1056,7 +1067,7 @@ RegisterCommand('skin',function(source,args,rawCommand)
             if nplayer then
                 TriggerClientEvent("skinmenu",nplayer,args[2], true)
                 TriggerClientEvent("Notify",source,"sucesso","Você setou a skin <b>"..args[2].."</b> no passaporte <b>"..parseInt(args[1]).."</b>.", 5)
-				vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), 'O ADMIN '..user_id..' SETOU A SKIN '..args[2]..' NO PASSAPORTE '..parseInt(args[1]))
+				vRP.sendLog('', 'O ADMIN '..user_id..' SETOU A SKIN '..args[2]..' NO PASSAPORTE '..parseInt(args[1]))
             end
         end
     elseif skinConfig[user_id] then
@@ -1074,7 +1085,7 @@ RegisterCommand('skin',function(source,args,rawCommand)
 		end
 
         TriggerClientEvent("skinmenu",source,skin.skin, true)
-		vRP.sendLog(GetConvar("ic_secret_vrp_player_webhook", GetConvar("interior_city_webhook_logs", "")), 'O USUARIO: '..user_id..' SETOU A SKIN '..skin.skin)
+		vRP.sendLog('', 'O USUARIO: '..user_id..' SETOU A SKIN '..skin.skin)
         skinCooldown[user_id] = os.time()
 		skinsActive[user_id] = true
     end
@@ -1797,57 +1808,43 @@ end)
 -------------------
 
 function src.checkpermcarregar()
-	
-    local source = source
-	local user_id = vRP.getUserId(source)
-	local nplayer = vRPclient.getNearestPlayer(source, 5)
-	local nhealth = vRPclient.getHealth(nplayer)
-	local request = nil
-
-    if user_id then
-		if nplayer then
-			
-		if nhealth <= 105 then
-			request = true
-		else
-			TriggerClientEvent("Notify",source,"sucesso","Solicitação para carregar foi enviada")
-			request = vRP.request(nplayer, 'Deseja aceitar ser carregado?', 5000)
-		end
-
-			if request then
-				if vRP.getInventoryItemAmount(user_id,"corda") >= 1 then
-					return true
-				else
-					TriggerClientEvent("Notify",source,"Negado","Você não possui item <b>CORDAS</b>")
-					return false
-				end
-			else
-				TriggerClientEvent("Notify",source,"Negado","<b>Recusado</b>")
-				return false
-			end
-		else
-			TriggerClientEvent("Notify",source,"Negado","<b>Não há ninguém próximo!</b>")
-			return false
-		end
+    local player = source
+    local userId = vRP.getUserId(player)
+    if not userId or GetEntityHealth(GetPlayerPed(player)) <= 101 or vRPclient.isHandcuffed(player) then return false end
+    local target = vRPclient.getNearestPlayer(player,3.0)
+    if not playersNear(player,target,3.0) then
+        TriggerClientEvent("Notify",player,"negado","Nenhum jogador próximo.",5000)
+        return false
     end
+    if shoulderPartners[player] or shoulderPartners[target] or trunkAssignments[target] or vRPclient.isMalas(target) then return false end
+    if vRP.getInventoryItemAmount(userId,"corda") < 1 then
+        TriggerClientEvent("Notify",player,"negado","Você precisa de uma corda para carregar nos ombros.",5000)
+        return false
+    end
+    local accepted = GetEntityHealth(GetPlayerPed(target)) <= 105
+    if not accepted then
+        TriggerClientEvent("Notify",player,"aviso","Solicitação enviada ao jogador próximo.",5000)
+        accepted = vRP.request(target,"Deseja aceitar ser carregado?",15)
+    end
+    if not accepted or not playersNear(player,target,3.0) then return false end
+    if shoulderPartners[player] or shoulderPartners[target] then return false end
+    shoulderApprovals[player] = {target=target,expires=os.time()+10}
+    return target
 end
-
-
----------------------------------------------------------------------------------
---  CARREGAR NO OMBRO------------------------------------------------------------
----------------------------------------------------------------------------------
-RegisterServerEvent('cmg2_animations:sync')
-AddEventHandler('cmg2_animations:sync', function(target, animationLib,animationLib2, animation, animation2, distans, distans2, height,targetSrc,length,spin,controlFlagSrc,controlFlagTarget,animFlagTarget)
-    --print("got to srv cmg2_animations:sync")
-    TriggerClientEvent('cmg2_animations:syncTarget', targetSrc, source, animationLib2, animation2, distans, distans2, height, length,spin,controlFlagTarget,animFlagTarget)
-    --print("triggering to target: " .. tostring(targetSrc))
-    TriggerClientEvent('cmg2_animations:syncMe', source, animationLib, animation,length,controlFlagSrc,animFlagTarget)
+RegisterNetEvent('cmg2_animations:sync',function()
+    local player = source
+    local approval = shoulderApprovals[player]
+    shoulderApprovals[player] = nil
+    if not approval or approval.expires < os.time() or not playersNear(player,approval.target,3.0) then return stopShoulderCarry(player) end
+    local target = approval.target
+    if shoulderPartners[player] or shoulderPartners[target] or trunkAssignments[target] then return end
+    shoulderPartners[player], shoulderPartners[target] = target, player
+    TriggerClientEvent('cmg2_animations:syncTarget',target,player,'nm','firemans_carry',0.15,0.27,0.63,-1,0.0,33)
+    TriggerClientEvent('cmg2_animations:syncMe',player,'missfinale_c2mcs_1','fin_c2_mcs_1_camman',-1,49,1,target)
 end)
 
-RegisterServerEvent('cmg2_animations:stop')
-AddEventHandler('cmg2_animations:stop', function(targetSrc)
-    TriggerClientEvent('cmg2_animations:cl_stop', targetSrc)
-end)
+RegisterNetEvent('cmg2_animations:stop',function() stopShoulderCarry(source) end)
+
 
 
 RegisterServerEvent("vrp_policia:algemar")

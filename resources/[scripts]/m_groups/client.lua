@@ -62,12 +62,12 @@ RegisterNUICallback('getUserDetails', function(data, cb)
 end)
 
 RegisterNUICallback('addGroup', function(data, cb)
-    vSERVER.addGroup(data.userId, data.group, data.isOnline)
+    vSERVER.addGroup(data.userId, data.group)
     cb('ok')
 end)
 
 RegisterNUICallback('removeGroup', function(data, cb)
-    vSERVER.removeGroup(data.userId, data.group, data.isOnline)
+    vSERVER.removeGroup(data.userId, data.group)
     cb('ok')
 end)
 

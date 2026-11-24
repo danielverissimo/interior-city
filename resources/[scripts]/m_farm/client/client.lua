@@ -188,6 +188,13 @@ RegisterNetEvent('routes:initialize', function()
     ServerAPI.openRoutes()
 end)
 
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+    SetNuiFocus(false, false)
+    SendNUIMessage({action='close'})
+    removeBlip()
+end)
+
 local function isPlayerInAirVehicle()
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)

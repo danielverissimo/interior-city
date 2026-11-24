@@ -1,4 +1,10 @@
 Config = { roubos = {}, setup = {}, webhooks = {}, settings = {} }
+Config.AtmC4 = {
+    plantSeconds = 6,
+    fuseSeconds = 10,
+    lootWindowSeconds = 180,
+    models = {'prop_atm_01','prop_atm_02','prop_atm_03','prop_fleeca_atm'}
+}
 
 -- Integração padrão com vrp_notifycall.
 -- Pode ser reaproveitada nos próximos roubos sem precisar alterar a NUI.

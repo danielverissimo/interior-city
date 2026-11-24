@@ -155,6 +155,8 @@ local function publicJob(job)
         spawn = job.resultSpawn,
         amount = job.displayAmount,
         resultAmount = job.resultAmount,
+        recipeTime = job.recipeTime,
+        startedBy = job.startedBy,
         startedAt = job.startedAt,
         endAt = job.endAt,
         remaining = math.max(0, job.endAt - now),
@@ -282,7 +284,8 @@ local function getUserId(source)
 end
 
 local function ensureNumber(value, default)
-	if type(value) == 'number' then return value end
+	value = tonumber(value)
+	if value and value == value and value ~= math.huge and value ~= -math.huge then return value end
 	return default or 0
 end
 
@@ -330,15 +333,15 @@ local function findStorageItem(items, name)
 end
 
 -- Ranking helpers
-local function readUserRanking()
-    local raw = vRP.getSData('m_craft:ranking:users')
+local function readUserRanking(orgName)
+    local raw = vRP.getSData(orgName and ('m_craft:ranking:org:'..orgName) or 'm_craft:ranking:users')
     local ok, data = pcall(json.decode, raw or '{}')
     if not ok or type(data) ~= 'table' then data = {} end
     return data
 end
 
-local function writeUserRanking(map)
-    vRP.setSData('m_craft:ranking:users', json.encode(map or {}))
+local function writeUserRanking(map, orgName)
+    vRP.setSData(orgName and ('m_craft:ranking:org:'..orgName) or 'm_craft:ranking:users', json.encode(map or {}))
 end
 
 local function getPlayerDisplayName(userId)
@@ -383,7 +386,6 @@ function ServerAPI.hasMinPermission(blipIndex)
 		org.armazemPermission
 	})
 end
-
 
 function ServerAPI.getBenchState(blipIndex)
     local src = source
@@ -480,21 +482,20 @@ end
 function ServerAPI.produceItem(blipIndex, data)
     local src = source
     local org = getOrgByIndex(blipIndex)
-    if not org then return false end
+    if not org or type(data) ~= 'table' then return false end
     if not userHasAnyPermission(src, { org.craftPermission }) then return false end
 
     local benchKey = getBenchKey(org)
-    if not benchKey or BenchLocks[benchKey] then return false end
+    if not benchKey then return false end
     if CraftJobs[benchKey] then return false end
-    BenchLocks[benchKey] = true
 
     local function unlock(result)
-        BenchLocks[benchKey] = nil
         return result
     end
 
     local recipes = org.craftItems or {}
     local payloadItem = (data and data.item) or data
+    if type(payloadItem) ~= 'table' then return unlock(false) end
     local idx = ensureNumber(payloadItem and payloadItem.index or data and data.index, nil)
     local recipe = (idx and recipes[idx]) or nil
     if not recipe then
@@ -513,17 +514,19 @@ function ServerAPI.produceItem(blipIndex, data)
     local userId = getUserId(src)
     if not userId then return unlock(false) end
 
-    local produceAmount = tonumber(data and data.amount) or 1
-    produceAmount = math.floor(produceAmount)
-    if produceAmount < 1 then produceAmount = 1 end
-    if produceAmount > 1000 then produceAmount = 1000 end
+    local produceAmount = ensureNumber(data.amount, 0)
+    if produceAmount < 1 or produceAmount > 1000 or produceAmount % 1 ~= 0 then return unlock(false) end
 
     local storageItems = readStorage(org.name)
 
-    -- Primeiro valida tudo. Nenhum material é retirado se faltar qualquer requisito.
+    -- Soma requisitos repetidos antes de validar para nunca consumir parcialmente.
+    local required = {}
     for _,req in ipairs(recipe.requires or {}) do
         local reqName = req.spawn or req.name
         local need = ensureNumber(req.amount, 0) * produceAmount
+        if reqName and need > 0 then required[reqName] = (required[reqName] or 0) + need end
+    end
+    for reqName,need in pairs(required) do
         if need > 0 then
             local it = select(1, findStorageItem(storageItems, reqName))
             if not it or ensureNumber(it.amount, 0) < need then
@@ -533,9 +536,7 @@ function ServerAPI.produceItem(blipIndex, data)
     end
 
     -- Retira os materiais no início da fabricação.
-    for _,req in ipairs(recipe.requires or {}) do
-        local reqName = req.spawn or req.name
-        local need = ensureNumber(req.amount, 0) * produceAmount
+    for reqName,need in pairs(required) do
         if need > 0 then
             local it, storageIndex = findStorageItem(storageItems, reqName)
             if it then
@@ -573,9 +574,9 @@ function ServerAPI.produceItem(blipIndex, data)
     TriggerClientEvent('m_craft:benchStarted', -1, benchKey, src)
 
     -- Mantém a regra anterior do ranking: contabiliza quando a fabricação é iniciada.
-    local rank = readUserRanking()
+    local rank = readUserRanking(org.name)
     rank[tostring(userId)] = ensureNumber(rank[tostring(userId)], 0) + 1
-    writeUserRanking(rank)
+    writeUserRanking(rank, org.name)
 
     sendMageLog(craftLogKey(org.name, 'started'), {
         actorId = userId,
@@ -598,7 +599,7 @@ end
 
 local function collectCraftJob(src, org, expectedId)
     local benchKey = getBenchKey(org)
-    if not benchKey or BenchLocks[benchKey] then return false end
+    if not benchKey then return false end
     if not userHasAnyPermission(src, { org.craftPermission, org.armazemPermission }) then return false end
 
     local job = CraftJobs[benchKey]
@@ -619,19 +620,21 @@ local function collectCraftJob(src, org, expectedId)
     if not userId then return false end
 
     -- Trava antes da entrega para impedir coleta dupla por dois jogadores no mesmo frame.
-    BenchLocks[benchKey] = true
     local giveName = job.resultSpawn
     local giveQty = math.max(1, math.floor(tonumber(job.resultAmount) or 1))
 
     if giveName == 'money' then
         vRP.giveMoney(userId, giveQty)
     else
-        vRP.giveInventoryItem(userId, giveName, giveQty, true)
+        if vRP.computeInvWeight(userId) + vRP.getItemWeight(giveName) * giveQty > vRP.getInventoryMaxWeight(userId) then
+            TriggerClientEvent('Notify', src, 'negado', 'Espaco insuficiente na mochila. A producao continua pronta na bancada.', 5)
+            return false
+        end
+        if vRP.giveInventoryItem(userId, giveName, giveQty, true) ~= true then return false end
     end
 
     CraftJobs[benchKey] = nil
     writeCraftJobs()
-    BenchLocks[benchKey] = nil
     syncCraftState(benchKey)
 
     sendMageLog(craftLogKey(org.name, 'collected'), {
@@ -715,9 +718,9 @@ function ServerAPI.saveAll(blipIndex)
                     -- Registrar entrega no sistema de metas (lotus_orgs_v2)
                     local orgName = vRP.getUserGroupOrg(userId)
                     if orgName and spawn and have > 0 then
-                        exports.oxmysql:execute('INSERT INTO mirtin_orgs_goals(organization, user_id, item, amount, `day`, `month`) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)', {
+                        pcall(function() exports.oxmysql:execute('INSERT INTO mirtin_orgs_goals(organization, user_id, item, amount, `day`, `month`) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)', {
                             orgName, userId, spawn, have, os.date('%d'), os.date('%m')
-                        })
+                        }) end)
                     end
                 end
             end
@@ -728,9 +731,9 @@ function ServerAPI.saveAll(blipIndex)
 
     -- Atualiza ranking por depósito
     if totalDeposited > 0 then
-        local rank = readUserRanking()
+        local rank = readUserRanking(org.name)
         rank[tostring(userId)] = ensureNumber(rank[tostring(userId)], 0) + totalDeposited
-        writeUserRanking(rank)
+        writeUserRanking(rank, org.name)
 
         sendMageLog(craftLogKey(org.name, 'storage_deposit'), {
             actorId = userId,
@@ -786,16 +789,16 @@ function ServerAPI.saveItem(blipIndex, data)
     writeStorage(org.name, items)
 
     -- Atualiza ranking por depósito unitário
-    local rank = readUserRanking()
+    local rank = readUserRanking(org.name)
     rank[tostring(userId)] = ensureNumber(rank[tostring(userId)], 0) + amount
-    writeUserRanking(rank)
+    writeUserRanking(rank, org.name)
 
     -- Registrar entrega unitária no sistema de metas (lotus_orgs_v2)
     local orgName = vRP.getUserGroupOrg(userId)
     if orgName and spawn and amount > 0 then
-        exports.oxmysql:execute('INSERT INTO mirtin_orgs_goals(organization, user_id, item, amount, `day`, `month`) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)', {
+        pcall(function() exports.oxmysql:execute('INSERT INTO mirtin_orgs_goals(organization, user_id, item, amount, `day`, `month`) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)', {
             orgName, userId, spawn, amount, os.date('%d'), os.date('%m')
-        })
+        }) end)
     end
 
     sendMageLog(craftLogKey(org.name, 'storage_deposit'), {
@@ -816,8 +819,9 @@ end
 
 -- Ranking placeholder (could be extended to track per-org crafts)
 function ServerAPI.getRanking(blipIndex)
-    -- Build top list by crafts
-    local rank = readUserRanking()
+    local org = getOrgByIndex(blipIndex)
+    if not org or not userHasAnyPermission(source, { org.craftPermission, org.armazemPermission }) then return {} end
+    local rank = readUserRanking(org.name)
     local arr = {}
     for k,v in pairs(rank) do
         local uid = tonumber(k)
@@ -838,10 +842,81 @@ end
 function ServerAPI.getOrgStorage(orgName)
 	local src = source
 	if type(orgName) ~= 'string' then return end
+	local allowed = false
+	for _,org in ipairs(Config.Coords or {}) do
+		if org.name == orgName and userHasAnyPermission(src, { org.armazemPermission }) then allowed = true break end
+	end
+	if not allowed then return end
 	local items = readStorage(orgName)
 	TriggerClientEvent('m_craft:showStorageMenu', src, orgName, items)
 end
 
 -- Removido: não permitir retirada via menu
+
+-- Snapshot apenas da bancada selecionada no mundo. Nunca envia outras faccoes.
+function ServerAPI.getWorkshop(blipIndex)
+    local src = source
+    local org = getOrgByIndex(blipIndex)
+    if not org then return false end
+    local canCraft = userHasAnyPermission(src, { org.craftPermission })
+    local canDeposit = userHasAnyPermission(src, { org.armazemPermission })
+    if not canCraft and not canDeposit then return false end
+    local stock, stored = {}, readStorage(org.name)
+    for _,it in ipairs(stored) do stock[it.spawn or it.name] = ensureNumber(it.amount, 0) end
+    local materials = {}
+    for _,it in ipairs(org.armazemItems or {}) do
+        local spawn = it.spawn or it.name
+        materials[#materials+1] = {spawn=spawn, name=it.name, image=it.image, amount=stock[spawn] or 0}
+    end
+    return {
+        name=org.name, recipes=org.craftItems or {}, storage=materials,
+        job=publicJob(CraftJobs[getBenchKey(org)]), canCraft=canCraft, canDeposit=canDeposit
+    }
+end
+
+local function isAtBench(src, org)
+    local ped = GetPlayerPed(src)
+    if not ped or ped == 0 then return false end
+    local coords = GetEntityCoords(ped)
+    for _,point in ipairs(org.coords or {}) do
+        local x,y,z = tonumber(point.x or point[1]),tonumber(point.y or point[2]),tonumber(point.z or point[3])
+        if x and y and z and #(coords - vector3(x,y,z)) <= 4.0 then return true end
+    end
+    return false
+end
+
+-- Serializa deposito, consumo e coleta na mesma bancada. Uma falha libera a
+-- trava e nao deixa a NUI aguardando uma resposta indefinidamente.
+local function withBenchLock(key, callback, ...)
+    if BenchLocks[key] then return false end
+    BenchLocks[key] = true
+    local result = table.pack(xpcall(callback, debug.traceback, ...))
+    BenchLocks[key] = nil
+    if not result[1] then
+        print('[m_craft] Falha na bancada '..tostring(key)..': '..tostring(result[2]))
+        return false
+    end
+    return table.unpack(result, 2, result.n)
+end
+
+local mutations = { produceItem=true, collectBench=true, removeItemFromQueue=true, saveAll=true, saveItem=true }
+for _,name in ipairs({'hasMinPermission','getBenchState','getProductions','getStorage','getRanking','getWorkshop',
+    'produceItem','collectBench','removeItemFromQueue','saveAll','saveItem'}) do
+    local original, mutation = ServerAPI[name], mutations[name]
+    ServerAPI[name] = function(index, ...)
+        local src = source
+        local org = getOrgByIndex(index)
+        if not org or not isAtBench(src, org) then return false end
+        local key = getBenchKey(org)
+        if mutation then return withBenchLock(key, original, index, ...) end
+        local result = table.pack(xpcall(original, debug.traceback, index, ...))
+        if not result[1] then
+            print('[m_craft] Falha na bancada '..tostring(key)..': '..tostring(result[2]))
+            return false
+        end
+        return table.unpack(result, 2, result.n)
+    end
+end
+
 
 

@@ -21,7 +21,7 @@ const app = {
       <div class="item" data-route-name="${route.name}">
         <div class="content">
           <div class="image">
-            <img src="${route.icon}" alt="">
+            <img src="${window.htdocsItemImage?.(route.image) || route.icon}" alt="">
           </div>
           <div class="text">
             <div class="title">

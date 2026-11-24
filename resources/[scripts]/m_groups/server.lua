@@ -37,6 +37,14 @@ local blacklistGroups = {
 
 local webhookGroup = ""
 
+-- A vRP guarda os cargos em memoria. Atualiza ao iniciar este painel,
+-- inclusive quando somente m_groups e reiniciado apos editar o cadastro.
+AddEventHandler("onResourceStart", function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        exports["vrp"]:reloadManagedGroups()
+    end
+end)
+
 function src.checkPermission()
     local user_id = vRP.getUserId(source)
     return user_id and (vRP.hasPermission(user_id, "moderador.permissao") or vRP.hasPermission(user_id, "admin.permissao") or vRP.hasPermission(user_id, "developer.permissao")) or false
@@ -51,6 +59,7 @@ local function getBlacklistForJS()
 end
 
 function src.getGroups()
+    if not src.checkPermission() then return {}, {} end
     -- Consulta sempre os grupos atuais carregados pela vRP.
     local groups = vRP.getGroups() or {}
 
@@ -63,6 +72,7 @@ function src.getGroups()
 end
 
 function src.getUserDetails(userId)
+    if not src.checkPermission() then return nil end
     local user_id = tonumber(userId)
     
     if not user_id then return nil end
@@ -113,10 +123,11 @@ function src.getUserDetails(userId)
     return userDetails
 end
 
-function src.addGroup(userId, group, isOnline)
+function src.addGroup(userId, group)
     local source = source
     local admin_id = vRP.getUserId(source)
     local target_id = tonumber(userId)
+    if not target_id or type(group) ~= "string" then return end
     
     if not vRP.hasPermission(admin_id, "admin.permissao") then
         TriggerClientEvent("Notify", source, "negado", "Você não tem permissão para adicionar grupos.", 5000)
@@ -140,7 +151,7 @@ function src.addGroup(userId, group, isOnline)
         return
     end
     
-    if isOnline then
+    if vRP.getUserSource(target_id) then
         local nsource = vRP.getUserSource(target_id)
         if nsource then
             vRP.addUserGroup(target_id, group)
@@ -151,9 +162,18 @@ function src.addGroup(userId, group, isOnline)
         local rows = vRP.getUData(target_id, "vRP:datatable")
         if #rows > 0 then
             local data = json.decode(rows) or {}
-            if data and data.groups then
-                data.groups[group] = true
+            if type(data) ~= "table" then return end
+            data.groups = type(data.groups) == "table" and data.groups or {}
+            local config = groups[group]._config
+            if config and config.gtype == "org" then
+                for current in pairs(data.groups) do
+                    local currentConfig = groups[current] and groups[current]._config
+                    if currentConfig and currentConfig.gtype == "org" then
+                        data.groups[current] = nil
+                    end
+                end
             end
+            data.groups[group] = true
             
             vRP.setUData(target_id, "vRP:datatable", json.encode(data))
             TriggerClientEvent("Notify", source, "sucesso", "** OFFLINE ** Você adicionou o (ID: " .. target_id .. ") no grupo: " .. group, 5000)
@@ -164,10 +184,11 @@ function src.addGroup(userId, group, isOnline)
     vCLIENT.setUserDetails(source,target_id)
 end
 
-function src.removeGroup(userId, group, isOnline)
+function src.removeGroup(userId, group)
     local source = source
     local admin_id = vRP.getUserId(source)
     local target_id = tonumber(userId)
+    if not target_id or type(group) ~= "string" then return end
     
     if not vRP.hasPermission(admin_id, "admin.permissao") then
         TriggerClientEvent("Notify", source, "negado", "Você não tem permissão para remover grupos.", 5000)
@@ -186,7 +207,7 @@ function src.removeGroup(userId, group, isOnline)
         return
     end
     
-    if isOnline then
+    if vRP.getUserSource(target_id) then
         local nsource = vRP.getUserSource(target_id)
         if nsource then
             vRP.removeUserGroup(target_id, group)

@@ -285,7 +285,8 @@ function updateDisplayHud(inVehicle)
 		local doorstatus = (GetVehicleDoorLockStatus(vehicle) == 2)
 		local _,lights,highlights = GetVehicleLightsState(vehicle)
 		local engine = GetVehicleEngineHealth(vehicle)/10
-		local fuel = GetVehicleFuelLevel(vehicle)
+		local capacity = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
+		local fuel = capacity > 0 and math.max(0, math.min(100, GetVehicleFuelLevel(vehicle) / capacity * 100)) or 100
 		local speed = GetEntitySpeed(vehicle) * 3.6
 		local rpm = GetVehicleCurrentRpm(vehicle) * 100
         local gear = GetVehicleCurrentGear(vehicle)

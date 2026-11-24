@@ -111,6 +111,7 @@ Routes = {
                 count += 1
                 pickupsFormatted[tostring(count)] = {
                     item = v.item,
+                    expiresAt = v.expiresAt,
                     amount = v.amount,
                     id = k
                 }
@@ -214,11 +215,15 @@ Routes = {
 
     ---@see Config
     ["REQUEST_ITEMS_CONFIG"] = function(data)
-        local config = Items 
-        for k,v in pairs(config) do 
-            if v.func then 
-                config[k].func = nil
+        local config = {}
+        for item, definition in pairs(Items) do
+            local entry = { expiryDuration = itemExpiryDuration(item) }
+            for field, value in pairs(definition) do
+                if field ~= "func" then
+                    entry[field] = value
+                end
             end
+            config[item] = entry
         end
         ---@return table<string, table>
         return config

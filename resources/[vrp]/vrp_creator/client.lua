@@ -248,7 +248,7 @@ function TriggerCreateCharacter()
 	EndFade()
 
 	SetNuiFocus(true, true)
-	SendNUIMessage({ whitelist = true, id = (vSERVER.getUserId() or 0), reset = resetCharacterFlow })
+	SendNUIMessage({ identity = true, reset = resetCharacterFlow })
 
 	SetEntityCoordsNoOffset(PlayerPedId(),402.55,-996.37,-99.01,true,true,true)
 	SetEntityHeading(PlayerPedId(),f(180))
@@ -265,20 +265,22 @@ function TriggerCreateCharacter()
 	end)
 end
 
-RegisterNUICallback('finishWhitelist', function(data, cb)
-	local accepted = vSERVER.finishWhitelist(data)
+RegisterNUICallback('registerIdentity', function(data, cb)
+	local accepted = isInCharacterMode and vSERVER.registerIdentity(data)
 	if not accepted then
 		if cb then cb({ ok = false }) end
 		return
 	end
 
+	local model = data.sex == 1 and "mp_m_freemode_01" or "mp_f_freemode_01"
+	if GetEntityModel(PlayerPedId()) ~= GetHashKey(model) then changeGender(model) end
 	refreshDefaultCharacter()
 	TaskUpdateSkinOptions()
 	TaskUpdateFaceOptions()
 	TaskUpdateHeadOptions()
 	SetEntityVisible(PlayerPedId(), true)
 	SetNuiFocus(isInCharacterMode,isInCharacterMode)
-	SendNUIMessage({ whitelist = false, CharacterMode = isInCharacterMode, CharacterMode2 = not isInCharacterMode, CharacterMode3 = not isInCharacterMode })
+	SendNUIMessage({ identity = false, CharacterMode = isInCharacterMode, CharacterMode2 = not isInCharacterMode, CharacterMode3 = not isInCharacterMode })
 
 	if cb then cb({ ok = true }) end
 end)
@@ -293,11 +295,14 @@ RegisterNuiCallback('resetChar', function(data, cb)
 	ClearAllPedProps(PlayerPedId())
 
 	print('Resetando Char')
-	changeGender('mp_m_freemode_01')
+	local model = GetEntityModel(PlayerPedId()) == GetHashKey("mp_f_freemode_01")
+		and "mp_f_freemode_01" or "mp_m_freemode_01"
+	changeGender(model)
 	Wait(1000)
 	SetEntityCoordsNoOffset(PlayerPedId(),402.55,-996.37,-99.01,true,true,true)
 	StartPlayerTeleport(PlayerId(), 402.55, -996.37, -99.01, 180.0, true, true, true)
 	SetEntityVisible(PlayerPedId(), true)
+	cb({ ok = true })
 end)
 
 function refreshDefaultCharacter()
@@ -331,29 +336,6 @@ RegisterNUICallback('notify', function(data, cb)
 	TriggerEvent('Notify', data.type, data.message, 5)
 end)
 
-RegisterNUICallback('changeGender', function(data,cb) 
-	if not isInCharacterMode then
-		if cb then cb({ ok = false }) end
-		return
-	end
-
-	if tonumber(data.sex) == 1 then
-		changeGender("mp_m_freemode_01")
-	else
-		changeGender("mp_f_freemode_01")
-	end
-
-	actual_gender = tonumber(data.sex) == 1 and 'mp_m_freemode_01' or 'mp_f_freemode_01'
-end)
-
-RegisterNUICallback('verify', function(data, cb)
-	if vSERVER.checkWhitelist() then
-		ExecuteCommand("BIOWNDWllIIiiLLljI WL_VERIFICAR")
-		return cb({ whitelisted = true })
-	end
-	return cb({ whitelisted = false })
-end)
-
 RegisterNUICallback('cDone',function(data,cb)
 	SetNuiFocus(isInCharacterMode, isInCharacterMode)
 	SendNUIMessage({ CharacterMode = not isInCharacterMode, CharacterMode2 = isInCharacterMode, CharacterMode3 = not isInCharacterMode })
@@ -374,7 +356,7 @@ RegisterNUICallback('BackPart2', function(data,cb)
 	SendNUIMessage({ CharacterMode = not isInCharacterMode, CharacterMode2 = isInCharacterMode, CharacterMode3 = not isInCharacterMode })
 end)
 
-local function finishResetAtHospital(spawn)
+local function finishCharacterSpawn(spawn, isReset)
 	spawn = type(spawn) == "table" and spawn or resetSpawn
 	local x = tonumber(spawn.x) or resetSpawn.x
 	local y = tonumber(spawn.y) or resetSpawn.y
@@ -401,11 +383,13 @@ local function finishResetAtHospital(spawn)
 	SetEntityInvincible(ped, false)
 	SetEntityVisible(ped, true)
 
-	local maxHealth = GetEntityMaxHealth(ped)
-	if maxHealth < 200 then maxHealth = 200 end
-	SetEntityHealth(ped, maxHealth)
-	ClearPedBloodDamage(ped)
-	TriggerEvent("mirtin_survival:updateComa", false)
+	if isReset then
+		local maxHealth = GetEntityMaxHealth(ped)
+		if maxHealth < 200 then maxHealth = 200 end
+		SetEntityHealth(ped, maxHealth)
+		ClearPedBloodDamage(ped)
+		TriggerEvent("mirtin_survival:updateComa", false)
+	end
 
 	local timeout = GetGameTimer() + 5000
 	while not HasCollisionLoadedAroundEntity(ped) and GetGameTimer() < timeout do
@@ -452,16 +436,10 @@ RegisterNUICallback('cDoneSave',function(data,cb)
 	SetNuiFocus(false, false)
 	SendNUIMessage({ CharacterMode = false, CharacterMode2 = false, CharacterMode3 = false })
 
-	if result.reset == true then
-		finishResetAtHospital(result.spawn)
-	else
-		SetEntityCoordsNoOffset(PlayerPedId(),-1713.54,-887.1,8.0,true,true,true)
-		SetEntityHeading(PlayerPedId(),f(225.34))
-		continuousFadeOutNetwork = false
-		loadCutSine()
-	end
+	finishCharacterSpawn(result.spawn, result.reset == true)
 
 	if cb then cb({ ok = true }) end
+	if not result.reset then activationScreen() end
 end)
 
 RegisterNUICallback('cChangeHeading',function(data,cb)
@@ -639,139 +617,6 @@ function TaskUpdateHeadOptions()
 	-- Maquiagem
 	SetPedHeadOverlay(ped,4,data.makeupModel,0.99)
 	SetPedHeadOverlayColor(ped,4,0,0,0)
-end
-
-function loadCutSine()
-	DoScreenFadeOut(1000)
-	Wait(1500)
-	RequestCollisionAtCoord(PlayerPedId(),-1170.57, -1644.02, 4.38)
-	SetEntityCoords(PlayerPedId(), -1170.57, -1644.02, 4.38, false, false, false, true)
-	DoScreenFadeOut(1000)
-
-	Wait(4000)
-	TriggerCamController(-1)
-	doStatus = 2
-
-	if DoesCamExist(cam) then
-		RenderScriptCams(false,true,250,1,0)
-		DestroyCam(cam,false)
-		cam = nil
-	end
-	
-	Wait(2000)
-	local spaws = {
-		vec4(-1611.94,-1057.54,13.04,320.05),
-		vec4(-1611.94,-1057.54,13.04,320.05),
-	}
-	local randomSpawn = spaws[math.random(1, #spaws)]
-	RequestCollisionAtCoord(PlayerPedId(),randomSpawn.x,randomSpawn.y,randomSpawn.z,randomSpawn.w)
-	SetEntityCoords(PlayerPedId(), randomSpawn.x,randomSpawn.y,randomSpawn.z,randomSpawn.w + 1.0, false, false, false, true)
-
-	Wait(5000)
-	while not HasCollisionLoadedAroundEntity(PlayerPedId()) do
-		SetEntityCoords(PlayerPedId(), randomSpawn.x,randomSpawn.y,randomSpawn.z,randomSpawn.w + 1.0, false, false, false, true)
-		Citizen.Wait(0)
-	end
-	-- RequestCutscene('mp_intro_concat',8)
-
-	-- while not HasCutsceneLoaded() do
-	-- 	Citizen.Wait(10)
-	-- end
-
-	-- PrefetchSrl('GTAO_INTRO_MALE')
-	-- PrefetchSrl('GTAO_INTRO_FEMALE')
-	-- while not IsSrlLoaded() do
-	-- 	Citizen.Wait(10)
-	-- end
-
-	-- BeginSrl()
-	-- SetCutsceneEntityStreamingFlags('MP_Female_Character',0,1)
-	-- SetCutsceneEntityStreamingFlags('MP_Male_Character',0,0)
-	-- RegisterEntityForCutscene(nil,'MP_Male_Character',3, 0, 64)
-	-- RegisterEntityForCutscene(PlayerPedId(),'MP_Female_Character',0,0,64)
-	-- for i = 7,1,-1 do 
-	-- 	SetCutsceneEntityStreamingFlags("MP_Plane_Passenger_"..i, 0, 1)
-	-- 	RegisterEntityForCutscene(nil, 'MP_Plane_Passenger_'..i, 3, GetHashKey('mp_f_freemode_01'), 0)
-	-- 	RegisterEntityForCutscene(nil, 'MP_Plane_Passenger_'..i, 3, GetHashKey('mp_m_freemode_01'), 0)
-	-- end
-
-
-	DoScreenFadeOut(1000)
-
-	StopCutsceneImmediately()
-	EndSrl()
-	EndFade()
-	
-
-	Wait(2000)
-	DoScreenFadeIn(1000)
-
-	TriggerEvent('flaviin:toggleHud', true)
-	TriggerEvent('notify:toogle', true)
-	TriggerEvent('chat:toogle', true)
-	TriggerEvent('shortcuts:terms', true)
-	DisplayRadar(true)
-	-- if HasCutsceneLoaded() then
-	-- 	SetTimeout(28*1000, function()
-			
-	-- 		Wait(2000)
-	-- 		StopCutsceneImmediately()
-		
-
-	-- 		Wait(3000)
-	-- 		ShutdownLoadingScreen()
-	-- 		while IsScreenFadingIn() do
-	-- 			Citizen.Wait(1)
-	-- 		end
-
-	-- 		Wait(2000)
-	-- 		local qtd = math.random(1,100)
-	-- 		if qtd > 50 then
-	-- 			RequestCollisionAtCoord(PlayerPedId(), -270.0,-1903.83,27.75)
-	-- 			SetEntityCoordsNoOffset(PlayerPedId(), -270.0,-1903.83,27.75, true, true, false)
-	-- 		else
-	-- 			RequestCollisionAtCoord(PlayerPedId(), -280.64,-1916.72,29.94)
-	-- 			SetEntityCoordsNoOffset(PlayerPedId(), -280.64,-1916.72,29.94, true, true, false)
-	-- 		end
-
-	-- 		--[[if qtd >= 60 and qtd <= 100 then
-	-- 			RequestCollisionAtCoord(PlayerPedId(), -1669.27,-976.74,7.41)
-	-- 			SetEntityCoordsNoOffset(PlayerPedId(), -1669.27,-976.74,7.41, true, true, false)
-	-- 		elseif qtd > 40 and qtd < 60 then
-	-- 			RequestCollisionAtCoord(PlayerPedId(), -1666.6,-970.72,7.55)
-	-- 			SetEntityCoordsNoOffset(PlayerPedId(), -1666.6,-970.72,7.55, true, true, false)
-	-- 		else
-	-- 			RequestCollisionAtCoord(PlayerPedId(), -1654.02,-1001.36,13.01)
-	-- 			SetEntityCoordsNoOffset(PlayerPedId(), -1654.02,-1001.36,13.01, true, true, false)
-	-- 		end--]]
-	-- 		StopCutsceneImmediately()
-	-- 		EndSrl()
-	-- 		EndFade()
-			
-
-	-- 		Wait(2000)
-	-- 		DoScreenFadeIn(1000)
-	-- 	end)
-		
-	-- 	SetTimeout(1000, function()
-	-- 		DoScreenFadeIn(1000)
-	-- 	end)
-		
-	-- 	StartCutscene()
-	-- 	Citizen.CreateThread(function()
-	-- 		while IsCutsceneActive() do
-	-- 		  SetPlayerControl(PlayerId(), true, false)
-	-- 		  Wait(1)
-	-- 		end
-	-- 	end)
-	-- 	TriggerEvent('flaviin:toggleHud', true)
-	-- 	TriggerEvent('notify:toogle', true)
-	-- 	TriggerEvent('chat:toogle', true)
-	-- 	TriggerEvent('shortcuts:terms', true)
-	-- 	DisplayRadar(true)
-	-- end
-	Wait(1000)
-	activationScreen()
 end
 
 RegisterNetEvent("Character:UpdateClothes",function(custom)

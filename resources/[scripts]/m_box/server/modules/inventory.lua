@@ -169,7 +169,7 @@ function CreateTunnel.paymentReward()
             })	
 
             Config.Crates[prize.crate].items[prize.itemId].func(source, user_id)
-            vRP.sendLog('https://discord.com/api/webhooks/1358316246776414213/IIDkLwcuc4VRIWf7x3ttsNlgWuYBO42pLETFwv-hQkwd4wjIjGFH7VvtNSPgA7Cww61b', 'USUARIO '..user_id..' RESGATOU O BAU '..Config.Crates[prize.crate].name..' E GANHOU O ITEM '..crateItem.name)
+            vRP.sendLog('', 'USUARIO '..user_id..' RESGATOU O BAU '..Config.Crates[prize.crate].name..' E GANHOU O ITEM '..crateItem.name)
 
             local crate_price = Config.Crates[prize.crate].price
             local key_price = Config.Keys[Config.Crates[prize.crate].key].price

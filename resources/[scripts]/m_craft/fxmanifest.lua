@@ -1,7 +1,7 @@
 
 
 author       '@seven7s.___'
-version      '1.0.0'
+version      '2.0.0'
 description  'Script refeito pelos desenvolvedores da Nikito Community'
 
 fx_version 'bodacious'
@@ -21,7 +21,7 @@ shared_scripts {
 }
 
 client_scripts {
-    'client/*.lua',
+    'client/workshop.lua',
 }
 
 server_scripts {

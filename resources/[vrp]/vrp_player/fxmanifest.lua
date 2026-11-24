@@ -23,7 +23,7 @@ files {
 
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weapons.meta'
 
-data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponbottleaxe.meta'
+data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponbattleaxe.meta'
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponbottle.meta'
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponbullpuprifle.meta'
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponcompactrifle.meta'
@@ -53,5 +53,4 @@ data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponspecialcarbine.meta'
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponstonehatchet.meta'
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponvintagepistol.meta'
 data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponwrench.meta'
-data_file 'WEAPONINFO_FILE_PATCH' 'damage-weapons/weaponparafal.meta'
-
+-- Arquivo ausente: damage-weapons/weaponparafal.meta (a arma possui recurso próprio).

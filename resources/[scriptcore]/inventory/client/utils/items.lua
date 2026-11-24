@@ -5,6 +5,65 @@ local scubaMask = 0
 local scubaTank = 0
 local inUseDrug = false
 local countdownDrug = 0
+local energySprintMultiplier = 1.15
+local sprintBoosts = {}
+
+local function setSprintBoost(effect, multiplier)
+    sprintBoosts[effect] = multiplier
+
+    local strongestBoost = 1.0
+    for _, boost in pairs(sprintBoosts) do
+        strongestBoost = math.max(strongestBoost, boost)
+    end
+
+    SetRunSprintMultiplierForPlayer(PlayerId(), strongestBoost)
+    if strongestBoost == 1.0 then
+        RestorePlayerStamina(PlayerId(), 1.0)
+    end
+end
+local methArmourBonus = 5
+local methArmourReinforcement
+
+local function reinforceMethArmour(ped)
+    local reinforcement = { ped = ped, remaining = methArmourBonus, armour = GetPedArmour(ped) }
+    methArmourReinforcement = reinforcement
+
+    CreateThread(function()
+        while methArmourReinforcement == reinforcement do
+            if PlayerPedId() ~= ped or IsEntityDead(ped) or GetPedArmour(ped) <= 0 then
+                methArmourReinforcement = nil
+                return
+            end
+
+            reinforcement.armour = GetPedArmour(ped)
+            Wait(0)
+        end
+    end)
+end
+
+AddEventHandler("gameEventTriggered", function(eventName, args)
+    local reinforcement = methArmourReinforcement
+    if not reinforcement or eventName ~= "CEventNetworkEntityDamage" then return end
+
+    local ped = reinforcement.ped
+    if args[1] ~= ped or PlayerPedId() ~= ped or IsEntityDead(ped) then return end
+
+    local armour = GetPedArmour(ped)
+    local lost = reinforcement.armour - armour
+    local weapon = args[7]
+    if lost > 0 and weapon and GetWeaponDamageType(weapon) == 3 then
+        local absorbed = math.min(lost, reinforcement.remaining)
+        armour = armour + absorbed
+        SetPedArmour(ped, armour)
+        reinforcement.remaining = reinforcement.remaining - absorbed
+    end
+
+    reinforcement.armour = armour
+    if reinforcement.remaining == 0 or armour == 0 then
+        methArmourReinforcement = nil
+    end
+end)
+
 RegisterNetEvent('inventory:useDrugs', function(drug)
 	local ped = PlayerPedId()
 
@@ -17,79 +76,31 @@ RegisterNetEvent('inventory:useDrugs', function(drug)
 				return
 			end
 
+            local health = GetEntityHealth(ped)
+            SetEntityHealth(ped, math.floor(health * 0.95))
+            setSprintBoost("cocaina", energySprintMultiplier)
 
-			countdownDrug = 15
-			calc_health = (GetEntityHealth(ped) * 0.05)
-			SetEntityHealth(ped, parseInt(GetEntityHealth(ped) - calc_health))
-			SetRunSprintMultiplierForPlayer(PlayerId(), 1.3)
-
-			CreateThread(function()
-				while inUseDrug do
-					countdownDrug = countdownDrug - 1
-
-					if countdownDrug <= 0 then
-						inUseDrug = false
-						SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
-						RestorePlayerStamina(PlayerId(), 1.0)
-						break;
-					end
-					Wait(1000)
-				end
-			end)
-
-			return
-		elseif drug == "metanfetamina" then
-			if GetPedArmour(ped) >= 75 then
-				TriggerEvent("Notify", "negado", "Você está com o colete muito alto não pode utilizar.", 5)
-				inUseDrug = false
-				return
-			end
-
-			local currentArmor = GetPedArmour(ped)
-			local maxArmor = 100
-			local armorToRestore = 0.25 * maxArmor
-			local targetArmor = currentArmor + armorToRestore
-
-			if targetArmor > 0.75 * maxArmor then
-				targetArmor = 0.75 * maxArmor
-			end
-
-			local armorIncrement = 1
-
-			countdownDrug = 25
-
-			local lastHealth = GetEntityHealth(ped)
-
-			CreateThread(function()
-				while inUseDrug do
-					if GetEntityHealth(ped) < lastHealth then
-						TriggerEvent("Notify", "negado", "O efeito da droga foi cancelado porque você foi ferido.")
-						inUseDrug = false
-						break
-					end
-
-					lastHealth = GetEntityHealth(ped)
-
-					currentArmor = parseInt(currentArmor) + parseInt(armorIncrement)
-					if currentArmor > targetArmor then
-						currentArmor = targetArmor
-					end
-
-					SetPedArmour(ped, parseInt(currentArmor))
-
-					countdownDrug = countdownDrug - 1
-
-					if countdownDrug <= 0 then
-						inUseDrug = false
-						break
-					end
-
-					Wait(1000)
-				end
-			end)
-
-			return
-		elseif drug == "heroina" then
+            SetTimeout(15000, function()
+                setSprintBoost("cocaina", nil)
+                inUseDrug = false
+            end)
+            return
+        elseif drug == "metanfetamina" then
+            local currentArmor = GetPedArmour(ped)
+            if currentArmor <= 0 or IsEntityDead(ped) then
+                TriggerEvent("Notify", "negado", "O efeito exige que você ainda esteja com colete.", 5)
+            else
+                if currentArmor < 100 then
+                    SetPedArmour(ped, math.min(100, currentArmor + methArmourBonus))
+                    TriggerEvent("Notify", "sucesso", "Seu colete foi recuperado.", 5)
+                elseif not API.hasMethArmourReinforcement() then
+                    reinforceMethArmour(ped)
+                    TriggerEvent("Notify", "sucesso", "Seu colete recebeu 5 pontos de proteção contra os próximos tiros.", 5)
+                end
+            end
+            inUseDrug = false
+            return
+        elseif drug == "heroina" then
 			countdownDrug = 15
 
 			CreateThread(function()
@@ -112,7 +123,7 @@ RegisterNetEvent('inventory:useDrugs', function(drug)
 				return
 			end
 
-			SetRunSprintMultiplierForPlayer(PlayerId(), 1.3)
+			setSprintBoost("cogumelo", 1.3)
 
 			local currentArmor = GetPedArmour(ped)
 			local maxArmor = 100
@@ -135,6 +146,7 @@ RegisterNetEvent('inventory:useDrugs', function(drug)
 			CreateThread(function()
 				while inUseDrug do
 					if GetEntityHealth(ped) < lastHealth then
+						setSprintBoost("cogumelo", nil)
 						TriggerEvent("Notify", "negado", "O efeito da droga foi cancelado porque você foi ferido.")
 						inUseDrug = false
 						break
@@ -149,8 +161,7 @@ RegisterNetEvent('inventory:useDrugs', function(drug)
 
 
 					SetPedArmour(ped, parseInt(currentArmor))
-					SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
-					RestorePlayerStamina(PlayerId(), 1.0)
+					setSprintBoost("cogumelo", nil)
 
 					countdownDrug = countdownDrug - 1
 
@@ -183,6 +194,81 @@ RegisterNetEvent('inventory:useDrugs', function(drug)
 		end
 	end
 end)
+
+local overdoseEffect
+local overdoseWalk = "move_m@drunk@moderatedrunk"
+local overdoseAnim = "missfam5_blackout"
+local overdoseScreen = "DrugsTrevorClownsFight"
+
+local function stopOverdoseEffect()
+    local effect = overdoseEffect
+    if not effect then return end
+    overdoseEffect = nil
+
+    if effect.screenStarted then
+        AnimpostfxStop(overdoseScreen)
+    end
+    if DoesEntityExist(effect.ped) then
+        if effect.walkApplied then
+            ResetPedMovementClipset(effect.ped, 0.25)
+        end
+        if effect.animStarted then
+            StopAnimTask(effect.ped, overdoseAnim, "vomit", 1.0)
+        end
+    end
+    RemoveAnimDict(overdoseAnim)
+    RemoveAnimSet(overdoseWalk)
+end
+
+RegisterNetEvent("inventory:drugOverdose", function(duration)
+    if overdoseEffect then return end
+    local ped = PlayerPedId()
+    if GetEntityHealth(ped) <= 101 then return end
+
+    local effect = { ped = ped, screenStarted = not AnimpostfxIsRunning(overdoseScreen) }
+    overdoseEffect = effect
+    if effect.screenStarted then
+        AnimpostfxPlay(overdoseScreen, 0, true)
+    end
+    RequestAnimDict(overdoseAnim)
+    RequestAnimSet(overdoseWalk)
+
+    CreateThread(function()
+        local expires = GetGameTimer() + duration
+        while overdoseEffect == effect and GetGameTimer() < expires
+            and PlayerPedId() == ped and GetEntityHealth(ped) > 101 do
+            if IsPedOnFoot(ped) and not IsPedRagdoll(ped) then
+                if not effect.animStarted and HasAnimDictLoaded(overdoseAnim) then
+                    TaskPlayAnim(ped, overdoseAnim, "vomit", 4.0, -4.0, 2000, 48, 0.0, false, false, false)
+                    effect.animStarted = true
+                end
+                if not effect.walkApplied and HasAnimSetLoaded(overdoseWalk) then
+                    SetPedMovementClipset(ped, overdoseWalk, 0.25)
+                    effect.walkApplied = true
+                end
+            end
+            Wait(100)
+        end
+        if overdoseEffect == effect then
+            stopOverdoseEffect()
+        end
+    end)
+end)
+
+AddEventHandler("onResourceStop", function(resource)
+    if resource == GetCurrentResourceName() then
+        stopOverdoseEffect()
+        if next(sprintBoosts) then
+            SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
+        end
+    end
+end)
+
+function API.hasMethArmourReinforcement()
+    local reinforcement = methArmourReinforcement
+    return reinforcement ~= nil and reinforcement.ped == PlayerPedId()
+        and not IsEntityDead(reinforcement.ped) and GetPedArmour(reinforcement.ped) > 0
+end
 
 function API.isInDrug()
 	return inUseDrug
@@ -271,17 +357,8 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- SISTEMA DE ENERGETICO
 -----------------------------------------------------------------------------------------------------------------------------------------
-local energetico = false
-
 function API.setEnergetico(status)
-	if status then
-		SetRunSprintMultiplierForPlayer(PlayerId(), 1.15)
-		energetico = true
-	else
-		SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
-		RestorePlayerStamina(PlayerId(), 1.0)
-		energetico = false
-	end
+    setSprintBoost("energetico", status and energySprintMultiplier or nil)
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -469,6 +546,13 @@ function API.startAnimHotwired()
 	end
 	TaskPlayAnim(PlayerPedId(), "anim@amb@clubhouse@tutorial@bkr_tut_ig3@", "machinic_loop_mechandplayer", 3.0, 3.0, -1,
 		49, 5.0, 0, 0, 0)
+end
+
+function API.getNearestRepairVehicle()
+	local vehicle = vRP.getNearestVehicle(3)
+	if vehicle and NetworkGetEntityIsNetworked(vehicle) then
+		return VehToNet(vehicle)
+	end
 end
 
 RegisterNetEvent('reparar')

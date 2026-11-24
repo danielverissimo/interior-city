@@ -1,7 +1,7 @@
 -- print('[DEBUG]: Client Eletricista Init Sucess')
 
 local inservice = false
-local LADDER_VEHICLE_HASH = 241596819
+local LADDER_VEHICLE_HASH = GetHashKey('unoservice')
 local LADDER_PROP = `prop_ic_ladder`
 -- local LADDER_PROP = `prop_byard_ladder01`
 local etapa = 1
@@ -14,6 +14,17 @@ local posteAlvoKey = nil
 local escadaData = nil
 local escadaWatchdogRunning = false
 local repair_timer = 10
+local repairInProgress = false
+
+-- Bloqueia somente a direcao de subida; o eixo positivo permite descer.
+local function limitLadderClimb()
+    DisableControlAction(0, 32, true)
+    DisableControlAction(0, 172, true)
+    if GetControlNormal(0, 31) < 0.0 then
+        DisableControlAction(0, 31, true)
+    end
+    DisableControlAction(0, 22, true)
+end
 
 -- Ajustes do emprego de Eletricista.
 local SERVICE_GARAGE = vector3(-819.92, -742.11, 23.78)
@@ -369,10 +380,7 @@ function init_eletric()
                     -- Não altera posição do poste, da escada ou do marcador.
                     if horizontalDistance <= 2.2 and heightFromPole >= LADDER_SAFE_CLIMB_OFFSET then
                         idle = 1
-                        DisableControlAction(0, 32, true)  -- W / subir
-                        DisableControlAction(0, 31, true)  -- eixo frente/trás
-                        DisableControlAction(0, 172, true) -- seta para cima
-                        DisableControlAction(0, 22, true)  -- pular
+                        limitLadderClimb()
 
                         local velocity = GetEntityVelocity(ped)
                         if velocity.z > 0.0 then
@@ -384,21 +392,27 @@ function init_eletric()
 
                     if distToDraw <= 10.0 then
                         idle = 1
+                        local canRepairSafely = horizontalDistance <= 1.85
+                            and heightFromPole >= LADDER_REPAIR_MIN_OFFSET
+                            and heightFromPole <= (LADDER_SAFE_CLIMB_OFFSET + 0.35)
+                        local instruction = "~w~SUBA MAIS NA ESCADA PARA CONSERTAR O POSTE"
+                        if canRepairSafely then
+                            instruction = "~w~PRESSIONE ~g~E~w~ PARA CONSERTAR O POSTE"
+                        elseif heightFromPole > (LADDER_SAFE_CLIMB_OFFSET + 0.35) then
+                            instruction = "~w~DESCA UM POUCO PARA CONSERTAR O POSTE"
+                        elseif horizontalDistance > 1.85 then
+                            instruction = "~w~APROXIME-SE DO POSTE PELA ESCADA"
+                        end
                         DrawText3D(
                             drawPos.x,
                             drawPos.y,
                             drawPos.z,
-                            "~w~PRESSIONE ~g~E~w~ PARA CONSERTAR O POSTE"
+                            instruction
                         )
 
                         -- O E pode ser usado numa faixa segura antes do topo. O texto continua
                         -- no local original, mas o jogador não precisa atingir o limite da escada.
-                        local canRepairSafely = horizontalDistance <= 1.85
-                            and heightFromPole >= LADDER_REPAIR_MIN_OFFSET
-                            and heightFromPole <= (LADDER_SAFE_CLIMB_OFFSET + 0.35)
-
                         if canRepairSafely and IsControlJustPressed(0, 38) then
-                            TriggerEvent("Notify", "sucesso", "Você está concertando o poste, aguarde.",10)
                             concertandoPoste()
                         end
                     end
@@ -743,63 +757,78 @@ function deletarEscada()
 end
 
 function concertandoPoste()
+    if repairInProgress or etapa ~= 3 or not inservice then return false end
     local ped = PlayerPedId()
+    local target, targetKey = posteAlvo, posteAlvoKey
+    if not target or not targetKey or not DoesEntityExist(target) then return false end
 
-    local animDict = "amb@prop_human_parking_meter@female@idle_a"
-    local animName = "idle_a_female"
+    repairInProgress = true
+    local animDict, animName = "mini@repair", "fixing_a_player"
+    local ok, completed = xpcall(function()
+        RequestAnimDict(animDict)
+        local loadDeadline = GetGameTimer() + 5000
+        while not HasAnimDictLoaded(animDict) do
+            if GetGameTimer() >= loadDeadline or not inservice or IsEntityDead(ped) then
+                return false
+            end
+            Wait(10)
+        end
+        if not inservice or etapa ~= 3 or posteAlvo ~= target or not DoesEntityExist(target) then
+            return false
+        end
 
-    -- carrega a animação
-    RequestAnimDict(animDict)
-    while not HasAnimDictLoaded(animDict) do
-        Wait(10)
-    end
+        -- Animacao secundaria: conserva a tarefa de escalar para poder descer depois.
+        TaskPlayAnim(ped, animDict, animName, 8.0, -8.0, repair_timer * 1000 + 1000, 49, 0.0, false, false, false)
+        local startDeadline = GetGameTimer() + 1000
+        while not IsEntityPlayingAnim(ped, animDict, animName, 3) do
+            if GetGameTimer() >= startDeadline or not inservice or IsEntityDead(ped) then
+                return false
+            end
+            Wait(10)
+        end
 
-    -- trava controles durante o conserto
-    local repairing = true
-    Citizen.CreateThread(function()
-        while repairing do
-            -- trava movimento
-            DisableControlAction(0, 30, true) -- MoveLeftRight
-            DisableControlAction(0, 31, true) -- MoveUpDown
-            DisableControlAction(0, 21, true) -- sprint
-            DisableControlAction(0, 22, true) -- jump
-            DisableControlAction(0, 32, true) -- W
-            DisableControlAction(0, 33, true) -- S
-            DisableControlAction(0, 34, true) -- A
-            DisableControlAction(0, 35, true) -- D
-
-            -- trava combate/ações
-            DisableControlAction(0, 24, true) -- attack
-            DisableControlAction(0, 25, true) -- aim
-            DisableControlAction(0, 140, true)
-            DisableControlAction(0, 141, true)
-            DisableControlAction(0, 142, true)
-            DisableControlAction(0, 37, true)  -- weapon wheel
-            DisablePlayerFiring(ped, true)
-
+        TriggerEvent("Notify", "aviso", "Consertando o poste. Aguarde 10 segundos.", 10)
+        TriggerEvent("progress", repair_timer, "Consertando poste")
+        local finishAt = GetGameTimer() + repair_timer * 1000
+        while GetGameTimer() < finishAt do
+            if not inservice or etapa ~= 3 or posteAlvo ~= target or posteAlvoKey ~= targetKey
+                or not DoesEntityExist(target) or not DoesEntityExist(EscadaObject)
+                or IsEntityDead(ped) or not IsEntityPlayingAnim(ped, animDict, animName, 3) then
+                return false
+            end
+            for _, control in ipairs({30,31,21,22,32,33,34,35,24,25,140,141,142,37}) do
+                DisableControlAction(0, control, true)
+            end
+            DisablePlayerFiring(PlayerId(), true)
+            local coords = GetEntityCoords(ped)
+            DrawText3D(coords.x, coords.y, coords.z + 0.8,
+                ("~y~CONSERTANDO O POSTE: ~w~%ds"):format(math.ceil((finishAt - GetGameTimer()) / 1000)))
             Wait(0)
         end
-    end)
+        return inservice and etapa == 3 and posteAlvo == target and posteAlvoKey == targetKey
+            and DoesEntityExist(target) and DoesEntityExist(EscadaObject) and not IsEntityDead(ped)
+    end, debug.traceback)
 
-    -- animação upper body (funciona na escada)
-    TaskPlayAnim(ped, animDict, animName, 8.0, -8.0, -1, 49, 0.0, false, false, false)
+    -- Sem thread de bloqueio separada: falhas e cancelamentos sempre liberam os controles.
+    repairInProgress = false
+    pcall(StopAnimTask, ped, animDict, animName, -8.0)
+    if not ok then
+        print('[m_empregos] Falha no conserto do poste: ' .. tostring(completed))
+    end
+    if not ok or not completed then
+        if inservice then
+            TriggerEvent("Notify", "negado", "Conserto interrompido. Voce pode descer ou pressionar E para tentar novamente.", 8)
+        end
+        return false
+    end
 
-    TriggerEvent("progress", repair_timer)
-    Wait(repair_timer * 1000)
-
-    -- libera tudo
-    repairing = false
-    ClearPedSecondaryTask(ped)
-
-    postesReparados[posteAlvoKey] = true
-    removePoleBlip(posteAlvoKey)
-
-    TriggerEvent("Notify", "sucesso", "Você concertou este poste, pegue sua escada e vá para o próximo.", 10)
-
-    TriggerServerEvent('m_empregos:upgrade_level')
-	TriggerServerEvent('m_empregos:payment')
-
+    postesReparados[targetKey] = true
+    removePoleBlip(targetKey)
     etapa = 4
+    TriggerEvent("Notify", "sucesso", "Poste consertado. Desca a escada, recolha e guarde no Uno.", 10)
+    TriggerServerEvent('m_empregos:upgrade_level')
+    TriggerServerEvent('m_empregos:payment')
+    return true
 end
 
 function spawnEscadaPersistente()
@@ -903,6 +932,9 @@ end)
 
 AddEventHandler("onResourceStop", function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
+    inservice = false
+    repairInProgress = false
+    StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", -8.0)
     clearElectricianGuides()
     RemoverEscada()
     deletarEscada()

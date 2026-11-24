@@ -19,10 +19,12 @@ local cache = false
 local cachePix = false
 local cacheGraph = false
 local configNames = {}
+local bankOpen = false
 -----------------------------------------------------------------------------------------------------------------------------------------
 --[ THREAD ]-----------------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------------------
 local function toggleNuiFrame(shouldShow)
+    bankOpen = shouldShow == true
     SetNuiFocus(shouldShow, shouldShow)
     SendReactMessage('setVisible', shouldShow)
 end
@@ -31,6 +33,7 @@ RegisterNUICallback('hideFrame', function(_, cb)
     toggleNuiFrame(false)
     cb({})
 end)
+RegisterNetEvent('m_bank:closeForRobbery',function() toggleNuiFrame(false) end)
 
 RegisterNUICallback('showFrame', function(_, cb)
     toggleNuiFrame(true)
@@ -116,45 +119,78 @@ RegisterNUICallback("editarPix", function(data)
 end)
 
 
-Citizen.CreateThread(function()
-    -- local auth = eGServer.checkAuth()
-    local egSleep = 1000
-    while true do
-        local ped = PlayerPedId()
-        local x,y,z = table.unpack(GetEntityCoords(ped))
-        local ui = GetMinimapAnchor()
-
-        if not IsPedInAnyVehicle(ped) and GetSelectedPedWeapon(ped) == GetHashKey("WEAPON_UNARMED") then
-            for k,v in pairs(bancos) do
-                local distance = Vdist(x,y,z,v.x,v.y,v.z)
-                if distance < 5 then
-                    egSleep = 1
-                    mBMarker({v.x, v.y, v.z},1.0, 1.0,1.0, "cash", "banco")
-                  --  drawTxt(ui.right_x+0.25,ui.bottom_y-0.100,"PRESSIONE ~r~E~w~ PARA ~r~ABRIR O BANCO")
-                    if IsControlJustPressed(0,38) then
-                        cache = false
-                        valueToNui()
-                        toggleNuiFrame(true)
-                    end
-                end
-            end
-            for k,v in pairs(atms) do
-                local distance = Vdist(x,y,z,v.x,v.y,v.z)
-                if distance < 3 and not v.assaltavel then
-                    egSleep = 1
-                    drawTxt(ui.right_x+0.25,ui.bottom_y-0.100,"PRESSIONE ~r~E~w~ PARA ~r~ABRIR O CAIXA ELETRÔNICO")
-                    if IsControlJustPressed(0,38) then
-                        valueToNui()
-                        toggleNuiFrame(true)
-                    end
-                 end
-            end
+-- Detecta os objetos carregados do mapa, inclusive ATMs de interiores.
+local atmModels = {}
+for _,model in ipairs(cFG.atmModels or {'prop_atm_01','prop_atm_02','prop_atm_03','prop_fleeca_atm'}) do
+    atmModels[#atmModels+1] = GetHashKey(model)
+end
+local nearbyAtm = nil
+local atmDistance = tonumber(cFG.atmInteractionDistance) or 2.0
+local function findNearbyAtm(position)
+    local nearest, distance = nil, atmDistance
+    for _,model in ipairs(atmModels) do
+        local entity = GetClosestObjectOfType(position.x,position.y,position.z,atmDistance,model,false,false,false)
+        if entity ~= 0 and DoesEntityExist(entity) then
+            local d = #(position-GetEntityCoords(entity))
+            if d <= distance then nearest, distance = entity, d end
         end
-        Wait(egSleep)
-        egSleep = 1000
+    end
+    return nearest
+end
+Citizen.CreateThread(function()
+    while true do
+        nearbyAtm = findNearbyAtm(GetEntityCoords(PlayerPedId()))
+        Wait(500)
     end
 end)
 
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 750
+        local ped = PlayerPedId()
+        local position=GetEntityCoords(ped)
+        local blocked=false
+        if GetResourceState('m_roubos')=='started' then
+            local ok,result=pcall(function() return exports.m_roubos:isAtmUnavailable(position.x,position.y,position.z) end)
+            blocked=ok and result==true
+        end
+        if bankOpen and blocked then toggleNuiFrame(false) end
+        if not blocked and not bankOpen and not roubando and not IsEntityDead(ped) and not IsPedInAnyVehicle(ped,false)
+            and GetSelectedPedWeapon(ped) == GetHashKey('WEAPON_UNARMED') then
+            local position = GetEntityCoords(ped)
+            local bank, bankDistance = nil, 5.0
+            for _,point in pairs(bancos) do
+                local distance = Vdist(position.x,position.y,position.z,point.x,point.y,point.z)
+                if distance < bankDistance then bank, bankDistance = point, distance end
+            end
+            local atmAvailable = nearbyAtm and DoesEntityExist(nearbyAtm)
+                and #(position-GetEntityCoords(nearbyAtm)) <= atmDistance
+            if not atmAvailable then
+                for _,point in pairs(atms) do
+                    if Vdist(position.x,position.y,position.z,point.x,point.y,point.z) <= atmDistance then
+                        atmAvailable = true
+                        break
+                    end
+                end
+            end
+            if bank or atmAvailable then
+                sleep = 0
+                if bank then
+                    mBMarker({bank.x,bank.y,bank.z},1.0,1.0,1.0,'cash','banco')
+                end
+                local ui = GetMinimapAnchor()
+                drawTxt(ui.right_x+0.25,ui.bottom_y-0.100,
+                    atmAvailable and 'PRESSIONE ~g~E~w~ PARA ABRIR O CAIXA ELETRONICO' or 'PRESSIONE ~g~E~w~ PARA ABRIR O BANCO')
+                if IsControlJustPressed(0,38) then
+                    cache, cachePix, cacheGraph = false, false, false
+                    valueToNui()
+                    toggleNuiFrame(true)
+                end
+            end
+        end
+        Wait(sleep)
+    end
+end)
 function mBMarker(vector, sizex, sizey, sizez, src, id)
     if not HasStreamedTextureDictLoaded(src) then
         RequestStreamedTextureDict(src, true)

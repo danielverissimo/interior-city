@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arsenal Policial</title><style>html,body{background:transparent!important;color-scheme:normal!important}[hidden]{display:none!important}</style><link rel="stylesheet" href="style.css"><script defer src="app.js"></script></head>
+<body>
+<main id="arsenal" hidden>
+  <section class="panel" role="dialog" aria-modal="true" aria-labelledby="title">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">◇</span><div>INTERIOR CITY<small>DEPARTAMENTO POLICIAL</small></div></div>
+      <div class="rail-label">SUPRIMENTOS</div>
+      <nav aria-label="Categorias">
+        <button class="nav active" data-category="todos"><span>Catálogo completo</span><b data-count="todos">0</b></button>
+        <button class="nav" data-category="armas"><span>Armas</span><b data-count="armas">0</b></button>
+        <button class="nav" data-category="municoes"><span>Munições</span><b data-count="municoes">0</b></button>
+        <button class="nav" data-category="equipamentos"><span>Equipamentos</span><b data-count="equipamentos">0</b></button>
+      </nav>
+      <div class="owner-tools" hidden>
+        <div class="rail-label">ADMINISTRAÇÃO</div>
+        <button class="nav" id="manage-prices"><span>Editar preços</span><span>↗</span></button>
+        <button class="nav" id="manage-items"><span>Gerenciar equipamentos</span><span>↗</span></button>
+        <button class="nav" id="manage-location"><span>Localização do arsenal</span><span>↗</span></button>
+      </div>
+      <div class="rail-footer"><span class="status-dot"></span> ACESSO RESTRITO<small>Equipamentos entregues na mochila.<br>Todas as retiradas são pagas.</small></div>
+    </aside>
+    <div class="workspace">
+      <header>
+        <div><div class="eyebrow">CENTRAL DE EQUIPAMENTOS</div><h1 id="title">Arsenal<span> policial</span></h1></div>
+        <div class="header-actions"><div class="wallet"><small>DINHEIRO EM MÃOS</small><strong id="balance">R$ 0</strong></div><button class="icon-button" id="close" aria-label="Fechar arsenal">×</button></div>
+      </header>
+      <div class="toolbar"><div><h2 id="category-title">Catálogo completo</h2><span id="result-count">0 itens disponíveis</span></div><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Buscar equipamento..." aria-label="Buscar equipamento" autocomplete="off"></label></div>
+      <div id="management-note" hidden>EDIÇÃO DE PREÇOS <span>Selecione um equipamento para alterar o valor.</span></div>
+      <div class="catalog-layout">
+        <div id="catalog" class="catalog" aria-label="Equipamentos disponíveis"></div>
+        <aside class="detail" aria-label="Equipamento selecionado">
+          <div class="detail-content">
+          <div class="detail-label">EQUIPAMENTO SELECIONADO <span id="detail-number">—</span></div>
+          <div id="detail-art" class="detail-art"></div>
+          <span id="detail-category" class="tag">CATÁLOGO</span>
+          <h2 id="detail-name">Selecione um equipamento</h2>
+          <p id="detail-description">Escolha um item ao lado para conferir o valor e realizar a compra.</p>
+          <div class="price-row"><span>Valor por unidade</span><strong id="unit-price">—</strong></div>
+          <div class="quantity-row"><label for="quantity">Quantidade</label><div class="stepper"><button id="decrease" aria-label="Diminuir quantidade">−</button><input id="quantity" type="number" min="1" max="1" value="1" step="1" aria-label="Quantidade"><button id="increase" aria-label="Aumentar quantidade">+</button></div></div>
+          </div>
+          <div class="detail-checkout">
+          <div class="total-row"><span>Total da compra</span><strong id="total">—</strong></div>
+          <button class="primary" id="purchase" disabled>Comprar equipamento <span>↗</span></button>
+          <button class="secondary" id="edit-price" hidden>Editar valor deste item</button>
+          <p class="purchase-note" id="purchase-note">Pagamento com dinheiro em mãos.</p>
+          </div>
+        </aside>
+      </div>
+      <footer><span id="status" role="status" aria-live="polite">Selecione um equipamento para começar.</span><span class="escape"><kbd>ESC</kbd> Fechar</span></footer>
+    </div>
+    <div id="price-modal" class="modal" hidden>
+      <form class="dialog" id="price-form"><div class="eyebrow">ADMINISTRAÇÃO / PREÇOS</div><h2>Editar valor</h2><p id="edit-name"></p><label>Novo preço por unidade<input id="new-price" type="number" min="1" max="10000000" step="1" required></label><p class="dialog-note">O valor será salvo e atualizado para todos os policiais.</p><div class="dialog-actions"><button class="secondary" type="button" data-dismiss>Cancelar</button><button class="primary" type="submit">Salvar preço</button></div></form>
+    </div>
+    <div id="location-modal" class="modal" hidden>
+      <section class="dialog"><div class="eyebrow">ADMINISTRAÇÃO / LOCALIZAÇÃO</div><h2>Defina onde abrir o arsenal.</h2><p>Fique no local desejado e clique em <b>Usar minha posição atual</b>. O marcador e o blip do mapa serão movidos para esse ponto.</p><div class="location-value"><small>PONTO ATIVO DO ARSENAL</small><code id="current-location">—</code></div><p class="dialog-note">Não precisa digitar coordenadas: sua posição substitui a anterior. Você também pode remover o ponto antes de escolher outro.</p><button class="secondary danger-link" id="clear-location">Remover ponto atual</button><div class="dialog-actions"><button class="secondary" data-dismiss>Voltar</button><button class="primary" id="relocate">Usar minha posição atual</button></div></section>
+    </div>
+    <div id="items-modal" class="modal" hidden>
+      <section class="dialog items-dialog"><div class="eyebrow">ADMINISTRAÇÃO / CATÁLOGO</div><h2>Gerenciar equipamentos</h2><p>Escolha o que os policiais podem comprar. As alterações são salvas para todos.</p>
+        <div class="items-controls"><button class="secondary active" data-manage-tab="active">No arsenal</button><button class="secondary" data-manage-tab="candidates">Adicionar itens</button><input id="manage-search" type="search" placeholder="Buscar por nome ou código..." aria-label="Buscar itens do arsenal"></div>
+        <div id="manage-list" class="manage-list"></div>
+        <p id="manage-status" role="status"></p><div class="dialog-actions"><button class="secondary" data-dismiss>Concluir</button></div>
+      </section>
+    </div>
+  </section>
+</main>
+</body></html>

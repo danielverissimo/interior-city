@@ -3,9 +3,8 @@ import { VisibilityProvider } from "./providers/visibility";
 import { PlayerStats } from "./components/player-stats";
 import { Velocimeter } from "./components/velocimeter";
 
-import Logo from "/images/logo.png";
-import Cupom from "/images/cupom.png";
 import Safezone from "/images/safezone.png";
+import CityLogo from "/images/logo.png";
 import Bullets from "/icons/bullets.svg";
 
 import { useNuiEvent } from "./hooks/useNuiEvent";
@@ -102,7 +101,6 @@ export function App() {
   const { hud } = useHud();
   const [safe, setSafe] = useState(true);
   const [assault, setAssault] = useState(true);
-  const [showCupom, setShowCupom] = useState(true);
   const [makapoints, setMakapoints] = useState({ visible: isEnvBrowser(), points: 0 });
 
   useNuiEvent<IData>("update", (data) => {
@@ -111,13 +109,12 @@ export function App() {
     if (data.assaultTime !== undefined) setAssault(data.assaultTime);
   });
 
-  useNuiEvent("showCupom", setShowCupom);
   useNuiEvent("makapoints", setMakapoints);
 
   return (
     <VisibilityProvider>
       <div className="flex flex-col items-center gap-4 absolute top-6 -translate-x-1/2 left-1/2">
-        <img src={Logo} alt="logo" className="logo" />
+        <img src={CityLogo} alt="Interior City" className="logo" />
         {safe && <img src={Safezone} className="h-8" />}
         {makapoints?.visible && (
           <div
@@ -132,14 +129,6 @@ export function App() {
         )}
       </div>
 
-      {showCupom && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
-          <img src={Cupom} className="cupom" />
-          <p className="text-white text-xs font-normal text-shadow-sm text-shadow-black -mt-4">
-            Digite <b>/ocultar</b> para ocultar o cupom
-          </p>
-        </div>
-      )}
 
       <Progress />
       <OthersInformations />

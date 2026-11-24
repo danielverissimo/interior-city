@@ -565,8 +565,8 @@ function API.takeInspectItem(from_slot, to_slot, amount)
                     return
                 end
                 amount = ((amount or 1) > slot_data.amount) and slot_data.amount or amount
-                if vRP.tryGetInventoryItem(target_id, slot_data.item, amount, from_slot) then
-                    vRP.giveInventoryItem(user_id, slot_data.item, amount, to_slot)
+                if vRP.tryGetInventoryItem(target_id, slot_data.item, amount, false, from_slot, true) then
+                    vRP.giveInventoryItem(user_id, slot_data.item, amount, false, to_slot, slot_data.expiresAt)
                     if InventoryAudit then
                         InventoryAudit.Log("inventory_inspect_item_taken", {
                             actorId = user_id,
@@ -640,8 +640,8 @@ function API.putInspectItem(from_slot, to_slot, amount)
                     }
                 end
                 amount = ((amount or 1) > slot_data.amount) and slot_data.amount or amount
-                if vRP.tryGetInventoryItem(user_id, slot_data.item, amount, from_slot) then
-                    vRP.giveInventoryItem(target_id, slot_data.item, amount, to_slot)
+                if vRP.tryGetInventoryItem(user_id, slot_data.item, amount, false, from_slot, true) then
+                    vRP.giveInventoryItem(target_id, slot_data.item, amount, false, to_slot, slot_data.expiresAt)
 
                     if InventoryAudit then
                         InventoryAudit.Log("inventory_inspect_item_given", {

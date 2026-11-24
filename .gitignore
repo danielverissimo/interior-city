@@ -85,3 +85,47 @@ resources/**/*.ybn.xml
 /resources/\[roupas\]/vrp_roupas/stream/roupasbr/photothumb.db
 /resources/\[scriptcore\]/m_mdt/web/README.md
 /resources/\[scripts\]/m_ponto/web/README.md
+
+# Local working copy
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+!.env.assets.example
+.assets-store.json
+secrets/
+/config/keys.cfg
+*.key
+*.pem
+*.pfx
+*.p12
+
+# Local server state and generated files
+/auditoria/
+/build/
+/cache/
+/db/
+/txData/
+/backups/
+/state/
+/runtime/
+/.migration-review/
+.runtime/
+node_modules/
+__pycache__/
+.assets-cache/
+.assets-state.json
+.asset-part-*
+.replxx_history
+/imgui.ini
+*.log
+*.dmp
+Thumbs.db
+.DS_Store
+
+# Local database exports. Versioned migrations can live in database/.
+/database/databasedelux.sql
+/database/databasedelux.zip
+/resources/\[scriptcore]/m_paineladm_v2/calls_data.json
+/resources/\[scripts]/b_spotify/storage.json
+/resources/\[vrp]/vrp_admin/vips.json.bak

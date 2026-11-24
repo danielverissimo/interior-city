@@ -64,6 +64,12 @@
       }
     },
     {
+      "path": "resources/[scriptcore]/m_paineladm_v2/logs_config.json",
+      "changes": {
+        "webhook": 16
+      }
+    },
+    {
       "path": "resources/[scriptcore]/m_paineladm_v2/nui/script.js",
       "changes": {
         "webhook": 1

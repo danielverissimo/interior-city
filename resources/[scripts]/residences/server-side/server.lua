@@ -19,7 +19,7 @@ local homesInterior = {}
 local homes = {}
 local chestOpen = {}
 ----------------------------
-local webhookbaucasas = "https://discord.com/api/webhooks/1101555813962756296/ZSOjXO_ue2qlQ0lN6Gm96Zt5oj5sZ9SEdvsVIOTflO69sbcdVVt7FIm_JFi04Nqghsg7"
+local webhookbaucasas = ""
 
 function SendWebhookMessage(webhook,message)
 	if webhook ~= nil and webhook ~= "" then

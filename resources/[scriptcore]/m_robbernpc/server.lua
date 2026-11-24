@@ -1097,39 +1097,7 @@ local function allLootWasTaken(session, userId)
 end
 
 local function buildRandomLoot()
-    local sourceList = {}
-
-    for _, entry in ipairs(Config.Loot or {}) do
-        -- getItemName retorna "Deleted" nessa vRP quando o item não existe.
-        -- Evita transportar a tabela inteira de itens (que contém funções) pelo Proxy.
-        local exists = entry.item and vRP.getItemName(entry.item) ~= 'Deleted'
-        if exists then
-            sourceList[#sourceList + 1] = entry
-        else
-            print(('^3[m_robbernpc]^7 Item ignorado na Config.Loot porque não existe na base: %s'):format(tostring(entry.item)))
-        end
-    end
-
-    if #sourceList < Config.LootCount then
-        return nil, ('Há apenas %s item(ns) válido(s) na Config.Loot; são necessários %s.'):format(#sourceList, Config.LootCount)
-    end
-
-    -- Fisher-Yates para garantir itens diferentes sem repetição.
-    for i = #sourceList, 2, -1 do
-        local j = math.random(i)
-        sourceList[i], sourceList[j] = sourceList[j], sourceList[i]
-    end
-
-    local loot = {}
-    for i = 1, Config.LootCount do
-        local entry = sourceList[i]
-        local min = tonumber(entry.min) or 1
-        local max = tonumber(entry.max) or min
-        if max < min then min, max = max, min end
-        loot[entry.item] = { amount = math.random(min, max) }
-    end
-
-    return loot
+    return BuildNPCTrunkLoot()
 end
 
 local function denyStart(source, message, netId)
@@ -1320,6 +1288,8 @@ end)
 
 RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
     local source = source
+    local requestNetId = tonumber(netId)
+    local ok, errorMessage = xpcall(function()
     local userId = vRP.getUserId(source)
     if not userId then return end
 
@@ -1409,9 +1379,7 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
     activeVehicles[netId] = source
     setEntityState(entity, 'trunkrobberBusy', true)
 
-    -- Verificamos o rastreador ANTES da taskbar. Se existir, o alarme original
-    -- do GTA dispara imediatamente quando o arrombamento começa. O rastreador
-    -- só é removido e recuperado pelo ladrão se a taskbar for concluída.
+    -- Registra se havia rastreador antes da taskbar para tratar a remoção no sucesso.
     local hadRadarAtStart = vehicleOwnerId and vehicleHasRadar(vehicleOwnerId, entity) or false
 
     -- O alerta é disparado ANTES do minigame, no exato início do arrombamento.
@@ -1419,14 +1387,21 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
     -- com sucesso, evitando rastrear uma tentativa que falhou na taskbar.
     local alertId = ensurePoliceAlert(source, location)
 
-    if hadRadarAtStart then
-        TriggerClientEvent('m_robbernpc:vehicleAlarm', source, netId, tonumber(Config.RadarVehicleAlarmDuration) or 30000)
+    local usedLockpick = vRP.useLockpick(userId)
+    if not usedLockpick then
+        clearVehicleBusy(netId, entity)
+        TriggerClientEvent('m_robbernpc:attemptEnded', source, false, netId)
+        if usedLockpick == nil then
+            print('[m_robbernpc] API vRP.useLockpick indisponivel. Reinicie o servidor para carregar as alteracoes do vrp.')
+            notify(source, 'negado', 'O sistema de lockpick esta indisponivel no momento.', 5)
+        end
+        return
     end
-
-    TriggerClientEvent('m_robbernpc:attemptStarted', source, netId)
-
-    -- Mantida exatamente a chamada de taskbar solicitada pelo usuário.
-    local finished = vRPclient.taskBar(source, 3000, math.random(7, 15))
+    local networkOwner = NetworkGetEntityOwner(entity)
+    local alarmClient = networkOwner > 0 and networkOwner or source
+    TriggerClientEvent('m_robbernpc:vehicleAlarm', alarmClient, netId, tonumber(Config.TrunkVehicleAlarmDuration) or 30000)
+    local speed = tonumber(GetConvar('vehicle_lockpick_speed', '1.5')) or 1.5
+    local finished = RunTrunkLockpick(source, netId, speed)
 
     entity = getVehicleFromNetId(netId)
 
@@ -1519,10 +1494,6 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
         maxWeight = math.max(maxWeight, math.ceil(lootWeight + 1))
     end
 
-    if Config.ConsumeLockpick then
-        vRP.tryGetInventoryItem(userId, Config.LockpickItem, 1, true)
-    end
-
     -- NPC: continua bloqueado definitivamente depois do primeiro roubo.
     -- Player: pode ser roubado novamente depois do cooldown configurado.
     if sessionType == 'player' then
@@ -1565,6 +1536,15 @@ RegisterNetEvent('m_robbernpc:tryStart', function(netId, rearCoords)
             TriggerClientEvent('m_robbernpc:forceSessionEnd', source, chestId, netId)
         end
     end)
+    end, debug.traceback)
+    if not ok then
+        if requestNetId and activeVehicles[requestNetId] == source then
+            clearVehicleBusy(requestNetId, getVehicleFromNetId(requestNetId))
+        end
+        TriggerClientEvent('m_robbernpc:attemptEnded', source, false, requestNetId)
+        notify(source, 'negado', 'Nao foi possivel iniciar o arrombamento. Tente novamente.', 5)
+        print('[m_robbernpc] Erro no arrombamento: ' .. tostring(errorMessage))
+    end
 end)
 
 RegisterNetEvent('m_robbernpc:readyOpenChest', function(chestId)

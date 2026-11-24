@@ -1,14 +1,12 @@
 import { IMessage } from "../interfaces/global";
 
-export default function Message({ icon, message, title, category, boxColor, background, color, created_at }: IMessage) {
+export default function Message({ icon, message, title, created_at }: IMessage) {
   return (
     <div
-      className="animate-fade-right w-full py-3 px-2.5 flex item-start gap-2.5 rounded-md"
+      className="city-chat-message animate-fade-right w-full py-3 px-2.5 flex item-start gap-2.5 rounded-md"
       style={{
-        boxShadow: `inset 0 0 0 .05rem  ${color ? color : "rgba(255, 255, 255, 0.30)"}`,
-        background: background
-          ? background
-          : "radial-gradient(1133.06% 111.04% at 100.14% 50%, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.00) 100%)",
+        boxShadow: "inset 0 0 0 1px rgba(255,255,255,.09)",
+        background: "rgba(18,20,23,.88)",
       }}
     >
       <img src={`./icons/${icon || "default"}.svg`} alt={icon || "default"} className="w-[1.75rem] h-[1.625rem]" />

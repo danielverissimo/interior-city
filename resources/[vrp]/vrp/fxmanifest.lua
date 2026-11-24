@@ -35,12 +35,10 @@ files {
 	'loading/css/**',
     'loading/fonts/**',
     'loading/icons/**',
-	'loading/js/**',
-	'loading/intro/**',
-	'branding/*'
+    'loading/js/**'
 }
 
--- A introdução é fornecida exclusivamente por ic_loading.
+loadscreen "loading/index.html"   
 
 
 -- Adicione estas linhas no final do seu vrp/fxmanifest.lua

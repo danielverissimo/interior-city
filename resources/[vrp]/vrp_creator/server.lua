@@ -9,21 +9,14 @@ Tunnel.bindInterface(GetCurrentResourceName(), src)
 
 local VIP_GROUP = "vipinicial"
 local VIP_TITLE = "Vip Inicial"
-local VIP_DURATION_SECONDS = 7 * 24 * 60 * 60
-local VIP_MARKER_KEY = "vipinicial"
 local CHARACTER_CREATED_KEY = "creator:character_created"
 local RESET_PENDING_KEY = "creator:reset_pending"
 local HOSPITAL_SPAWN = { x = 1155.67, y = -1547.43, z = 34.85, h = 0.0 }
+local FIRST_ARRIVAL = { x = 261.17, y = -1197.78, z = 29.28, h = 357.02 }
 
 local inCreator = {}
-local WhitelistPending = {}
+local registeredModels = {}
 local userlogin = {}
-
-local cars = {
-    ["t20"] = true,
-    ["osiris"] = true,
-    ["speedo"] = true,
-}
 
 local function notify(playerSource, notifyType, message, time)
     if playerSource then
@@ -167,31 +160,6 @@ local function reconcileVip(user_id)
     end
 end
 
-local function grantInitialVip(user_id, playerSource)
-    -- Este marcador nunca é apagado. Assim, reset de personagem não renova o VIP.
-    if vRP.getUData(user_id, VIP_MARKER_KEY) ~= "" then
-        return false
-    end
-
-    if not ensureVipGroup() then
-        return false
-    end
-
-    local expiration = os.time() + VIP_DURATION_SECONDS
-    exports.oxmysql:executeSync([[
-        INSERT INTO temporary_vips (user_id, expiration_date)
-        VALUES (?, FROM_UNIXTIME(?))
-        ON DUPLICATE KEY UPDATE expiration_date = VALUES(expiration_date)
-    ]], { user_id, expiration })
-
-    vRP.addUserGroup(user_id, VIP_GROUP)
-    persistUserData(user_id)
-    vRP.setUData(user_id, VIP_MARKER_KEY, "1")
-
-    notify(playerSource, "sucesso", "Você recebeu o Vip Inicial por 7 dias.", 7)
-    return true
-end
-
 local function resetAppearanceState(user_id)
     exports.oxmysql:executeSync([[
         UPDATE vrp_users_infos
@@ -223,7 +191,7 @@ local function startCharacterReset(user_id, requestedBy, reason)
     end
 
     -- Marca o personagem como já criado ANTES de zerar o controller.
-    -- Isso impede kit inicial, carro, indicação e Vip Inicial novamente mesmo
+    -- Isso impede que o jogador receba o kit inicial novamente, mesmo
     -- se o jogador desconectar no meio da recriação.
     vRP.setUData(user_id, CHARACTER_CREATED_KEY, "1")
     vRP.setUData(user_id, RESET_PENDING_KEY, json.encode({
@@ -256,126 +224,41 @@ exports("requestCharacterReset", function(user_id, requestedBy, reason)
     return startCharacterReset(user_id, requestedBy, reason)
 end)
 
-src.getUserId = function()
-    local playerSource = source
-    local user_id = vRP.getUserId(playerSource)
-    if user_id then
-        WhitelistPending[user_id] = playerSource
-    end
-    return user_id
-end
-
-src.checkWhitelist = function()
-    local playerSource = source
-    local user_id = vRP.getUserId(playerSource)
-
-    if user_id then
-        local query = exports.oxmysql:query_async(
-            "SELECT whitelist FROM vrp_users WHERE id = ?",
-            { user_id }
-        )
-
-        if #query > 0 and query[1].whitelist then
-            WhitelistPending[user_id] = nil
-            return true
+local function validCharacterName(value)
+    if type(value) ~= "string" then return false end
+    local length = utf8.len(value)
+    if not length or length < 2 or length > 25 then return false end
+    for _, code in utf8.codes(value) do
+        if not ((code >= 65 and code <= 90) or (code >= 97 and code <= 122)
+            or (code >= 192 and code <= 255 and code ~= 215 and code ~= 247)) then
+            return false
         end
     end
-
-    return false
+    return true
 end
 
-src.finishWhitelist = function(data)
+src.registerIdentity = function(data)
     local playerSource = source
     local user_id = vRP.getUserId(playerSource)
-    if not user_id or not inCreator[user_id] or type(data) ~= "table" then
+    if not user_id or not inCreator[user_id] or type(data) ~= "table" then return false end
+
+    local name = type(data.name) == "string" and data.name:match("^%s*(.-)%s*$") or ""
+    local surname = type(data.surname) == "string" and data.surname:match("^%s*(.-)%s*$") or ""
+    local age = type(data.age) == "number" and math.tointeger(data.age)
+    local sex = data.sex
+    if not validCharacterName(name) or not validCharacterName(surname)
+        or not age or age < 18 or age > 2147483647 or (sex ~= 0 and sex ~= 1) then
         return false
     end
 
-    local name = tostring(data.name or ""):gsub("^%s+", ""):gsub("%s+$", "")
-    local surname = tostring(data.surname or ""):gsub("^%s+", ""):gsub("%s+$", "")
-    local age = tonumber(data.age)
+    local result = exports.oxmysql:executeSync(
+        "UPDATE vrp_user_identities SET nome = ?, sobrenome = ?, idade = ? WHERE user_id = ?",
+        { name, surname, age, user_id }
+    )
+    if not result or vRP.getUserId(playerSource) ~= user_id then return false end
 
-    if name == "" or surname == "" or #name > 25 or #surname > 25 or not age or age < 18 or age > 99 then
-        notify(playerSource, "negado", "Dados do personagem inválidos.", 5)
-        return false
-    end
-
-    local nameStr = (name .. surname):lower()
-    if nameStr:find("iframe", 1, true) or nameStr:find("<", 1, true) or nameStr:find(">", 1, true) then
-        DropPlayer(playerSource, ":)")
-        vRP.setBanned(user_id, true, "IFRAME INJECT")
-        return false
-    end
-
-    local resetPending = isResetPending(user_id)
-
-    -- A NUI usa este marcador apenas no fluxo de reset/plástica.
-    -- O servidor confirma o estado persistente para impedir que um primeiro acesso
-    -- force artificialmente o modo de recriação e pule etapas do onboarding.
-    if data.resetIdentityOnly == true and not resetPending then
-        notify(playerSource, "negado", "Fluxo de recriação inválido.", 5)
-        return false
-    end
-
-    -- Dados de marketing/recompensa só são processados na criação original.
-    if not resetPending then
-        local findType = tostring(data.find or "")
-        local allowedFindTypes = {
-            instagram = true,
-            youtube = true,
-            tiktok = true,
-            facebook = true,
-            amigo = true,
-            outros = true,
-        }
-
-        if allowedFindTypes[findType] then
-            exports.oxmysql:executeSync(
-                "INSERT INTO leads_new (user_id, type, created_at) VALUES (?, ?, ?)",
-                { user_id, findType, os.date("%Y-%m-%d %H:%M:%S") }
-            )
-            exports.oxmysql:executeSync(
-                ("UPDATE leads SET `%s` = `%s` + 1"):format(findType, findType),
-                {}
-            )
-        end
-    end
-
-    vRP.execute("vRP/update_user_first_spawn", {
-        user_id = user_id,
-        nome = name,
-        sobrenome = surname,
-        idade = age,
-    })
     vRP.updateIdentity(user_id)
-
-    if not resetPending then
-        local rewardCar = vRP.getUData(user_id, "rewardCar")
-        if rewardCar == "" then
-            if data.vehicle and cars[data.vehicle] then
-                local placa = vRP.gerarPlaca()
-                vRP.execute("vRP/inserir_veh", {
-                    veiculo = data.vehicle,
-                    user_id = user_id,
-                    placa = placa,
-                    ipva = os.time(),
-                    expired = "{}",
-                })
-            elseif data.vehicle then
-                print("Veiculo não encontrado na criacao " .. tostring(data.vehicle))
-            end
-
-            vRP.setUData(user_id, "rewardCar", "1")
-
-            local recommendation = tonumber(data.recomendation or data.recommendation)
-            if recommendation and recommendation ~= user_id then
-                vRP.giveBankMoney(recommendation, 50000)
-            end
-        end
-
-        grantInitialVip(user_id, playerSource)
-    end
-
+    registeredModels[user_id] = GetHashKey(sex == 1 and "mp_m_freemode_01" or "mp_f_freemode_01")
     return true
 end
 
@@ -387,6 +270,12 @@ local function finalizeCharacterCreation(playerSource, currentCharacterMode, Clo
 
     if type(currentCharacterMode) ~= "table" or type(Clothes) ~= "table" then
         return { ok = false, error = "Dados do personagem inválidos." }
+    end
+
+    local registeredModel = registeredModels[user_id]
+    local model = math.tointeger(tonumber(Clothes.pedModel) or 0)
+    if not registeredModel or not model or (model & 0xffffffff) ~= (registeredModel & 0xffffffff) then
+        return { ok = false, error = "Confirme os dados e o gênero do personagem antes de salvar." }
     end
 
     -- Cabelo nunca é persistido dentro de "clothes".
@@ -422,6 +311,7 @@ local function finalizeCharacterCreation(playerSource, currentCharacterMode, Clo
         vRP.setUData(user_id, CHARACTER_CREATED_KEY, "1")
     end
 
+    registeredModels[user_id] = nil
     inCreator[user_id] = nil
     SetPlayerRoutingBucket(playerSource, 0)
 
@@ -434,7 +324,7 @@ local function finalizeCharacterCreation(playerSource, currentCharacterMode, Clo
     return {
         ok = true,
         reset = resetPending,
-        spawn = resetPending and HOSPITAL_SPAWN or nil,
+        spawn = resetPending and HOSPITAL_SPAWN or FIRST_ARRIVAL,
     }
 end
 
@@ -579,9 +469,9 @@ RegisterCommand("resetplayer", function(playerSource, args)
         return
     end
 
-    local targetId = tonumber(args[1])
+    local targetId = args[1] == nil and staffId or tonumber(args[1])
     if not targetId then
-        notify(playerSource, "negado", "Use: /resetplayer ID", 5)
+        notify(playerSource, "negado", "Use /resetplayer para recriar o seu personagem ou /resetplayer ID para outro jogador.", 5)
         return
     end
 
@@ -596,11 +486,10 @@ RegisterCommand("resetplayer", function(playerSource, args)
         return
     end
 
-    local confirmed = vRP.request(
-        playerSource,
-        ('Você deseja mesmo resetar o player com ID "%s"?'):format(targetId),
-        30
-    )
+    local confirmation = targetId == staffId
+        and "Refazer seu personagem? O rosto, a roupa atual e as tatuagens serão redefinidos."
+        or ('Você deseja mesmo resetar o player com ID "%s"?'):format(targetId)
+    local confirmed = vRP.request(playerSource, confirmation, 30)
 
     if not confirmed then
         return
@@ -628,29 +517,8 @@ RegisterCommand("verroupas", function(playerSource)
 end)
 
 AddEventHandler("vRP:playerLeave", function(user_id)
-    WhitelistPending[user_id] = nil
     userlogin[user_id] = nil
+    registeredModels[user_id] = nil
     inCreator[user_id] = nil
 end)
 
-CreateThread(function()
-    while true do
-        for user_id, playerSource in pairs(WhitelistPending) do
-            local bucket = GetPlayerRoutingBucket(playerSource)
-            if bucket == 0 then
-                if vRP.isWhitelisted(user_id) then
-                    WhitelistPending[user_id] = nil
-                else
-                    SetPlayerRoutingBucket(playerSource, playerSource)
-                    print("UID: " .. user_id .. " | PULANDO WL (bucket: " .. bucket .. ")")
-                    TriggerEvent("AC:ForceBan", playerSource, {
-                        reason = "SKIP_WL_3",
-                        additionalData = "Pulou Whitelist!",
-                        forceBan = true,
-                    })
-                end
-            end
-        end
-        Wait(5000)
-    end
-end)

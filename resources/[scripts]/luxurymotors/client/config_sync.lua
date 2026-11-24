@@ -24,7 +24,7 @@ RegisterNetEvent("luxurymotors:syncConfig",function(data)
             test_drive=vector4(tonumber(t[1]) or 0.0,tonumber(t[2]) or 0.0,tonumber(t[3]) or 0.0,tonumber(t[4]) or 0.0)
         }
     end
-    ApplyDeluxeLocation(data.deluxe)
+    ApplyDeluxeLocation(data.deluxe or DeluxeConfig)
     if RefreshDeluxeBlip then RefreshDeluxeBlip() end
 end)
 

@@ -20,6 +20,16 @@ function serverFunctions.sellVehicle(vehicleData)
         return TriggerClientEvent("Notify",src,"negado","Você não possui esse veiculo em sua garagem.", 5)
     end
 
+    local available, access = pcall(function()
+        return exports.luxurymotors:getVehicleAccess(user_id, vehicleSpawn)
+    end)
+    if not available or not access then
+        return TriggerClientEvent('Notify', src, 'negado', 'Validação da garagem indisponível. Tente novamente.', 5)
+    end
+    if access.premium then
+        return TriggerClientEvent('Notify', src, 'negado', 'Veículos comprados com diamantes não podem ser revendidos por dinheiro.', 5)
+    end
+
     local target_user_id = vehicleData['userId']
     local target_source = vRP.getUserSource(target_user_id)
 
@@ -98,7 +108,7 @@ function serverFunctions.sellVehicle(vehicleData)
 
     vRP._execute("bm_module/garages/updateOwnerVehicle", { new_owner = target_user_id, user_id = user_id, veiculo = vehicleSpawn, portamalas = json.encode({}) })
 
-    vRP.sendLog("https://discord.com/api/webhooks/1315817948069232691/xposEjhb58o_02T9HwIT14rZlc5U6QaFGn3dGVds7jIA1Q4uryBmfuX5TS3cUkrUSiOW", "[COMPROU] " ..target_user_id.. " | [VENDEU] "..user_id.." | VALOR "..vehiclePrice.." | VEICULO: "..vehicleName.."")
+    vRP.sendLog("", "[COMPROU] " ..target_user_id.. " | [VENDEU] "..user_id.." | VALOR "..vehiclePrice.." | VEICULO: "..vehicleName.."")
     
     exports["vrp_admin"]:generateLog({
         category = "admin",

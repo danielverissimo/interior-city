@@ -10,7 +10,7 @@ export default {
         sans: ['Montserrat']
       },
       colors: {
-        primary: '#2981FF'
+        primary: '#d29f22'
       },
       background: {
       },
@@ -19,7 +19,7 @@ export default {
         'primary-gradient': 'linear-gradient(135deg, #2981FF 0%, #0030ff 100%)'
       },
       boxShadow: {
-        'primary': '0 0 .875rem 0 #2981FF'
+        'primary': '0 0 .875rem 0 #d29f2255'
       }
     },
   },

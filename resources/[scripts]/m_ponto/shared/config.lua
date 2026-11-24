@@ -152,6 +152,7 @@ Config.Orgs = {
         }
     },
     ["Policia"] = {
+        clockOnly = true,
         coords = {
             vec3(441.02,-978.35,30.68),
         },
@@ -160,6 +161,12 @@ Config.Orgs = {
         offDutyTitle = "Paisana",
         autoCreateOffDuty = true,
         groups = {
+            ["ComandoPM"] = {
+                WeaponsKit = { "Parafal", "Pdw", "Glock", "Taser", "Lanterna", "Cassetete" }
+            },
+            ["SubComandoPM"] = {
+                WeaponsKit = { "Parafal", "Pdw", "Glock", "Taser", "Lanterna", "Cassetete" }
+            },
             ["CoronelPM"] = {
                 WeaponsKit = { "Parafal", "Pdw", "Glock", "Taser", "Lanterna", "Cassetete" }
             },
@@ -433,6 +440,7 @@ Config.Orgs = {
         }
     },
     ["Driftking"] = {
+        clockOnly = true,
         coords = {
             vec3(918.93,-2043.33,30.62),
         },
@@ -459,6 +467,7 @@ Config.Orgs = {
         }
     },
     ["LSCustoms"] = {
+        clockOnly = true,
         coords = {
             vec3(-338.72,-157.70,44.58),
         },
@@ -477,6 +486,7 @@ Config.Orgs = {
         }
     },
     ["RedLine"] = {
+        clockOnly = true,
         coords = {
             vec3(2746.63,3505.09,55.25),
         },
@@ -494,6 +504,7 @@ Config.Orgs = {
         }
     },
     ["SportRacer"] = {
+        clockOnly = true,
         coords = {
             vec3(917.41,-950.55,44.25),
         },

@@ -1,6 +1,5 @@
 window.classInstances = {};
 globalThis.SelectedItem = {};
-window.imageUrl = 'http://127.0.0.1/images/'
 
 window.isOnline = true;
 
@@ -75,7 +74,7 @@ function renderEquippedWeaponsPanel(snapshot = {}) {
 			</div>
 			<div class="equipped-weapon-content">
 				<div class="equipped-weapon-visual">
-					${image ? `<img src="${window.imageUrl}${image}.png" alt="" onerror="this.onerror=null;this.src='./images/weapon.svg'">` : '<img src="./images/weapon.svg" alt="">'}
+					${image ? `<img src="${window.inventoryItemImage(image)}" alt="" onerror="this.onerror=null;this.src='./images/weapon.svg'">` : '<img src="./images/weapon.svg" alt="">'}
 				</div>
 				<div class="equipped-weapon-info">
 					<strong title="${displayName.replace(/"/g, "&quot;")}">${displayName}</strong>
@@ -143,7 +142,7 @@ function updateWeaponHud(payload = {}) {
 	reserve.textContent = String(Math.max(0, Number(payload.reserve) || 0));
 
 	if (itemImage) {
-		const nextSrc = `${window.imageUrl}${itemImage}.png`;
+		const nextSrc = window.inventoryItemImage(itemImage);
 		if (image.dataset.src !== nextSrc) {
 			image.dataset.src = nextSrc;
 			image.onerror = () => {
@@ -222,7 +221,7 @@ function renderQuickHotbar(payload = {}, held = false) {
 		slot.className = `quick-hotbar-slot${isActive ? " is-active" : ""}${data.empty ? " is-empty" : ""}`;
 		slot.innerHTML = `
 			<div class="quick-hotbar-key">${i}</div>
-			${image ? `<img class="quick-hotbar-item" src="${window.imageUrl}${image}.png" alt="" onerror="this.style.opacity='.18'">` : ""}
+			${image ? `<img class="quick-hotbar-item" src="${window.inventoryItemImage(image)}" alt="" onerror="this.style.opacity='.18'">` : ""}
 			${amountText ? `<div class="quick-hotbar-amount">${amountText}</div>` : ""}
 			${isActive ? '<div class="quick-hotbar-equipped">EQUIPADO</div>' : ""}
 		`;
@@ -282,8 +281,12 @@ const Routes = {
 		document.querySelector('.chest-title').innerHTML = 'Chão'
 	},
 	UPDATE_PICKUP: async (payload) => {
-		if (window.classInstances?.right?.pickup) {
+		if ($("#inventory").is(":visible") && (window.classInstances?.right?.pickup || $("#inventory").hasClass("single-inventory"))) {
 			const pickupData = await Client("GET_PICKUPS");
+			if (!$("#inventory").is(":visible")) return;
+			if ($("#inventory").hasClass("single-inventory") && Object.keys(pickupData.inventory || {}).length === 0) return;
+			$("#inventory").removeClass("single-inventory");
+			document.querySelector('.chest-title').textContent = 'Chão';
 			window.classInstances.right = new Pickup(pickupData);
 		}
 	},
@@ -324,7 +327,7 @@ const Routes = {
 		window.classInstances.right = new Shop(payload);
 		$("#inventory").show();
 		$('.weight-wrapper-right').css('display', 'none')
-		document.querySelector('.chest-title').innerHTML = 'Loja de departamento'
+		document.querySelector('.chest-title').textContent = payload.mode === "sell" ? payload.store_name : "Loja de departamento";
 	},
 	FORCE_UPDATE_INVENTORY: async (payload) => {
 		if (window.classInstances.left && $("#inventory").is(":visible")) {

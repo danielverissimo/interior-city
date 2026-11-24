@@ -16,30 +16,10 @@ let attempt = 1;
 let g_start, g_end;
 let animation_loop;
 let game_started = false;
+let speedMultiplier = 1;
 
 let streak = 0;
 let max_streak = 3;
-let taskSettings = null;
-
-function boundedInt(value, min, max, fallback) {
-  const number = Number(value);
-  return Number.isFinite(number) ? Math.max(min, Math.min(max, Math.round(number))) : fallback;
-}
-
-function configureTask(settings) {
-  taskSettings = null;
-  max_streak = 3;
-  if (!settings || typeof settings !== "object") return;
-
-  const targetMinDegrees = boundedInt(settings.targetMinDegrees, 5, 90, 25);
-  taskSettings = {
-    targetMinDegrees,
-    targetMaxDegrees: boundedInt(settings.targetMaxDegrees, targetMinDegrees, 90, 35),
-    initialIntervalMs: boundedInt(settings.initialIntervalMs, 5, 50, 12),
-    finalIntervalMs: boundedInt(settings.finalIntervalMs, 5, 50, 9),
-  };
-  max_streak = boundedInt(settings.rounds, 1, 8, 3);
-}
 
 let gradientCanvas = document.createElement("canvas");
 let gradientCtx = gradientCanvas.getContext("2d");
@@ -194,21 +174,15 @@ function draw() {
   if (typeof animation_loop !== undefined) clearInterval(animation_loop);
 
   g_start = getRandomInt(20, 40) / 10;
-  const targetWidth = taskSettings
-    ? getRandomInt(taskSettings.targetMinDegrees, taskSettings.targetMaxDegrees) * Math.PI / 180
-    : getRandomInt(3, 5) / 5;
-  g_end = g_start + targetWidth;
+  g_end = getRandomInt(3, 5) / 5;
+  g_end = g_start + g_end;
 
   degrees = 0;
   new_degrees = 360;
 
   key_to_press = "" + getRandomInt(1, 4);
 
-  time = taskSettings
-    ? Math.round(taskSettings.initialIntervalMs +
-      (taskSettings.finalIntervalMs - taskSettings.initialIntervalMs) *
-      streak / Math.max(1, max_streak - 1))
-    : 12;
+  time = 12;
 
   animation_loop = setInterval(animate_to, time);
 }
@@ -223,7 +197,7 @@ function animate_to() {
     canvas.style.display = "none";
     return;
   }
-  degrees += 2;
+  degrees += 2 * speedMultiplier;
   init();
 }
 
@@ -301,7 +275,7 @@ document.addEventListener("keydown", function ({ code }) {
       correct();
     }
     init(true);
-    if (streak !== max_streak) {
+    if (streak != 3) {
       draw();
     } else {
       finishsound();
@@ -318,8 +292,8 @@ document.addEventListener("keydown", function ({ code }) {
 
 window.addEventListener("message", ({ data }) => {
   if (data.action === "createTask") {
-    streak = 0;
-    configureTask(data.settings);
+    const requestedSpeed = Number(data.speedMultiplier);
+    speedMultiplier = Number.isFinite(requestedSpeed) && requestedSpeed > 0 ? requestedSpeed : 1;
     canvas.style.display = "";
     draw();
     document.querySelector('.taskImageProgress').style.display = 'flex'

@@ -75,7 +75,8 @@
         const img = document.createElement('img');
         img.className = 'drug-image';
         img.alt = String(drug.label || drug.item || 'Droga');
-        img.src = `${imageBaseUrl}${encodeURIComponent(String(drug.image || drug.item || ''))}.png`;
+        const image = drug.image || drug.item || '';
+        img.src = window.htdocsItemImage?.(image) || `${imageBaseUrl}${encodeURIComponent(image)}.png`;
         img.addEventListener('error', () => {
             img.remove();
             if (!imageWrap.querySelector('.image-fallback')) imageWrap.appendChild(fallbackIcon());

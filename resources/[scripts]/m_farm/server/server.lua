@@ -261,6 +261,7 @@ local function organizeRoutesToClient(userId, routeType)
     for _, route in ipairs(Config.Rewards[routeType]) do
         table.insert(routes, {
             name = route.name,
+            image = route.image,
             icon = Config.imageURL .. '/' .. route.image .. '.png',
             coins = Config.coinAmount,
             multiplier = getUserMultiplier(userId),
@@ -271,9 +272,13 @@ end
 
 --- @param index integer
 --- @return void
-function ServerAPI.openRoutes(index)
-    local source = source
+local function openRoutesForPlayer(source, index)
     local userId = vRP.getUserId(source)
+    if not userId then return false end
+    if usersRoutes[userId] and usersRoutes[userId].initialized then
+        TriggerClientEvent('Notify', source, 'negado', 'Voce ja esta em uma rota ativa. Finalize-a antes de iniciar outra.')
+        return false
+    end
 
     -- If no index provided, pick the first route the user has permission for
     if not index then
@@ -287,20 +292,37 @@ function ServerAPI.openRoutes(index)
 
     if not index or not Config.Routes[index] then
         TriggerClientEvent('Notify', source, 'negado', 'Nenhuma rota disponível para suas permissões.')
-        return
+        return false
     end
     if not hasPermission(userId, Config.Routes[index].permissions) then
         TriggerClientEvent('Notify', source, 'negado', 'Você não possui permissão para esta rota.')
-        return
+        return false
     end
     if not Config.Rewards[Config.Routes[index].rewardType] then
         TriggerClientEvent('Notify', source, 'negado', 'Recompensas não configuradas para esta rota.')
-        return
+        return false
     end
 
-    ClientAPI.openRoutes(source, organizeRoutesToClient(userId, Config.Routes[index].rewardType))
     usersRoutes[userId] = { routeIndex = index, initialized = false }
+    ClientAPI.openRoutes(source, organizeRoutesToClient(userId, Config.Routes[index].rewardType))
+    return true
 end
+
+function ServerAPI.openRoutes(index)
+    return openRoutesForPlayer(source, index)
+end
+
+-- Adaptador server-side para o inicio separado. Preserva o menu, as permissoes,
+-- os trajetos, as recompensas e toda a coleta do m_farm existente.
+exports('openFarmRoutesForPlayer', function(player, rewardType)
+    if GetInvokingResource() ~= 'm_farm_inicio' then return false end
+    player=tonumber(player)
+    if not player or type(rewardType)~='string' then return false end
+    for index,route in ipairs(Config.Routes) do
+        if route.rewardType==rewardType then return openRoutesForPlayer(player,index) end
+    end
+    return false
+end)
 
 --- @return boolean
 function ServerAPI.boostRoute()
@@ -343,7 +365,10 @@ function ServerAPI.startRoute(routeName, region)
         return false
     end
 
-    local routeIndex = usersRoutes[userId].routeIndex
+    local pending = usersRoutes[userId]
+    if not pending then return false end
+    local routeIndex = pending.routeIndex
+    if not Config.Routes[routeIndex] or not hasPermission(userId, Config.Routes[routeIndex].permissions) then return false end
     local rewardType = Config.Routes[routeIndex].rewardType
     local rewards = Config.Rewards[rewardType]
 

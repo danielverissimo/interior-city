@@ -14,7 +14,7 @@ Citizen.CreateThread(function()
 	while true do
         local players,id = vSERVER.CheckPlayers()
         SetDiscordAppId(1457016081515413729)
-        SetDiscordRichPresenceAssetText('TocaDoMago DELUX')
+        SetDiscordRichPresenceAssetText('Interior City')
 		SetDiscordRichPresenceAsset("logo")
 		SetDiscordRichPresenceAssetSmall('logo')
 		SetDiscordRichPresenceAssetSmallText('O Servidor mais otimizado do BRASIL')
@@ -131,6 +131,7 @@ end)
 -- FIX TRUNKIN
 -----------------------------------------------------------------------------------------------------------------------------------------
 local isInTrunkIn = false
+local isTrunkVehID = nil
 
 src.updateTrunkIn = function(vehicle, status)
 	if status then
@@ -151,12 +152,54 @@ src.updateTrunkIn = function(vehicle, status)
 					SetEntityVisible(PlayerPedId(), true)
 					SetEntityInvincible(PlayerPedId(), false)
 					vRP.setMalas(false)
+					TriggerServerEvent("novak:server:trunkLeft")
 				end
 			end
 			Wait(300)
 		end
 	end)
 end
+RegisterNetEvent("novak:client:insertUserInTrunkin",function(netId)
+    local deadline = GetGameTimer()+2000
+    while not NetworkDoesEntityExistWithNetworkId(netId) and GetGameTimer() < deadline do Wait(50) end
+    if not NetworkDoesEntityExistWithNetworkId(netId) then
+        TriggerServerEvent("novak:server:trunkResult",false)
+        return
+    end
+    local vehicle = NetToVeh(netId)
+    if not IsEntityAVehicle(vehicle) then
+        TriggerServerEvent("novak:server:trunkResult",false)
+        return
+    end
+    local entered = vRP.setMalas(true,netId) == true
+    if entered then src.updateTrunkIn(vehicle,true) end
+    TriggerServerEvent("novak:server:trunkResult",entered)
+end)
+
+RegisterNetEvent("novak:client:removeUserInTrunkin",function(netId)
+    vRP.setMalas(false,netId)
+    DetachEntity(PlayerPedId(),true,true)
+    SetEntityVisible(PlayerPedId(),true)
+    src.updateTrunkIn(nil,false)
+    TriggerServerEvent("novak:server:trunkLeft")
+end)
+
+RegisterNetEvent("vrp_player:unstuck",function()
+    local ped = PlayerPedId()
+    if IsEntityAttached(ped) or IsPedInAnyVehicle(ped,false) or LocalPlayer.state.isSpawnActived then
+        TriggerEvent("Notify","negado","Saia do veículo ou finalize a ação atual antes de desbugar.",5000)
+        return
+    end
+    TriggerEvent("dynamic:closeMenu")
+    ClearPedTasksImmediately(ped)
+    ClearPedSecondaryTask(ped)
+    ResetPedMovementClipset(ped,0.0)
+    ResetPedStrafeClipset(ped)
+    ResetPedWeaponMovementClipset(ped)
+    FreezeEntityPosition(ped,false)
+    SetEntityVisible(ped,true)
+    TriggerEvent("Notify","sucesso","Animações e movimentos restabelecidos.",5000)
+end)
 -- soco
 
 -- Citizen.CreateThread(function()
@@ -977,7 +1020,7 @@ local pedlist = {
 	-- { ['coords'] = vec4(1279.09,-264.3,97.83,12.42), ['hash2'] = "s_m_y_swat_01"}, -- Bronks
 	-- { ['coords'] = vec4(-2664.1,1327.31,147.37,179.12), ['hash2'] = "s_m_y_swat_01"}, -- Korea
 	-- { ['coords'] = vec4(-711.66,5768.39,17.32,0.0), ['hash2'] = "s_m_y_swat_01"}, -- Magnatas
-	-- { ['coords'] = vec4(-2041.56,-139.79,27.09,200.66), ['hash2'] = "s_m_y_swat_01"}, -- Franca
+	-- { ['coords'] = vec4(-2041.56,-139.79,27.09,200.66), ['hash2'] = "s_m_y_swat_01"}, -- Azul
 	-- { ['coords'] = vec4(-1816.57,449.37,128.41,356.57), ['hash2'] = "s_m_y_swat_01"}, -- Turquia
 	-- { ['coords'] = vec4(-1536.96,83.17,56.77,320.41), ['hash2'] = "s_m_y_swat_01"}, -- Central
 	-- { ['coords'] = vec4(1441.19,1137.88,114.33,93.4), ['hash2'] = "s_m_y_swat_01"}, -- Russia
@@ -986,7 +1029,7 @@ local pedlist = {
 	-- { ['coords'] = vec4(-543.9,338.73,84.37,171.8), ['hash2'] = "s_m_y_swat_01"}, -- Tequila
 	-- { ['coords'] = vec4(-3171.44,798.19,11.76,32.58), ['hash2'] = "s_m_y_swat_01"}, -- Furia
 	-- { ['coords'] = vec4(-295.06,184.01,87.92,184.9), ['hash2'] = "s_m_y_swat_01"}, -- Lux
-	-- { ['coords'] = vec4(1013.54,-111.65,73.89,129.59), ['hash2'] = "s_m_y_swat_01"}, -- Motoclube
+	-- { ['coords'] = vec4(1013.54,-111.65,73.89,129.59), ['hash2'] = "s_m_y_swat_01"}, -- Vermelhos
 	-- { ['coords'] = vec4(-1085.32,-1642.62,4.48,127.54), ['hash2'] = "s_m_y_swat_01"}, -- Baixada
 	-- { ['coords'] = vec4(501.09,-1340.5,29.3,359.54), ['hash2'] = "s_m_y_swat_01"}, -- Cohab
 	-- { ['coords'] = vec4(-2205.53,4242.72,48.34,40.62), ['hash2'] = "s_m_y_swat_01"}, -- Lacoste
@@ -995,7 +1038,7 @@ local pedlist = {
 	-- { ['coords'] = vec4(2358.98,3084.35,48.16,24.85), ['hash2'] = "s_m_y_swat_01"}, -- Roxos
 	-- { ['coords'] = vec4(-810.72,166.42,72.22,115.44), ['hash2'] = "s_m_y_swat_01"}, -- Belgica
 	-- { ['coords'] = vec4(-1897.39,2078.76,141.0,317.93), ['hash2'] = "s_m_y_swat_01"}, -- Italia
-	-- { ['coords'] = vec4(180.02,2793.22,45.65,281.69), ['hash2'] = "s_m_y_swat_01"}, -- Colombia
+	-- { ['coords'] = vec4(180.02,2793.22,45.65,281.69), ['hash2'] = "s_m_y_swat_01"}, -- Verdes
 	-- { ['coords'] = vec4(-543.9,338.73,84.37,171.8), ['hash2'] = "s_m_y_swat_01"}, -- Vanilla
 	-- { ['coords'] = vec4(730.95,3395.45,62.68,300.98), ['hash2'] = "s_m_y_swat_01"}, -- Cosanostra
 
@@ -1703,7 +1746,8 @@ exports("setinsafe", function(status)
 end)
 
 function src.isInDomination()
-	return exports.dominacao:inDomination() or exports.dm_module:inDomination() or exports['fusion_dominacao_pistol']:inDomination()
+	if not GlobalState.isDominationActive then return false end
+	return exports.dm_module:inDomination()
 end
 
 RegisterNetEvent("novak:markerYouOrganization", function(permission, orgName)
@@ -1789,55 +1833,32 @@ end)
 -- CARREGAR NO OMBRO
 --------------------------------------------------------------------------------
 local carryingBackInProgress = false
+local carryingPartner = nil
 
-RegisterCommand("carregar",function(source, args)
-	
-		if not carryingBackInProgress then
-			if vSERVER.checkpermcarregar() then
-				carryingBackInProgress = true
-				local player = PlayerPedId()	
-				lib = 'missfinale_c2mcs_1'
-				anim1 = 'fin_c2_mcs_1_camman'
-				lib2 = 'nm'
-				anim2 = 'firemans_carry'
-				distans = 0.15
-				distans2 = 0.27
-				height = 0.63
-				spin = 0.0		
-				length = 100000
-				controlFlagMe = 49
-				controlFlagTarget = 33
-				animFlagTarget = 1
-				local closestPlayer = GetClosestPlayer(3)
-				target = GetPlayerServerId(closestPlayer)
-				if closestPlayer ~= nil then
-				--	print("triggering cmg2_animations:sync")
-					TriggerServerEvent('cmg2_animations:sync', closestPlayer, lib,lib2, anim1, anim2, distans, distans2, height,target,length,spin,controlFlagMe,controlFlagTarget,animFlagTarget)
-				else
-				--	print("[Aviso] Nenhum jogador por perto")
-				end
-			end
-		else
-			carryingBackInProgress = false
-			ClearPedSecondaryTask(GetPlayerPed(-1))
-			DetachEntity(GetPlayerPed(-1), true, false)
-			local closestPlayer = GetClosestPlayer(3)
-			target = GetPlayerServerId(closestPlayer)
-			TriggerServerEvent("cmg2_animations:stop",target)
-		end
-	
+RegisterCommand("carregar",function()
+    if carryingBackInProgress then
+        TriggerServerEvent("cmg2_animations:stop")
+        return
+    end
+    local target = vSERVER.checkpermcarregar()
+    if type(target) == "number" and target > 0 then
+        TriggerServerEvent("cmg2_animations:sync")
+    end
 end,false)
-
 RegisterNetEvent('cmg2_animations:syncTarget')
 AddEventHandler('cmg2_animations:syncTarget', function(target, animationLib, animation2, distans, distans2, height, length,spin,controlFlag)
 	local playerPed = GetPlayerPed(-1)
-	local targetPed = GetPlayerPed(GetPlayerFromServerId(target))
+	local targetPlayer = GetPlayerFromServerId(target)
+    if targetPlayer == -1 then TriggerServerEvent('cmg2_animations:stop') return end
+    local targetPed = GetPlayerPed(targetPlayer)
+    carryingPartner = target
 	carryingBackInProgress = true
 	print("triggered cmg2_animations:syncTarget")
 	RequestAnimDict(animationLib)
 
 	while not HasAnimDictLoaded(animationLib) do
 		Citizen.Wait(10)
+		if not carryingBackInProgress then return end
 	end
 	if spin == nil then spin = 180.0 end
 	AttachEntityToEntity(GetPlayerPed(-1), targetPed, 0, distans2, distans, height, 0.5, 0.5, spin, false, false, false, false, 2, false)
@@ -1846,28 +1867,54 @@ AddEventHandler('cmg2_animations:syncTarget', function(target, animationLib, ani
 end)
 
 RegisterNetEvent('cmg2_animations:syncMe')
-AddEventHandler('cmg2_animations:syncMe', function(animationLib, animation,length,controlFlag,animFlag)
+AddEventHandler('cmg2_animations:syncMe', function(animationLib, animation,length,controlFlag,animFlag,partner)
 	local playerPed = GetPlayerPed(-1)
-	print("triggered cmg2_animations:syncMe")
+	carryingPartner = partner
+    carryingBackInProgress = true
 	RequestAnimDict(animationLib)
 
 	while not HasAnimDictLoaded(animationLib) do
 		Citizen.Wait(10)
+		if not carryingBackInProgress then return end
 	end
 	Wait(500)
+	if not carryingBackInProgress then return end
 	if controlFlag == nil then controlFlag = 0 end
 	TaskPlayAnim(playerPed, animationLib, animation, 8.0, -8.0, length, controlFlag, 0, false, false, false)
 
-	Citizen.Wait(length)
 end)
 
 RegisterNetEvent('cmg2_animations:cl_stop')
 AddEventHandler('cmg2_animations:cl_stop', function()
 	carryingBackInProgress = false
+	carryingPartner = nil
 	ClearPedSecondaryTask(GetPlayerPed(-1))
 	DetachEntity(GetPlayerPed(-1), true, false)
 end)
 
+CreateThread(function()
+    while true do
+        if carryingBackInProgress and carryingPartner then
+            local partner = GetPlayerFromServerId(carryingPartner)
+            if partner == -1 or IsEntityDead(PlayerPedId()) then TriggerServerEvent("cmg2_animations:stop") end
+        end
+        Wait(1000)
+    end
+end)
+
+AddEventHandler('onResourceStop',function(name)
+    if name ~= GetCurrentResourceName() then return end
+    if carryingBackInProgress then
+        DetachEntity(PlayerPedId(),true,false)
+        ClearPedSecondaryTask(PlayerPedId())
+    end
+    if isInTrunkIn then
+        vRP.setMalas(false)
+        TriggerServerEvent("novak:server:trunkLeft")
+        DetachEntity(PlayerPedId(),true,true)
+        SetEntityVisible(PlayerPedId(),true)
+    end
+end)
 function GetPlayers()
     local players = {}
 
@@ -1899,7 +1946,7 @@ function GetClosestPlayer(radius)
         end
     end
 --	print("jogador mais próximo é dist: " .. tostring(closestDistance))
-	if closestDistance <= radius then
+	if closestDistance >= 0 and closestDistance <= radius then
 		return closestPlayer
 	else
 		return nil

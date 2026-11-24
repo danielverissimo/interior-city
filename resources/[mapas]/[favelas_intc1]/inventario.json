@@ -1,0 +1,4153 @@
+[
+    {
+        "file":  "apa_ch2_04_1.ybn",
+        "destination":  "cold_favela_observatorio\\stream\\apa_ch2_04_1.ybn",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  222261,
+        "sha256":  "811906881B9CBE19A1404137656AD80697E9FD3552B9230867F5B0300CE84419"
+    },
+    {
+        "file":  "apa_ch2_04_long_9.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\apa_ch2_04_long_9.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  13291,
+        "sha256":  "F1684C156CA57A4A38D2C772F67108B76A873B74989EB95AB0EB63F6FCD39AF1"
+    },
+    {
+        "file":  "apa_ch2_04_strm_6.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\apa_ch2_04_strm_6.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  11438,
+        "sha256":  "FEC9EB2CC49822A865CFEE75F16BEA6FDD2469377477E28B627A66447355F517"
+    },
+    {
+        "file":  "apa_ch2_10_strm_0.ymap",
+        "destination":  "cold_favela_mirante\\stream\\apa_ch2_10_strm_0.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  12531,
+        "sha256":  "A18B4C23EB6568B3A8D5A8D42041AD7D5FE805B26A3B96256976823CC5401538"
+    },
+    {
+        "file":  "ch1_01_grass_2.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\ch1_01_grass_2.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1467397,
+        "sha256":  "CC167727FA0731B123E30D4ED94FF7E64C60252AD768D770A3785C8A21806EB6"
+    },
+    {
+        "file":  "ch1_01_grass_3.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\ch1_01_grass_3.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1732306,
+        "sha256":  "14D27E893BDE2EB7AEC79E728E412038F3AEA7480E8BB4E0FF945894C9ADEBF1"
+    },
+    {
+        "file":  "ch1_04b_grass_0.ymap",
+        "destination":  "cold_favela_pantano\\stream\\ch1_04b_grass_0.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  1579356,
+        "sha256":  "E496E446CA4A4B7B1A7CBE1D76A7FE91FB17AD7ED5A4AC87AAC1ABCD2D80D9E6"
+    },
+    {
+        "file":  "ch1_06d_grass_0.ymap",
+        "destination":  "cold_favela_mirante\\stream\\ch1_06d_grass_0.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  943425,
+        "sha256":  "0908A6022A3FD06B705FA28821396F48BD41AA6C53727163DD01B582471C8F23"
+    },
+    {
+        "file":  "ch2_04_grass_0.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\ch2_04_grass_0.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1614237,
+        "sha256":  "622B225BA134C509F2922A8E669B163D551EA58E9BAA9F5020A1C482DA63D8F2"
+    },
+    {
+        "file":  "ch2_04_grass_1.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\ch2_04_grass_1.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1520507,
+        "sha256":  "D20FD54991B59D0C9EAEBA8B3679E6ABE39948FD5FC0BAB8E166ED2ACE219600"
+    },
+    {
+        "file":  "ch2_10_grass_0.ymap",
+        "destination":  "cold_favela_mirante\\stream\\ch2_10_grass_0.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  1616986,
+        "sha256":  "99687A4A3B7771E2DBC42A71CA26FFF610141AB9EE8596DAF58E8B135224F0DB"
+    },
+    {
+        "file":  "ch3_06_grass_0.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\ch3_06_grass_0.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  2617820,
+        "sha256":  "8B9334BB830AA66117DE2491073A89BD827538DB980FA17050CBBABE7FB11565"
+    },
+    {
+        "file":  "ch3_06_grass_1.ymap",
+        "destination":  "cold_favela_barragem\\stream\\ch3_06_grass_1.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  2340172,
+        "sha256":  "0720725D0D65568B08AC72592A784BDEFE2813BD952B9713E7E3B50F6125BBC9"
+    },
+    {
+        "file":  "ch3_08_grass_0.ymap",
+        "destination":  "cold_favela_barragem\\stream\\ch3_08_grass_0.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1447256,
+        "sha256":  "EA713837132B1B05D1E25809EA8981993C058D3EB4D8FD5BE50DA6AF254B9235"
+    },
+    {
+        "file":  "ch3_10_grass_0.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\ch3_10_grass_0.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1985437,
+        "sha256":  "1012D3A3CDE21AB80D4F63EDA1A5D90929D7071F7ED3B96A3A40D8C9BD93A003"
+    },
+    {
+        "file":  "ch3_10_grass_1.ymap",
+        "destination":  "cold_favela_trilho\\stream\\ch3_10_grass_1.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1652830,
+        "sha256":  "61D82296C749E0C4893326F05D3E7CCDBD97FA9B189899D99E4FCEA50AE6CBC1"
+    },
+    {
+        "file":  "cs4_14_grass_0.ymap",
+        "destination":  "cold_favela_egito\\stream\\cs4_14_grass_0.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  1117181,
+        "sha256":  "3E9952677BC18C32902849A8909BFBA7BB6D0FED6FE2CBBD6C3D3C7038F1388A"
+    },
+    {
+        "file":  "cs5_2_critical_0.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\cs5_2_critical_0.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  14632,
+        "sha256":  "B8B3E356D0A8B42E413DA4E4536E26B999A3CB8F333B2BBBA9E51B07BDA32F57"
+    },
+    {
+        "file":  "cs5_2_grass_0.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\cs5_2_grass_0.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1394485,
+        "sha256":  "6B6C709D230DB1F2B2AE7CCC7FA210BC9A054383EFBED8C0FD0E963122BA6FEB"
+    },
+    {
+        "file":  "cs5_2_strm_0.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\cs5_2_strm_0.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  20496,
+        "sha256":  "F648B607AE8D9E2F84973E79FA2323912B635631790E621F04E00ADE153813AA"
+    },
+    {
+        "file":  "cs6_09_0.ybn",
+        "destination":  "cold_favela_novaesperanca\\stream\\cs6_09_0.ybn",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  212225,
+        "sha256":  "337EF8C0D4ADA78BDE155BE8899E56A9B1908BA32B041F6F613E19CB03FFC8A2"
+    },
+    {
+        "file":  "cs6_09_1.ybn",
+        "destination":  "cold_favela_novaesperanca\\stream\\cs6_09_1.ybn",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  276572,
+        "sha256":  "0D7B484052C3E44A9165DC6FE57E211A8EC8D42D19C6F67EE49670785841223F"
+    },
+    {
+        "file":  "cs6_09_8.ybn",
+        "destination":  "cold_favela_novaesperanca\\stream\\cs6_09_8.ybn",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  420545,
+        "sha256":  "C3F43BD237838665B59FA9E3847C48A337B6AE2C602CE6BEEB07630F50EAB063"
+    },
+    {
+        "file":  "cs6_09_9.ybn",
+        "destination":  "cold_favela_novaesperanca\\stream\\cs6_09_9.ybn",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  138167,
+        "sha256":  "444BE55D6E2B8055EBBC19166230AE78927B1D369F9F8A427DCAA43EC30B84CE"
+    },
+    {
+        "file":  "cs6_09_grass_0.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\cs6_09_grass_0.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  2418263,
+        "sha256":  "AE2254FDA88430BE79DEF871752072227FF74113994BF30A3D51BEA515F8E4FC"
+    },
+    {
+        "file":  "desktop.ini",
+        "destination":  "originais\\desktop.ini",
+        "resource":  "favelas_cold_assets",
+        "bytes":  106,
+        "sha256":  "B420FEA70DC309E74E9594EA74B41F3B239458B1EF8FE7064C392C4757262CC0"
+    },
+    {
+        "file":  "favela_mirante_01.ymap",
+        "destination":  "cold_favela_mirante\\stream\\favela_mirante_01.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  16376,
+        "sha256":  "80E8874E504ACF78140955F14DF2D35B8537B4AA620158528A4505BEFB4DC176"
+    },
+    {
+        "file":  "favela_mirante_02.ymap",
+        "destination":  "cold_favela_mirante\\stream\\favela_mirante_02.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  14765,
+        "sha256":  "E53D7D80EBDF1A06E867AC0840602552593B54BBB1BB5350E325F9A88698E5E9"
+    },
+    {
+        "file":  "favela_pantano_01.ymap",
+        "destination":  "cold_favela_pantano\\stream\\favela_pantano_01.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  13061,
+        "sha256":  "076A956F26C23DDE0D6A5FEAF9BE00BC4848573705206AF2A3F7F95F60F017E3"
+    },
+    {
+        "file":  "favela_pantano_02.ymap",
+        "destination":  "cold_favela_pantano\\stream\\favela_pantano_02.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  10725,
+        "sha256":  "79B2C23FE26E5E00A749C473EFAD717A8D0845D95DAC8EE65F1A7912A898332A"
+    },
+    {
+        "file":  "favela_rotatoria_01.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\favela_rotatoria_01.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  14849,
+        "sha256":  "D5D389EB7599B131C6EBE209EBAB9E7E1755257676116FE2F16461D47CB1B9BB"
+    },
+    {
+        "file":  "favela_rotatoria_02.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\favela_rotatoria_02.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  15028,
+        "sha256":  "173239B0AE81048BC4459A0923686AF5C46ACD4D68946C56440BCE256B9EC0FB"
+    },
+    {
+        "file":  "gustavera_bar.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bar.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2298,
+        "sha256":  "45D517142B602893D81E8DCB29807EA025A44ECC209B31D5218C55AFF7EB1BA6"
+    },
+    {
+        "file":  "gustavera_barbe.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_barbe.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3550,
+        "sha256":  "93415EEA7856A493B19BE85BE76FD6DD7B36DE1AE23D28B32AE7F453FBEF74B7"
+    },
+    {
+        "file":  "gustavera_barbe_cadeira.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_barbe_cadeira.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221775,
+        "sha256":  "C91678901D0F542819E5DEB7261C31F3408F13B94D524EF2A7DED7F60BC18080"
+    },
+    {
+        "file":  "gustavera_barbe_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_barbe_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79684,
+        "sha256":  "BB1EFBCA976D0D81C93E7EFC090E6713EBF984FFFD54A19B00C515C28177BC26"
+    },
+    {
+        "file":  "gustavera_barbe_mirror.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_barbe_mirror.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  743,
+        "sha256":  "93A926F522027BD25CBB7BB24A1378317C92251496881F33A82E789C4A7F992B"
+    },
+    {
+        "file":  "gustavera_barbe_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_barbe_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  842125,
+        "sha256":  "BA39A5CCC4D9E3488B63B1071B3C9C51F69831841C304AA98CEE17EDF40B10BD"
+    },
+    {
+        "file":  "gustavera_barragem_barbe_mlo.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_barragem_barbe_mlo.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1217,
+        "sha256":  "B975BF8B38681A1624A3A985F40AC25E8C89DEE556B43DBFB59359C322D259F8"
+    },
+    {
+        "file":  "gustavera_barragem_bar_mlo.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_barragem_bar_mlo.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1216,
+        "sha256":  "A9CF8BD1C589D0D17F82AFE0DAF9E345E7F47419997D7ECB9393D35C7F6BFD14"
+    },
+    {
+        "file":  "gustavera_barragem_bau_mlo.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_barragem_bau_mlo.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1220,
+        "sha256":  "0520BBA33CB4880007FA184C08CE6C19C758888B080AF83C7DA5AF22DBF99BA0"
+    },
+    {
+        "file":  "gustavera_barragem_chefe_mlo.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_barragem_chefe_mlo.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1219,
+        "sha256":  "DEA885663F51A0C3EFC7AD9EF0FB82E0A02EC1F9F5A6721E419D70E97AACE7EC"
+    },
+    {
+        "file":  "gustavera_barragem_roupa_mlo.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_barragem_roupa_mlo.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1225,
+        "sha256":  "39EC970D7560C208BF5229FBF744F58AD47D634B78C461F364F370992ED47591"
+    },
+    {
+        "file":  "gustavera_bar_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bar_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79684,
+        "sha256":  "BB1EFBCA976D0D81C93E7EFC090E6713EBF984FFFD54A19B00C515C28177BC26"
+    },
+    {
+        "file":  "gustavera_bar_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bar_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  187092,
+        "sha256":  "EFC8DF7A9355080C291C0D79F01DC61FEFA44FBD4F9968E7178CBCFD975AF3FA"
+    },
+    {
+        "file":  "gustavera_bau.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bau.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3417,
+        "sha256":  "F4A0038361BEC13E4084BC9B68BDCF317B14C8D6FD3301953DD9385C05804057"
+    },
+    {
+        "file":  "gustavera_bau_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bau_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  4256,
+        "sha256":  "DA2947758284C6E873B4F000860550146789744C86BEE2A0E1C03185FCBDD689"
+    },
+    {
+        "file":  "gustavera_bau_escada.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bau_escada.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  15814,
+        "sha256":  "4440CC22CA1DEB573847948F26DD67E6CBB677C256454BFD2FECE6BD97E6B110"
+    },
+    {
+        "file":  "gustavera_bau_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_bau_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  131153,
+        "sha256":  "68C76959E3F04754DDBBCA2488C0303B461BB2AA3DAE97E054694C7CEBBBB255"
+    },
+    {
+        "file":  "gustavera_cemiterio_barbe_mlo.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_cemiterio_barbe_mlo.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1227,
+        "sha256":  "51C1E900705BF71036D90BF9B41EAF4A4457F73F02A1D5DE0926734A859CD8AA"
+    },
+    {
+        "file":  "gustavera_cemiterio_bar_mlo.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_cemiterio_bar_mlo.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1227,
+        "sha256":  "FD17FC4F44BC05D1E5B8C85A77F855BAB9E0B3A784E903F2F131615EB8EEEFB1"
+    },
+    {
+        "file":  "gustavera_cemiterio_bau_mlo.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_cemiterio_bau_mlo.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1225,
+        "sha256":  "CD2B83C5A1DEFB24D739C723BEF3EB437F8BC9764D0E874CEC3BC07AEEFB033F"
+    },
+    {
+        "file":  "gustavera_cemiterio_chefe_mlo.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_cemiterio_chefe_mlo.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1320,
+        "sha256":  "17409D99CE526855C16837A22D828144BDC1E66AE5A01D354EB2C10C4D9B86B7"
+    },
+    {
+        "file":  "gustavera_cemiterio_roupa_mlo.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_cemiterio_roupa_mlo.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1233,
+        "sha256":  "C4CD752CACE77E3BAFD9FFFA3ACC744B5D5442C9F51A4C3A924D302DF5A9922D"
+    },
+    {
+        "file":  "gustavera_chefe.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_chefe.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  4325,
+        "sha256":  "EDCF929E1A2AC3011E58713FDCBF5E00D75C1E47C054263DC45A74F2C642D2F6"
+    },
+    {
+        "file":  "gustavera_chefe_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_chefe_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  24158,
+        "sha256":  "3721F7C3B54336E2D33213102F89D3ED495C92285BBD171B703468CA64D6B141"
+    },
+    {
+        "file":  "gustavera_chefe_escada.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_chefe_escada.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  16630,
+        "sha256":  "70BF500CD1DE921FE98F5F04A7DDCC71BCF0549F31ADFF309F0CAA3235FE05E7"
+    },
+    {
+        "file":  "gustavera_chefe_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_chefe_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  414741,
+        "sha256":  "9FD7A61ABBDD82236DEFBEDD59BC85277CC6460399EA0593D05C41DE10CC61D1"
+    },
+    {
+        "file":  "gustavera_complexomiramar_barbe_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_barbe_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1231,
+        "sha256":  "42125EF41889A1FA8C5F7BFDEAC9B48DEFE5F8E0CEE90F27B8B18AF4BAAB669B"
+    },
+    {
+        "file":  "gustavera_complexomiramar_bar_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_bar_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1227,
+        "sha256":  "54BF5CC6C33259B9F5C76B418B9CF4E19B754540427AB272719B54A19A56A4E9"
+    },
+    {
+        "file":  "gustavera_complexomiramar_bau_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_bau_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1228,
+        "sha256":  "FD041D11A1923E246DEE33F5A5FEE53C3DA91DC0666FDE3688436B4DD9C684FF"
+    },
+    {
+        "file":  "gustavera_complexomiramar_chefe_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_chefe_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1230,
+        "sha256":  "B05F63A7F1CEB5628D6DF7B815A8F613D2B21F8B5FDEC6E137EA4BDCA330384D"
+    },
+    {
+        "file":  "gustavera_complexomiramar_farm_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_farm_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1233,
+        "sha256":  "6A62D62D5D701D4C7B518CDF0C4183AD8026AB1A2C0450306AAEE5D937544628"
+    },
+    {
+        "file":  "gustavera_complexomiramar_fios.ydr",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_fios.ydr",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  473002,
+        "sha256":  "A19BEEFB61CDB88EFD22765C73456E4B65DF263E32D024D2A927ADB09FC7006B"
+    },
+    {
+        "file":  "gustavera_complexomiramar_mec_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_mec_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1240,
+        "sha256":  "4F01653E719E41C59137A6CF906C7110A55FEF06AFA4547DA1C19BC49B4ACEC7"
+    },
+    {
+        "file":  "gustavera_complexomiramar_piscina_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_piscina_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1233,
+        "sha256":  "9F38E76E2E91C64EAC6694F287AAE76CD6199AECDAE8CE5CF8415326AFA07014"
+    },
+    {
+        "file":  "gustavera_complexomiramar_roupa_mlo.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_complexomiramar_roupa_mlo.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1239,
+        "sha256":  "BB6EE9D913D1FC4D46C802C9ADB2778CB98C01F81DE75AAD0AF9817474011D1F"
+    },
+    {
+        "file":  "gustavera_egito_barbe_mlo.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_egito_barbe_mlo.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  1221,
+        "sha256":  "284A1CE3F0CF22BEF12360F50CB55E130953C1677CE62225F47C66BA0FAA9FB8"
+    },
+    {
+        "file":  "gustavera_egito_bar_mlo.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_egito_bar_mlo.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  1217,
+        "sha256":  "685256FA96E6D196D8630A35B35EEAF20A9126D10978C6171E8BFB96AC01D613"
+    },
+    {
+        "file":  "gustavera_egito_bau_mlo.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_egito_bau_mlo.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  1219,
+        "sha256":  "52DF10687CAD5EA514845F899F40852734514A37AC7DE207B99ADC6071094362"
+    },
+    {
+        "file":  "gustavera_egito_chefe_mlo.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_egito_chefe_mlo.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  1222,
+        "sha256":  "49FE42ED95BDDE283BE6390EF57CF5307C0D9D0394A874CF7869BA0CCF917FCA"
+    },
+    {
+        "file":  "gustavera_egito_roupa_mlo.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_egito_roupa_mlo.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  1224,
+        "sha256":  "99AF1E0F7A733CADEB425893E8BD67B8972AD69F7043391183537F4E425A24BF"
+    },
+    {
+        "file":  "gustavera_farm.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_farm.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3019,
+        "sha256":  "4B3DD965463A75EEC45EAF7EA3892C54667951092F683BC954F5EAD3F0E8F1BC"
+    },
+    {
+        "file":  "gustavera_farm_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_farm_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3325,
+        "sha256":  "3485451C49122D1066337085FFB6CB752229D11705F2741BB9B309A27F703A5B"
+    },
+    {
+        "file":  "gustavera_farm_escada.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_farm_escada.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  16245,
+        "sha256":  "73C924779127615167D62CF21A1EFD6ADF75FBF4C2B2818B7B1D53864C855DC8"
+    },
+    {
+        "file":  "gustavera_farm_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_farm_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  4558,
+        "sha256":  "A29E716B65B4D145D3E375E310EF3D2B9C6C351169C15875015DB4602E395878"
+    },
+    {
+        "file":  "gustavera_fav_arma_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_arma_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  584771,
+        "sha256":  "87662A5DF6FD4819FBD312C0C758D2FC5A5FAC0E1EEAC49FAAE7A3BA3E143BF6"
+    },
+    {
+        "file":  "gustavera_fav_arma_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_arma_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  396839,
+        "sha256":  "4C024D005126693F75D2854BE931E3128E7BA9413E28AA6F99A297B52C50ECAE"
+    },
+    {
+        "file":  "gustavera_fav_arma_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_arma_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  561358,
+        "sha256":  "2DE92F7CD2EB3F5F8E7CE4FB78838C668C344308ABA2168910DD52C91D1FDBA9"
+    },
+    {
+        "file":  "gustavera_fav_arma_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_arma_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  670118,
+        "sha256":  "8A32916B0B7FDB3165D51FE232DE6EA677BB926FB07718C9244B48F3484851A7"
+    },
+    {
+        "file":  "gustavera_fav_banco_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_banco_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  650299,
+        "sha256":  "5A7372999712A22949F0BCF08A55B22872DFB1FFC0B5D1497C0AC0DF302BCDA6"
+    },
+    {
+        "file":  "gustavera_fav_banco_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_banco_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  786858,
+        "sha256":  "6219FA5E7662EBC29F5B34A102CCA3E7376BE7D482DABBE39EF07D6CD1BA32CE"
+    },
+    {
+        "file":  "gustavera_fav_banco_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_banco_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  825273,
+        "sha256":  "391A646F9CA67F3333C5E41900C777BFEB2AE83B7563F566AD7B514CDABA0E4A"
+    },
+    {
+        "file":  "gustavera_fav_banco_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_banco_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  214690,
+        "sha256":  "248F9DCC1C7152CA8A16C67DE73D367C02DCB48370D093CEB502CFC4902DE3A6"
+    },
+    {
+        "file":  "gustavera_fav_bandeiras.yft",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_bandeiras.yft",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2719,
+        "sha256":  "3DF02690DF257EE5C5DE4AD29677EA397E422CCF0C58EB4A56283747C2CC9009"
+    },
+    {
+        "file":  "gustavera_fav_barragem_01.ydr",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_01.ydr",
+        "resource":  "cold_favela_barragem",
+        "bytes":  361841,
+        "sha256":  "90A663CCD8F2837C68F0047079CB93167F1C11009B611D7069B41D489D961D6E"
+    },
+    {
+        "file":  "gustavera_fav_barragem_01.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_01.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  13203,
+        "sha256":  "2B4C196C44F133F51969B1DE281C9E4E065CC6AF6EDB4FAC0535AE7F957D4121"
+    },
+    {
+        "file":  "gustavera_fav_barragem_02.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_02.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  11974,
+        "sha256":  "82FD45E7D4DBFC001A28294E2847B1657B68E58EBC57FAE2777D6448CD769B1E"
+    },
+    {
+        "file":  "gustavera_fav_barragem_03.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_03.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  11667,
+        "sha256":  "0441E996014B399BC51BB5CB20F8BE0830EE24A0945BAA0CD1DD30DBE92D9DCE"
+    },
+    {
+        "file":  "gustavera_fav_barragem_04.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_04.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  9494,
+        "sha256":  "3150AB234CA19E91454C1963215B9D73C46A17A868CD4168E0F0DEEA7FEEA583"
+    },
+    {
+        "file":  "gustavera_fav_barragem_05.ymap",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_05.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  6128,
+        "sha256":  "9013ECE3A98BECA646A690DBC75032BD13EBA869DC68DA34DE9B3AF9472C1B27"
+    },
+    {
+        "file":  "gustavera_fav_barragem_col.ybn",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_col.ybn",
+        "resource":  "cold_favela_barragem",
+        "bytes":  601388,
+        "sha256":  "BFCC2791CC117278FD15BC1DE37E1AB4584E1A113C0562E66C7D676AB6704660"
+    },
+    {
+        "file":  "gustavera_fav_barragem_manifest.ymf",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_fav_barragem_manifest.ymf",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1788,
+        "sha256":  "81579CFBC4F67B457C063E9ABB05D470D58C8D029665216D5C2D0A09122A299C"
+    },
+    {
+        "file":  "gustavera_fav_barreira.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_barreira.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2578,
+        "sha256":  "473A42186045237B5CE7F0783FA6B7B6DB055FCE4BA3A91F1673C16ADFDFE2DC"
+    },
+    {
+        "file":  "gustavera_fav_barreira2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_barreira2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3745,
+        "sha256":  "54492AC0FCFBA73876EEFCABBF3E1C3C3E2446FD9A24ACA9242E7C8D8532FA5F"
+    },
+    {
+        "file":  "gustavera_fav_barreira3.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_barreira3.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2137,
+        "sha256":  "38EAFF800258D93B26A6FE1FF6899130CE4CA9CF6A057D75C35AD64D880950D1"
+    },
+    {
+        "file":  "gustavera_fav_barreira4.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_barreira4.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3311,
+        "sha256":  "7C39DA8973102ED09C98727433F9DBB79B2DEEEA96745DCA476EC6F8F253A95F"
+    },
+    {
+        "file":  "gustavera_fav_barreira5.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_barreira5.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  4080,
+        "sha256":  "2818A20CB0C7E8A4C8DAF3733F59E6A0F530A4B8AB57990A53F465E0A5479834"
+    },
+    {
+        "file":  "gustavera_fav_bar_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_bar_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  688267,
+        "sha256":  "88088D8017390C1E28C20B9A30B9D3BC546B8B1E9A348F707498CB296499DA1B"
+    },
+    {
+        "file":  "gustavera_fav_cadeira_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_cadeira_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221677,
+        "sha256":  "675A6F0B32522A31CF89DD5CC3FA7A5DEBE9405BF100B4879023A7F2271730CF"
+    },
+    {
+        "file":  "gustavera_fav_caixa_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_caixa_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  174270,
+        "sha256":  "7ED9EFC5DC734290C3E9E3E2C58D001AEB333FB0551CDF1FD20983B000E7A6FA"
+    },
+    {
+        "file":  "gustavera_fav_caixa_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_caixa_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  116854,
+        "sha256":  "E19B9C3669F61E0070CDE633BE28DB77111FF0C9D42C0EBB71E0FD77321585F1"
+    },
+    {
+        "file":  "gustavera_fav_caixa_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_caixa_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  47285,
+        "sha256":  "552721ACD288C9FC09CF043E6F8D9ED78997ADB06686513EEFEF834811B2C45F"
+    },
+    {
+        "file":  "gustavera_fav_casas.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casas.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  5151,
+        "sha256":  "CCE57DDE128C9043EC80ED0FC2344FADB1E928073275FEF5946D490AA78C8E9E"
+    },
+    {
+        "file":  "gustavera_fav_casa_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221209,
+        "sha256":  "F063BC21E4AE4284FD0B1917536111F96DA1ED81680249C15954DECE4988F355"
+    },
+    {
+        "file":  "gustavera_fav_casa_01a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_01a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221208,
+        "sha256":  "5C442C45B72622246EF4C65C7C3BF5030A6EAAE3EBA0BC634F630AC5D9B54455"
+    },
+    {
+        "file":  "gustavera_fav_casa_01b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_01b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221180,
+        "sha256":  "BB13DDAE7733FFD5FB4F53D19E067DE61958A1DEDF8368CFE7680AD5D06F2139"
+    },
+    {
+        "file":  "gustavera_fav_casa_01c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_01c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221175,
+        "sha256":  "C83E0D71BFD8A3A2C37EBF624B6148E2273B016EAB206C0C7116618147950F7D"
+    },
+    {
+        "file":  "gustavera_fav_casa_01d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_01d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  221174,
+        "sha256":  "A5C45671B124EFE139762DAEAA3F7A1D5B8A292FC4D872D600415C18538FC710"
+    },
+    {
+        "file":  "gustavera_fav_casa_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  67295,
+        "sha256":  "6C86DA580456A60457ADE608B1059DDC5575010E26FF0F611A31D5FED9FD549C"
+    },
+    {
+        "file":  "gustavera_fav_casa_02a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_02a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  67304,
+        "sha256":  "7632DA362F48AFE3A52169E2F4C5CADC26FB15BBD87F178395ACFE7BF5B82924"
+    },
+    {
+        "file":  "gustavera_fav_casa_02b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_02b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  67227,
+        "sha256":  "AD2B7B04FC32A82D45CF45E156B70ED78B0848DCFB51F0EF420B279212D8FA0C"
+    },
+    {
+        "file":  "gustavera_fav_casa_02c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_02c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  67395,
+        "sha256":  "4823307D698D56F1E203D25BA9B9A97D5AF29007B748D79E69681C29DDCE6CA1"
+    },
+    {
+        "file":  "gustavera_fav_casa_02d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_02d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  67300,
+        "sha256":  "BE7A72EB26FCB4ACCD64AED22A318A5649139551E5A9402A9F0CB32DC98E3478"
+    },
+    {
+        "file":  "gustavera_fav_casa_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  124326,
+        "sha256":  "944B689E940715C3B68F2D2C67A446DBCC3FA32A3E5996AE816A311E477C14CA"
+    },
+    {
+        "file":  "gustavera_fav_casa_03a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_03a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  275041,
+        "sha256":  "36DDD2F54278BFB5EA4AB171929990561E6F9AAA2EAA6D09AD0281733C725A11"
+    },
+    {
+        "file":  "gustavera_fav_casa_03b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_03b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  281924,
+        "sha256":  "518765868224562589E18A30A1475DE8E248AF392754075B2901710F9B9E3AF1"
+    },
+    {
+        "file":  "gustavera_fav_casa_03c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_03c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  281890,
+        "sha256":  "FA1881B593837C7919B1587BEE6C330720F180F87562E175AE6624CA5F20C253"
+    },
+    {
+        "file":  "gustavera_fav_casa_03d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_03d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  280171,
+        "sha256":  "F654AB2ADB444D226CC258993DB22D29CFC643478BF4E73B6C3A38282ECC79B4"
+    },
+    {
+        "file":  "gustavera_fav_casa_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  95216,
+        "sha256":  "135890D0CFD3E70CAC9717D55D572C2B47164558D256A0ABE6F62725D20123CC"
+    },
+    {
+        "file":  "gustavera_fav_casa_04a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_04a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  95221,
+        "sha256":  "9443365A496B91155E643DD3060E4D11E0E9AEF62318E2E78114DA311130C4CD"
+    },
+    {
+        "file":  "gustavera_fav_casa_04b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_04b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  95066,
+        "sha256":  "BF5A052262C29210E4BF3BED9FF05A2216A56E6CC4F9173574E1085B1C0CDF38"
+    },
+    {
+        "file":  "gustavera_fav_casa_04c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_04c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  95175,
+        "sha256":  "95A1ABDD072CC2EB74142A61BCC6B35085D413F6CAD3ECB967F4E678BDE61D6D"
+    },
+    {
+        "file":  "gustavera_fav_casa_04d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_04d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  95178,
+        "sha256":  "F5ED664514D1096A9D1591DCD0E9A7DF70B2DB1914B063733FF5E72B1BBC073C"
+    },
+    {
+        "file":  "gustavera_fav_casa_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  76162,
+        "sha256":  "E093F7F01628A2CA9F86E8A95BBA9F1F470C878E7D6750F2608BE53D4F03782B"
+    },
+    {
+        "file":  "gustavera_fav_casa_05a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_05a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  76165,
+        "sha256":  "72F442E4BC3A34504B16E93390930C28EDCAEABE7D1304359AF8A810EC018485"
+    },
+    {
+        "file":  "gustavera_fav_casa_05b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_05b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  76657,
+        "sha256":  "285D2A756133ADFE7E29A429328264AF4DC731F4E057322EC3D59CEAAD8985E9"
+    },
+    {
+        "file":  "gustavera_fav_casa_05c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_05c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  77578,
+        "sha256":  "B734C65AE703FF991DFDA2D67148EC8598E9D7A267E59068BEF7BBC63389948C"
+    },
+    {
+        "file":  "gustavera_fav_casa_05d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_05d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  76672,
+        "sha256":  "55F6E5F9F4B391FA3F23AF7767E21DC0D6799A64D916959CF072EA22B05EC1BE"
+    },
+    {
+        "file":  "gustavera_fav_casa_06.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_06.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  269035,
+        "sha256":  "C37BB699DDC3ECBF3D96DF5E3E7A9C055C3E7477E2ABDCCC0C9C24D582062463"
+    },
+    {
+        "file":  "gustavera_fav_casa_06a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_06a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  267800,
+        "sha256":  "8DAB13C298A413BF7CEA8AD44214633F7722F514EA9541BAACD485776497B015"
+    },
+    {
+        "file":  "gustavera_fav_casa_06b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_06b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  267861,
+        "sha256":  "EDB52E23E474369BA142AEC12C41B132E5EF188A1D0D62FAFB5C8B2AF231195B"
+    },
+    {
+        "file":  "gustavera_fav_casa_06c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_06c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  267803,
+        "sha256":  "E57696E3A0A11EAC21CB945ABE516704EAA7445E262C82B6690176CD392A0D05"
+    },
+    {
+        "file":  "gustavera_fav_casa_06d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_06d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  267803,
+        "sha256":  "1F2E217F865D36AB1C1EF40E063EE439CAE0835758460CB6B50F40E1BABF358B"
+    },
+    {
+        "file":  "gustavera_fav_casa_07.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_07.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  228006,
+        "sha256":  "A44A6474BC2C4AC4ED44F347B1A1A4B835AA9EC091DA31F53AEC0D8036361FAF"
+    },
+    {
+        "file":  "gustavera_fav_casa_07a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_07a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  228014,
+        "sha256":  "1AD661D4A6A26B0EEE6387AF308088AC469E9658DDF17663627F46A9DB1DB212"
+    },
+    {
+        "file":  "gustavera_fav_casa_07b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_07b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  183400,
+        "sha256":  "C995249EDE866535307DC38505C68CE8A074FE2439F9101E512CC3EB5A8AC640"
+    },
+    {
+        "file":  "gustavera_fav_casa_07c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_07c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  190221,
+        "sha256":  "FC684E9F80766C8C9AABDFD5CEB0B951AFF5D26049A936821296F9ECB52E0BE1"
+    },
+    {
+        "file":  "gustavera_fav_casa_07d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_07d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  190341,
+        "sha256":  "204F29FA4418F0F72590D54506A9B51BD1D3436500C7252D674C55EF5BB987F5"
+    },
+    {
+        "file":  "gustavera_fav_casa_08.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_08.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  25786,
+        "sha256":  "FF76D558FFEBD7CAACF16C374F6C14B2692906A00BA10166395F0D543C83215E"
+    },
+    {
+        "file":  "gustavera_fav_casa_09.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_09.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  110943,
+        "sha256":  "0A77E0EBCC3CD5D97EFB11AE870B0FA7563D4F1F162DA65F3D41A5BDB3545DB9"
+    },
+    {
+        "file":  "gustavera_fav_casa_09a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_09a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194309,
+        "sha256":  "288DE7CEA4E7FC00FA6B2276D0FFF90626F632FF70A97B26C3AFF08C76F889DC"
+    },
+    {
+        "file":  "gustavera_fav_casa_09b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_09b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194308,
+        "sha256":  "FE5F41DBF19A36EDF7DA686FEEDBD62AEB609D9940858E4DA0C053A82989DEE7"
+    },
+    {
+        "file":  "gustavera_fav_casa_09c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_09c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194302,
+        "sha256":  "88C55D6715E4310ACC0812671F08E0702B3C6E858FFF989FEECE414FD9C97B04"
+    },
+    {
+        "file":  "gustavera_fav_casa_09d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_09d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194304,
+        "sha256":  "77102F46E018D5C8F02ACA79EB17ADBD6A27FDBFDF4DAD4792450E356887A163"
+    },
+    {
+        "file":  "gustavera_fav_casa_10.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_10.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  85928,
+        "sha256":  "2444DF2A14B96CAFB1EB6B9EBDFC7E0398EC919C82AC63E4CC5CC949484C83C4"
+    },
+    {
+        "file":  "gustavera_fav_casa_10a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_10a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  85928,
+        "sha256":  "BCA0101A31676A7B43CB8CBDBFCE48C8023E6504619A762290668ED89C35BD23"
+    },
+    {
+        "file":  "gustavera_fav_casa_10b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_10b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  85922,
+        "sha256":  "1DCF6354169652B7829B8CBE79656B1A51A31382229AB30BBE7E87C4342589C1"
+    },
+    {
+        "file":  "gustavera_fav_casa_10c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_10c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  85923,
+        "sha256":  "D0258668AB9751BFB7B3933F66ACCE54E4DCC376576D89E451719216B66E8856"
+    },
+    {
+        "file":  "gustavera_fav_casa_10d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_10d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  85929,
+        "sha256":  "25C9DCC3C9FE69B18A169EFCF37840259A9F3E07002A6B9F9136FB8FF818A79C"
+    },
+    {
+        "file":  "gustavera_fav_casa_11.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_11.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  139482,
+        "sha256":  "2D91369D7366E009628992913523CE6657A3CB7ABB13FC17174A49C02C42573E"
+    },
+    {
+        "file":  "gustavera_fav_casa_11a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_11a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  139487,
+        "sha256":  "CCA03D26511403D18832A28F7A169C3121AACBDC5E90E9427CE2557771B783A6"
+    },
+    {
+        "file":  "gustavera_fav_casa_11b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_11b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  139484,
+        "sha256":  "F6EA3D7ADAE0E3F616AB4C89C5C26EA9C17B450EF93B9E45A06A10C9DC524DE3"
+    },
+    {
+        "file":  "gustavera_fav_casa_11c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_11c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  139487,
+        "sha256":  "A4D88C2B1DCBFB31FF8701A8241B72A236EF01A4EC4431B6B726AB2EC914D289"
+    },
+    {
+        "file":  "gustavera_fav_casa_11d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_11d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  139487,
+        "sha256":  "2B3A78770873E6FE84E86DE28BC02F7A639A5950739D8B117DB8F21588FED60B"
+    },
+    {
+        "file":  "gustavera_fav_casa_12.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_12.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  145596,
+        "sha256":  "D66F20945A2D4B9D405638DD7E512529A8B30C455435F0E32070E50A9D11C121"
+    },
+    {
+        "file":  "gustavera_fav_casa_12a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_12a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  145605,
+        "sha256":  "428D601076B7D19890CD5DD632108663AFD496D2DEE3D2AB4D86D06897D65B51"
+    },
+    {
+        "file":  "gustavera_fav_casa_12b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_12b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  145598,
+        "sha256":  "F549FB41CED3A7CBE9091756022E64FCF8C209A98091F298FB9DE7B9B30D8617"
+    },
+    {
+        "file":  "gustavera_fav_casa_12c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_12c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  145606,
+        "sha256":  "946263F43176F645F47F301D342DF0F8DBBF98A83ED17945827DA19B607100D1"
+    },
+    {
+        "file":  "gustavera_fav_casa_12d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_12d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  142540,
+        "sha256":  "22496C473EBDD8B4AC1668AE093D7BFAF983D7328046F4A7B3DFEC3B4A99FE41"
+    },
+    {
+        "file":  "gustavera_fav_casa_13.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_13.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  75658,
+        "sha256":  "3302953D0DD6745190B5CB6B5984A021CE5331777F8CB86D147F42DA1CE701CC"
+    },
+    {
+        "file":  "gustavera_fav_casa_13a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_13a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  75645,
+        "sha256":  "F0F04B1CFE3083DEC5FE7358A70942CFA168D87ACF2F40173862B35BA0E1E884"
+    },
+    {
+        "file":  "gustavera_fav_casa_13b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_13b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  75655,
+        "sha256":  "C821C7E62010BE22CCEC0CC160C05594ABFD3E1162E073250006AB5CF369A0D1"
+    },
+    {
+        "file":  "gustavera_fav_casa_13c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_13c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  75644,
+        "sha256":  "EE3B2DDBF0A461F9AE61C3EE0B14DBAF7932F37C108DD676A7A6838EF0A5F668"
+    },
+    {
+        "file":  "gustavera_fav_casa_13d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_13d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  75580,
+        "sha256":  "6C272B37A592F99CC9B848D016EAE256D45EBE9E21870A12FC8DF6EF4C7376B4"
+    },
+    {
+        "file":  "gustavera_fav_casa_14.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_14.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32155,
+        "sha256":  "FBEFA7F8E2D0FD710262EA498EEABE3E1EDCF38E3ED0312B5E166586A882C314"
+    },
+    {
+        "file":  "gustavera_fav_casa_14a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_14a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32157,
+        "sha256":  "347CB03CEDA801C3B4398F0C6E84187A831FFD1CD26670BE7685054752C433BD"
+    },
+    {
+        "file":  "gustavera_fav_casa_14b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_14b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32158,
+        "sha256":  "22268E2C4ECD91220AC211AA334995632AC72C36EDEC2F3D664D0DA80DFB59E4"
+    },
+    {
+        "file":  "gustavera_fav_casa_14c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_14c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32162,
+        "sha256":  "660712C248ED73504F84DB86F188047CFF48F98DFC741A0E004BB0FC6504DF7B"
+    },
+    {
+        "file":  "gustavera_fav_casa_14d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_14d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32023,
+        "sha256":  "8B6A2DFADCBEE4EF9569FE8CF3976EE7CAF6705C37960A385B69E375B5F507D2"
+    },
+    {
+        "file":  "gustavera_fav_casa_15.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_15.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  238025,
+        "sha256":  "82E0FC9C838C15541D3AD6A314B60891D5FD22DE1E2CA2DF083843CD25AB52C0"
+    },
+    {
+        "file":  "gustavera_fav_casa_15a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_15a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  238029,
+        "sha256":  "05F405491274E93D612D2418451311241ED159FAF4F01DE7EDF40CAC6BFA67C1"
+    },
+    {
+        "file":  "gustavera_fav_casa_15b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_15b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  238031,
+        "sha256":  "79172942BE9EFFA38B0E8F6221B3550142CCCE0BBB0C7BEAE7DE6F13CE6AD117"
+    },
+    {
+        "file":  "gustavera_fav_casa_15c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_15c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  238037,
+        "sha256":  "A5FE9C2F4358E38980E10DD21B973C6D9ED7215A7A3785FB916CA007B574CA0A"
+    },
+    {
+        "file":  "gustavera_fav_casa_15d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_15d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  238038,
+        "sha256":  "43F833FE9911EE2D37EFAC5FF75EEA6FAB896C88FD5AAF87CC96A4F04ABC10CD"
+    },
+    {
+        "file":  "gustavera_fav_casa_16.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_16.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  94195,
+        "sha256":  "4B8330AAD9A603D24F3AAC318D915A1F706C22ADE957C596E8EE65B292A16F5E"
+    },
+    {
+        "file":  "gustavera_fav_casa_16a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_16a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  85306,
+        "sha256":  "DE9E7E9BD8F0BCECF041C165E95B6393AC35524A32B6D45A83EAC93B6B985BEE"
+    },
+    {
+        "file":  "gustavera_fav_casa_16b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_16b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  94200,
+        "sha256":  "6885C0F694FE4897DBBC4125E023981D1561E1D84B1CF1AA453B6FCF162EA0BC"
+    },
+    {
+        "file":  "gustavera_fav_casa_16c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_16c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  94199,
+        "sha256":  "A813E25B0640666ACC1034CBA7BFDCD1F0C3158AF43AC028B5E23B1953D83DA7"
+    },
+    {
+        "file":  "gustavera_fav_casa_16d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_16d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  94200,
+        "sha256":  "E4C373CB1DAE0A46413CFD365D8EA03403C3EC1D58758DD6EFACD9D96FCDB47B"
+    },
+    {
+        "file":  "gustavera_fav_casa_17.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_17.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  62283,
+        "sha256":  "6EB41A5833E2B300AF2997E815B42B07B854749AAA5BE87D09BC0429B26316CF"
+    },
+    {
+        "file":  "gustavera_fav_casa_17a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_17a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  62718,
+        "sha256":  "9F239FCA34D94ADA2B696910014E54AB6B916FACFF37B2AA93D4D8886F042A4F"
+    },
+    {
+        "file":  "gustavera_fav_casa_17b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_17b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  62712,
+        "sha256":  "406705C2C98BF1B949FA5597EFD6151E690E0A4CAAE76BA2FC5EA0B5AFD7B1E4"
+    },
+    {
+        "file":  "gustavera_fav_casa_17c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_17c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  62713,
+        "sha256":  "7C90D54D2CE1A8F1F18B393689BC3381877E7923A0982D38605EAE5F0856D62D"
+    },
+    {
+        "file":  "gustavera_fav_casa_17d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_17d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  62715,
+        "sha256":  "C820E519B5BA8ECFA56847E6A7966A4EB0F036E2831F6E0D3F256FE212494538"
+    },
+    {
+        "file":  "gustavera_fav_casa_18.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_18.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  74714,
+        "sha256":  "00CA43B223918DAF60533BF7AEC7B274BD8ECE27E0BF4354F9D84DA1894F7963"
+    },
+    {
+        "file":  "gustavera_fav_casa_18a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_18a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  74715,
+        "sha256":  "0E84CF14A3E5D2E760447669DA895D9AD73685D76314B2623A0B419E18C76F2B"
+    },
+    {
+        "file":  "gustavera_fav_casa_18b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_18b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  53338,
+        "sha256":  "EEC2DBA83CCFEB624908AFC52D05C30B73F44914B523F6D03E082BBCEDF1A20B"
+    },
+    {
+        "file":  "gustavera_fav_casa_18c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_18c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  74723,
+        "sha256":  "90B7618DA23F8C8E50E31C34D1BE0DB0541FE0C9DCC1E137D592908B212FB991"
+    },
+    {
+        "file":  "gustavera_fav_casa_18d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_18d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  53657,
+        "sha256":  "74309A021642B30E87BE5AFA3FC401D7848CF6EA9E1761BFF9E92B98AFE137B4"
+    },
+    {
+        "file":  "gustavera_fav_casa_19.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_19.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79003,
+        "sha256":  "06CAA09BE4AB8EB6AB07B480BB4AECCD86E1D8E3E59CFDCEDF1D4B0FB2975A75"
+    },
+    {
+        "file":  "gustavera_fav_casa_19a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_19a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79004,
+        "sha256":  "B9759BAFE2EB899AB3384ACA1C4E7B1DF9BA970AB3803CE7B83199062D22EE65"
+    },
+    {
+        "file":  "gustavera_fav_casa_19b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_19b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79008,
+        "sha256":  "1155AF74B3099CDF03F19EA3494D3F71E64AF1CB348D3B70D14CB0500C3E9CEF"
+    },
+    {
+        "file":  "gustavera_fav_casa_19c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_19c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79323,
+        "sha256":  "5858831CDECB1727D9CA7A8A02CC6A802B26D8F72772454BF9DA0574D261DB26"
+    },
+    {
+        "file":  "gustavera_fav_casa_19d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_19d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79009,
+        "sha256":  "4449867EC4378A2CE45E7AB8BB2D675B070AA850AB97837F61FF8A4414A95CCB"
+    },
+    {
+        "file":  "gustavera_fav_casa_20.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_20.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32170,
+        "sha256":  "7F98F7F41EBCC77C4141701AA6F56FF4C929FAFF9A4A3615705B2B017913B3DB"
+    },
+    {
+        "file":  "gustavera_fav_casa_20a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_20a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32178,
+        "sha256":  "1E90181EEF8220A8C7967931DE45215CCB0FE37C0BC590D9CF9885D47FB65C14"
+    },
+    {
+        "file":  "gustavera_fav_casa_20b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_20b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32064,
+        "sha256":  "38F899BE7CAD6DAF15B0399D4C97915C41BEF13F8C75E43E999F8F043B1F2D1E"
+    },
+    {
+        "file":  "gustavera_fav_casa_20c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_20c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32178,
+        "sha256":  "E4E1D592630508A926ED555A7C2794180C297040D51E588FDFFE1C45DB297956"
+    },
+    {
+        "file":  "gustavera_fav_casa_20d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_20d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32175,
+        "sha256":  "9C64D042A07AB2929A9DD9531109540034B407BDFFA308D24685B9530E607EC8"
+    },
+    {
+        "file":  "gustavera_fav_casa_21.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_21.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  43404,
+        "sha256":  "D71C74B14A7A5B32564E7390218E105B0B504DAF7B57618E39911EE28325BFA0"
+    },
+    {
+        "file":  "gustavera_fav_casa_21a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_21a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  43409,
+        "sha256":  "68AEF8A502A436DB518CE7C736A2C1D090D631937813C9DA0A55D768DD7596C4"
+    },
+    {
+        "file":  "gustavera_fav_casa_21b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_21b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  43412,
+        "sha256":  "C34C4C2FEC21F5D5F9355E545EB8C29D44C672471D0F00216CC2E3EF31EAE350"
+    },
+    {
+        "file":  "gustavera_fav_casa_21c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_21c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  43410,
+        "sha256":  "4FC8981851609B14915EC7386E1850E592A6B383F93AF31C9B6BD3376B49B906"
+    },
+    {
+        "file":  "gustavera_fav_casa_21d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_21d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  43326,
+        "sha256":  "69438083394450E1877D85460F03331688317DD0365843D5E31AE35CABC8DB21"
+    },
+    {
+        "file":  "gustavera_fav_casa_22.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_22.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  72554,
+        "sha256":  "A01C0F4A9B626AE93491D3A532C0ECB86277B3FF1903DF012FA758C82814955E"
+    },
+    {
+        "file":  "gustavera_fav_casa_22a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_22a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  72523,
+        "sha256":  "5A533B2EC43C3BDEB9ED89FCF99039C3F3F1E3F9A167EA58C6C3339D2E0FDDCD"
+    },
+    {
+        "file":  "gustavera_fav_casa_22b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_22b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  72531,
+        "sha256":  "69C2C7AFF13DCD1D5BC0855BA5E9889EC8D55C74CDF8E0070F86165EB0E81ED6"
+    },
+    {
+        "file":  "gustavera_fav_casa_22c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_22c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  72539,
+        "sha256":  "F6DA29128592A393724917B8E389732E2A29106A69A28AB2C2DE6CA8246F62C8"
+    },
+    {
+        "file":  "gustavera_fav_casa_22d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_22d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  72550,
+        "sha256":  "3694B013ABA2C13CE74F686CD2A36E7E49113CBA90896D8BD68C5D9DEB3B09F7"
+    },
+    {
+        "file":  "gustavera_fav_casa_23.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_23.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  110139,
+        "sha256":  "BFC957D56B9ABC873814B768D54CD979C8C80FC8F991C5BEB04E4C95FEC0C123"
+    },
+    {
+        "file":  "gustavera_fav_casa_23a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_23a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  110150,
+        "sha256":  "E87B79A06C1397D39BECDFB4A375E50608098E25A81D0A330A7E2DCCE51A311E"
+    },
+    {
+        "file":  "gustavera_fav_casa_23b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_23b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  110144,
+        "sha256":  "28A6FF24D002A4D21F7D6428778FDB38B0E589C2DDA394C0B3BBE577A0D8252D"
+    },
+    {
+        "file":  "gustavera_fav_casa_23c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_23c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  109928,
+        "sha256":  "561E50B4DF35DDC8C9BBFEFC26D6BA5CE128EFE359FD230DC8AE188EA42D00FA"
+    },
+    {
+        "file":  "gustavera_fav_casa_23d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_23d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  110150,
+        "sha256":  "B3F2F07AC131AD102FC0611B0700F973DF11055C792402F4A34FC194CF43783D"
+    },
+    {
+        "file":  "gustavera_fav_casa_24.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_24.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  535194,
+        "sha256":  "8AD0E5F34FA3ED8480415DFB8C425EBA00342934230C2B9890E8C862040D5A47"
+    },
+    {
+        "file":  "gustavera_fav_casa_25.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_25.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194664,
+        "sha256":  "FFA6BC616817DF30A2F94E89C317DF3F77042C58F98D2B8B4442F6F796EEC531"
+    },
+    {
+        "file":  "gustavera_fav_casa_25a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_25a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194664,
+        "sha256":  "5F2B36A715D89FF23BB47AEA94D605C5FE9C254F37CD0E0DB77AEA5940A0D5F0"
+    },
+    {
+        "file":  "gustavera_fav_casa_25b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_25b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194680,
+        "sha256":  "01791D4EC909396C9793FC5924B9160E98A601055C5AE1EFAEA201917D55B0EB"
+    },
+    {
+        "file":  "gustavera_fav_casa_25c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_25c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194634,
+        "sha256":  "DD9B07B16084FBC5B25C4FFF17E74D387F2FB64928384CBEAF77723B93B89212"
+    },
+    {
+        "file":  "gustavera_fav_casa_25d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_25d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  194643,
+        "sha256":  "7BED5CB060B066B7247EEA96ACD46A97C71F5D4E259E4A6B0E06CC4A3A114050"
+    },
+    {
+        "file":  "gustavera_fav_casa_26.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_26.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  367663,
+        "sha256":  "FD889BE04A1F34CF8D2DBA30A514FF1CABE3F8549BE0117F8544444536E06F0B"
+    },
+    {
+        "file":  "gustavera_fav_casa_26a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_26a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  367519,
+        "sha256":  "0E444001CC74C76AA0F447340B0251965D52C0BAB1D69C658E05ED4DEB6C7DFB"
+    },
+    {
+        "file":  "gustavera_fav_casa_26b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_26b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  367400,
+        "sha256":  "299E110026CEE8D3329E357209EEAEAE8C8418F9953C6EA6170315041A38BFBA"
+    },
+    {
+        "file":  "gustavera_fav_casa_26c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_26c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  367499,
+        "sha256":  "9B756626F82E0744CBC63D2FF51A35DB176D77EFFE465D9319FCB3FC8EE6C148"
+    },
+    {
+        "file":  "gustavera_fav_casa_26d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_26d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  367508,
+        "sha256":  "396F9ADFDCD09BFF24F45AA988F6B6D4BDF5964201B1344FE2FAA856CAE9E9C5"
+    },
+    {
+        "file":  "gustavera_fav_casa_27.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_27.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  248796,
+        "sha256":  "F29C83AD79BDF9EC641ED0C2B09E6CD7B297D31F7FE82F666E02281B26B79D6E"
+    },
+    {
+        "file":  "gustavera_fav_casa_27a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_27a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  249020,
+        "sha256":  "8E7BBBBA70D67BD97DDEB09E6004DBFBCF57E10A1144947745D53AB283AD5A05"
+    },
+    {
+        "file":  "gustavera_fav_casa_27b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_27b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  248780,
+        "sha256":  "0B9383CE526359CB3D7EFB047CA7C747789D522B26E67DDE8C47096E444896F1"
+    },
+    {
+        "file":  "gustavera_fav_casa_27c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_27c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  249039,
+        "sha256":  "C7AB24B38456B126B670CAA8A4AD4C53D2C007F7B92340AEE284688AD85ECA81"
+    },
+    {
+        "file":  "gustavera_fav_casa_27d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_27d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  249029,
+        "sha256":  "6137BB07E80E0296FCB9C017C4595DC376DC304C9635A0BCC26EA3C855D8A92C"
+    },
+    {
+        "file":  "gustavera_fav_casa_28.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_28.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108877,
+        "sha256":  "0DE40CED8CBB5193243B66659A378C59EEF05988D97BF910AC49641AEEFD0AC5"
+    },
+    {
+        "file":  "gustavera_fav_casa_28a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_28a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108855,
+        "sha256":  "8912357D6F7BF44EE5E8044AD2D265D177B3973E2490379770BF6E50F65D890E"
+    },
+    {
+        "file":  "gustavera_fav_casa_28b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_28b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108876,
+        "sha256":  "FBCE48A4B35D04F184703063B11A0D33EE332361BF751744034CA265468FAFB7"
+    },
+    {
+        "file":  "gustavera_fav_casa_28c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_28c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108875,
+        "sha256":  "8FF1FFE8175A73559181424EA1709DA8F436FEA5F18AF83DB42D4FB8F088B4A8"
+    },
+    {
+        "file":  "gustavera_fav_casa_28d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_28d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108879,
+        "sha256":  "5315BD2CC480A2956ACA0F470F1B433DAB9E700B1B107AB17DD11793257D0D00"
+    },
+    {
+        "file":  "gustavera_fav_casa_29.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_29.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  156598,
+        "sha256":  "0305F7DDF660D2554BB426CA187FCA2A85540DDFA0BC5178A33249D20ABB96C0"
+    },
+    {
+        "file":  "gustavera_fav_casa_29a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_29a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  156614,
+        "sha256":  "3003B548C03BEFA2F033A40B6ADA9F78DD40C532D9CC527354B0AF076826AC3F"
+    },
+    {
+        "file":  "gustavera_fav_casa_29b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_29b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  156642,
+        "sha256":  "76E2028B7631176ED259AF3AF0C32E2A8977E0BA979F3F51874C01E7BE1AC696"
+    },
+    {
+        "file":  "gustavera_fav_casa_29c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_29c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  156628,
+        "sha256":  "2A7F790B798B87FCF3180FB5F389BF65D6B8F62D7D79B2196A3D03594987F618"
+    },
+    {
+        "file":  "gustavera_fav_casa_29d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_29d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  156610,
+        "sha256":  "BBF27D42254C564E942CA2EC7F71E53F76981E5B0DC0556557DD702414A05397"
+    },
+    {
+        "file":  "gustavera_fav_casa_30.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_30.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  258991,
+        "sha256":  "CCD60A5B3721762CE4BF3E54FE373DCE1BC595A2E4513E941AD8AD550DEEE98E"
+    },
+    {
+        "file":  "gustavera_fav_casa_30a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_30a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  259002,
+        "sha256":  "35B2EF89213AE3247A333C62B2AEE5F1D4B313BB2A8BCF3BF861C00318EE7DC3"
+    },
+    {
+        "file":  "gustavera_fav_casa_30b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_30b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  258890,
+        "sha256":  "11023275AAD4ACE9675D22FFB26AA7A44E7D3F32A9071FC26269D0AAAEEEA91B"
+    },
+    {
+        "file":  "gustavera_fav_casa_30c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_30c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  259003,
+        "sha256":  "D8C5A9463D40206F9EDE0342E88654BC6C4A134EE42E3CAA8C65C70E74819C23"
+    },
+    {
+        "file":  "gustavera_fav_casa_30d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_30d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  258988,
+        "sha256":  "41CBF1F7DB3656AB791EB145EDA1C6643B7E8B7B4D3E198F90C9E2D158561CF9"
+    },
+    {
+        "file":  "gustavera_fav_casa_31.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_31.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  61692,
+        "sha256":  "784D188199A62A6C3EAC37B9281255E3DE9E85915052BBD4C424908CA4D63D12"
+    },
+    {
+        "file":  "gustavera_fav_casa_31a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_31a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  61697,
+        "sha256":  "EC8ECE010428E06F43BE6C373D9C1F0960AF8CD71895146762AC2E649EF05977"
+    },
+    {
+        "file":  "gustavera_fav_casa_31b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_31b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  61691,
+        "sha256":  "EFAEB42A28CF4C099CA2F5842523A6BB00A0BC1C3266C06AF188EC48E18028BF"
+    },
+    {
+        "file":  "gustavera_fav_casa_31c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_31c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  61694,
+        "sha256":  "3930D9AF97B0AEEB3CB40D8C0E7266EED7CB78014D2A2E3F3B9986ABA5FE6752"
+    },
+    {
+        "file":  "gustavera_fav_casa_31d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_31d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  61692,
+        "sha256":  "5E16CCA51859498C4CFEC296E5565AF4E975ECD954604DCCBD7F24B4B01CC98F"
+    },
+    {
+        "file":  "gustavera_fav_casa_32.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_32.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  40167,
+        "sha256":  "05C7482BE374A49B27A061D61CE8877FECBA5C4AECA28623F906FFCE9A0671BF"
+    },
+    {
+        "file":  "gustavera_fav_casa_32a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_32a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  40186,
+        "sha256":  "94BD364D61C0348CCA79916BC2967ABC668D4AB37F47EC571845645A9AE57B02"
+    },
+    {
+        "file":  "gustavera_fav_casa_32b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_32b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  40162,
+        "sha256":  "F29D1A1880F9C6586F8EF62FC446D2B066FC81D3E11A5B42285E268548F64467"
+    },
+    {
+        "file":  "gustavera_fav_casa_32c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_32c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  40149,
+        "sha256":  "7226927253D70739EB3BC9E403E7894FFB20A65E3406270C160AB94BFF6A92FD"
+    },
+    {
+        "file":  "gustavera_fav_casa_32d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_32d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  40162,
+        "sha256":  "031F0AEBA50601181F3B97888B3D1980F686C74FD1A8CEBF237131AB45B1FBF1"
+    },
+    {
+        "file":  "gustavera_fav_casa_33.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_33.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  57980,
+        "sha256":  "3E6E25C98354EB963A71DCF58D2ED150BE9C9419330E8BDE00462CD7C9B83A05"
+    },
+    {
+        "file":  "gustavera_fav_casa_33a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_33a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  58016,
+        "sha256":  "79F6691EE160E79E07077F165251E3345703CA9E0D7F5B9D97F582DD53028D22"
+    },
+    {
+        "file":  "gustavera_fav_casa_33b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_33b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  57985,
+        "sha256":  "1531E3FB697BB7A1DDDDF3FE79D4522B3204BF361186FB22521A42B4DF32AAA8"
+    },
+    {
+        "file":  "gustavera_fav_casa_33c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_33c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  42652,
+        "sha256":  "FF1041458AD3B59065763EBA20CE1DA07EF0F3E5C45B1916F398106461672E94"
+    },
+    {
+        "file":  "gustavera_fav_casa_33d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_33d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  58011,
+        "sha256":  "01539BC4A310B83A6B3C40544BA966F2E446C187F9C49927044F5B47EFF4F797"
+    },
+    {
+        "file":  "gustavera_fav_casa_34.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_34.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  119196,
+        "sha256":  "EE324E0D0E1948A50ACEA085878226D8ADE69ED501F0DAF51F0C917BF5203660"
+    },
+    {
+        "file":  "gustavera_fav_casa_34a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_34a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  119207,
+        "sha256":  "72B074C9F4229EDB397631B1A815477FCD6A0CB54D2DA8FF76B2056F2784E9D3"
+    },
+    {
+        "file":  "gustavera_fav_casa_34b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_34b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  119062,
+        "sha256":  "3B86BBCE43DED75AEE63924276C8F62C632E6BD09DD53426749F861D393E589D"
+    },
+    {
+        "file":  "gustavera_fav_casa_34c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_34c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  119069,
+        "sha256":  "EA7B0811C8AE8960064EDFB33F08300036B9489940452D157B51F9E69F81FB04"
+    },
+    {
+        "file":  "gustavera_fav_casa_34d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_34d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  119024,
+        "sha256":  "F6B7ED3956C6A98B2CCFECA8C29C7EAFBE82B70694104549BB90F6D12546496A"
+    },
+    {
+        "file":  "gustavera_fav_casa_35.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_35.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  109452,
+        "sha256":  "0DC818A30232E1788D853E9E4B9B146D148E1599E9B22CDD3B630A5918971EBE"
+    },
+    {
+        "file":  "gustavera_fav_casa_35a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_35a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  109462,
+        "sha256":  "0A17EA245292B78702916BC22E79673A5281E99841B9E998FF2DC7A3D7BF5585"
+    },
+    {
+        "file":  "gustavera_fav_casa_35b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_35b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  109463,
+        "sha256":  "40439DB62FB951A251E1C12A2F41723C8A1C656A32F55F893DA3BBDAE2AF9FA8"
+    },
+    {
+        "file":  "gustavera_fav_casa_35c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_35c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  109740,
+        "sha256":  "CF303CAAE0F28924476E0C07C2A6CBA42425C99416346C8B2440E009F5740370"
+    },
+    {
+        "file":  "gustavera_fav_casa_35d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_35d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  109739,
+        "sha256":  "2E10B4475B4DB97ED57AACF8B0BF7E7A1084B91B991D173F6F436A7C9B245CDD"
+    },
+    {
+        "file":  "gustavera_fav_casa_36.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_36.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  244361,
+        "sha256":  "58074DB800C00BDA71CF9F0D1B79ED6165825A0D69DBA21D320863E9B2D10B4E"
+    },
+    {
+        "file":  "gustavera_fav_casa_36a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_36a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  244363,
+        "sha256":  "C6F6FD434AECE973D6DA3E39F12186B42E97DE83BA4BDB2546BB3CE074F84B25"
+    },
+    {
+        "file":  "gustavera_fav_casa_36b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_36b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  244367,
+        "sha256":  "D0F9D5F6CFE82BE4E8DDA30FA78EA18E217E38A75FEBCBFA9A01BCFBF2041B9A"
+    },
+    {
+        "file":  "gustavera_fav_casa_36c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_36c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  227561,
+        "sha256":  "8C67DA07741D385B66E6B827C6106DE4F4542FEADC90EECFF73FCD2D730F423C"
+    },
+    {
+        "file":  "gustavera_fav_casa_36d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_36d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  244362,
+        "sha256":  "4B20A70F440FB0F212AE8222687E92B11A6DBDFA670098488CBA46A1E76DDF96"
+    },
+    {
+        "file":  "gustavera_fav_casa_37.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_casa_37.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  16343,
+        "sha256":  "0959B68FD53DFF4D01FE4E9C8FFA99B7793330DD9331492E65C664CDEA16A0FC"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_01.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_01.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  10499,
+        "sha256":  "815AFCBE6ED1C0B97115E9AB562EFE256D27FF168F5F59CB1F249D91D5C14FC7"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_02.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_02.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  10948,
+        "sha256":  "2F8FC5C31C9F6E50CE8577D7D8D1BBAD03FE3C5E8E2B33834A4DE2080A846120"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_col.ybn",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_col.ybn",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  606048,
+        "sha256":  "E50C1521ECA1FDD0D65D3C1A7040584667BEDE9A0424ECC6DF4BB939608CB1BE"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_manifest.ymf",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_manifest.ymf",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1832,
+        "sha256":  "45510C45D413A8548B68DBE6D3D21836214598A45AC88709AFD5E759D9632026"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_rua.ydr",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_rua.ydr",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  1288533,
+        "sha256":  "2BD36A63D3B62F52FE169A4D6042DFFB4F9A9EB274700F5318AE8EA5D554DFAA"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_rua.ytyp",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_rua.ytyp",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  542,
+        "sha256":  "D2E4CAF4632914AB9D9F4D074D4E3134EBD4B72FC0574F56429DD2418F441CAA"
+    },
+    {
+        "file":  "gustavera_fav_cemiterio_rua_col.ybn",
+        "destination":  "cold_favela_cemiterio\\stream\\gustavera_fav_cemiterio_rua_col.ybn",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  163950,
+        "sha256":  "05E7DD7908EFFD60C714D140D7B237C40404ECC41981A67256933CE4B5910B0A"
+    },
+    {
+        "file":  "gustavera_fav_chao_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_chao_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2784,
+        "sha256":  "5044EF5F244F7B179E1809BD2050FE38D15C4996854B1EAF4F58FB74E8518CF3"
+    },
+    {
+        "file":  "gustavera_fav_chao_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_chao_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2318,
+        "sha256":  "ABDEC5AE7152600E2109EAD12B0710C2E3FD691A68C209BF114AD4220202B3AD"
+    },
+    {
+        "file":  "gustavera_fav_chao_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_chao_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  181887,
+        "sha256":  "D0BFA2A49F348368CDCD729F56DA4D1F43867AD0D8C0924D28480D6DEDFB881E"
+    },
+    {
+        "file":  "gustavera_fav_chao_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_chao_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  171143,
+        "sha256":  "EFBDED465AA839D4023441D581E1365CA79518C8C47E1A4C81536C2D05A06321"
+    },
+    {
+        "file":  "gustavera_fav_chao_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_chao_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  259875,
+        "sha256":  "03E53C58DA709A41C5B90E67A0C12A342F787727891E2308038D5184C63E00B5"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_01.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_01.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  9845,
+        "sha256":  "4950710D50388D0E9A6E6B672057EACC0B645A2199F742B1D01635ABF8277F1A"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_02.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_02.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  9582,
+        "sha256":  "0716FA37A16795097D751CC62763BC3D9B1D26B9BBF48F2FEB2975F1275BE9AE"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_03.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_03.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  10560,
+        "sha256":  "92F4573C24F874BF62A29CEF74194A8483AF2CCF71400881B026B2A04999A8AF"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_04.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_04.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  8874,
+        "sha256":  "902437BAAEB8938DC90D80EEA400EBD933D0C016265E47F6214442AD2A0675D9"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_05.ymap",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_05.ymap",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  6960,
+        "sha256":  "0CD2126ACF5E7CDBFB78AF560254F4873D9360871CD873ED748064D0A82A94F6"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_col.ybn",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_col.ybn",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  891752,
+        "sha256":  "4FC406BBCF47FE676DB50C501FAB0F82F645C34EC4CF43D6DFDDAA737A4650BE"
+    },
+    {
+        "file":  "gustavera_fav_complexomiramar_manifest.ymf",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_fav_complexomiramar_manifest.ymf",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  1860,
+        "sha256":  "BD91DD1A0D6572A2D1D138814E1BF4B9D01F2041C214DCCD7E31C7B9F6C6ED01"
+    },
+    {
+        "file":  "gustavera_fav_dinheiro.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_dinheiro.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  167433,
+        "sha256":  "9113B1271C48E55C747A362FD089EA3DAFF0B5CAF1FE7ACBA0C5CCA414DFCD64"
+    },
+    {
+        "file":  "gustavera_fav_egito_01.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_01.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  11960,
+        "sha256":  "34B64A8846FE60AF134DD626FBBF952B2FEE5F141E9756770DF5762F2F0D0521"
+    },
+    {
+        "file":  "gustavera_fav_egito_02.ymap",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_02.ymap",
+        "resource":  "cold_favela_egito",
+        "bytes":  15229,
+        "sha256":  "62A3051A6D211A8D33BF6760FA7DDCF42B1104DD68BA859796B09BB8339AB36F"
+    },
+    {
+        "file":  "gustavera_fav_egito_col.ybn",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_col.ybn",
+        "resource":  "cold_favela_egito",
+        "bytes":  591077,
+        "sha256":  "E7B55F146D8151B032A18935835CD716CCC8C6843370CE51D988E4F2130DD5CF"
+    },
+    {
+        "file":  "gustavera_fav_egito_manifest.ymf",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_manifest.ymf",
+        "resource":  "cold_favela_egito",
+        "bytes":  1500,
+        "sha256":  "C3EDFAC809EBB0A99F7D2A95D6962D065A6611D1253CE5F467123B5D57FE53C4"
+    },
+    {
+        "file":  "gustavera_fav_egito_rua.ydr",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_rua.ydr",
+        "resource":  "cold_favela_egito",
+        "bytes":  1741686,
+        "sha256":  "6233D2D42263B33018D5809CCACB8863D3E8501D29F5C5F685D52700B543E999"
+    },
+    {
+        "file":  "gustavera_fav_egito_rua.ytyp",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_rua.ytyp",
+        "resource":  "cold_favela_egito",
+        "bytes":  539,
+        "sha256":  "9EEE17DE730AD264C46D95F5CB5D25460E3AA297D62C9620BDA7B6F045D51574"
+    },
+    {
+        "file":  "gustavera_fav_egito_rua_col.ybn",
+        "destination":  "cold_favela_egito\\stream\\gustavera_fav_egito_rua_col.ybn",
+        "resource":  "cold_favela_egito",
+        "bytes":  301547,
+        "sha256":  "A0C4DE8CD66377EB8060D46BC5F12EEA4199904A3105BD9BCD63B28642737A2F"
+    },
+    {
+        "file":  "gustavera_fav_escada_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  10142,
+        "sha256":  "8CA9576815CDD3507BA53F3CB3B901FDA1B579B47A06A7BE75935A28C80069BE"
+    },
+    {
+        "file":  "gustavera_fav_escada_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  15847,
+        "sha256":  "B7934C4A7F769DA8917B3505160EB3791D65FB85CEA58EB1CCE702F108619DED"
+    },
+    {
+        "file":  "gustavera_fav_escada_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2784,
+        "sha256":  "1B280FA2508F6742C0210D92A12D031234081EA02D8A2C4AAE5718FCE09C0AC2"
+    },
+    {
+        "file":  "gustavera_fav_escada_03a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_03a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  9155,
+        "sha256":  "D19A7C8DADABE2E8924DEEBDA04D590C6C06B3B87A7470DEAC868B71017F62E1"
+    },
+    {
+        "file":  "gustavera_fav_escada_03b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_03b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2691,
+        "sha256":  "1E50A312ED7C9664D717BCC0DF21D71D6C0D48F4BB011921B596F93585515D7E"
+    },
+    {
+        "file":  "gustavera_fav_escada_03c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_03c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2696,
+        "sha256":  "AD618F0B0FCEAFE5CE04A15CC05D636111B36195902BB69467743795F24E3A12"
+    },
+    {
+        "file":  "gustavera_fav_escada_03d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_03d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2701,
+        "sha256":  "29D8F2D64A03F61D64FADC3BB04AE796CCA3C986BBCBF0EF69713B3C3763C781"
+    },
+    {
+        "file":  "gustavera_fav_escada_03e.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_03e.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  4460,
+        "sha256":  "7974F23399ACC16980718F83A4AE6A920CE6A2B3F9D99F3949B376D8A115EFD8"
+    },
+    {
+        "file":  "gustavera_fav_escada_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  16077,
+        "sha256":  "0F11638398AAEE0E1F74F023D8B9590A0A4D87B1CA5CCBC37A20D3AB91C0297B"
+    },
+    {
+        "file":  "gustavera_fav_escada_04a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_04a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  15388,
+        "sha256":  "81E3BB52688A4256D7CDE9C920882166531A645AD2065B1D501B1673FA4CB7CC"
+    },
+    {
+        "file":  "gustavera_fav_escada_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3911,
+        "sha256":  "B897B192C65A1DAD1F18A117928A5CFDFE8F48C1ECF3C22E50A699CF244ED23A"
+    },
+    {
+        "file":  "gustavera_fav_escada_m.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_m.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  19022,
+        "sha256":  "D1654C9E8FD9634695B37475634E606CB12C21E2C002330FE5AEB06FA15B2269"
+    },
+    {
+        "file":  "gustavera_fav_escada_m_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_escada_m_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  13387,
+        "sha256":  "857FEF880F36443E3433519C909C00915B54576FA444D04652A456343AF7E7B0"
+    },
+    {
+        "file":  "gustavera_fav_estacionamento.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_estacionamento.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  623582,
+        "sha256":  "5A6B9315134B99BFC715D5FE06804D7A6F1F37CAB865FC1ECDE10B2DDBAEEFD4"
+    },
+    {
+        "file":  "gustavera_fav_estacionamento2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_estacionamento2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  386884,
+        "sha256":  "9FB82F3BF0BAB169819E74CA5F5D011B6CD8B9FD9459F585B40EDFE6E81FF366"
+    },
+    {
+        "file":  "gustavera_fav_faixa_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_faixa_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  8541,
+        "sha256":  "BED84DEB62FE4CCF6B91BAD1C577309F19FCE63DB518E8B52B93072445D382A5"
+    },
+    {
+        "file":  "gustavera_fav_fios.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_fios.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  101527,
+        "sha256":  "8D85A2A6728BB908592D99A9D8528B1AF535B9222DBFBDC8390C82282A27FD4C"
+    },
+    {
+        "file":  "gustavera_fav_galpao.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_galpao.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  424393,
+        "sha256":  "0102BC4C90E6EB763F32AA55CAC93329F5C17CE963F23B14C4F151B2DB1151A1"
+    },
+    {
+        "file":  "gustavera_fav_galpao2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_galpao2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  260602,
+        "sha256":  "6B77D764855059DBB891539444A982FD242462C72D573DCC343EC6A968503C9D"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  370240,
+        "sha256":  "1D89D55BF33547F5B14F9CCF4607591B395564F43544843A3C8F2DCC2C3E306B"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  315539,
+        "sha256":  "718A89EA5955CF5B80A20B02B200E34CE2798EAA53F431B6D896109556C3E981"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  83681,
+        "sha256":  "776AA9190A35E390615C145ABC6AFB83E486A4D9F6060BBBAA41EBF171B5596B"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  533,
+        "sha256":  "126A2613380EB276BECE268C79C356EFF3D5C551EA6C1C52399B520D9E76F096"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  533,
+        "sha256":  "65A66573A409F31B804304E68B2AA19BB2C78A7BFEF76D13C60C3A01D1B1BD8B"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_06.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_06.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  534,
+        "sha256":  "F34A72DAF386C9C522D1709589E02237FC4E5035101DA3831FA5D70C78B88DC6"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_07.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_07.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  534,
+        "sha256":  "4DBA9DDD9512F549C6D553016A4D89E1DD561EC439F54F194F4A3E69CF98224F"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_08.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_08.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  534,
+        "sha256":  "FB7A4E6E3A2BBF215A52FA2100799CC01B91954D894BDF3E1737F3FC642C95A2"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_09.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_09.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  533,
+        "sha256":  "06C29F46AE14189AF08F381F7BD39C26C5CBC67F1742394E904A93B3CA40C0A6"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_10.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_10.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  533,
+        "sha256":  "AD9B503B17C227E70D6EFF319E440865C0FC0B5750928448BCBB02E5F333ECA3"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_11.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_11.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  534,
+        "sha256":  "2DA1440DE2D99C470058F139F3903E263C095FE373F478B6CA1B4D9E79080944"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_12.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_12.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  534,
+        "sha256":  "F641C98F0CBE00397CCFB01AC62776E77F2CE5AD4B81E126FA2883E7FB23762B"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_13.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_13.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "90B443DCDA4973B6EBE1ECAA1C2D2A7DD79DF3DADF77A76634B88731158CFBFE"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_14.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_14.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "7A878460D256D84960614740A04BB2082FD39FB242E801CDE33E55448DF98040"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_15.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_15.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  530,
+        "sha256":  "11B5DACDBFD9118C89B25CCE7D713E2B5F1B1DEC7F55512B6244311E58F2C4EE"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_16.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_16.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  29864,
+        "sha256":  "51858B3AC874B8583E516436658784FD4E374C6E88483D99A07C980C32C9FF43"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_17.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_17.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "78C63630D7FFFC891997E96F229307BB9DCD569463C385C83C15F48F45871BC3"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_18.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_18.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "8D28442C3CCD95546C930B7BFDE2264A5CCE08396CF7FDF8261B30BD7F3C2E11"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_19.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_19.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "BFAFCD4CC0FB7EA50C55F0B02E49662E2A43EC404EB6DCE2762D7AA90D42C329"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_20.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_20.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "62A06E15DB0E49CA2B0849260859FB3951DA9D9B78E2309D37D948FA59F29B84"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_21.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_21.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "71A58E3B2AF3C9956D2921B7064B6219C42756227FAF85646FA1F87A9C30D059"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_22.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_22.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "E5EB74FDC3D2AA10C1EEE159CEACF980AF930E6CABC3537B1CA00897C0BB4C54"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_23.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_23.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "8B1C0A220DE18F87B8A869290C828DCF75E5AA0562BC9CC18B4FF424D9377614"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_24.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_24.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  528,
+        "sha256":  "B65C6B8E077DDA45B55D195D1657A35C4B6900C2E2F5089A36F43DE19E8A76DA"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_25.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_25.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  534,
+        "sha256":  "C1B92FCFCFAB5D3EC75DBA967557D36362CE309E808B98B454F3A586501493BC"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_26.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_26.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "574878F6DE1D47810E21EB21C3FF2062227DE2B5F7B769709DD2D54B22925CE9"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_27.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_27.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "0741DF9A7A52575D966DE6417E84220668AD66FB539A90058F3F0E00D0C6C0F5"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_28.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_28.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "AC681202FAC0BEAA3BA774B3D0B770C950F372955107B6A8D6259A2F856A16FD"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_29.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_29.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "1F52F55D8A688AACF9457DFAB00515EF0226D2044C371137CA80DFF1AD908C5F"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_30.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_30.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "ECFE2D560E32B7C0E69DDCDB2196EACF748EF59F250DC10E390F87AFB19624F4"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_31.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_31.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "5CD974DF183D5CD4AF302237D4976B51C5B260405AC3869738A4966E3972D487"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_32.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_32.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "378234E2F20A569813E8955BB6CDFB3AEBB8D8965D33BA99B7819CBF0B1E288A"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_33.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_33.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "2494BB37103E2D5D08E6AAE292DDB7A13D452D1951DCE090BF022A4F5756CBCD"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_34.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_34.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "1DE1183BE8DC3FB8B4A52B71F755040AD297FBEA454D4BC385B5A30C59D271E7"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_35.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_35.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  549,
+        "sha256":  "03C1258F906A4E8DBB8E3DC0BB92BDEF7763F12885857826254FB61C3A367055"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_36.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_36.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  549,
+        "sha256":  "106AD7B0C8AB9F9C77BA248CD8EDAFE0659657CBA8C05C2EE8E6B288A0AE8F61"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_37.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_37.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  544,
+        "sha256":  "87B17B2485A3AA99FCD6FA10D97B32020A74DCB48EDEF1786955F3BF89383E3C"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_38.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_38.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  530,
+        "sha256":  "DF1D3A43E95A6A96EC27AC2F019F9CB8172D74F6FF9F2A8EA9C00EC654777A2D"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_39.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_39.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "337200E8D382627A371D9556949446E4215D5DD639BCEFCBE36F6DCD89FF7C84"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_40.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_40.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "722289DBEFFE913295AA6A6E29216884A95D75611EBF21A08E73E3B11FBD8BFC"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_41.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_41.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "252A0C21D13756643B25BE09CADBAB48320AE5DBE6DFA5A03B99D658EFE22861"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_42.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_42.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "7B3FC8FF2065BEA0084D042F2B035DB5634F7CC9DA80C4C6289E60EA91ADB57E"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_43.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_43.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  529,
+        "sha256":  "E029CE663233B7CE8074603A8B24ED7B63FAB785E6CCB4FB9CC5DAF3D79B918E"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_44.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_44.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  44188,
+        "sha256":  "7E0C067A309A0FFD5E4FABE234D4D2C51BD95DB070684D77CD924CB9B3F74D02"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_45.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_45.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  70682,
+        "sha256":  "9CCA99E3D1D2A5422283298EB33A78AC195EC2D732A863E3B67BAD7D64EDAB78"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_46.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_46.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  126505,
+        "sha256":  "8FF37C6E3652D219DF8F9034BEB16E1A89B651E2AE02664B0642BE02F07ADB10"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_47.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_47.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  39345,
+        "sha256":  "81C3DDBFA780F4EA74046877B8C8F4608250EFB0AD542F0B419D706F2FA98A4D"
+    },
+    {
+        "file":  "gustavera_fav_graffiti_48.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_graffiti_48.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  82520,
+        "sha256":  "D7BB1E30B1F43AAB217EFC051920941DCF504BE9B61E07F7CD6191AE3D773B0F"
+    },
+    {
+        "file":  "gustavera_fav_heliponto.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_heliponto.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  24039,
+        "sha256":  "AAB67AF0275AE3178B449DAB3D671AD6D94784BF4C6BC6C3215B12C1E51F195B"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_01.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_01.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  9699,
+        "sha256":  "70FCB5AF46DB4DF7CEEEF719A73813CCEF5B856C737FB653ACB91AE30D36478C"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_02.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_02.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  12079,
+        "sha256":  "4447C37C8B7C1AF77F95E038D773049FD2D8EBBD91CB7F273DA63600211BB868"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_03.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_03.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  11515,
+        "sha256":  "661F3A4CC683FED8A65D0AFB3D6394F76AA00C526BEF64F0A5BE92A637BE9F62"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_04.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_04.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  4773,
+        "sha256":  "C909C67660ABE5E5ED097803DBDCD3539DFB5E3F681F3836F5E2310CD2D1B898"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_col.ybn",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_col.ybn",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  465576,
+        "sha256":  "146352A7EDABE6CEFA0BB269FBA5BB0D7D570D7C81D87DF53EE9966F09EB1B84"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_manifest.ymf",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_manifest.ymf",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1836,
+        "sha256":  "6ABD4C1F1E7C6CC5B343D7E8CEC487F73D45DD7AC999DA8800D430C616876524"
+    },
+    {
+        "file":  "gustavera_fav_horizonte_oclusao.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_fav_horizonte_oclusao.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  2232,
+        "sha256":  "BB67DCDF93841A9390A3C28D3537C490AA18AF48330753682466EA576AEF0454"
+    },
+    {
+        "file":  "gustavera_fav_ilha_01.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_ilha_01.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  11725,
+        "sha256":  "67A7493E99F499EAD41AA6CD9E1CFDAFA6AD4D7CA1DDED6A7D17B2DC8B0646DE"
+    },
+    {
+        "file":  "gustavera_fav_ilha_02.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_ilha_02.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  5547,
+        "sha256":  "59C51959AB0DA0AD46F1C74AD259EBF48BED5BB892CAB899DE9F563BF7107ABE"
+    },
+    {
+        "file":  "gustavera_fav_ilha_col.ybn",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_ilha_col.ybn",
+        "resource":  "cold_favela_ilha",
+        "bytes":  595140,
+        "sha256":  "806DA5CC96D8F81E1F87EE531958349B39FED603FF84F758D0BD662C13FC2902"
+    },
+    {
+        "file":  "gustavera_fav_ilha_manifest.ymf",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_ilha_manifest.ymf",
+        "resource":  "cold_favela_ilha",
+        "bytes":  1664,
+        "sha256":  "DF28EC9B0A67AF9B5D30E83BF19D3F6668C612CD33BC47BA3E43922910371264"
+    },
+    {
+        "file":  "gustavera_fav_lampada.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_lampada.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  10801,
+        "sha256":  "17BDCF36664D96BC124A471090933D0893B67D84C9BC5F03D658DCB38F02DA74"
+    },
+    {
+        "file":  "gustavera_fav_lombada_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_lombada_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  51371,
+        "sha256":  "3B297607395ADA71D63CB49F0190D3EABA68E8EB4FCF630155F9F3DE47AA9C40"
+    },
+    {
+        "file":  "gustavera_fav_lombada_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_lombada_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  7269,
+        "sha256":  "3135C3C80F160B77AFF2DF7ACD4EC22777ADABE7C4ED46C8100C65212C8F276E"
+    },
+    {
+        "file":  "gustavera_fav_lombada_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_lombada_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  96117,
+        "sha256":  "62305749C7BE54F11EACBD1E653F5C77E4889CEDAAF6447F395DB83E2556F37C"
+    },
+    {
+        "file":  "gustavera_fav_lombada_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_lombada_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  237400,
+        "sha256":  "FFF9253AC6943EB16B561E8D44633993BD905D39F9CBED6532720276EAE43393"
+    },
+    {
+        "file":  "gustavera_fav_mesa_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_mesa_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  36188,
+        "sha256":  "FE3EC5B518DCC9367EEC0F7F21DE78EA7AB0B4E8DAA98E029021D2017D9C04E8"
+    },
+    {
+        "file":  "gustavera_fav_mesa_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_mesa_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  430922,
+        "sha256":  "C1D097AF92AD3D0E2E769D7D701F919185BF8F828364F66F3C79045C14CB93D7"
+    },
+    {
+        "file":  "gustavera_fav_mesa_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_mesa_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3462061,
+        "sha256":  "E2368CBB63F44836DAA3293F2D743780E35C502EA13E4918664828E0B8563587"
+    },
+    {
+        "file":  "gustavera_fav_mesa_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_mesa_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  167357,
+        "sha256":  "FAF116C7958BDB8EF406FFB05790761A5C7555C8A53211AD915D56C8371E5039"
+    },
+    {
+        "file":  "gustavera_fav_mesa_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_mesa_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3170448,
+        "sha256":  "C3B9D31EA9E0D5B7A0BAB89E58E8D9A05E6940B431A75BA5822BA2630F063052"
+    },
+    {
+        "file":  "gustavera_fav_mirante_col.ybn",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_fav_mirante_col.ybn",
+        "resource":  "cold_favela_mirante",
+        "bytes":  543258,
+        "sha256":  "E216DDEA711CA467DED006730EC6900250CEB3C1DA893BE37236AF5677DBDAB5"
+    },
+    {
+        "file":  "gustavera_fav_mirante_manifest.ymf",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_fav_mirante_manifest.ymf",
+        "resource":  "cold_favela_mirante",
+        "bytes":  1176,
+        "sha256":  "35B122A4288D6E4F2C8E8F32B21DBC3383E811B5BE3AA7C1B3FAC5ED3323AFB9"
+    },
+    {
+        "file":  "gustavera_fav_mirante_rua.ydr",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_fav_mirante_rua.ydr",
+        "resource":  "cold_favela_mirante",
+        "bytes":  702463,
+        "sha256":  "99D8482A0BBFC7EAE8FF9AC3CDBF7400F192E30CB09E1171B69A875F1981AEA8"
+    },
+    {
+        "file":  "gustavera_fav_mirante_rua.ytyp",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_fav_mirante_rua.ytyp",
+        "resource":  "cold_favela_mirante",
+        "bytes":  540,
+        "sha256":  "AB023A7EBD8BDAD3BE34A36B33506B3A6F7C2D7345116033270CECA9C12BC549"
+    },
+    {
+        "file":  "gustavera_fav_mirante_rua_col.ybn",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_fav_mirante_rua_col.ybn",
+        "resource":  "cold_favela_mirante",
+        "bytes":  441781,
+        "sha256":  "C0E3679EE24D65E72AEF6133166B2C3D568F636E3718FB678E9EAD5F916EDB36"
+    },
+    {
+        "file":  "gustavera_fav_narguile.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_narguile.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  543171,
+        "sha256":  "98899B1B2BB0C4AA5C77FC0BE48A71F6CF228BEF55FB96BA6CA6DE82C15B034A"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_01.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_01.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  11647,
+        "sha256":  "EA7484733E2709D1F44D91FBA33DF0436EF3A11E9907FC80C8A0027DAD52D3D3"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_02.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_02.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  12631,
+        "sha256":  "4350489DE61B435FAE10A42D31044F6E43DDF7039E72A818C53100089A60B358"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_03.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_03.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  9366,
+        "sha256":  "713B83405A69B0A23C3285A1B7B660DD6DF368552BEC468CD5F5312C5065CD10"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_04.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_04.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  11434,
+        "sha256":  "E7E2DAAEEFB3BBC4A4F278F9CBEC34A84AE081592101FF4318C064C57A968B37"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_05.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_05.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  6674,
+        "sha256":  "2290B0734EFA82024543C84F4940954306DA44B6B4D2DAD9608B4E2D2F386381"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_col.ybn",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_col.ybn",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  999998,
+        "sha256":  "FBA942B5F1B0037C771CCEB7F3C4EA3D4A8870B61E793A8EB41F0BAF2726BD04"
+    },
+    {
+        "file":  "gustavera_fav_novaesperanca_manifest.ymf",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_fav_novaesperanca_manifest.ymf",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  2312,
+        "sha256":  "ED321DA4302D704F60E865A3DC4D32C071D87AC358B2B282D3FD62363087EEFA"
+    },
+    {
+        "file":  "gustavera_fav_observatorio_01.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_observatorio_01.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  11447,
+        "sha256":  "D373A3FA61AC3E723D0A7A9B0BB4A87C5F3D7235057EED2055B77B624715DBB7"
+    },
+    {
+        "file":  "gustavera_fav_observatorio_02.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_observatorio_02.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  11832,
+        "sha256":  "0963A688A6759036603DBE9503F4AD9F57F7022457446D711FEB8FFDCB9AE91F"
+    },
+    {
+        "file":  "gustavera_fav_observatorio_03.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_observatorio_03.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  3168,
+        "sha256":  "FD3C9E744264299723346A64363C0BFBD11FC8E4263C5033E1EF3D07C6D1147C"
+    },
+    {
+        "file":  "gustavera_fav_observatorio_col.ybn",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_observatorio_col.ybn",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  604034,
+        "sha256":  "872DFDDFC290D6369799A6DAD1647B21ED4F18AB3D1B82018AB2700F32FE1C4B"
+    },
+    {
+        "file":  "gustavera_fav_observatorio_manifest.ymf",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_observatorio_manifest.ymf",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1388,
+        "sha256":  "FD0AC53F454337E7D8D2257A025C7BFA4CA365CFB8F363B00B9AC8CC32B0D0F2"
+    },
+    {
+        "file":  "gustavera_fav_palco.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1109771,
+        "sha256":  "C6852B4BE7F31E8BFD4CDE0A8A96DD6C25BEB03FBFE05E2FF26F12E588450E2B"
+    },
+    {
+        "file":  "gustavera_fav_palco2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  271885,
+        "sha256":  "2CF9CA20286D4FE9422CB4D54D2CF1E9A8BF60ACE1001E563AF8395FD4890198"
+    },
+    {
+        "file":  "gustavera_fav_palco_estrutura.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_estrutura.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  773952,
+        "sha256":  "0C4CF675B733812DD43C7E2EB0C602008C97F35DC3E5ADBE2B02042496DED0E9"
+    },
+    {
+        "file":  "gustavera_fav_palco_estrutura2.ycd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_estrutura2.ycd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1881,
+        "sha256":  "4D79CAFFF50784ACD9A0866B13FAED0F4B34D1E9A88A3ED5EF8772DFBF110697"
+    },
+    {
+        "file":  "gustavera_fav_palco_estrutura2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_estrutura2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1000355,
+        "sha256":  "FA452531B39B99ABEF537D830FB8968AF27CBAB405B34C3E1B8203F87E559B94"
+    },
+    {
+        "file":  "gustavera_fav_palco_ferros.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_ferros.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1019138,
+        "sha256":  "26BA2BCD07208249972A05C5CCFE2232C34A95AC3702721A334A7EC530DC5315"
+    },
+    {
+        "file":  "gustavera_fav_palco_som.ycd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_som.ycd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  706,
+        "sha256":  "16A27531A46294F3640690015A69492590DF1796E68B5EC8BA047CF6B2665F96"
+    },
+    {
+        "file":  "gustavera_fav_palco_som.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_som.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1058025,
+        "sha256":  "F0B467E006D6782661ED0D061CD3B444516BD4F7B8C253D01CFCA81EC99F7314"
+    },
+    {
+        "file":  "gustavera_fav_palco_telao.ycd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_telao.ycd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  706,
+        "sha256":  "BA2C9D472568625EA382FAF42C322AF277D7A175A92B95DB54CD1D90386A6542"
+    },
+    {
+        "file":  "gustavera_fav_palco_telao.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_telao.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  38649,
+        "sha256":  "9F7959DA37845F43E3F80F7B2B58521795E63E779F6C37FABC05223BE7E71B44"
+    },
+    {
+        "file":  "gustavera_fav_palco_tv.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_palco_tv.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  32303,
+        "sha256":  "D2497383F1E1DC5FB49F1CD805EB6515E3F9E013752513E4E9A2F08F74E380E6"
+    },
+    {
+        "file":  "gustavera_fav_pantano_col.ybn",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_fav_pantano_col.ybn",
+        "resource":  "cold_favela_pantano",
+        "bytes":  534382,
+        "sha256":  "1578434D617CBB809E7DE07B535182C1B66E77FAB72233622CFCABCB27B8B66F"
+    },
+    {
+        "file":  "gustavera_fav_pantano_manifest.ymf",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_fav_pantano_manifest.ymf",
+        "resource":  "cold_favela_pantano",
+        "bytes":  1156,
+        "sha256":  "6E5EAF1A9FEF9010A1A5DEB2B672B0E211C576F825B0C9C53BA53F60E8E3E289"
+    },
+    {
+        "file":  "gustavera_fav_pantano_rua.ydr",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_fav_pantano_rua.ydr",
+        "resource":  "cold_favela_pantano",
+        "bytes":  180580,
+        "sha256":  "AB3C19068534AE80F1467BB52CABFBBB47C3F3E1009B842A8B9A2126488B8BF1"
+    },
+    {
+        "file":  "gustavera_fav_pantano_rua.ytyp",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_fav_pantano_rua.ytyp",
+        "resource":  "cold_favela_pantano",
+        "bytes":  538,
+        "sha256":  "F6C5A308577E642C8C80A516D76BF79F19E65740F0495F017724A534914E5CF7"
+    },
+    {
+        "file":  "gustavera_fav_pantano_rua_col.ybn",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_fav_pantano_rua_col.ybn",
+        "resource":  "cold_favela_pantano",
+        "bytes":  136139,
+        "sha256":  "E3F9E6D9E833D772E37501F8F5343A1EA5DCE78361D82C6EDD4EB4189892DBFB"
+    },
+    {
+        "file":  "gustavera_fav_parede_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1251,
+        "sha256":  "623F62B2D0E36091850FBE0D535D379157B58CBFD8D404EE2908E4177D820E14"
+    },
+    {
+        "file":  "gustavera_fav_parede_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2666,
+        "sha256":  "F36B05801EE7F32C73D397F542264DABD02278C2BC58816406F2F379D3964A61"
+    },
+    {
+        "file":  "gustavera_fav_parede_02a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_02a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2528,
+        "sha256":  "0E5B5390D2BD1BF59D56CA71381490BD51182C585DA3A7A1F642E6657A96E065"
+    },
+    {
+        "file":  "gustavera_fav_parede_02b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_02b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2488,
+        "sha256":  "80963AC4F9247531A70AC308B127D40ADE7B3A29C9B0DD5F8D34D2BD32AA699F"
+    },
+    {
+        "file":  "gustavera_fav_parede_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1265,
+        "sha256":  "14173C828C3B3325EB0D55CD35B15A8A5618D7E5F96E4A289209FDB061CFDECB"
+    },
+    {
+        "file":  "gustavera_fav_parede_03a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_03a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1266,
+        "sha256":  "247C6712A81DB2AD9E62F036452C71F1A087C507808C9BA2B6CED6C4CDA6E50D"
+    },
+    {
+        "file":  "gustavera_fav_parede_03b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_03b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1267,
+        "sha256":  "2B91C7AB9E963C74077C0F99742CE1FFA869365B98F1E51A43353E95E52A2CB3"
+    },
+    {
+        "file":  "gustavera_fav_parede_03c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_03c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  21454,
+        "sha256":  "B1BF8FDF50EF7A56406E2220368FA78A5CB8638B78C7481E1647F33CE6A88719"
+    },
+    {
+        "file":  "gustavera_fav_parede_03d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_03d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  21386,
+        "sha256":  "1EABEE3D2DCF6C20983BF553FD6F7DD7CE920F73650E5DB1380EC4B2FA76E633"
+    },
+    {
+        "file":  "gustavera_fav_parede_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  29254,
+        "sha256":  "513B21DDC7119B195C653662D45253C72D53B60C3BF156729881ED586FC6AC9E"
+    },
+    {
+        "file":  "gustavera_fav_parede_04a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_04a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  29255,
+        "sha256":  "C77A8874E5D1107A383F272190820DF0CF2B0309CFBD3BF66E246BADC1C2B2B4"
+    },
+    {
+        "file":  "gustavera_fav_parede_04b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_04b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  29257,
+        "sha256":  "3DCB469DD07BAF59E47197DF04CDEDCA720A2FBE7A8DCBEA9C402BDEF19271B5"
+    },
+    {
+        "file":  "gustavera_fav_parede_04c.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_04c.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  29256,
+        "sha256":  "40BF8C4FFE0CEF92CF78AD2BD64D3F3A902DDC2497E1B8F3A063F2E8079AC1FA"
+    },
+    {
+        "file":  "gustavera_fav_parede_04d.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_04d.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  29255,
+        "sha256":  "815C10AA344D6CF5111D461E8EEB2A932A589099BD0438B38FE8FEA478D63A07"
+    },
+    {
+        "file":  "gustavera_fav_parede_04e.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_04e.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  30118,
+        "sha256":  "1000FF593517AB306CAB4BAF27862BD9138E7229E6D32F24F16F4453CED3B4CF"
+    },
+    {
+        "file":  "gustavera_fav_parede_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  40034,
+        "sha256":  "D60218A3B91F705ABC24BE63B2E99DF369256728F3D8F637B5C7B85E1D595C7A"
+    },
+    {
+        "file":  "gustavera_fav_parede_06.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_06.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  21771,
+        "sha256":  "8AA74E69249EA19C9E7C8D033AEEB0A15066337E216321298713531B0BB5DB85"
+    },
+    {
+        "file":  "gustavera_fav_parede_06a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_06a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  82344,
+        "sha256":  "445DED5CFE4C97397552FEAD8762F7BB2692DF9E4A03848B40558D17587562F1"
+    },
+    {
+        "file":  "gustavera_fav_parede_06b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parede_06b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1935,
+        "sha256":  "04E744D24120023385D9A64AEA54A0FFFE25617E2D8DB44D112D15918F912AF7"
+    },
+    {
+        "file":  "gustavera_fav_parquinho.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parquinho.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  590841,
+        "sha256":  "C1044D529A7F290455DE766031DD082C780CCAEACE3AB25BE57B8E2A85C934F2"
+    },
+    {
+        "file":  "gustavera_fav_parquinho2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_parquinho2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  744290,
+        "sha256":  "5DD7ADAF2D5DF2279C0221925413EA3A2AADF20A32AFF88E99CC9FD371D36A55"
+    },
+    {
+        "file":  "gustavera_fav_pier.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_pier.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  898194,
+        "sha256":  "2A60CECC2AFC62B2333C14D241F0B02DED96100AF24C6DD667A05E2EA396B054"
+    },
+    {
+        "file":  "gustavera_fav_piscina_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_piscina_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1729,
+        "sha256":  "496D2CB075E8F32B7F06137005FBFBA0D5940E01CE406C9791DFEE3F95BA7248"
+    },
+    {
+        "file":  "gustavera_fav_piscina_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_piscina_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  839,
+        "sha256":  "9A5776A5156DA37C584325DD5877177084EEAC035B5F41F68E5A6D8C9770C1BB"
+    },
+    {
+        "file":  "gustavera_fav_piscina_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_piscina_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1028,
+        "sha256":  "40D0D16EE238C85347B0A62C36C505273302D8DBDADF0DB359A4A35D90210D3F"
+    },
+    {
+        "file":  "gustavera_fav_placa_01.yft",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_placa_01.yft",
+        "resource":  "favelas_cold_assets",
+        "bytes":  115922,
+        "sha256":  "F55365AF52D3A7B9ACB2F6259C27857900CE7202706CBD544F93B89E5BF29E70"
+    },
+    {
+        "file":  "gustavera_fav_placa_02.yft",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_placa_02.yft",
+        "resource":  "favelas_cold_assets",
+        "bytes":  113033,
+        "sha256":  "ED778DC39F79897C50FB604A4F7E8F5169A993D5463126B0B8737AB5DAB480BA"
+    },
+    {
+        "file":  "gustavera_fav_ponto.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_ponto.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  363435,
+        "sha256":  "AD3AB2AB01A990EA647F48F366CADC77567ED7E15BF486F9BDB22BB7EA7C95DA"
+    },
+    {
+        "file":  "gustavera_fav_poste_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_poste_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  299180,
+        "sha256":  "162118735661E7F6155D750F339390399B62582CAD57CBC7CD9AA7B9DC5688DB"
+    },
+    {
+        "file":  "gustavera_fav_poste_01a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_poste_01a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  790819,
+        "sha256":  "0B491532DA40D0A35B21B528790912779BB9B79AAD4DF1459AB49F1603F5C01A"
+    },
+    {
+        "file":  "gustavera_fav_poste_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_poste_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  461450,
+        "sha256":  "116C514F7BE6D6C2F28F1D51551DE13AC380D4ECA8BEB022F5DE7A801070BDDD"
+    },
+    {
+        "file":  "gustavera_fav_poste_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_poste_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3258,
+        "sha256":  "D5E75D09EDED07AE88DFA3AB7F5BB34EB7F1ADF621DB5C5B54B5F1B6D61A2FE7"
+    },
+    {
+        "file":  "gustavera_fav_poste_04.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_poste_04.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  36565,
+        "sha256":  "9C444F033DD871897AFA76D2E3A73248FFFC711AD3E051DF3A96EA7039F1AFD6"
+    },
+    {
+        "file":  "gustavera_fav_poste_05.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_poste_05.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  42811,
+        "sha256":  "8FABE0D2FDEC65A792239DB098AE6028BCF7E722A2B546109F87015E7A1D3477"
+    },
+    {
+        "file":  "gustavera_fav_props.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_props.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  7831,
+        "sha256":  "533C445C5B9BAD560E468C35929469A59B4E3BA30BA74172F11A4C9A6F8C86BF"
+    },
+    {
+        "file":  "gustavera_fav_quadra.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_quadra.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1270458,
+        "sha256":  "31C5E4533AE7D3B73902443AA3564070EF228C2FFC636F8713F463F04E2FDEE6"
+    },
+    {
+        "file":  "gustavera_fav_quadra2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_quadra2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1043370,
+        "sha256":  "F431AFC5C5D79DD3F883B78F78B96D15D7FFC80DF84A3B6AADA80706F684C297"
+    },
+    {
+        "file":  "gustavera_fav_quadra_03.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_quadra_03.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1443711,
+        "sha256":  "BE9860657302F1E63C26D36685F9BE66151B842C911D9482F60ACDFC90C99605"
+    },
+    {
+        "file":  "gustavera_fav_racktv.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_racktv.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  111287,
+        "sha256":  "DCBC7E4359F316E1E7D51A1AB85768544B9AAD6BB1597DB28056CBDAA98DAE56"
+    },
+    {
+        "file":  "gustavera_fav_rampa.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_rampa.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  4718,
+        "sha256":  "D44D855ABD4536B2E1123E9D08A982BD6DB9FB0B0A6C7498CA478B7627E2280A"
+    },
+    {
+        "file":  "gustavera_fav_rotatoria_col.ybn",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_fav_rotatoria_col.ybn",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  510762,
+        "sha256":  "3D050015AB47DD7FABCD4B205F827CA1ECBD7631D4BF3E54EAA689FD9D8A78BA"
+    },
+    {
+        "file":  "gustavera_fav_rotatoria_manifest.ymf",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_fav_rotatoria_manifest.ymf",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  1180,
+        "sha256":  "CEFB12B8803B75480A3C78E24057A696DD783074F681AD9D18D2BD348077B2CA"
+    },
+    {
+        "file":  "gustavera_fav_rotatoria_rua.ydr",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_fav_rotatoria_rua.ydr",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  545742,
+        "sha256":  "CBBA1EAC0C71FAAE24F1006C665D33A86F7DCF45572347C9BD09B5CAF8A24BB2"
+    },
+    {
+        "file":  "gustavera_fav_rotatoria_rua.ytyp",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_fav_rotatoria_rua.ytyp",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  541,
+        "sha256":  "3DBC6280859F10A8EFCCDAD514E012412F7CA69F55BF16A9FDAF9E29DF9C7A28"
+    },
+    {
+        "file":  "gustavera_fav_rotatoria_rua_col.ybn",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_fav_rotatoria_rua_col.ybn",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  350196,
+        "sha256":  "199F1637BB2C1AE353ADB7D353AED6F9AB48FC6050113845A28571880F6530C5"
+    },
+    {
+        "file":  "gustavera_fav_rua_ilha.ydr",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_rua_ilha.ydr",
+        "resource":  "cold_favela_ilha",
+        "bytes":  2684584,
+        "sha256":  "00A2E1F05CEAF1E3CF6997AB0F7E4AF95DC086E1EC1DB4392DE28157C640E7D3"
+    },
+    {
+        "file":  "gustavera_fav_rua_ilha.ytyp",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_rua_ilha.ytyp",
+        "resource":  "cold_favela_ilha",
+        "bytes":  539,
+        "sha256":  "3B0DF4357A5487801448B1E43CAB72044B59528438AF4AEF79048480F7393F60"
+    },
+    {
+        "file":  "gustavera_fav_rua_ilha_col.ybn",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_fav_rua_ilha_col.ybn",
+        "resource":  "cold_favela_ilha",
+        "bytes":  482496,
+        "sha256":  "587780DD3EA7834BFE80BEEC099745FCE893629D1416C7EF3C4553478AA46877"
+    },
+    {
+        "file":  "gustavera_fav_rua_observatorio.ydr",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_rua_observatorio.ydr",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1843543,
+        "sha256":  "3903D121C800DB6D379FAEEAA566CFB4E4FD4A5A4CF22B1C6278C5C9325B012D"
+    },
+    {
+        "file":  "gustavera_fav_rua_observatorio.ytyp",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_rua_observatorio.ytyp",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  548,
+        "sha256":  "94572EA656CA45CD736C5A30D10B568F77127A86161A478AF684020A77EBA084"
+    },
+    {
+        "file":  "gustavera_fav_rua_observatorio_col.ybn",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_fav_rua_observatorio_col.ybn",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  239362,
+        "sha256":  "C884D1F3BBEF8B6C2F5B6ADD956AE4593787CFC0D3ECC98E6615203EB3C6C1D7"
+    },
+    {
+        "file":  "gustavera_fav_saara_01.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_01.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  13452,
+        "sha256":  "8DB3CCC0B29B31EC76E2F12CF630B989DFA235B75980979367E73364066D08A2"
+    },
+    {
+        "file":  "gustavera_fav_saara_02.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_02.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  9733,
+        "sha256":  "AB6096EA0E4B9801BDEE2761591C17B0C48687EE6DF7BA8AF342FFBA99E05D21"
+    },
+    {
+        "file":  "gustavera_fav_saara_col.ybn",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_col.ybn",
+        "resource":  "cold_favela_saara",
+        "bytes":  586547,
+        "sha256":  "12F2AD315F2B2ED71CDBD514DB123845361D1F7C6B7F15182E99A96F4B2466A1"
+    },
+    {
+        "file":  "gustavera_fav_saara_manifest.ymf",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_manifest.ymf",
+        "resource":  "cold_favela_saara",
+        "bytes":  1256,
+        "sha256":  "37A020DBBBC2252D251CF5609104D79A9FD276417ED4684CA7D56CAC510F6C1A"
+    },
+    {
+        "file":  "gustavera_fav_saara_rua.ydr",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_rua.ydr",
+        "resource":  "cold_favela_saara",
+        "bytes":  295792,
+        "sha256":  "285ED884E308202DC66132886C6FAE4091F58D72CF26765A90E7F2F160EE41EC"
+    },
+    {
+        "file":  "gustavera_fav_saara_rua.ytyp",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_rua.ytyp",
+        "resource":  "cold_favela_saara",
+        "bytes":  537,
+        "sha256":  "8349BBDE007274CD5A968EC33867528E47E404B7AE488DDCD9271CC1AB50B011"
+    },
+    {
+        "file":  "gustavera_fav_saara_rua_col.ybn",
+        "destination":  "cold_favela_saara\\stream\\gustavera_fav_saara_rua_col.ybn",
+        "resource":  "cold_favela_saara",
+        "bytes":  224950,
+        "sha256":  "9A8B158CC493814714CF539460DBA901C601191F2F0DCC2AC93F66820AF05FC3"
+    },
+    {
+        "file":  "gustavera_fav_spray.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_spray.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  742584,
+        "sha256":  "A41FA1922CEF7A7BA9264E3175E4472B795E9AF0650B46C91B11E7E7618ECAC9"
+    },
+    {
+        "file":  "gustavera_fav_telhado.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_telhado.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  9915,
+        "sha256":  "BD514957EFA47FB539B3E86CCFBDE0429C63EDA437C632CA95111EBA7C6BA898"
+    },
+    {
+        "file":  "gustavera_fav_tenda.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_tenda.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  489577,
+        "sha256":  "C3BBBD4BE27618499BF7909BD02641DD529F4893E096B8E0B9EB4CA6D18F2AF7"
+    },
+    {
+        "file":  "gustavera_fav_tenda2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_tenda2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  379286,
+        "sha256":  "DF9CEC060DF9D2B6973A8379CEB9E8BBE78302AF2C830B173D283FAE3FE134E6"
+    },
+    {
+        "file":  "gustavera_fav_terreno_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_terreno_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108553,
+        "sha256":  "5578CEC941DCA6CB5545DA819519A5E8A85EC89E931783E689E6FF62DFDD078A"
+    },
+    {
+        "file":  "gustavera_fav_terreno_01a.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_terreno_01a.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108551,
+        "sha256":  "960938776799682BA0D534C099C4306A0DA709A3953FF5DDF437C102320EDCFE"
+    },
+    {
+        "file":  "gustavera_fav_terreno_01b.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_terreno_01b.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  108552,
+        "sha256":  "FEF77ED6F6701F8DE986421C5AF320069A618F631BB1647604F19F81296CE9E7"
+    },
+    {
+        "file":  "gustavera_fav_tijolos.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_tijolos.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  10880,
+        "sha256":  "42C1F9E4A6B51D5B27B6B32DA85F9B9E964D9FF14E084D41E59B4906EA468455"
+    },
+    {
+        "file":  "gustavera_fav_toldo_01.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_toldo_01.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  266113,
+        "sha256":  "7A03D7D796012BD006F7EB153FCC748C788AA6CFDB74534103EC0E3A7679EE68"
+    },
+    {
+        "file":  "gustavera_fav_toldo_02.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_toldo_02.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  5937,
+        "sha256":  "035E6B48177CF4175F40DA137C17961A367A860F7078C633207B8706EB8B2B0C"
+    },
+    {
+        "file":  "gustavera_fav_toldo_03.yft",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_toldo_03.yft",
+        "resource":  "favelas_cold_assets",
+        "bytes":  35509,
+        "sha256":  "4671594383C9DB4835589A0B1487DE3BF9DE5F065B673121069BE6C8267CFD26"
+    },
+    {
+        "file":  "gustavera_fav_toldo_04.yft",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_toldo_04.yft",
+        "resource":  "favelas_cold_assets",
+        "bytes":  35142,
+        "sha256":  "0DDAE9809AD659A99578B965EB118B4B9A8E701722D6E363FDE540D730299445"
+    },
+    {
+        "file":  "gustavera_fav_toldo_05.yft",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_toldo_05.yft",
+        "resource":  "favelas_cold_assets",
+        "bytes":  6655,
+        "sha256":  "549FAC12B9FEC6ADD53890C1F7275642C4423CB2A48FE4BF85203523C818B077"
+    },
+    {
+        "file":  "gustavera_fav_trilho_01.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_01.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  10114,
+        "sha256":  "B4953480C6C930C31D7E41AFD65EA4105A279FAE616BD377EF030CC8DBE36B6E"
+    },
+    {
+        "file":  "gustavera_fav_trilho_02.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_02.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  10659,
+        "sha256":  "7BEBD2F5F4A1D78A64F8516119B0D41A48B75F69F6C3B9B2090F960FD889A7D6"
+    },
+    {
+        "file":  "gustavera_fav_trilho_03.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_03.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  5536,
+        "sha256":  "6433E1F62099B6AB59E66D0C532BD4010CC09D95B6AF4192C2D95EC551785E1F"
+    },
+    {
+        "file":  "gustavera_fav_trilho_col.ybn",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_col.ybn",
+        "resource":  "cold_favela_trilho",
+        "bytes":  595834,
+        "sha256":  "9217ABD33DC58C13CA1805342AA9CFE6F89112D0B580C6893359046D937AD86F"
+    },
+    {
+        "file":  "gustavera_fav_trilho_manifest.ymf",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_manifest.ymf",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1588,
+        "sha256":  "B0828BDC92170BC68693763C04740F3B472133FE07513408F76E588E6FE6D4E8"
+    },
+    {
+        "file":  "gustavera_fav_trilho_rua.ydr",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_rua.ydr",
+        "resource":  "cold_favela_trilho",
+        "bytes":  2148758,
+        "sha256":  "2657E178C3FFBABAD10F76A37618808DB6D3581F41023433B2D393DC4329E14D"
+    },
+    {
+        "file":  "gustavera_fav_trilho_rua.ytyp",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_rua.ytyp",
+        "resource":  "cold_favela_trilho",
+        "bytes":  540,
+        "sha256":  "0FBF74D9E4A3389EB0CDDC02232DC8CCEA3EBDB1E696C5C8DDDA40F0E0740DC4"
+    },
+    {
+        "file":  "gustavera_fav_trilho_rua_col.ybn",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_fav_trilho_rua_col.ybn",
+        "resource":  "cold_favela_trilho",
+        "bytes":  336903,
+        "sha256":  "D6C7E3D8353E7A88BFEBEA37E26D2B1A7A2A67AC4AE43805B83703CF3D693D14"
+    },
+    {
+        "file":  "gustavera_fav_txt.ytd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_txt.ytd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  7121297,
+        "sha256":  "DD6960237D72CBE6E2E04EB53E5DE433ED6C09D58C85710BFF246BE9B7AAEF23"
+    },
+    {
+        "file":  "gustavera_fav_varal.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_fav_varal.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  303399,
+        "sha256":  "961EF37068E35E715A93245D257FE1450C81A9B5B2741C4326BC1E032E716F85"
+    },
+    {
+        "file":  "gustavera_grafites_txt.ytd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_grafites_txt.ytd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2751987,
+        "sha256":  "8D2BCF641396FF8B0769EB237449B2B23D18A650469D6E4FA97AFD64C9AD3B40"
+    },
+    {
+        "file":  "gustavera_horizonte_barbe_mlo.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_horizonte_barbe_mlo.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1228,
+        "sha256":  "9E3113C4E99252D168ED54E2642CBBEF147DDEEE88E8B0297628AF0D8E0FD626"
+    },
+    {
+        "file":  "gustavera_horizonte_bar_mlo.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_horizonte_bar_mlo.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1225,
+        "sha256":  "9D8017E6A519CA98F811DB175D010E93D987CBE0A9A13F2E294FF4CACB723D69"
+    },
+    {
+        "file":  "gustavera_horizonte_bau_mlo.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_horizonte_bau_mlo.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1225,
+        "sha256":  "68329E71D4CAF64E62315A9218428EC15E51B721AC7713EEAF19BC055A37932B"
+    },
+    {
+        "file":  "gustavera_horizonte_chefe_mlo.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_horizonte_chefe_mlo.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1224,
+        "sha256":  "A6647B263676F2EAA5FD9A422EE12E84CA081E9522CD2E31D1E2671B5F6A056A"
+    },
+    {
+        "file":  "gustavera_horizonte_farm_mlo.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_horizonte_farm_mlo.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1232,
+        "sha256":  "33C5162930D10A918F286918E6A542468699649A5F313D716619BA516CEE89D7"
+    },
+    {
+        "file":  "gustavera_horizonte_roupa_mlo.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_horizonte_roupa_mlo.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1236,
+        "sha256":  "374309B5002AA80A0D509E590FB7A615800D65B73B892A18E447D713D59095D0"
+    },
+    {
+        "file":  "gustavera_ilha_barbe_mlo.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_ilha_barbe_mlo.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  1222,
+        "sha256":  "D3C296E80DC2CC48D6193A3F09A8176DDB672C257165511A115976902ED1E369"
+    },
+    {
+        "file":  "gustavera_ilha_bar_mlo.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_ilha_bar_mlo.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  1215,
+        "sha256":  "D761A42FCB7D1D067AC24AD1A83DB356A19DBCF86FA08C70B0DE811E920AC38D"
+    },
+    {
+        "file":  "gustavera_ilha_bau_mlo.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_ilha_bau_mlo.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  1217,
+        "sha256":  "5A5AEA731B39475984212C7C6694FA26711F8DFC8F6A72220523CE991AC5C6B4"
+    },
+    {
+        "file":  "gustavera_ilha_chefe_mlo.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_ilha_chefe_mlo.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  1220,
+        "sha256":  "8EDF498E9C8D74B5AA1658230840C038A993A91EBB36B45190E26CC388509E18"
+    },
+    {
+        "file":  "gustavera_ilha_roupa_mlo.ymap",
+        "destination":  "cold_favela_ilha\\stream\\gustavera_ilha_roupa_mlo.ymap",
+        "resource":  "cold_favela_ilha",
+        "bytes":  1228,
+        "sha256":  "48A128AE885A10FB79A455B58529559C1B1D170BA57C5DD28682D6FF06C1F7C2"
+    },
+    {
+        "file":  "gustavera_mirante_barbe_mlo.ymap",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_mirante_barbe_mlo.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  1223,
+        "sha256":  "247BB5685730AE4BB9FF65E2383238FC021E394F0B2B499C1FC5C184AD6752D0"
+    },
+    {
+        "file":  "gustavera_mirante_bar_mlo.ymap",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_mirante_bar_mlo.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  1225,
+        "sha256":  "CB8696938CA810B493B4F9DE04E65279A4325CA87E481DF67F944EA829F5AF68"
+    },
+    {
+        "file":  "gustavera_mirante_bau_mlo.ymap",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_mirante_bau_mlo.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  1221,
+        "sha256":  "1290339ABA4F678405557B3D6945CBECF6F88CB9DD997BF2E421D6A4EA97AC26"
+    },
+    {
+        "file":  "gustavera_mirante_roupa_mlo.ymap",
+        "destination":  "cold_favela_mirante\\stream\\gustavera_mirante_roupa_mlo.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  1225,
+        "sha256":  "3C3C77561A3A93C89BFBFBBB7F9CD358C27F0E4FC3E7A251DB5E7A8D4BE048EA"
+    },
+    {
+        "file":  "gustavera_novaesperanca_barbe_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_barbe_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1227,
+        "sha256":  "35277847CAB2709F11C316A84C5CD06CC3CAD5255364B1B662AD6C89C1E7FE8A"
+    },
+    {
+        "file":  "gustavera_novaesperanca_bar_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_bar_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1224,
+        "sha256":  "60232AEAEA6F5F0D92BA88370DEEE14CD9DEBA3403F27B6E07EBE04FC0C0A0EB"
+    },
+    {
+        "file":  "gustavera_novaesperanca_bau_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_bau_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1224,
+        "sha256":  "3D5BF0ED2660023FF1D0C2AE69DBC9DC5BD626A99492BCA7578BB9D4A5115193"
+    },
+    {
+        "file":  "gustavera_novaesperanca_chefe_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_chefe_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1225,
+        "sha256":  "A9017BB8BFD365ECD1ED7B861D96E71F2138231EC2E1A59DF8792FAD1198A891"
+    },
+    {
+        "file":  "gustavera_novaesperanca_farm_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_farm_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1228,
+        "sha256":  "10899B26ACB21DA5BAECA00B60719197F461F811A1AAFFE95AC77C4F593FE6E2"
+    },
+    {
+        "file":  "gustavera_novaesperanca_mec_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_mec_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1235,
+        "sha256":  "2F10466A732EE2C2FEC116C2638451E85036CC1409496A24C9157C8DF7263D6F"
+    },
+    {
+        "file":  "gustavera_novaesperanca_piscina_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_piscina_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1226,
+        "sha256":  "5C4A328D00C1F559FFB69E7D1DC063D8A371E2FACCFA923DDF2F878CA4B13288"
+    },
+    {
+        "file":  "gustavera_novaesperanca_roupa_mlo.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_novaesperanca_roupa_mlo.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  1236,
+        "sha256":  "23098AA8F25AC0E788DE5A0652D0E38F0F90E1C2F6375BA13926DFADCEC007F1"
+    },
+    {
+        "file":  "gustavera_observatorio_barbe_mlo.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_observatorio_barbe_mlo.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1226,
+        "sha256":  "3FBA948C2E1C2C91DBB0897F0372A5F08D34BC93DBDACF3C82503C2A79D302C7"
+    },
+    {
+        "file":  "gustavera_observatorio_bar_mlo.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_observatorio_bar_mlo.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1225,
+        "sha256":  "F63510F98F334C36C610D7585D5387A987BA88F392801D26DC991FDE33666988"
+    },
+    {
+        "file":  "gustavera_observatorio_bau_mlo.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_observatorio_bau_mlo.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1225,
+        "sha256":  "888B0C8999EAF988476EB19D51A1A9DFF5D3DA76EB67962329BC18884E21DC88"
+    },
+    {
+        "file":  "gustavera_observatorio_chefe_mlo.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_observatorio_chefe_mlo.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1227,
+        "sha256":  "37671F7FE84CF26FBEB05B853573ADBEFCD07FB031A306485D3F06277BBD1309"
+    },
+    {
+        "file":  "gustavera_observatorio_roupa_mlo.ymap",
+        "destination":  "cold_favela_observatorio\\stream\\gustavera_observatorio_roupa_mlo.ymap",
+        "resource":  "cold_favela_observatorio",
+        "bytes":  1236,
+        "sha256":  "E902758282333AB0B5FB68FB2A7006D593BD4AFA66FF9EE6621C5A1CC8A2B576"
+    },
+    {
+        "file":  "gustavera_pantano_barbe_mlo.ymap",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_pantano_barbe_mlo.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  1225,
+        "sha256":  "0938A3BC4361A8661230FCAFBA04FCCB1F2788ABB7DD89BFD8E05DADEC4A0687"
+    },
+    {
+        "file":  "gustavera_pantano_bar_mlo.ymap",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_pantano_bar_mlo.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  1226,
+        "sha256":  "67E1751C17E1F653AC679B6BA3961D3D7574F5603893B29C0FFF24DA4EB7626E"
+    },
+    {
+        "file":  "gustavera_pantano_bau_mlo.ymap",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_pantano_bau_mlo.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  1222,
+        "sha256":  "A293B8E4FEA61DFFEC9C8A7B8FBAF3777CB45168A33B8CDD1AAA6E7EEAB9ABD5"
+    },
+    {
+        "file":  "gustavera_pantano_roupa_mlo.ymap",
+        "destination":  "cold_favela_pantano\\stream\\gustavera_pantano_roupa_mlo.ymap",
+        "resource":  "cold_favela_pantano",
+        "bytes":  1227,
+        "sha256":  "76FE870CA49F15C49558F7E3A27BFA6E777D9E009FCAC97F72CF9AB56D4D933A"
+    },
+    {
+        "file":  "gustavera_piscina.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_piscina.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1449,
+        "sha256":  "26FE624B5217E8353D2576908FBF8622EEDD58774927BD2C2438555B24536660"
+    },
+    {
+        "file":  "gustavera_props_txt.ytd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_props_txt.ytd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  1639313,
+        "sha256":  "E88AB13EB0D87F9D3847330A0FF77CA30967A141E5C06EFA0EA2E842412AF196"
+    },
+    {
+        "file":  "gustavera_rotatoria_barbe_mlo.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_rotatoria_barbe_mlo.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  1228,
+        "sha256":  "9070E8D8F6E553CE8CB5A3710D45C2467E59C86666099365507903C60029C166"
+    },
+    {
+        "file":  "gustavera_rotatoria_bar_mlo.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_rotatoria_bar_mlo.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  1228,
+        "sha256":  "4338CBCEF75A439F92E458CE7A6EFADD45C19AD11FA5D512AC73562D80821EFF"
+    },
+    {
+        "file":  "gustavera_rotatoria_bau_mlo.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_rotatoria_bau_mlo.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  1224,
+        "sha256":  "B4B3158702C496410F6BEF4F2F578400ED7963F5DE8D36462B219D46FE6DB697"
+    },
+    {
+        "file":  "gustavera_rotatoria_roupa_mlo.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\gustavera_rotatoria_roupa_mlo.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  1231,
+        "sha256":  "944B3D2D49CC7EE4FDD03ADEFD78F8D5014048BB2552E0F1C00ECB6DA5D3C832"
+    },
+    {
+        "file":  "gustavera_roupa.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_roupa.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  3132,
+        "sha256":  "42AEC774E8D43E0D2C579F4D1275B512FE77000232097973E0FA66D11FFF6C69"
+    },
+    {
+        "file":  "gustavera_roupa_col.ybn",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_roupa_col.ybn",
+        "resource":  "favelas_cold_assets",
+        "bytes":  79684,
+        "sha256":  "BB1EFBCA976D0D81C93E7EFC090E6713EBF984FFFD54A19B00C515C28177BC26"
+    },
+    {
+        "file":  "gustavera_roupa_shell.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_roupa_shell.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  186985,
+        "sha256":  "A58D1FACD1D3EDC16D39E4D330A33A63FD2B06C07EB6FB672799E359D65F6EC6"
+    },
+    {
+        "file":  "gustavera_ruas_txt.ytd",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_ruas_txt.ytd",
+        "resource":  "favelas_cold_assets",
+        "bytes":  2626713,
+        "sha256":  "E2DF6E83E6D5825687DCEB25BC9496146DA0C5CD3BD5476D63708DCD1B47EB5F"
+    },
+    {
+        "file":  "gustavera_rua_barragem.ydr",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_rua_barragem.ydr",
+        "resource":  "cold_favela_barragem",
+        "bytes":  1744956,
+        "sha256":  "918718210789244E25ACC5DF2CEF9EC5E8E4D74CF3D687272B023E6CF83A8235"
+    },
+    {
+        "file":  "gustavera_rua_barragem.ytyp",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_rua_barragem.ytyp",
+        "resource":  "cold_favela_barragem",
+        "bytes":  598,
+        "sha256":  "1D689589C2CB4D1EA12CBC79E68AF25A83A2A0462F50BD9C402C523B819C5523"
+    },
+    {
+        "file":  "gustavera_rua_barragem2.ydr",
+        "destination":  "favelas_cold_assets\\stream\\gustavera_rua_barragem2.ydr",
+        "resource":  "favelas_cold_assets",
+        "bytes":  711836,
+        "sha256":  "DE7CBB91B072DBCCF14023D166CBE9D1D64726F1F6BD64E9DC644D53962F17CA"
+    },
+    {
+        "file":  "gustavera_rua_barragem_col.ybn",
+        "destination":  "cold_favela_barragem\\stream\\gustavera_rua_barragem_col.ybn",
+        "resource":  "cold_favela_barragem",
+        "bytes":  450148,
+        "sha256":  "F83802346281CC966C01AC5A5F9A572C7C5FB8ACA232D44BC2431FEB4D0FC82B"
+    },
+    {
+        "file":  "gustavera_rua_complexomiramar.ydr",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_rua_complexomiramar.ydr",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  2413095,
+        "sha256":  "911B069E8CEC792B1844DB497D18570902B0EA848123D3A6FDCBD7A43F867C92"
+    },
+    {
+        "file":  "gustavera_rua_complexomiramar.ytyp",
+        "destination":  "cold_favela_complexomiramar\\stream\\gustavera_rua_complexomiramar.ytyp",
+        "resource":  "cold_favela_complexomiramar",
+        "bytes":  601,
+        "sha256":  "0E6259166C7E0EBFC53760B8F2F10C6110E933992FD109CE8C278B569117B9DF"
+    },
+    {
+        "file":  "gustavera_rua_horizonte.ydr",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_rua_horizonte.ydr",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  1906499,
+        "sha256":  "48EF0FE1A9D8355F09A5A1A4FE018B01B7977A12E4BDBAB3C3A92A8014AF36D9"
+    },
+    {
+        "file":  "gustavera_rua_horizonte.ytyp",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_rua_horizonte.ytyp",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  521,
+        "sha256":  "63D476950F1927EC1B476C80DA683B563647ACCAB37F778352C7BACFAED68668"
+    },
+    {
+        "file":  "gustavera_rua_horizonte_col.ybn",
+        "destination":  "cold_favela_horizonte\\stream\\gustavera_rua_horizonte_col.ybn",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  198315,
+        "sha256":  "771E47382AC8BFF5F2880246A641603ACEF770BFF095A826011102257B8345BC"
+    },
+    {
+        "file":  "gustavera_rua_novaesperanca.ydr",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_rua_novaesperanca.ydr",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  2962497,
+        "sha256":  "3F33DEF80D917D54A8E352CE8DC90F5307BA755058E4557800E1619B80D1DCF5"
+    },
+    {
+        "file":  "gustavera_rua_novaesperanca.ytyp",
+        "destination":  "cold_favela_novaesperanca\\stream\\gustavera_rua_novaesperanca.ytyp",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  524,
+        "sha256":  "CB42DE74248D48532E2A5A072F0C1B07F965744A36240454DE974620DCDB3CE1"
+    },
+    {
+        "file":  "gustavera_saara_barbe_mlo.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_saara_barbe_mlo.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  1220,
+        "sha256":  "D0BEE54A8FC556B6FC8A1A3C9BDFABC25C42B930523055B94FCFDF11B59B6C64"
+    },
+    {
+        "file":  "gustavera_saara_bar_mlo.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_saara_bar_mlo.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  1215,
+        "sha256":  "C7C4BA1CF767490F7707E3A61179F05B9E128DB8CDCF99034DCE560D3CBEE1F1"
+    },
+    {
+        "file":  "gustavera_saara_bau_mlo.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_saara_bau_mlo.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  1216,
+        "sha256":  "226AB794FAC51B891314F078E0727071EBBEF742E3F7C1E07F6C3C74CE726E77"
+    },
+    {
+        "file":  "gustavera_saara_chefe_mlo.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_saara_chefe_mlo.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  1213,
+        "sha256":  "13DB7215E2D2F8685DAE02438A86E4DE625C909BCB018A8A85CC64458178FDAC"
+    },
+    {
+        "file":  "gustavera_saara_roupa_mlo.ymap",
+        "destination":  "cold_favela_saara\\stream\\gustavera_saara_roupa_mlo.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  1226,
+        "sha256":  "249E3EF9903D047FFB2643C9729D8ECBC88901D5C76342FBC68C3229C6BE7129"
+    },
+    {
+        "file":  "gustavera_trilho_barbe_mlo.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_trilho_barbe_mlo.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1220,
+        "sha256":  "EE0FF1A49257D30156A86FF1D8A434063647E5948821EEA3B3D8E808DD37C895"
+    },
+    {
+        "file":  "gustavera_trilho_bar_mlo.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_trilho_bar_mlo.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1221,
+        "sha256":  "A2DE4C645F737561CDA7DD9E50457783C3F61E46D27314990DB0FF8961650B16"
+    },
+    {
+        "file":  "gustavera_trilho_bau_mlo.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_trilho_bau_mlo.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1219,
+        "sha256":  "48DC658F6E4986EE5820248287605A9BC76ECFF817D6359F64361B92F0B13FAC"
+    },
+    {
+        "file":  "gustavera_trilho_chefe_mlo.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_trilho_chefe_mlo.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1223,
+        "sha256":  "5105B4196458586538B5CA515F0022AAC2AACC09B300B19967B59A2DDF397B86"
+    },
+    {
+        "file":  "gustavera_trilho_roupa_mlo.ymap",
+        "destination":  "cold_favela_trilho\\stream\\gustavera_trilho_roupa_mlo.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  1224,
+        "sha256":  "AA703CD08EFA32D86C5D71B9A42AE34A47D0A4F835A3CC3E5683E1DFB9E2AE95"
+    },
+    {
+        "file":  "hei_ch1_01_long_12.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\hei_ch1_01_long_12.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  22118,
+        "sha256":  "1DD642432120EB09EFCFB04C5B9452522EB2D1256F37D5710F601E7DF49A0508"
+    },
+    {
+        "file":  "hei_ch1_01_strm_7.ymap",
+        "destination":  "cold_favela_cemiterio\\stream\\hei_ch1_01_strm_7.ymap",
+        "resource":  "cold_favela_cemiterio",
+        "bytes":  19811,
+        "sha256":  "6816B18C3530CAA6B41DB7C3C809D0A53BF20956B3AE5A95C7A2991D605B867A"
+    },
+    {
+        "file":  "hei_ch1_06d_critical_0.ymap",
+        "destination":  "cold_favela_mirante\\stream\\hei_ch1_06d_critical_0.ymap",
+        "resource":  "cold_favela_mirante",
+        "bytes":  2710,
+        "sha256":  "6A8CA084120DF3CAE47C78CD7E9328BEEF394D16AE64C2C9C8F729F456EB2103"
+    },
+    {
+        "file":  "hei_ch3_06_critical_2.ymap",
+        "destination":  "cold_favela_barragem\\stream\\hei_ch3_06_critical_2.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  20216,
+        "sha256":  "11D01231ADDBCC127DDF6736834B2264C9004C0CC698A577898D3D21DFFE87EE"
+    },
+    {
+        "file":  "hei_ch3_06_long_4.ymap",
+        "destination":  "cold_favela_barragem\\stream\\hei_ch3_06_long_4.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  20119,
+        "sha256":  "D4504975C3D274DE51F59A6A31F1C77590CC5F49A6B0988BCEDE3BFF3C8715E0"
+    },
+    {
+        "file":  "hei_ch3_06_strm_1.ymap",
+        "destination":  "cold_favela_barragem\\stream\\hei_ch3_06_strm_1.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  20208,
+        "sha256":  "8C4DCD6D5FA5AB37DF294128DA7F45F615416A435DB0F5039E887EE8EF20D8AD"
+    },
+    {
+        "file":  "hei_ch3_08_long_0.ymap",
+        "destination":  "cold_favela_barragem\\stream\\hei_ch3_08_long_0.ymap",
+        "resource":  "cold_favela_barragem",
+        "bytes":  19292,
+        "sha256":  "FEFF4D360E37DAD056C3CD94457C9793079F40A4BE3DDAC5DCF86D7CDA6F545E"
+    },
+    {
+        "file":  "hei_ch3_10_critical_0.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\hei_ch3_10_critical_0.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  14086,
+        "sha256":  "BF1ACAB28376FAEAC27BD6413BA4ECCED89F1E1943779232D5B56FBF64358A6C"
+    },
+    {
+        "file":  "hei_ch3_10_critical_2.ymap",
+        "destination":  "cold_favela_trilho\\stream\\hei_ch3_10_critical_2.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  18079,
+        "sha256":  "FEABE2491A882A89D78D8A8952992AA073865397A0AB6D539736FA9127B8BDF0"
+    },
+    {
+        "file":  "hei_ch3_10_critical_3.ymap",
+        "destination":  "cold_favela_trilho\\stream\\hei_ch3_10_critical_3.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  19897,
+        "sha256":  "2EA4553078A1820DA1E93CF686046A53D82E9E6DE9BE507E7BBB0113C417C64A"
+    },
+    {
+        "file":  "hei_ch3_10_long_0.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\hei_ch3_10_long_0.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  17006,
+        "sha256":  "A8AA14E54E2CDA33BF3CA855A930A2BF1F81D5840DEFE52EC9F44C093F923B83"
+    },
+    {
+        "file":  "hei_ch3_10_long_5.ymap",
+        "destination":  "cold_favela_trilho\\stream\\hei_ch3_10_long_5.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  21879,
+        "sha256":  "D91169D04589763B3D817AFD75A841ED57CF69160E50925B68CC5FC1EAA5623A"
+    },
+    {
+        "file":  "hei_ch3_10_strm_1.ymap",
+        "destination":  "cold_favela_horizonte\\stream\\hei_ch3_10_strm_1.ymap",
+        "resource":  "cold_favela_horizonte",
+        "bytes":  15993,
+        "sha256":  "31C99339AE6E2D77FC4E1FB1C6269A035F68CCCD080794D730D0DD8E4EA3887D"
+    },
+    {
+        "file":  "hei_ch3_10_strm_5.ymap",
+        "destination":  "cold_favela_trilho\\stream\\hei_ch3_10_strm_5.ymap",
+        "resource":  "cold_favela_trilho",
+        "bytes":  19642,
+        "sha256":  "10E0AB5629355267E5CFB13DE367D992CCABE4B3426A2DDD278D886444B04A4D"
+    },
+    {
+        "file":  "hei_id2_rd_strm_4.ymap",
+        "destination":  "cold_favela_rotatoria\\stream\\hei_id2_rd_strm_4.ymap",
+        "resource":  "cold_favela_rotatoria",
+        "bytes":  16472,
+        "sha256":  "3AF88E546C526948DDEB442368E08F8782B88ECEE5DE2FCA1666A5FBFD64203A"
+    },
+    {
+        "file":  "lr_cs4_11_strm_5.ymap",
+        "destination":  "cold_favela_saara\\stream\\lr_cs4_11_strm_5.ymap",
+        "resource":  "cold_favela_saara",
+        "bytes":  10344,
+        "sha256":  "BF2CE783EDED2308DD167616FD56BB83CBEBD79010C64253AAEC737B41A1DBE6"
+    },
+    {
+        "file":  "lr_cs6_09_critical_0.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\lr_cs6_09_critical_0.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  16154,
+        "sha256":  "F8E246DDB157807C04D850D56C20D78813E38E9F0A360275A73B970EB6B20D25"
+    },
+    {
+        "file":  "lr_cs6_09_long_0.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\lr_cs6_09_long_0.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  10255,
+        "sha256":  "16E33FE487E6841EC1E7134A5165148554EB000EBF0240EA970C4FC367339AE0"
+    },
+    {
+        "file":  "lr_cs6_09_long_2.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\lr_cs6_09_long_2.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  12512,
+        "sha256":  "E8919082F1FDE9693FD2A18EA369D6D080B2BEAFC11566EF4EB2398E35987F82"
+    },
+    {
+        "file":  "lr_cs6_09_strm_0.ymap",
+        "destination":  "cold_favela_novaesperanca\\stream\\lr_cs6_09_strm_0.ymap",
+        "resource":  "cold_favela_novaesperanca",
+        "bytes":  7385,
+        "sha256":  "2365A1778AE4214CE8250046E93F38C974AA5E513A322A87B34913AD2AC8C4F3"
+    },
+    {
+        "file":  "mp_residential.ytyp",
+        "destination":  "favelas_cold_assets\\stream\\mp_residential.ytyp",
+        "resource":  "favelas_cold_assets",
+        "bytes":  8451,
+        "sha256":  "41FBAACD00335E2564F9CC6A544B9A8E149A1949723C0C5256B53CF23985E631"
+    }
+]

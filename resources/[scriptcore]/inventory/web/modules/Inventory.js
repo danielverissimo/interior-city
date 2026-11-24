@@ -14,6 +14,37 @@ function disableHiddenDropables() {
 	});
 }
 
+function itemValidityRemaining(expiresAt, duration, now = Date.now() / 1000) {
+	return Math.max(0, Math.min(1, (expiresAt - now) / duration));
+}
+
+function mergeItemValidity(destination, source) {
+	if (source.expiresAt) {
+		destination.expiresAt = Math.min(destination.expiresAt || source.expiresAt, source.expiresAt);
+	}
+}
+
+function refreshItemValidityBars() {
+	const inventory = document.getElementById("inventory");
+	if (!inventory?.getClientRects().length) return;
+
+	const now = Date.now() / 1000;
+	for (const bar of inventory.querySelectorAll(".item-validity")) {
+		const remaining = itemValidityRemaining(
+			Number(bar.dataset.expiresAt), Number(bar.dataset.duration), now,
+		);
+		bar.style.setProperty("--validity-remaining", remaining);
+		bar.setAttribute("aria-valuenow", remaining > 0 ? Math.ceil(remaining * 100) : 0);
+		const name = bar.previousElementSibling;
+		if (remaining === 0 && !name.classList.contains("item-expired")) {
+			name.classList.add("item-expired");
+			name.title = `${name.textContent} · Vencido`;
+		}
+	}
+}
+
+setInterval(refreshItemValidityBars, 1000);
+
 class Inventory {
 	items;
 	maxWeight = 0;
@@ -163,14 +194,31 @@ class Inventory {
 		return `${weight.toFixed(1)}kg`;
 	}
 	getItemHtml(item, target, slot, method = "allDiv") {
+		const expiresAt = Number(item.expiresAt);
+		const validity = expiresAt > 0
+			? (expiresAt * 1000 <= Date.now()
+				? "Vencido"
+				: `Validade ${new Date(expiresAt * 1000).toLocaleString("pt-BR")}`)
+			: "";
+		const title = validity ? `${item.name} · ${validity}` : item.name;
+		const duration = Number(globalThis.Config?.[item.item]?.expiryDuration);
+		const remaining = duration > 0 ? itemValidityRemaining(expiresAt, duration) : 0;
+		const expired = validity === "Vencido";
+		const validityBar = validity && duration > 0
+			? `<span class="item-validity" role="progressbar" aria-label="Validade restante"
+				aria-valuenow="${remaining > 0 ? Math.ceil(remaining * 100) : 0}"
+				data-expires-at="${expiresAt}" data-duration="${duration}"
+				style="--validity-remaining: ${remaining}"></span>`
+			: "";
 		if (method === "onlyItems") {
 			return `
             <p class="weight-item-inventory">${this.formatWeight(item.weight)}</p>
             <p class="amount-item-inventory">${
 							item.price ? `R$${item.price}` : `${item.amount}x`
 						}</p>
-            <p class="name-item-inventory" title="${item.name}">${item.name}</p>
-            <img src="http://127.0.0.1/images/${item.item}.png" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
+            <p class="name-item-inventory${validityBar ? " name-with-validity" : ""}${expired ? " item-expired" : ""}" title="${title}">${item.name}</p>
+            ${validityBar}
+            <img src="${window.inventoryItemImage(item.item)}" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
             `;
 		}
 		return `
@@ -179,8 +227,9 @@ class Inventory {
             <p class="amount-item-inventory">${
 							item.price ? `R$${item.price}` : `${item.amount}x`
 						}</p>
-            <p class="name-item-inventory" title="${item.name}">${item.name}</p>
-            <img src="http://127.0.0.1/images/${item.item}.png" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
+            <p class="name-item-inventory${validityBar ? " name-with-validity" : ""}${expired ? " item-expired" : ""}" title="${title}">${item.name}</p>
+            ${validityBar}
+            <img src="${window.inventoryItemImage(item.item)}" onerror="this.onerror=null;this.src='./images/weapon.svg'"/>
         </div>
         `;
 	}
@@ -224,7 +273,7 @@ class Inventory {
 		// );
 		$(".image-grame").attr(
 			"src",
-			`http://127.0.0.1/images/${globalThis.SelectedItem.item}.png`,
+			window.inventoryItemImage(globalThis.SelectedItem.item),
 		);
 		$(`.slot-${side}${item.id}`).addClass("slot-active");
 	}
@@ -320,9 +369,11 @@ class Inventory {
 						.addClass("slot-item")
 						.addClass(`slot-${next.side}`);
 				}
-			} else if (old.item.item === next.item.item) {
+			} else if (old.item.item === next.item.item
+				&& (old.item.expiresAt * 1000 <= Date.now()) === (next.item.expiresAt * 1000 <= Date.now())) {
 				if (old.item.amount <= inputValue) {
 					this.items[next.id.toString()].amount += inputValue;
+					mergeItemValidity(this.items[next.id.toString()], old.item);
 					const html = this.getItemHtml(
 						this.items[next.id.toString()],
 						next.side,

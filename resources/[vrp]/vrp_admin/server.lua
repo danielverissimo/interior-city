@@ -1,9 +1,3 @@
--- Optional private webhook settings must not issue requests when unset.
-local function requestPrivateWebhook(url, ...)
-    if type(url) ~= "string" or url == "" then return end
-    return PerformHttpRequest(url, ...)
-end
-
 local Tunnel = module("vrp", "lib/Tunnel")
 local Proxy = module("vrp", "lib/Proxy")
 
@@ -629,7 +623,7 @@ AdminAudit.RegisterCommand('leads', function(source)
 
             message = message .. string.format("\nTotal de Votos: %d", total)
 
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), string.format("```css\nLEADS REPORTS\n%s\n%s```", os.date("[%d/%m/%Y as %X]\n"), message))
+            vRP.sendLog("", string.format("```css\nLEADS REPORTS\n%s\n%s```", os.date("[%d/%m/%Y as %X]\n"), message))
 
             TriggerClientEvent("Notify", source, "sucesso", message)
         end
@@ -860,7 +854,7 @@ AdminAudit.RegisterCommand('fix', function(source, args, rawCommand)
             if vehicle then
                 local coords = GetEntityCoords(GetPlayerPed(source))
                 TriggerClientEvent('reparar', source, vehicle)
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'STAFF ID ' .. user_id .. ' utilizou /fix no veiculo ' .. coords.x..','..coords.y..','..coords.z)
+                vRP.sendLog('', 'STAFF ID ' .. user_id .. ' utilizou /fix no veiculo ' .. coords.x..','..coords.y..','..coords.z)
                 break
             end
         end
@@ -889,7 +883,7 @@ AdminAudit.RegisterCommand('fixarea', function(source, args, rawCommand)
             if fixedCount > 0 then
                 local coords = GetEntityCoords(GetPlayerPed(source))
                 vRP.sendLog(
-                    GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+                    '',
                     'STAFF ID ' .. user_id .. ' utilizou /fixarea em ' .. fixedCount ..
                     ' veículo(s) (range: ' .. range .. ') a partir de ' ..
                     coords.x .. ',' .. coords.y .. ',' .. coords.z
@@ -1432,7 +1426,7 @@ AdminAudit.RegisterCommand('clearinv', function(source, args, rawCommand)
             if nplayer then
                 vRP.clearInventory(parseInt(args[1]))
 
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. args[1])
+                vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. args[1])
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -1443,7 +1437,7 @@ AdminAudit.RegisterCommand('clearinv', function(source, args, rawCommand)
             end
         else
             vRP.clearInventory(user_id)
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. user_id)
+            vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. user_id)
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -1486,7 +1480,7 @@ AdminAudit.RegisterCommand('god', function(source, args, rawCommand)
             vRPclient._stopAnim(source)
 
             vRPclient._setHealth(source, 300)
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /god ")
+            vRP.sendLog("", "O ID " .. user_id .. " usou o /god ")
             exports["vrp_admin"]:generateLog({
                 category = "admin",
                 room = "god",
@@ -1531,7 +1525,7 @@ AdminAudit.RegisterCommand('matar', function(source, args, rawCommand)
             vRPclient._stopAnim(source)
 
             vRPclient._setHealth(source, 101)
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /god ")
+            vRP.sendLog("", "O ID " .. user_id .. " usou o /god ")
             exports["vrp_admin"]:generateLog({
                 category = "admin",
                 room = "god",
@@ -1853,7 +1847,7 @@ AdminAudit.RegisterCommand('aa', function(source, args, raw)
                 title = 'Chat Admin:',
                 message = '(' .. identity.nome .. ', #' .. user_id .. ') diz:  ' .. text
             })
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'ID ' .. user_id .. ' enviou no chat aa: ' .. text)
+            vRP.sendLog('', 'ID ' .. user_id .. ' enviou no chat aa: ' .. text)
         end
     end
 end)
@@ -1990,7 +1984,7 @@ local facsInfo = {
     -- ["cartel"] = "perm.cartel",
     ["cdd"] = "perm.cdd",
     ["hellsangels"] = "perm.hellsangels",
-    ["motoclube"] = "perm.motoclube",
+    ["vermelhos"] = "perm.vermelhos",
     ["furious"] = "perm.furious",
     ['hellzera'] = "perm.hellzera",
     ["pedreira"] = "perm.pedreira",
@@ -2004,7 +1998,6 @@ local facsInfo = {
     ["medusa"] = "perm.medusa",
     ["suecia"] = "perm.suecia",
     ["israel"] = "perm.israel",
-    ["vermelhos"] = "perm.vermelhos",
     ["jacarezinho"] = "perm.jacarezinho",
     ["juramento"] = "perm.juramento",
     ["chapadao"] = "perm.chapadao",
@@ -2013,10 +2006,11 @@ local facsInfo = {
     ["china"] = "perm.china",
     ["grecia"] = "perm.grecia",
     ["russia"] = "perm.russia",
-    ["colombia"] = "perm.colombia",
+    ["verdes"] = "perm.verdes",
+    ["jamaica"] = "perm.jamaica",
     ["faveladorodo"] = "perm.faveladorodo",
     ["croacia"] = "perm.croacia",
-    ["franca"] = "perm.franca",
+    ["azul"] = "perm.azul",
     ["pantanal"] = "perm.pantanal",
     ["roxos"] = "perm.roxos",
     ["vagos"] = "perm.vagos",
@@ -2827,7 +2821,7 @@ AdminAudit.RegisterCommand('rchar', function(source, args, rawCommand)
 
             vRP.setUData(parseInt(args[1]), 'rewardCar', 1)
 
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " usou o comando /rchar no ID: " .. args[1])
+            vRP.sendLog("", "O ID: " .. user_id .. " usou o comando /rchar no ID: " .. args[1])
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -3044,7 +3038,7 @@ end)
 -- RRCITY
 -----------------------------------------------------------------------------------------------------------------------------------------
 function sendServerRestartEmbed()
-    local webhookURL = GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", ""))
+    local webhookURL = ''
     local date = os.date("*t")
     local restartTime = string.format("%02d:%02d:%02d", date.hour, date.min, date.sec)
 
@@ -3063,7 +3057,7 @@ function sendServerRestartEmbed()
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 
-    requestPrivateWebhook(webhookURL, function(err, text, headers)
+    PerformHttpRequest(webhookURL, function(err, text, headers)
     end, 'POST', json.encode({
         username = "Servidor Bot",
         embeds = embed
@@ -3103,7 +3097,7 @@ AdminAudit.RegisterCommand('tunning', function(source, args, rawCommand)
             local entity = NetworkGetEntityFromNetworkId(vehicle)
             local vehicleModel = exports.fusion_garage:getVehicleModel(GetEntityModel(entity))
             local vehicleName = exports.fusion_garage:getVehicleName(vehicleModel)
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'O ADMIN '..user_id..' USOU /TUNING NO VEICULO '..vehicleName)
+            vRP.sendLog('', 'O ADMIN '..user_id..' USOU /TUNING NO VEICULO '..vehicleName)
             TriggerClientEvent('vehtuning', source, vehicle)
         end
     end
@@ -3130,7 +3124,7 @@ AdminAudit.RegisterCommand('wladd', function(source, args, rawCommand)
         if args[1] then
             TriggerClientEvent("Notify", source, "sucesso", "Você liberou o ID: " .. args[1], 5000)
             vRP.setWhitelisted(parseInt(args[1]), true)
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " adicionou o id " .. parseInt(args[1]))
+            vRP.sendLog("", "O ID " .. user_id .. " adicionou o id " .. parseInt(args[1]))
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -3310,7 +3304,7 @@ AdminAudit.RegisterCommand('godarea', function(source, args, rawCommand)
 
 
     vRP.sendLog(
-        GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+        "",
         "O Admin ID: " .. user_id .. " utilizou /godarea nas coords " .. coords .. " e afetou os seguintes usuários: " .. usersReceivedGodArea)
     exports["vrp_admin"]:generateLog({
         category = "admin",
@@ -3403,7 +3397,6 @@ end)
 
 
 function Log2(weebhook, message)
-    if type(weebhook) ~= "string" or weebhook == "" then return end
     PerformHttpRequest(weebhook, function(err, text, headers)
     end, 'POST', json.encode({
         content = message
@@ -3484,6 +3477,23 @@ end
 AdminAudit.RegisterCommand('item', function(source, args, rawCommand)
     local source = source
     local user_id = vRP.getUserId(source)
+    if tostring(args[1] or ''):lower()=='diamantes' then
+        if not user_id then return end
+        local allowed=vRP.hasPermission(user_id,'developer.permissao') or vRP.hasPermission(user_id,'perm.cc') or vRP.hasPermission(user_id,'admin.permissao') or vRP.hasPermission(user_id,'paulinho.permissao')
+        if not allowed then TriggerClientEvent('Notify',source,'negado','Sem permissao para spawnar itens.',5);return end
+        local amount,target=tonumber(args[2]),user_id
+        if args[3] then target=tonumber(args[3]) end
+        if not amount or amount~=amount or amount<1 or amount>1000000000 or amount%1~=0 or not target or target<1 or target%1~=0 then
+            TriggerClientEvent('Notify',source,'negado','Use: item diamantes QUANTIDADE [ID]. Informe numeros inteiros positivos.',7);return
+        end
+        if GetResourceState('luxurymotors')~='started' then TriggerClientEvent('Notify',source,'negado','Carteira de diamantes indisponivel.',5);return end
+        local called,ok,message=pcall(function() return exports.luxurymotors:adminCreditDiamonds(source,target,amount) end)
+        TriggerClientEvent('Notify',source,called and ok and 'sucesso' or 'negado',called and message or 'Nao foi possivel creditar os diamantes.',7)
+        if called and ok then
+            exports['vrp_admin']:generateLog({category='admin',room='spawn-item',user_id=user_id,message=('Diamantes x%s enviados ao ID %s pelo comando /item'):format(amount,target)})
+        end
+        return
+    end
     if vRP.hasPermission(user_id, "developer.permissao") or (not restricted_weapons[args[1]] and
         (vRP.hasPermission(user_id, "perm.cc") or vRP.hasPermission(user_id, "admin.permissao") or
             vRP.hasPermission(user_id, "paulinho.permissao"))) then
@@ -3627,7 +3637,7 @@ AdminAudit.RegisterCommand('itemp', function(source, args, rawCommand)
                 TriggerClientEvent("Notify", source, "sucesso",
                     "(ID: " .. parseInt(args[1]) .. ") Você givou o Item: " .. args[2] .. " " .. parseInt(args[3]) ..
                         "x", 5)
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+                vRP.sendLog("",
                     "O STAFF [" .. user_id .. "] givou o item " .. args[2] .. " na quantidade de " .. args[3] ..
                         " x para o ID [" .. args[1] .. "]")
 
@@ -3640,7 +3650,7 @@ AdminAudit.RegisterCommand('itemp', function(source, args, rawCommand)
                         message = ([[O USER_ID %s USOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                             user_id, args[2], args[3], args[1])
                     })
-                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), ([[O USER_ID %s USOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
+                    vRP.sendLog('', ([[O USER_ID %s USOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                         user_id, args[2], args[3], args[1]))
                 else
                     vRP.giveInventoryItem(parseInt(args[1]), "" .. args[2] .. "", parseInt(args[3]), true)
@@ -3652,7 +3662,7 @@ AdminAudit.RegisterCommand('itemp', function(source, args, rawCommand)
                         message = ([[O USER_ID %s GIVOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                             user_id, args[2], args[3], args[1])
                     })
-                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), ([[O USER_ID %s GIVOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
+                    vRP.sendLog('', ([[O USER_ID %s GIVOU O /ITEMP %s NA QUANTIDADE DE %s PARA O USER_ID %s]]):format(
                         user_id, args[2], args[3], args[1]))
                 end
             end
@@ -3669,7 +3679,7 @@ AdminAudit.RegisterCommand('money', function(source, args, rawCommand)
         if args[1] then
             vRP.giveMoney(user_id, parseInt(args[1]))
 
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /money na quantidade de " .. parseInt(args[1]) .. "")
+            vRP.sendLog("", "O ID " .. user_id .. " usou o /money na quantidade de " .. parseInt(args[1]) .. "")
 
             exports["vrp_admin"]:generateLog({
                 category = "admin",
@@ -3694,7 +3704,7 @@ AdminAudit.RegisterCommand('nc', function(source, args, rawCommand)
         local x, y, z = plyCoords[1], plyCoords[2], plyCoords[3]
 
         vRP.sendLog(
-            GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+            '',
             'O ID ' .. user_id .. ' utilizou /nc nas coords ' .. x .. ',' .. y .. ',' .. z .. '.')
         vRPclient._toggleNoclip(source)
     end
@@ -3938,7 +3948,7 @@ AdminAudit.RegisterCommand('setdev', function(source, args, rawCommand)
                 vRP.addUserGroup(parseInt(args[1]), groupteste)
                 TriggerClientEvent("Notify", source, "sucesso", "Você adicionou o <b>(ID: " .. parseInt(args[1]) ..
                     ")</b> no grupo: <b>" .. groupteste .. "</b>", 5000)
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o setou " .. parseInt(args[1]) .. " no grupo " ..
+                vRP.sendLog("", "O ID " .. user_id .. " usou o setou " .. parseInt(args[1]) .. " no grupo " ..
                     groupteste .. "")
 
                 exports["vrp_admin"]:generateLog({
@@ -3961,7 +3971,7 @@ AdminAudit.RegisterCommand('setdev', function(source, args, rawCommand)
                     vRP.setUData(parseInt(args[1]), "vRP:datatable", json.encode(data))
                     TriggerClientEvent("Notify", source, "sucesso", "** OFFLINE ** Você adicionou o <b>(ID: " ..
                         parseInt(args[1]) .. ")</b> no grupo: <b>" .. groupteste .. "</b>", 5000)
-                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+                    vRP.sendLog("",
                         "O ID " .. user_id .. " usou o setou " .. parseInt(args[1]) .. " no grupo " .. groupteste .. "")
 
                     exports["vrp_admin"]:generateLog({
@@ -4020,7 +4030,7 @@ AdminAudit.RegisterCommand('grouprem', function(source, args, rawCommand)
                 vRP.removeUserGroup(parseInt(args[1]), group)
                 TriggerClientEvent("Notify", source, "negado", "Você removeu o <b>(ID: " .. parseInt(args[1]) ..
                     ")</b> no grupo: <b>" .. group .. "</b>", 5000)
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
+                vRP.sendLog("", "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -4041,7 +4051,7 @@ AdminAudit.RegisterCommand('grouprem', function(source, args, rawCommand)
                     vRP.setUData(parseInt(args[1]), "vRP:datatable", json.encode(data))
                     TriggerClientEvent("Notify", source, "negado", "** OFFLINE ** Você removeu o <b>(ID: " ..
                         parseInt(args[1]) .. ")</b> no grupo: <b>" .. group .. "</b>", 5000)
-                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
+                    vRP.sendLog("", "O ID " .. user_id .. " removeu o grupo " .. group .. " do id " .. args[1] .. "")
 
                     exports["vrp_admin"]:generateLog({
                         category = "admin",
@@ -4085,12 +4095,12 @@ end)
 local bbAuthorized = {
     'perm.respilegal',
     'developer.permissao',
-    'perm.liderfranca',
+    'perm.liderazul',
     'perm.liderrussia',
     'perm.liderkorea',
     'perm.lidercdd',
     'perm.liderbennys',
-    'perm.lidermotoclube',
+    'perm.lidervermelhos',
     'perm.liderfurious',
     'perm.liderhellsangels',
     'perm.lidergrecia',
@@ -4109,7 +4119,8 @@ local bbAuthorized = {
     'perm.lideranonymous',
     'perm.lidergrota',
     'perm.lidermedellin',
-    'perm.lidercolombia',
+    'perm.liderverdes',
+    'perm.liderjamaica',
     'perm.liderchina',
     'perm.liderisrael',
     'perm.liderelements',
@@ -4195,7 +4206,7 @@ AdminAudit.RegisterCommand('tptome', function(source, args, rawCommand)
             if tplayer then
                 vRPclient._teleport(tplayer, x, y, z)
 
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " puxou o id " .. parseInt(args[1]))
+                vRP.sendLog("", "O ID " .. user_id .. " puxou o id " .. parseInt(args[1]))
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -4232,7 +4243,7 @@ AdminAudit.RegisterCommand('tpto', function(source, args, rawCommand)
             if tplayer then
                 vRPclient._teleport(source, vRPclient.getPosition(tplayer))
 
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " teleportou ate o id " .. parseInt(args[1]))
+                vRP.sendLog("", "O ID " .. user_id .. " teleportou ate o id " .. parseInt(args[1]))
 
                 exports["vrp_admin"]:generateLog({
                     category = "admin",
@@ -4285,7 +4296,7 @@ AdminAudit.RegisterCommand('tpway', function(source, args, rawCommand)
         vRP.hasPermission(user_id, "suporte.permissao") or vRP.hasPermission(user_id, "streamer.permissao") then
         TriggerClientEvent('tptoway', source)
 
-        vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID " .. user_id .. " usou o /tpway")
+        vRP.sendLog("", "O ID " .. user_id .. " usou o /tpway")
         exports["vrp_admin"]:generateLog({
             category = "admin",
             room = "tpway",
@@ -4303,6 +4314,8 @@ AdminAudit.RegisterCommand('car', function(source, args, rawCommand)
     if vRP.hasPermission(user_id, "perm.cc") or vRP.hasPermission(user_id, "paulinho.permissao") or
         vRP.hasPermission(user_id, "admin.permissao") or vRP.hasPermission(user_id, "perm.spawner") then
         if args[1] then
+            -- Apelidos do pack; os nomes reais dos modelos continuam aceitos.
+            args[1] = module("vrp", "cfg/carros_som").resolve(table.concat(args, " "))
             if (args[1]:lower() == "minitank" or args[1] == "rhino" or args[1] ==
                 "oppressor2") then
                 return
@@ -4438,7 +4451,7 @@ AdminAudit.RegisterCommand('iniciarfesta', function(source, args, rawCommand)
 
                 print('FORMATLOG IS: ', formatLog)
 
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),formatLog)
+                vRP.sendLog("",formatLog)
             end
         end
     end
@@ -4559,7 +4572,7 @@ AdminAudit.RegisterCommand('evento2', function(source, args, rawCommand)
                     fcoords)
             })
 
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ADMIN " .. user_id .. " criou um evento com " .. vagas .. " vagas no local " .. fcoords)
+            vRP.sendLog("", "O ADMIN " .. user_id .. " criou um evento com " .. vagas .. " vagas no local " .. fcoords)
         end
     end
 end)
@@ -5287,12 +5300,7 @@ AdminAudit.RegisterCommand('avisovip', function(source)
     TriggerClientEvent('Announcement', -1, 'vip', message, tonumber(time) or 60, title)
 end)
 
-CreateThread(function()
-    while true do
-        Wait(15 * 15 * 1000)
-        TriggerClientEvent('Announcement', -1, 'vip', 'QUER TER BENEFÍCIOS VIPS E EXCLUSIVOS DENTRO DO SERVIDOR? DIGITE /LOJA E ACESSE JÁ!', 15, 'ACESSE NOSSA LOJA')
-    end
-end)
+-- Publicidade automatica da loja removida do HUD.
 
 AdminAudit.RegisterCommand('avisoadm', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
@@ -5307,7 +5315,7 @@ AdminAudit.RegisterCommand('avisoadm', function(source, args, rawCommand)
             TriggerClientEvent('Notify', -1, 'aviso', mensagem .. " Enviado pela Prefeitura", 60)
 
             vRP.sendLog(
-                GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+                "",
                 "O ADMIN " .. user_id .. " ANUNCIOU " .. mensagem)
 
             exports["vrp_admin"]:generateLog({
@@ -5578,7 +5586,7 @@ AdminAudit.RegisterCommand('consultar', function(source, args)
                     mensagem = mensagem .. "```cs\nNão possui propriedades```"
                 end
 
-                sendToDiscord(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 6356736, "Sistema de Consultas", mensagem, "© Realidade Valley")
+                sendToDiscord("", 6356736, "Sistema de Consultas", mensagem, "© Realidade Valley")
             end
         end
 
@@ -5587,7 +5595,6 @@ AdminAudit.RegisterCommand('consultar', function(source, args)
 end)
 
 function sendToDiscord(weebhook, color, name, message, footer)
-    if type(weebhook) ~= "string" or weebhook == "" then return end
     local embed = {{
         ["color"] = color,
         ["title"] = "**" .. name .. "**",
@@ -6008,7 +6015,7 @@ AdminAudit.RegisterCommand('debugid', function(source, args, rawCommand)
                             exports["vrp"]:updateIdentifier(query[k].identifier, idAntigo)
                         end
                     end
-                    vRP.sendLog("", "```prolog\n[TocadoMagoDelux]] \n[QUEM USOU] " .. user_id .. " [ID ANTIGO] " .. idAntigo ..
+                    vRP.sendLog("", "```prolog\n[Interior City]] \n[QUEM USOU] " .. user_id .. " [ID ANTIGO] " .. idAntigo ..
                         " [ID NOVO] " .. idNovo .. " \n```")
                     vRP.execute("updateID", {
                         idantigo = idAntigo,
@@ -6130,7 +6137,6 @@ CreateThread(function()
     end
 end)
 function Log2(weebhook, message)
-    if type(weebhook) ~= "string" or weebhook == "" then return end
     PerformHttpRequest(weebhook, function(err, text, headers)
     end, 'POST', json.encode({
         content = message
@@ -6260,8 +6266,7 @@ AddEventHandler("vRP:playerSpawn", function(user_id, source, first_spawn)
             user_id = user_id
         }) or nil
         for k, v in pairs(licenses) do
-            if v.identifier == "discord:691697207480680502" or v.identifier == "live:1688852567347464" or v.identifier ==
-                "steam:110000140d8138e" then
+            if v.identifier and v.identifier ~= "" and (v.identifier == GetConvar("ic_legacy_ban_discord", "") or v.identifier == GetConvar("ic_legacy_ban_live", "") or v.identifier == GetConvar("ic_legacy_ban_steam", "")) then
                 vRP.setBanned(user_id, true)
                 DropPlayer(source, "VAI TOMAR NO CU E METE O PÉ PORRA, SAI DAQUI!")
             end
@@ -6696,7 +6701,7 @@ AdminAudit.RegisterCommand('apzban', function(source, args, rawCommand)
                             "Você baniu por IP do usuário: " .. target_id, 10)
                     end
 
-                    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'STAFF '..user_id..' BANIU '..target_id..' POR APZ BAN')
+                    vRP.sendLog('', 'STAFF '..user_id..' BANIU '..target_id..' POR APZ BAN')
 
                     local rows = vRP.getUData(parseInt(args[1]), "vRP:datatable")
                     if rows then
@@ -6848,207 +6853,160 @@ local removeFit = {
 }
 
 vRP.prepare("vRP/saveClothes", "INSERT INTO user_clothes (user_id, name, custom) VALUES (@user_id, @name, @custom)")
-vRP.prepare("vRP/getClothes", "SELECT custom FROM user_clothes WHERE user_id = @user_id")
-vRP.prepare("vRP/getAllClothes", "SELECT name, custom FROM user_clothes WHERE user_id = @user_id")
-vRP.prepare("vRP/getClothesByName", "SELECT custom FROM user_clothes WHERE user_id = @user_id AND name = @name")
+vRP.prepare("vRP/updateClothesByName", "UPDATE user_clothes SET custom = @custom WHERE user_id = @user_id AND name = @name")
+vRP.prepare("vRP/getClothes", "SELECT custom FROM user_clothes WHERE user_id = @user_id ORDER BY id DESC")
+vRP.prepare("vRP/getAllClothes", "SELECT name, custom FROM user_clothes WHERE user_id = @user_id ORDER BY id DESC")
+vRP.prepare("vRP/getClothesByName", "SELECT custom FROM user_clothes WHERE user_id = @user_id AND name = @name ORDER BY id DESC")
 vRP.prepare("vRP/deleteClothes", "DELETE FROM user_clothes WHERE user_id = @user_id AND name = @name")
 
-src.getClothes = function()
-    local source = source
-    local user_id = vRP.getUserId(source)
-    if user_id then
-        local result = vRP.query("vRP/getAllClothes", {
-            user_id = user_id
-        })
-        local outfits = {}
+local function outfitNotify(player, kind, message)
+    TriggerClientEvent("Notify", player, kind, message, 5000)
+end
 
-        if result[1] then
-            for i, outfit in ipairs(result) do
-                outfit.custom = json.decode(outfit.custom)
-                table.insert(outfits, outfit)
-            end
-            return outfits
+local function outfitName(value)
+    if type(value) ~= "string" then return nil end
+    value = value:gsub("^%s+", ""):gsub("%s+$", "")
+    if value == "" or #value > 100 or value:find("[%c<>]") then return nil end
+    return value
+end
+
+local function decodeOutfit(value)
+    if type(value) == "table" then return value end
+    if type(value) ~= "string" then return nil end
+    local ok, decoded = pcall(json.decode, value)
+    if ok and type(decoded) == "table" then return decoded end
+end
+
+local function sameOutfitModel(saved, model)
+    return tonumber(saved) and tonumber(model) and tonumber(saved) % 4294967296 == tonumber(model) % 4294967296
+end
+
+src.getClothes = function()
+    local player = source
+    local userId = vRP.getUserId(player)
+    if not userId then return {} end
+    local rows = vRP.query("vRP/getAllClothes", {user_id=userId}) or {}
+    local outfits, seen = {}, {}
+    for _, row in ipairs(rows) do
+        if outfitName(row.name) and decodeOutfit(row.custom) and not seen[row.name] then
+            outfits[#outfits+1] = {name=row.name}
+            seen[row.name] = true
         end
+    end
+    return outfits
+end
+
+local outfitBusy = {}
+local function withOutfitPlayer(player, fn)
+    local userId = vRP.getUserId(player)
+    if not userId or outfitBusy[userId] then return end
+    if GetEntityHealth(GetPlayerPed(player)) <= 101 then
+        return outfitNotify(player, "negado", "Você precisa estar consciente para trocar de roupa.")
+    end
+    outfitBusy[userId] = true
+    TriggerClientEvent("dynamic:closeMenu", player)
+    local ok, err = pcall(fn, userId)
+    outfitBusy[userId] = nil
+    if not ok then
+        print("[F9] Falha na operação de roupas: " .. tostring(err))
+        outfitNotify(player, "negado", "Não foi possível concluir. Tente novamente.")
     end
 end
 
-
-RegisterNetEvent("novak:playerOutfit")
-AddEventHandler("novak:playerOutfit", function(typeAction, parameters)
-    local source = source
-    local user_id = vRP.getUserId(source)
-
-    if user_id then
-        local modes = {
-            ["deletar"] = function ()
-                local nameOutfit = parameters.name
-                TriggerClientEvent("dynamic:closeSystem2", source)
-
-                if nameOutfit ~= "" then
-                    vRP.execute("vRP/deleteClothes", {
-                        user_id = user_id,
-                        name = nameOutfit
-                    })
-                    TriggerClientEvent("Notify", source, "sucesso", "Roupa '" .. nameOutfit .. "' deletada.", 3000)
-                else
-                    TriggerClientEvent("Notify", source, "erro", "Nome de outfit inválido.", 3000)
-                end
-            end,
-
-            ["salvar"] = function ()
-                local outfitName = parameters.name
-
-                local ped = GetPlayerPed(source)
-                local model = GetEntityModel(ped)
-    
-                if model ~= GetHashKey("mp_m_freemode_01") and model ~= GetHashKey("mp_f_freemode_01") then
-                    TriggerClientEvent("Notify", source, "negado", "Você não pode salvar roupas de um PED!", 3000)
-                    return
-                end
-    
-                local custom = vRPclient.getCustomization(source)
-                if custom then
-
-                    if outfitName == "" or outfitName == nil then
-                        TriggerClientEvent("dynamic:closeSystem2", source)
-                        TriggerClientEvent("Notify", source, "negado", "Você precisa colocar um nome!", 3000)
-                        return
-                    end
-                    TriggerClientEvent("dynamic:closeSystem2", source)
-                    vRP.execute("vRP/saveClothes", {
-                        user_id = user_id,
-                        name = outfitName,
-                        custom = json.encode(custom)
-                    })
-                    TriggerClientEvent("Notify", source, "sucesso", "Roupas salvas.", 3000)
-                end
-
-            end
-        }
-
-        if modes[typeAction] then
-            modes[typeAction]()
-            TriggerClientEvent("realidade_dynamic:closeMenu", source)
-        end
+local function saveOutfit(player, userId, name)
+    name = outfitName(name)
+    if not name then return outfitNotify(player, "negado", "Informe um nome válido para a roupa (até 100 caracteres).") end
+    local model = GetEntityModel(GetPlayerPed(player))
+    if not sameOutfitModel(model, GetHashKey("mp_m_freemode_01")) and not sameOutfitModel(model, GetHashKey("mp_f_freemode_01")) then
+        return outfitNotify(player, "negado", "Você não pode salvar roupas deste personagem.")
     end
+    local custom = vRPclient.getCustomization(player)
+    if type(custom) ~= "table" then return outfitNotify(player, "negado", "Não foi possível ler sua roupa atual.") end
+    custom.pedModel = model
+    local params = {user_id=userId,name=name,custom=json.encode(custom)}
+    local existing = vRP.query("vRP/getClothesByName", params) or {}
+    -- Await the write before reporting success or allowing another operation.
+    vRP.query(existing[1] and "vRP/updateClothesByName" or "vRP/saveClothes", params)
+    outfitNotify(player, "sucesso", "Roupa salva. Abra o F9 para vestir ou excluir.")
+end
+
+local function persistCurrentOutfit(player, userId)
+    local current = vRPclient.getCustomization(player)
+    if type(current) == "table" then
+        vRP.query("apparence/roupas", {user_id=userId,roupas=json.encode(current)})
+        vRP.updateUserApparence(userId, "clothes", current)
+    end
+end
+
+local function applyOutfit(player, userId, name)
+    local params = {user_id=userId,name=name}
+    local rows = vRP.query(name and "vRP/getClothesByName" or "vRP/getClothes", params) or {}
+    local custom = rows[1] and decodeOutfit(rows[1].custom)
+    if not custom then return outfitNotify(player, "negado", "Esta roupa não está disponível.") end
+    if not sameOutfitModel(custom.pedModel, GetEntityModel(GetPlayerPed(player))) then
+        return outfitNotify(player, "negado", "Esta roupa pertence a outro modelo de personagem.")
+    end
+    -- Clothing changes do not need to replace the player model.
+    custom.pedModel = nil
+    vRPclient.setCustomization(player, custom)
+    persistCurrentOutfit(player, userId)
+    outfitNotify(player, "sucesso", "Roupa aplicada.")
+end
+
+RegisterNetEvent("novak:playerOutfit", function(action, parameters)
+    local player = source
+    local name = type(parameters) == "table" and outfitName(parameters.name)
+    withOutfitPlayer(player, function(userId)
+        if not name then return outfitNotify(player, "negado", "Informe um nome válido para a roupa.") end
+        if action == "salvar" then
+            saveOutfit(player, userId, name)
+        elseif action == "deletar" then
+            vRP.query("vRP/deleteClothes", {user_id=userId,name=name})
+            outfitNotify(player, "sucesso", "Roupa excluída.")
+        end
+    end)
 end)
 
-RegisterServerEvent("player:outfitFunctions")
-AddEventHandler("player:outfitFunctions", function(mode)
-    local source = source
-    local user_id = vRP.getUserId(source)
-    if user_id then
-        if mode == "aplicar" then
-            local result = vRP.query("vRP/getClothes", {
-                user_id = user_id
-            })
-            if result[1] then
-                local custom = json.decode(result[1].custom)
-                if custom then
-                    local model = GetEntityModel(ped)
-                    if custom.pedModel ~= model then
-                        return TriggerClientEvent("Notify", source, "negado",
-                            "Você não pode setar roupas de outro sexo!", 3000)
-                    end
-                    TriggerClientEvent("dynamic:closeSystem2", source)
-                    vRPclient.setCustomization(source, custom)
-                    TriggerClientEvent("Notify", source, "sucesso", "Roupas aplicadas.", 3000)
-                else
-                    TriggerClientEvent("Notify", source, "erro", "Erro ao carregar as roupas.", 3000)
-                end
-            else
-                TriggerClientEvent("Notify", source, "erro", "Você não tem roupas salvas.", 3000)
-            end
-        elseif mode == "salvar" then
-            local ped = GetPlayerPed(source)
-            local model = GetEntityModel(ped)
-
-            if model ~= GetHashKey("mp_m_freemode_01") and model ~= GetHashKey("mp_f_freemode_01") then
-                TriggerClientEvent("Notify", source, "negado", "Você não pode salvar roupas de um PED!", 3000)
-                return
-            end
-
-            local custom = vRPclient.getCustomization(source)
-            if custom then
-                local name = vRP.prompt(source, "Nome do Outfit:", "")
-                if name == "" or name == nil then
-                    TriggerClientEvent("dynamic:closeSystem2", source)
-                    TriggerClientEvent("Notify", source, "negado", "Você precisa colocar um nome!", 3000)
-                    return
-                end
-                TriggerClientEvent("dynamic:closeSystem2", source)
-                vRP.execute("vRP/saveClothes", {
-                    user_id = user_id,
-                    name = name,
-                    custom = json.encode(custom)
-                })
-                TriggerClientEvent("Notify", source, "sucesso", "Roupas salvas.", 3000)
-            end
+RegisterNetEvent("player:outfitFunctions", function(mode)
+    local player = source
+    withOutfitPlayer(player, function(userId)
+        if mode == "salvar" then
+            saveOutfit(player, userId, vRP.prompt(player, "Nome da roupa:", ""))
         elseif mode == "deletar" then
-            TriggerClientEvent("dynamic:closeSystem2", source)
-            local name = vRP.prompt(source, "Nome do Outfit a deletar:", "")
-            if name ~= "" then
-                vRP.execute("vRP/deleteClothes", {
-                    user_id = user_id,
-                    name = name
-                })
-                TriggerClientEvent("Notify", source, "sucesso", "Roupa '" .. name .. "' deletada.", 3000)
-            else
-                TriggerClientEvent("Notify", source, "erro", "Nome de outfit inválido.", 3000)
-            end
+            local name = outfitName(vRP.prompt(player, "Nome da roupa para excluir:", ""))
+            if name then vRP.query("vRP/deleteClothes", {user_id=userId,name=name}) outfitNotify(player, "sucesso", "Roupa excluída.") end
+        elseif mode == "aplicar" then
+            applyOutfit(player, userId)
         elseif mode == "remover" then
-            local model
-            local ped = GetPlayerPed(source)
-
-            if GetEntityModel(ped) == GetHashKey("mp_m_freemode_01") then
-                TriggerClientEvent("updateRoupas2", source, removeFit["homem"])
-            elseif GetEntityModel(ped) == GetHashKey("mp_f_freemode_01") then
-                TriggerClientEvent("updateRoupas2", source, removeFit["mulher"])
-            end
-        else
-            TriggerClientEvent("skinshop:set" .. mode, source)
-        end
-    end
-end)
-
-RegisterServerEvent("player:setClothes")
-AddEventHandler("player:setClothes", function(name)
-    local source = source
-    local user_id = vRP.getUserId(source)
-    if user_id then
-
-        local status, time = exports['vrp']:getCooldown(user_id, "player_setclothes")
-
-        if not status then
-            return
-        end
-
-        exports['vrp']:setCooldown(user_id, "player_setclothes", 6)
-
-        local result = vRP.query("vRP/getClothesByName", {
-            user_id = user_id,
-            name = name
-        })
-        if result[1] then
-            local custom = json.decode(result[1].custom)
-            if custom then
-                local ped = GetPlayerPed(source)
-                local model = GetEntityModel(ped)
-                if custom.pedModel ~= model then
-                    return TriggerClientEvent("Notify", source, "negado", "Você setar roupas de outro sexo!", 3000)
+            local model = GetEntityModel(GetPlayerPed(player))
+            local fit = sameOutfitModel(model, GetHashKey("mp_m_freemode_01")) and removeFit.homem or
+                (sameOutfitModel(model, GetHashKey("mp_f_freemode_01")) and removeFit.mulher)
+            if fit then
+                local custom = {}
+                local components = {pants=4,vest=9,backpack=5,decals=10,mask=1,shoes=6,tshirt=8,torso=11,accessory=7,arms=3}
+                local props = {hat=0,bracelet=7,watch=6,glass=1,ear=2}
+                for name, index in pairs(components) do
+                    local part = fit[name]
+                    if part then custom[index] = {part.item,part.texture,0} end
                 end
-                vRPclient.setCustomization(source, custom)
-                TriggerClientEvent("Notify", source, "sucesso", "Roupa '" .. name .. "' aplicada.", 3000)
-            else
-                TriggerClientEvent("Notify", source, "negado", "Erro ao carregar as roupas.", 3000)
+                for name, index in pairs(props) do
+                    local part = fit[name]
+                    if part then custom["p"..index] = {part.item,part.texture} end
+                end
+                vRPclient.setCustomization(player,custom)
+                persistCurrentOutfit(player,userId)
+                outfitNotify(player,"sucesso","Roupa retirada.")
             end
-        else
-            TriggerClientEvent("Notify", source, "negado",
-                "Você não tem uma roupa salva com o nome '" .. name .. "'.", 3000)
         end
-    end
+    end)
 end)
 
+RegisterNetEvent("player:setClothes", function(name)
+    local player = source
+    name = outfitName(name)
+    if not name then return end
+    withOutfitPlayer(player, function(userId) applyOutfit(player, userId, name) end)
+end)
 
 function NotifyAdmins(msg)
     CreateThread(function()
@@ -7383,7 +7341,7 @@ AdminAudit.RegisterCommand('alterarid', function(source, args, rawCmd)
         print("^1[ ALTERAR ID ] ^7Finalizado")
         TriggerClientEvent("Notify", source, "sucesso",
             "Você modificou o ID " .. idUser .. " para o novo ID " .. changeId .. ".", 6000)
-        vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'STAFF ID ' .. user_id .. ' ALTEROU O ID ' .. idUser .. ' PARA O NOVO ID ' .. changeId)
+        vRP.sendLog('', 'STAFF ID ' .. user_id .. ' ALTEROU O ID ' .. idUser .. ' PARA O NOVO ID ' .. changeId)
     end
 end)
 
@@ -7504,7 +7462,7 @@ RegisterNetEvent("SAHUDUHNW", function(wp, type)
     print("ARMAS => ", user_id, wp, type, GetSelectedPedWeapon(GetPlayerPed(source)))
     NotifyAdmins("[SUSPEITO-GOSTH] Passaporte: " .. user_id)
 
-    Log2(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "PASSAPORTE: " .. user_id .. "\n[ARMA]: " .. wp .. "\n[TIPO]" .. type)
+    Log2('', "PASSAPORTE: " .. user_id .. "\n[ARMA]: " .. wp .. "\n[TIPO]" .. type)
 end)
 
 RegisterNetEvent("dbg:admin", function(...)
@@ -7735,7 +7693,7 @@ AdminAudit.RegisterCommand('clearinvall', function(source, args, rawCommand)
             vRP.clearAccount(parseInt(args[1]))
             TriggerClientEvent("Notify", source, "negado",
                 "Você limpou o inventário do ID: " .. parseInt(args[1]) .. ".", 5)
-            vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
+            vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
 
         else
             local rows = vRP.getUData(parseInt(args[1]), "vRP:datatable")
@@ -7749,7 +7707,7 @@ AdminAudit.RegisterCommand('clearinvall', function(source, args, rawCommand)
                 vRP.setUData(parseInt(args[1]), "vRP:datatable", json.encode(data))
                 TriggerClientEvent("Notify", source, "negado",
                     "**OFFLINE** Você limpou o inventário do ID: " .. parseInt(args[1]) .. ".", 5)
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
+                vRP.sendLog("", "O ID: " .. user_id .. " limpou o inventario do ID: " .. parseInt(args[1]))
             end
         end
     end
@@ -8173,7 +8131,7 @@ AdminAudit.RegisterCommand('scamp', function(source, args, rawCommand)
     end
 
     vRP.sendLog(
-        GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+        '',
         'O ID: ' .. user_id .. ' utilizou /scamp em ' .. distance .. ' metro(s) nos IDs: ' ..
             table.concat(affectedPlayerIds, ', '))
 
@@ -8543,7 +8501,7 @@ CreateThread(function()
 end)
 
 function LogList(message)
-    requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers)
+    PerformHttpRequest("", function(err, text, headers)
     end, 'POST', json.encode({
         content = message
     }), {
@@ -8717,7 +8675,6 @@ AdminAudit.RegisterCommand("SPAUddiMeBanir", function(source, args)
 end)
 
 function Log2(weebhook, message)
-    if type(weebhook) ~= "string" or weebhook == "" then return end
     PerformHttpRequest(weebhook, function(err, text, headers)
     end, 'POST', json.encode({
         content = message
@@ -8859,7 +8816,7 @@ CreateThread(function()
 end)
 
 function LogList(message)
-    requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers)
+    PerformHttpRequest("", function(err, text, headers)
     end, 'POST', json.encode({
         content = message
     }), {
@@ -9263,7 +9220,7 @@ AdminAudit.RegisterCommand('ilegalbl', function(source, args)
                     TriggerClientEvent("Notify", nsource, "sucesso",
                         "Você recebeu blacklist no comando /ilegal até o dia " .. expiration_date_readable, 5)
                 end
-                vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), "```prolog\n[ID: " .. user_id .. "]\n[ADICIONOU BLACKLIST ILEGAL]: " .. id .. " ```")
+                vRP.sendLog('', "```prolog\n[ID: " .. user_id .. "]\n[ADICIONOU BLACKLIST ILEGAL]: " .. id .. " ```")
             end
         end
     end
@@ -9568,7 +9525,7 @@ AdminAudit.RegisterCommand('addbl', function(source, args)
 
     vRP.setUData(nuserId, 'blacklist:adm', json.encode(blacklistCache[nuserId]))
 
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: ' .. userId .. '\n[BLACKLIST]:\n' .. nuserId .. '\n[MOTIVO]:\n' .. reason .. '\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
+    vRP.sendLog('', '```prolog\n[ID]: ' .. userId .. '\n[BLACKLIST]:\n' .. nuserId .. '\n[MOTIVO]:\n' .. reason .. '\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
 
     local nSource = vRP.getUserSource(nuserId)
     if nSource then
@@ -9641,7 +9598,7 @@ AdminAudit.RegisterCommand('rembl', function(source, args)
     exports.oxmysql:execute('DELETE FROM vrp_user_data WHERE dkey = ? AND user_id = ?', {'blacklist:adm', nuserId})
 
     TriggerClientEvent('Notify', source, 'sucesso', 'Blacklist removida do jogador com sucesso.', 20000)
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: ' .. userId .. '\n[TIROU BLACKLIST]: '..nuserId..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
+    vRP.sendLog('', '```prolog\n[ID]: ' .. userId .. '\n[TIROU BLACKLIST]: '..nuserId..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
 end)
 
 function checkIfUserIsBlacklisted(nuserId)
@@ -9783,7 +9740,7 @@ AdminAudit.RegisterCommand('bloquearfaccao', function(source, args)
 	end
 
 	blockedOrgDomination[result] = os.time() + 12 * 60 * 60
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), '```prolog\n[ID]: ' .. userId .. '\n[BLOQUEOU DOMINACAO]: '..result..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
+    vRP.sendLog('', '```prolog\n[ID]: ' .. userId .. '\n[BLOQUEOU DOMINACAO]: '..result..'\n[DATA]: ' .. os.date('%d/%m/%Y %H:%M:%S') .. '```')
 end)
 
 function isOrgBlocked(orgName)
@@ -10407,7 +10364,7 @@ AdminAudit.RegisterCommand('nn', function(source, args)
             })
         end
     end
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO : ' .. userId .. ' ENVIANDO MESSAGE : ' .. message)
+    vRP.sendLog('', 'USUARIO : ' .. userId .. ' ENVIANDO MESSAGE : ' .. message)
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -10623,7 +10580,7 @@ AddEventHandler("playerDropped", function(reason)
     local coordStr = string.format("X: %.2f, Y: %.2f, Z: %.2f", coords.x, coords.y, coords.z)
 
     -- Configuração do webhook
-    local webhookUrl = GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", ""))
+    local webhookUrl = ""
 
     -- Conteúdo da embed
     local embed = {
@@ -10661,7 +10618,7 @@ AddEventHandler("playerDropped", function(reason)
     }
 
     -- Enviar para o webhook
-    requestPrivateWebhook(webhookUrl, function(err, text, headers) end, "POST", json.encode({
+    PerformHttpRequest(webhookUrl, function(err, text, headers) end, "POST", json.encode({
         username = "Sistema de Logs",
         embeds = embed
     }), {
@@ -11249,7 +11206,7 @@ AdminAudit.RegisterCommand('topcrypto', function(source, args)
 
             TriggerClientEvent('Notify', source, 'aviso', message)
 
-            requestPrivateWebhook(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), function(err, text, headers) end, 'POST', json.encode({
+            PerformHttpRequest('', function(err, text, headers) end, 'POST', json.encode({
                 username = 'CryptoBot',
                 embeds = {{
                     title = 'Ranking de Criptomoedas',
@@ -11427,8 +11384,8 @@ AdminAudit.RegisterCommand('avisofac', function(source, args)
         end
     end
 
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
+    vRP.sendLog('', 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
+    vRP.sendLog('', 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
 end)
 
 AdminAudit.RegisterCommand('avisostaff', function(source, args)
@@ -11455,7 +11412,7 @@ AdminAudit.RegisterCommand('avisostaff', function(source, args)
         end
     end
 
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
+    vRP.sendLog('', 'USUARIO '..userId..' ENVIOU A MENSAGEM: '..message)
 end)
 
 AdminAudit.RegisterCommand('avisoilegal', function(source, args)
@@ -11522,7 +11479,7 @@ AdminAudit.RegisterCommand('perimetro', function(source, args)
     vCLIENT.createPerimeter(-1, tostring(userId), coords)
 
     TriggerClientEvent('Notify', source, 'sucesso', 'Perímetro ativado com sucesso.')
-    vRP.sendLog(GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")), 'USUARIO '..userId..' ATIVOU UM PERIMETRO NA LOCALIZAÇÃO: '..json.encode(coords))
+    vRP.sendLog('', 'USUARIO '..userId..' ATIVOU UM PERIMETRO NA LOCALIZAÇÃO: '..json.encode(coords))
 
     CreateThread(function()
         Wait(1000 * 60 * 10)
@@ -11615,7 +11572,7 @@ AdminAudit.RegisterCommand('blacklist', function(source, args)
     )
     TriggerClientEvent('Notify', source, 'sucesso', 'Blacklist removida com sucesso.')
     vRP.sendLog(
-        GetConvar("ic_secret_vrp_admin_webhook", GetConvar("interior_city_webhook_logs", "")),
+        '',
         'USUARIO ' .. userId .. ' REMOVEU SUA BLACKLIST'
     )
 end)
@@ -11792,7 +11749,7 @@ function SendWebhookMessage(webhook,message)
 	end
 end
 
--- /arma removido: o spawn de armas agora é feito pelo IC Admin,
+-- /arma removido: o spawn de armas agora é feito pelo m_paineladm_v2,
 -- entregando WEAPON_ + AMMO_ como itens compatíveis com o inventário atual.
 
 AdminAudit.RegisterCommand('hash',function(source,args,rawCommand)

@@ -542,7 +542,8 @@ function API.requireChest(type, network_id, chest_name)
             if chestItems then
                 for k, v in pairs(chestItems) do
                     itemCount += 1
-                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k }
+                    v.expiresAt = vRP.getItemExpiry(k, v.expiresAt)
+                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k, expiresAt = v.expiresAt }
                 end
             end
 
@@ -598,7 +599,8 @@ function API.requireChest(type, network_id, chest_name)
             if chestItems then
                 for k, v in pairs(chestItems) do
                     itemCount += 1
-                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k }
+                    v.expiresAt = vRP.getItemExpiry(k, v.expiresAt)
+                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k, expiresAt = v.expiresAt }
                 end
             end
             ITEMS_CACHE["orgChest:" .. chest_name] = chestItems
@@ -643,7 +645,8 @@ function API.requireChest(type, network_id, chest_name)
             if chestItems then
                 for k, v in pairs(chestItems) do
                     itemCount += 1
-                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k }
+                    v.expiresAt = vRP.getItemExpiry(k, v.expiresAt)
+                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k, expiresAt = v.expiresAt }
                 end
             end
             ITEMS_CACHE["HOME_" .. houseId] = chestItems
@@ -678,7 +681,8 @@ function API.requireChest(type, network_id, chest_name)
             if chestItems then
                 for k, v in pairs(chestItems) do
                     itemCount += 1
-                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k }
+                    v.expiresAt = vRP.getItemExpiry(k, v.expiresAt)
+                    formatedItems[tostring(itemCount)] = { amount = v["amount"], item = k, expiresAt = v.expiresAt }
                 end
             end
             ITEMS_CACHE["WAREHOUSES:" .. chest_name] = chestItems
@@ -754,20 +758,29 @@ function API.storeChestItem(slot, amount)
             local chestItems = ITEMS_CACHE[chest_name]
             if not chestItems then
                 print("ERRO GRAVE_INVENTARIO ", chest_name, chest_type)
+                return false
+            end
+            local storedStack = chestItems[slot_data.item]
+            if storedStack and vRP.isInventoryItemExpired(storedStack) ~= vRP.isInventoryItemExpired(slot_data) then
+                return { error = "Retire o lote do baú antes de guardar outro com validade diferente." }
             end
             if (tonumber(vRP.computeChestWeight(chestItems)) + tonumber((Items[slot_data.item].weight * amount))) > tonumber(weight) then
                 return {
                     error = "Baú cheio."
                 }
             else
-                if not vRP.tryGetInventoryItem(user_id, slot_data.item, amount, slot) then
+                if not vRP.tryGetInventoryItem(user_id, slot_data.item, amount, false, slot, true) then
                     return {
                         error = "Item não disponível!"
                     }
                 end
             end
             chestItems[slot_data.item] = chestItems[slot_data.item] or { amount = 0 }
-            chestItems[slot_data.item].amount = chestItems[slot_data.item].amount + amount
+            local stack = chestItems[slot_data.item]
+            if slot_data.expiresAt then
+                stack.expiresAt = math.min(stack.expiresAt or slot_data.expiresAt, slot_data.expiresAt)
+            end
+            stack.amount = stack.amount + amount
             ITEMS_CACHE[chest_name] = chestItems
 
             if InventoryAudit then
@@ -860,13 +873,14 @@ function API.takeChestItem(item, amount, slot)
                 return false
             end
             amount = ((amount > chestItems[item].amount) and chestItems[item].amount or amount)
+            local expiresAt = chestItems[item].expiresAt
             if amount == chestItems[item].amount then
                 chestItems[item] = nil
             else
                 chestItems[item].amount -= amount
             end
             ITEMS_CACHE[chest_name] = chestItems
-            vRP.giveInventoryItem(user_id, item, amount, slot)
+            vRP.giveInventoryItem(user_id, item, amount, false, slot, expiresAt)
 
             if InventoryAudit then
                 local isVehicle = chest_type == "VEHICLE"

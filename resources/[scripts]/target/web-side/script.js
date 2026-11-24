@@ -37,7 +37,7 @@ window.addEventListener("message",function(event){
 		$(".target-label").html("");
 
 		$.each(item["data"],function(index,item){
-			$(".target-label").append("<div id='target-" + index + "'<li>" + item["label"] + "</li></div>");
+			$(".target-label").append($("<div>", { id: "target-" + index, text: item["label"] }));
 
 			$("#target-" + index).data("TargetData",item["event"]);
 			$("#target-" + index).data("TunnelData",item["tunnel"]);
@@ -69,7 +69,9 @@ document.addEventListener("visibilitychange",function(){
 });
 
 $(document).on("mousedown",(event) => {
-	let element = event["target"];
+	if (event.button !== 0) return;
+	let element = $(event.target).closest(".target-label div[id^='target-']")[0];
+	if (!element) return;
 
 	if (element["id"].split("-")[0] === "target"){
 		let targetData = $("#" + element["id"]).data("TargetData");

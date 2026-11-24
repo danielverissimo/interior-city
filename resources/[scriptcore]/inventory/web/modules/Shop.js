@@ -127,21 +127,14 @@ class Shop extends Inventory {
 					this.renderSlots("right");
 					return false;
 				}
-				if (response.money) {
-					const foundSlot = invInstance.findSlotByItem("money");
-					if (foundSlot) {
-						invInstance.items[foundSlot].amount += response.money;
-					}
-				}
 				if (response.notify) {
 					Notify(response.notify, "success");
 				}
-				invInstance.items[from_slot].amount -= amount;
-				if (invInstance.items[from_slot].amount <= 0) {
-					delete invInstance.items[from_slot];
+				const inventory = await Client("GET_INVENTORY");
+				if (window.classInstances.right === this && window.classInstances.left === invInstance) {
+					window.classInstances.left = new Inventory(inventory);
+					this.renderSlots("right");
 				}
-				this.renderSlots("right");
-				invInstance.renderSlots("left");
 				return true;
 			}
 			Notify(

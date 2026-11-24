@@ -16,17 +16,20 @@ dependencies {
 
 shared_scripts {
     '@vrp/lib/utils.lua',
-    'shared/**'
+    'shared/config.lua',
+    'shared/tunnel.lua'
 }
 
 server_scripts {
     "config.lua",
-    "server/server.lua"
+    "server/server.lua",
+    "server/locations.lua"
 }
 
 client_scripts {
     "client/utils.lua",
     "client/client.lua",
+    "client/locations.lua",
 }
 
 ui_page 'web/build/index.html'

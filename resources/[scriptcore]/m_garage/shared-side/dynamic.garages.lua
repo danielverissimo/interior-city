@@ -1,6 +1,20 @@
 garagesLocs = garagesLocs or {}
 typeGarages = typeGarages or {}
 
+-- Migrate only the retired, two-vehicle hospital fleet. Preserve custom fleets.
+function MigrateLegacyHospitalVehicles(rawTypes)
+    local hospital = type(rawTypes) == 'table' and rawTypes.GaragemHospital
+    if type(hospital) ~= 'table' or type(hospital.vehicles) ~= 'table' or #hospital.vehicles ~= 2 then return false end
+    local models = {}
+    for _, vehicle in ipairs(hospital.vehicles) do
+        if type(vehicle) ~= 'table' or type(vehicle.vehicle) ~= 'string' then return false end
+        models[vehicle.vehicle:lower()] = true
+    end
+    if not models.wrsw4 or not models.wrsprinter22 then return false end
+    hospital.vehicles = {{vehicle='wrdefhp'},{vehicle='wrsprhp'}}
+    return true
+end
+
 local function copyTable(value)
     if type(value) ~= "table" then return value end
     local out = {}
@@ -54,6 +68,9 @@ if IsDuplicityVersion() then
         local typesText = LoadResourceFile(GetCurrentResourceName(), "shared-side/typeGarages.json")
         GarageConfigRaw = garagesText and json.decode(garagesText) or {}
         GarageTypesRaw = typesText and json.decode(typesText) or {}
+        if MigrateLegacyHospitalVehicles(GarageTypesRaw) then
+            SaveResourceFile(GetCurrentResourceName(), 'shared-side/typeGarages.json', json.encode(GarageTypesRaw), -1)
+        end
         ApplyGarageDynamicConfig(GarageConfigRaw, GarageTypesRaw)
         print(("^2[m_garage]^7 Config carregada: %d garagens e %d tipos."):format(#GarageConfigRaw, (function() local n=0 for _ in pairs(GarageTypesRaw) do n=n+1 end return n end)()))
     end

@@ -25,6 +25,9 @@ Config.Rewards = {
             image = 'WEAPON_PISTOL_MK2',
             items = {
                 { item = 'pecadearma', min = 5, max = 9 },
+                { item = 'metal', min = 4, max = 8 },
+                { item = 'molas', min = 1, max = 3 },
+                { item = 'gatilho', min = 1, max = 1 },
             }
         },
     },

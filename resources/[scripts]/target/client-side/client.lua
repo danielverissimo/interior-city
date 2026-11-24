@@ -25,7 +25,6 @@ local targetOpenedAt = 0
 local altReleasedSince = 0
 local targetAltDown = false
 local playerActive = true
-local windowState = {}
 local trunkState = {
     vehicle = 0,
     netId = 0,
@@ -217,7 +216,6 @@ local policeVeh = {
 
 local adminVeh = {
     { event = "target:adminDeleteVehicle", label = "Deletar Veículo", tunnel = "server" },
-    { event = "target:adminFix", label = "Fix", tunnel = "server" },
     { event = "target:sequestrar", label = "Sequestrar", tunnel = "server" },
     { event = "target:trunkin", label = "Entrar no Porta-Malas", tunnel = "server" },
     { event = "target:capo", label = "Abrir/Fechar Capô", tunnel = "client" },
@@ -236,7 +234,7 @@ local function requestControl(entity)
         NetworkRequestControlOfEntity(entity)
         Citizen.Wait(0)
     end
-    return DoesEntityExist(entity)
+    return DoesEntityExist(entity) and NetworkHasControlOfEntity(entity)
 end
 
 local function resolveTargetVehicle(data)
@@ -283,12 +281,54 @@ end
 
 local function closeVehicleDoorToggle(vehicle, door)
     if vehicle == 0 or not DoesEntityExist(vehicle) then return end
-    requestControl(vehicle)
+    if not GetIsDoorValid(vehicle, door) or IsVehicleDoorDamaged(vehicle, door) then return end
+    if not requestControl(vehicle) then return end
     if GetVehicleDoorAngleRatio(vehicle, door) > 0.10 then
         SetVehicleDoorShut(vehicle, door, false)
     else
         SetVehicleDoorOpen(vehicle, door, false, false)
     end
+end
+
+local passengerDoorNames = {
+    [0] = "Porta dianteira esquerda",
+    [1] = "Porta dianteira direita",
+    [2] = "Porta traseira esquerda",
+    [3] = "Porta traseira direita"
+}
+
+local function vehicleMenu(base, vehicle)
+    local options = {}
+    for _, option in ipairs(base) do
+        if (option.event ~= 'target:capo' or GetIsDoorValid(vehicle, 4))
+            and (option.event ~= 'target:malas' or GetIsDoorValid(vehicle, 5))
+            and (option.event ~= 'target:trunkin' or GetIsDoorValid(vehicle, 5))
+            and (option.event ~= 'target:sequestrar' or GetIsDoorValid(vehicle, 5)) then
+            options[#options + 1] = option
+        end
+    end
+    local count = 0
+    for door = 0, 3 do
+        if GetIsDoorValid(vehicle, door) and not IsVehicleDoorDamaged(vehicle, door) then
+            count = count + 1
+            options[#options + 1] = {
+                event = 'target:door' .. door,
+                label = 'Abrir/Fechar ' .. passengerDoorNames[door],
+                tunnel = 'client'
+            }
+        end
+    end
+    if count > 1 then
+        options[#options + 1] = { event = 'target:allDoors', label = 'Abrir/Fechar todas as portas', tunnel = 'client' }
+    end
+    return options
+end
+
+local function requestVehicleAction(data, action)
+    local vehicle = resolveTargetVehicle(data)
+    if vehicle == 0 then return end
+    if #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(vehicle)) > 4.0 then return end
+    TriggerServerEvent('target:vehicleAction', VehToNet(vehicle), action)
 end
 
 local function leaveTrunk()
@@ -382,7 +422,7 @@ function playerTargetEnable()
                         elseif role == "mechanic" then
                             menu = mechanicVeh
                         end
-                        SendNUIMessage({ response = "validTarget", data = menu })
+                        SendNUIMessage({ response = "validTarget", data = vehicleMenu(menu, entity) })
 
                         while success and targetActive do
                             local currentPed = PlayerPedId()
@@ -394,7 +434,8 @@ function playerTargetEnable()
                                 enableTargetCursor()
                             end
 
-                            if currentHit ~= 1 or GetEntityType(currentEntity) == 0 or #(currentCoords - currentEntCoords) > 1.0 then
+                            if not DoesEntityExist(entity) or #(currentCoords - GetEntityCoords(entity)) > 4.0
+                                or (not targetCursorActive and (currentHit ~= 1 or currentEntity ~= entity or #(currentCoords - currentEntCoords) > 1.0)) then
                                 success = false
                             end
                             Citizen.Wait(1)
@@ -626,36 +667,64 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNetEvent("target:capo")
 AddEventHandler("target:capo",function(data)
-    local vehicle = resolveTargetVehicle(data)
-    if vehicle == 0 then return end
-    if #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(vehicle)) > 4.0 then return end
-    closeVehicleDoorToggle(vehicle,4)
+    requestVehicleAction(data, 'door4')
 end)
 
 RegisterNetEvent("target:malas")
 AddEventHandler("target:malas",function(data)
-    local vehicle = resolveTargetVehicle(data)
-    if vehicle == 0 then return end
-    if #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(vehicle)) > 4.0 then return end
-    closeVehicleDoorToggle(vehicle,5)
+    requestVehicleAction(data, 'door5')
 end)
 
 RegisterNetEvent("target:vidros")
 AddEventHandler("target:vidros",function(data)
-    local vehicle = resolveTargetVehicle(data)
-    if vehicle == 0 then return end
-    if #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(vehicle)) > 4.0 then return end
-    requestControl(vehicle)
+    requestVehicleAction(data, 'windows')
+end)
 
-    local key = tostring(VehToNet(vehicle))
-    local lowered = windowState[key] == true
+for index = 0, 3 do
+    local door = index
+    RegisterNetEvent('target:door' .. door)
+    AddEventHandler('target:door' .. door, function(data)
+        requestVehicleAction(data, 'door' .. door)
+    end)
+end
+
+RegisterNetEvent('target:allDoors')
+AddEventHandler('target:allDoors', function(data)
+    requestVehicleAction(data, 'allDoors')
+end)
+
+RegisterNetEvent('target:applyVehicleAction')
+AddEventHandler('target:applyVehicleAction', function(netId, action)
+    if GetInvokingResource() then return end
+    if not NetworkDoesNetworkIdExist(netId) then return end
+    local vehicle = NetToVeh(netId)
+    if vehicle == 0 or not DoesEntityExist(vehicle) or not requestControl(vehicle) then return end
+    local door = tonumber(tostring(action):match('^door([0-5])$'))
+    if door then
+        closeVehicleDoorToggle(vehicle, door)
+        return
+    elseif action == 'allDoors' then
+        local shouldClose = false
+        for index = 0, 3 do
+            if GetIsDoorValid(vehicle, index) and not IsVehicleDoorDamaged(vehicle, index)
+                and GetVehicleDoorAngleRatio(vehicle, index) > 0.10 then shouldClose = true end
+        end
+        for index = 0, 3 do
+            if GetIsDoorValid(vehicle, index) and not IsVehicleDoorDamaged(vehicle, index) then
+                if shouldClose then SetVehicleDoorShut(vehicle, index, false)
+                else SetVehicleDoorOpen(vehicle, index, false, false) end
+            end
+        end
+        return
+    elseif action ~= 'windows' then return end
+
+    local lowered = Entity(vehicle).state.targetWindowsLowered == true
     if lowered then
         for i = 0,3 do RollUpWindow(vehicle,i) end
-        windowState[key] = false
     else
         RollDownWindows(vehicle)
-        windowState[key] = true
     end
+    Entity(vehicle).state:set('targetWindowsLowered', not lowered, true)
 end)
 
 RegisterNetEvent("target:clientToggleTrunk")
@@ -684,13 +753,15 @@ end)
 
 RegisterNetEvent("target:clientRepairVehicle")
 AddEventHandler("target:clientRepairVehicle",function(netId,mode)
+    if GetInvokingResource() then return end
     netId = tonumber(netId) or 0
     if netId <= 0 or not NetworkDoesNetworkIdExist(netId) then return end
     local vehicle = NetToVeh(netId)
     if vehicle == 0 or not DoesEntityExist(vehicle) or not IsEntityAVehicle(vehicle) then return end
-    if #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(vehicle)) > 9.0 then return end
-
-    requestControl(vehicle)
+    if not requestControl(vehicle) then
+        TriggerEvent('Notify', 'negado', 'Não foi possível obter controle do veículo para reparar.', 5000)
+        return
+    end
     if mode == "tires" then
         for i = 0,8 do SetVehicleTyreFixed(vehicle,i) end
     elseif mode == "engine" then
@@ -715,7 +786,7 @@ AddEventHandler("target:clientDeleteEntity",function(netId)
     if netId <= 0 or not NetworkDoesNetworkIdExist(netId) then return end
     local entity = NetToEnt(netId)
     if entity == 0 or not DoesEntityExist(entity) then return end
-    requestControl(entity)
+    if not requestControl(entity) then return end
     SetEntityAsMissionEntity(entity,true,true)
     if IsEntityAVehicle(entity) then DeleteVehicle(entity) else DeleteEntity(entity) end
 end)

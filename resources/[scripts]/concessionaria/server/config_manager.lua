@@ -1,4 +1,11 @@
 local FILE="dealership.json"
+local function restrictToOriginalVehicles()
+    for spawn in pairs(DealershipConfig.vehicles or {}) do
+        if not DealerVanillaModels[string.lower(tostring(spawn))] then
+            DealershipConfig.vehicles[spawn] = nil
+        end
+    end
+end
 DealershipConfig={settings={},testDrive={},categories={},vips={},vehicles={}}
 
 local function clone(v)
@@ -74,6 +81,7 @@ local function garageEntry(spawn)
 end
 
 local function buildRuntimeVehicle(spawn,state)
+    if not DealerVanillaModels[string.lower(tostring(spawn))] then return nil end
     local g=garageEntry(spawn)
     if not g then return nil end
 
@@ -135,11 +143,13 @@ local function loadFile()
     DealershipConfig.categories=type(data.categories)=="table" and data.categories or {}
     DealershipConfig.vips=type(data.vips)=="table" and data.vips or {}
     DealershipConfig.vehicles=type(data.vehicles)=="table" and data.vehicles or {}
+    restrictToOriginalVehicles()
 
     applyGlobals()
 end
 
 local function saveFile()
+    restrictToOriginalVehicles()
     if not SaveResourceFile(GetCurrentResourceName(),FILE,json.encode(DealershipConfig),-1) then
         DealershipAudit.Log("dealership_system_config_error", {
             details="Falha ao persistir `dealership.json` com `SaveResourceFile`. A alteração solicitada não foi confirmada como salva em disco."
@@ -247,6 +257,7 @@ exports("saveDealershipVehicle",function(spawn,stock,auditContext,category)
     stock=tonumber(stock)
 
     if spawn=="" then return false,"Informe o spawn do veículo." end
+    if not DealerVanillaModels[spawn] then return false,"Esta Dealer vende somente os veículos originais do GTA autorizados no catálogo." end
     if not stock or stock~=stock or stock==math.huge or stock<0 then return false,"Quantidade de estoque inválida." end
 
     local g=garageEntry(spawn)

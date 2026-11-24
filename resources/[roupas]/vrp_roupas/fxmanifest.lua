@@ -1,5 +1,13 @@
-fx_version 'adamant'
+fx_version 'cerulean'
 game 'gta5'
 
--- Arquivo ausente (auditoria): client_script "@GCNAC/src/c_04.lua"
+description 'Pack VRP roupas'
+
+files {
+    'stream/roupas-invictus/mp_f_freemode_01_mp_f_rz_invictus.meta',
+    'stream/roupas-invictus/mp_m_freemode_01_mp_m_rz_invictus.meta'
+}
+
+data_file 'SHOP_PED_APPAREL_META_FILE' 'stream/roupas-invictus/mp_f_freemode_01_mp_f_rz_invictus.meta'
+data_file 'SHOP_PED_APPAREL_META_FILE' 'stream/roupas-invictus/mp_m_freemode_01_mp_m_rz_invictus.meta'
 

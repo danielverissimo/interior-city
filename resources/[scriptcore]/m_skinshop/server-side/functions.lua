@@ -1,24 +1,84 @@
 function serverFunctions.saveCloths(clothes)
     local source = source
     local user_id = vRP.getUserId(source)
-
     if user_id then
         vRP.execute("apparence/roupas",{ user_id = user_id, roupas = json.encode(clothes) })
-		vRP.updateUserApparence(user_id, "clothes", clothes)
+        vRP.updateUserApparence(user_id, "clothes", clothes)
     end
-
-    if vRP.getMoney(user_id) > 100 or vRP.getBankMoney(user_id) > 100 then 
+    if vRP.getMoney(user_id) > 100 or vRP.getBankMoney(user_id) > 100 then
         vRP.tryFullPayment(user_id,parseInt(100))
     end
+end
 
+local function canOpenRemoteShop(user_id)
+    return vRP.hasGroup(user_id,"developerrealidade") or vRP.hasGroup(user_id,"respilegalrealidade") 
+    or vRP.hasGroup(user_id,"gestaorealidade") or vRP.hasGroup(user_id,"respeventosrealidade") or vRP.hasGroup(user_id,"supervisorrealidade")
 end
 
 function serverFunctions.checkPermission()
-    local src = source
-    local user_id = vRP.getUserId(src)
+    local userId = vRP.getUserId(source)
+    return userId ~= nil and canOpenRemoteShop(userId)
+end
 
-    return vRP.hasGroup(user_id,"developerrealidade") or vRP.hasGroup(user_id,"respilegalrealidade") 
-    or vRP.hasGroup(user_id,"gestaorealidade") or vRP.hasGroup(user_id,"respeventosrealidade") or vRP.hasGroup(user_id,"supervisorrealidade")
+local buyingClothes = {}
+
+local function canPurchaseClothes(player, userId)
+    local ped = GetPlayerPed(player)
+    if ped == 0 or GetEntityHealth(ped) <= 101 or GetVehiclePedIsIn(ped, false) ~= 0 then return false end
+    if vRP.hasPermission(userId, "perm.ferias") or canOpenRemoteShop(userId) then return true end
+    local position = GetEntityCoords(ped)
+    for _, shop in pairs(locateShops or {}) do
+        if #(position - vector3(shop[1], shop[2], shop[3])) <= 3.0 then return true end
+    end
+    return false
+end
+
+function serverFunctions.purchaseClothes(custom)
+    local player = source
+    local userId = vRP.getUserId(player)
+    if not userId or not canPurchaseClothes(player, userId) or type(custom) ~= "table" then
+        return false, "Você precisa estar em uma loja de roupas."
+    end
+
+    local pedModel = GetEntityModel(GetPlayerPed(player))
+    if pedModel ~= `mp_m_freemode_01` and pedModel ~= `mp_f_freemode_01` then
+        return false, "Este personagem não pode trocar de roupa."
+    end
+    local clean = { pedModel = pedModel }
+    local function copySlot(slot, prop)
+        local value = custom[slot] or custom[tostring(slot)]
+        if type(value) ~= "table" then return false end
+        local item, texture, palette = tonumber(value[1]), tonumber(value[2]), tonumber(value[3]) or 0
+        if not item or item % 1 ~= 0 or item < (prop and -1 or 0) or item > 10000
+            or not texture or texture % 1 ~= 0 or texture < 0 or texture > 1000
+            or palette % 1 ~= 0 or palette < 0 or palette > 3 then return false end
+        clean[slot] = prop and { item, texture } or { item, texture, palette }
+        return true
+    end
+    for id = 0, 11 do
+        if id ~= 2 and not copySlot(id, false) then return false, "Conjunto de roupas inválido." end
+    end
+    for id = 0, 7 do
+        if not copySlot("p" .. id, true) then return false, "Conjunto de acessórios inválido." end
+    end
+
+    if buyingClothes[userId] then return false, "Aguarde a compra em andamento." end
+    buyingClothes[userId] = true
+    local paid = false
+    local ok, saved = pcall(function()
+        paid = vRP.tryFullPayment(userId, SkinshopPurchasePrice)
+        if not paid then return false end
+        local result = vRP.query("apparence/roupas", { user_id = userId, roupas = json.encode(clean) })
+        return result ~= nil and result ~= false
+    end)
+    buyingClothes[userId] = nil
+    if ok and not paid then return false, "Saldo insuficiente para comprar as roupas." end
+    if not ok or not saved then
+        if paid then vRP.giveBankMoney(userId, SkinshopPurchasePrice) end
+        return false, "Não foi possível salvar as roupas. Tente novamente."
+    end
+    vRP.updateUserApparence(userId, "clothes", clean)
+    return true
 end
 
 

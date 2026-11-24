@@ -21,15 +21,10 @@ export default function App() {
           isEnvBrowser() && 'bg-zinc-700',
         )}
       >
-        <div
-          id="interface"
-          className="w-[932px] h-[586px] bg-[#101215] border-[18px] rounded-[24px] border-[#050505] py-[1.31rem] px-[1.63rem]"
-        >
-          <Routes>
-            <Route path="/home" element={<Home />} />
-            <Route path="*" element={<Navigate to="/home" />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/home" element={<Home />} />
+          <Route path="*" element={<Navigate to="/home" />} />
+        </Routes>
       </div>
       <Toaster position="top-center" reverseOrder={false} />
     </VisibilityProvider>

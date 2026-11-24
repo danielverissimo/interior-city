@@ -433,22 +433,22 @@ Config.Coords = {
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     {
-        name = 'Motoclube',
+        name = 'Vermelhos',
         craftItems = Config.CraftTemplate.motoclubSpecial,
         armazemItems = Config.ArmazemTemplate.motoclubSpecial,
-        craftPermission = 'perm.lidermotoclube',
-        armazemPermission = 'perm.motoclube',
+        craftPermission = 'perm.lidervermelhos',
+        armazemPermission = 'perm.vermelhos',
         coords = {
-            vec3(989.45,-136.06,74.05),
+            vec3(2449.86,-569.01,86.89),
         },
     },
 
     {
-        name = 'Franca',
+        name = 'Azul',
         craftItems = Config.CraftTemplate.motoclubSpecial,
         armazemItems = Config.ArmazemTemplate.motoclubSpecial,
-        craftPermission = 'perm.liderfranca',
-        armazemPermission = 'perm.franca',
+        craftPermission = 'perm.liderazul',
+        armazemPermission = 'perm.azul',
         coords = {
             vec3(-2361.49,1750.69,212.12),
         },
@@ -469,25 +469,15 @@ Config.Coords = {
         },
     },
 
-    {
-        name = 'Vermelhos',
-        craftItems = Config.CraftTemplate.Metanfetamina,
-        armazemItems = Config.ArmazemTemplate.Metanfetamina,
-        craftPermission = 'perm.lidervermelhos',  
-        armazemPermission = 'perm.vermelhos', 
-        coords = {
-            vec3(1266.66,-299.59,87.52),
-        },
-    },
     
     {
         name = 'Verdes',
         craftItems = Config.CraftTemplate.Maconha,
         armazemItems = Config.ArmazemTemplate.Maconha,
-        craftPermission = 'perm.liderverdes',
+        craftPermission = 'perm.verdes',
         armazemPermission = 'perm.verdes',
         coords = {
-            vec3(1398.55,-741.49,72.15),
+            vec3(1458.87,171.33,163.92),
         },
     },
 

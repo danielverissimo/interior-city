@@ -872,6 +872,40 @@ transition: all .2s;
   transform: translateY(-0.22rem);
 }
 
+.name-item-inventory.name-with-validity {
+  bottom: 0.55rem;
+}
+
+.name-item-inventory.item-expired::after {
+  content: " (vencido)";
+  color: #ffaaaa;
+}
+
+.item-validity {
+  position: absolute;
+  inset: auto 0.7rem 0.29rem;
+  height: 0.19rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+  pointer-events: none;
+}
+
+.item-validity::before {
+  content: "";
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #6ee7a5;
+  transform: scaleX(var(--validity-remaining));
+  transform-origin: left;
+  transition: transform 300ms linear;
+}
+
+.item-validity[aria-valuenow="0"] {
+  background: rgba(255, 115, 115, 0.42);
+}
+
 .middle-wrapper {
   width: 5.625rem;
   height: fit-content;
@@ -1110,6 +1144,7 @@ transition: all .2s;
 
 .functions-wrapper {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: .375rem;
 }
@@ -1144,7 +1179,7 @@ transition: all .2s;
   cursor: pointer;
 
   display: flex;
-  width: 8.8333rem;
+  width: 6.4375rem;
   height: 3.5rem;
   gap: .375rem;
   justify-content: center;

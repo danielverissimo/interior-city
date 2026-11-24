@@ -115,32 +115,34 @@ end
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local mala = false
 
-function tvRP.toggleMalas()
-	mala    = not mala
-	ped     = PlayerPedId()
-	vehicle = tvRP.getNearestVehicle(7)
-
-	if IsEntityAVehicle(vehicle) and GetVehicleClass(vehicle) ~= 8 and GetVehicleClass(vehicle) ~= 13 then
-		if mala then
-			AttachEntityToEntity(PlayerPedId(), vehicle, GetEntityBoneIndexByName(vehicle, "bumper_r"), 0.6, -0.4, -0.1, 60.0, -90.0, 180.0, false, false, false, true, 2, true)
-			SetEntityVisible(PlayerPedId(), false)
-			SetEntityInvincible(PlayerPedId(), false)
-		else
-			DetachEntity(PlayerPedId(), true, true)
-			SetEntityVisible(PlayerPedId(), true)
-			SetEntityInvincible(PlayerPedId(), false)
-		end
-		TriggerServerEvent("trymala", VehToNet(vehicle))
-	end
-
-	CreateThread(function()
-		while mala do
-			DisableControlAction(0,75)
-			Wait( 0 )
-		end
-	end)
+function tvRP.toggleMalas(vehicleNet)
+    local ped = PlayerPedId()
+    local vehicle = vehicleNet and NetToVeh(vehicleNet) or tvRP.getNearestVehicle(7)
+    if mala then
+        mala = false
+        DetachEntity(ped, true, true)
+        SetEntityVisible(ped, true)
+        SetEntityInvincible(ped, false)
+        if DoesEntityExist(vehicle) then
+            local exit = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, -3.0, 0.0)
+            SetEntityCoords(ped, exit.x, exit.y, exit.z, false, false, false, false)
+        end
+    else
+        if not IsEntityAVehicle(vehicle) or GetVehicleClass(vehicle) == 8 or GetVehicleClass(vehicle) == 13 then return false end
+        mala = true
+        AttachEntityToEntity(ped, vehicle, math.max(0, GetEntityBoneIndexByName(vehicle, "bumper_r")), 0.6, -0.4, -0.1, 60.0, -90.0, 180.0, false, false, false, true, 2, true)
+        SetEntityVisible(ped, false)
+        SetEntityInvincible(ped, false)
+        CreateThread(function()
+            while mala do
+                DisableControlAction(0, 75, true)
+                Wait(0)
+            end
+        end)
+    end
+    if IsEntityAVehicle(vehicle) then TriggerServerEvent("trymala", VehToNet(vehicle)) end
+    return true
 end
-
 RegisterNetEvent("syncmala")
 AddEventHandler("syncmala", function(index)
 	if NetworkDoesNetworkIdExist(index) then
@@ -155,12 +157,10 @@ AddEventHandler("syncmala", function(index)
 	end
 end)
 
-function tvRP.setMalas(flag)
-	if mala ~= flag then
-		tvRP.toggleMalas()
-	end
+function tvRP.setMalas(flag, vehicleNet)
+    if mala ~= flag then return tvRP.toggleMalas(vehicleNet) end
+    return true
 end
-
 function tvRP.isMalas()
 	return mala
 end

@@ -1,4 +1,6 @@
 local FILE="dealership.json"
+local imageCatalogOk, imageCatalog = pcall(json.decode, LoadResourceFile(GetCurrentResourceName(), 'addon_catalog.json') or '{}')
+imageCatalog = imageCatalogOk and type(imageCatalog) == 'table' and imageCatalog or {}
 DealershipConfig={settings={},testDrive={},categories={},vips={},vehicles={}}
 
 local function clone(v)
@@ -22,16 +24,9 @@ end
 
 local function categoryFromGarageType(tp)
     tp=string.lower(trim(tp))
-    local map={
-        ["sedans"]="sedan", ["sedan"]="sedan", ["suvs"]="sedan",
-        ["imports"]="esportivos", ["import"]="esportivos", ["sports"]="esportivos",
-        ["motos"]="motos", ["moto"]="motos",
-        ["vip"]="vips", ["vips"]="vips",
-        ["industrial"]="caminhoes", ["truck"]="caminhoes", ["trucks"]="caminhoes",
-        ["aeronaves"]="aeronaves", ["aircraft"]="aeronaves", ["helicopter"]="aeronaves",
-        ["brasileiros"]="brasileiros"
-    }
-    return map[tp] or "outros"
+    if tp == 'vip' or tp == 'vips' then return 'vips' end
+    if tp == 'brasileiros' then return 'brasileiros' end
+    return 'exclusivos'
 end
 
 local function categoryExists(id, categories)
@@ -42,6 +37,11 @@ local function categoryExists(id, categories)
 end
 
 local function validateCategories(categories)
+    local allowed = { vips=true, exclusivos=true, brasileiros=true, som=true, motos=true, blindados=true }
+    if type(categories) ~= 'table' or #categories ~= 6 then return false, 'Use as seis categorias da Luxury Motors.' end
+    for _, entry in ipairs(categories) do
+        if not allowed[entry.id] then return false, 'Categoria indisponivel na Luxury Motors.' end
+    end
     if type(categories)~="table" or #categories==0 then
         return false,"Cadastre pelo menos uma categoria."
     end
@@ -79,9 +79,12 @@ local function buildRuntimeVehicle(spawn,state)
 
     local tp=tostring(g.type or "outros")
     return {
-        name=tostring(g.name or g.model or spawn),
+        name=tostring(state.displayName or g.name or g.model or spawn),
+        image=imageCatalog[spawn] and imageCatalog[spawn].image,
         stock=math.max(0,math.floor(tonumber(state.stock) or 0)),
         price=math.max(0,math.floor(tonumber(g.price) or 0)),
+        currency=state.currency == 'diamonds' and 'diamonds' or 'cash',
+        diamondPrice=math.max(0,math.floor(tonumber(state.diamondPrice) or 0)),
         type=tp,
         category=state.category or categoryFromGarageType(tp),
         trunk=math.max(0,math.floor(tonumber(g.trunk) or 0)),
@@ -137,6 +140,33 @@ local function loadFile()
     DealershipConfig.vips=type(data.vips)=="table" and data.vips or {}
     DealershipConfig.vehicles=type(data.vehicles)=="table" and data.vehicles or {}
 
+    DealershipConfig.categories = {
+        { id='vips', label='Carros VIPs' },
+        { id='exclusivos', label='Carros exclusivos' },
+        { id='brasileiros', label='Brasileiros' },
+        { id='som', label='Carros rebaixados com som' },
+        { id='motos', label='Motos' },
+        { id='blindados', label='Carros blindados' }
+    }
+    local allowed = { vips=true, exclusivos=true, brasileiros=true, som=true, motos=true, blindados=true }
+    for spawn, vehicle in pairs(DealershipConfig.vehicles) do
+        if not allowed[vehicle.category] then
+            local garage = garageEntry(spawn)
+            vehicle.category = categoryFromGarageType(garage and garage.type)
+        end
+    end
+
+    -- Migracao unica: descartar o estoque legado desta loja. Depois disso,
+    -- manter somente os veiculos que o dono cadastrar pelo painel.
+    if DealershipConfig.settings.luxuryCatalogRevision ~= 1 then
+        local saveiro = DealershipConfig.vehicles.vwsava
+        DealershipConfig.vehicles = saveiro and {vwsava=saveiro} or {}
+        DealershipConfig.settings.notTop4Vehicles = saveiro and {'vwsava'} or {}
+        DealershipConfig.settings.luxuryCatalogRevision = 1
+        if not SaveResourceFile(GetCurrentResourceName(),FILE,json.encode(DealershipConfig),-1) then
+            print('^1[luxurymotors]^7 Falha ao persistir a limpeza do estoque legado.')
+        end
+    end
     applyGlobals()
 end
 
@@ -243,7 +273,7 @@ exports("getDealershipConfig",function()
     return response
 end)
 
-exports("saveDealershipVehicle",function(spawn,stock,auditContext,category)
+exports("saveDealershipVehicle",function(spawn,stock,auditContext,category,pricing)
     local invokingResource=GetInvokingResource()
     auditContext=type(auditContext)=="table" and auditContext or {}
     spawn=string.lower(trim(spawn))
@@ -258,6 +288,15 @@ exports("saveDealershipVehicle",function(spawn,stock,auditContext,category)
     end
 
     local current=DealershipConfig.vehicles[spawn] or {}
+    pricing = type(pricing) == 'table' and pricing or {currency=current.currency or 'cash', diamondPrice=current.diamondPrice}
+    local currency = pricing.currency
+    local displayName = pricing.displayName ~= nil and trim(pricing.displayName) or current.displayName
+    if displayName ~= nil and (displayName == '' or #displayName > 160 or displayName:find('%c')) then return false,'Nome de exibicao invalido.' end
+    local diamondPrice = tonumber(pricing.diamondPrice)
+    if currency ~= 'cash' and currency ~= 'diamonds' then return false,'Moeda invalida.' end
+    if currency == 'diamonds' and (not diamondPrice or diamondPrice ~= diamondPrice or diamondPrice < 1 or diamondPrice > 1000000000 or diamondPrice % 1 ~= 0) then
+        return false,'Preco em diamantes invalido.'
+    end
     local previousStock=current.stock
     if category~=nil then
         if type(category)~="string" then return false,"Categoria inválida." end
@@ -273,6 +312,9 @@ exports("saveDealershipVehicle",function(spawn,stock,auditContext,category)
     DealershipConfig.vehicles[spawn]={
         stock=math.floor(stock),
         category=category,
+        currency=currency,
+        diamondPrice=currency == 'diamonds' and diamondPrice or nil,
+        displayName=displayName,
         amountSell=math.max(0,math.floor(tonumber(current.amountSell) or 0))
     }
 
@@ -308,11 +350,12 @@ exports("removeDealershipVehicle",function(spawn,auditContext)
     end
 
     local previous=buildRuntimeVehicle(spawn,DealershipConfig.vehicles[spawn]) or {name=spawn,stock=DealershipConfig.vehicles[spawn].stock}
+    local previousState=DealershipConfig.vehicles[spawn]
     DealershipConfig.vehicles[spawn]=nil
-    vRP.execute("deluxe_dealership/removeVehicle",{vehicle=spawn})
 
     local ok,msg=saveFile()
-    if not ok then return false,msg end
+    if not ok then DealershipConfig.vehicles[spawn]=previousState; return false,msg end
+    vRP.execute("deluxe_dealership/removeVehicle",{vehicle=spawn})
     rebuildList()
     DealershipAudit.Log("dealership_stock_vehicle_removed",{
         actorId=tonumber(auditContext.actorId),
@@ -338,6 +381,7 @@ exports("saveDealershipSettings",function(payload,auditContext)
     if not valid then return false,validationMessage end
     local previous=clone(DealershipConfig)
     DealershipConfig.settings=clone(payload.settings)
+    DealershipConfig.settings.luxuryCatalogRevision=previous.settings.luxuryCatalogRevision or 1
     DealershipConfig.testDrive=clone(payload.testDrive)
     DealershipConfig.vips=clone(payload.vips)
     if type(payload.categories)=="table" then

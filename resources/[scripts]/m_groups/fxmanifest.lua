@@ -4,6 +4,8 @@ game 'gta5'
 
 lua54 'yes'
 
+dependency 'vrp'
+
 shared_script { '@vrp/lib/utils.lua', 'lib/tunnel.lua' }
 client_scripts { 'client.lua' }
 server_scripts { 'server.lua'}

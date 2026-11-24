@@ -52,7 +52,8 @@ function LoadShopsFromJson()
                     text = tostring(data.blip.text or "Loja"),
                     index = tonumber(data.blip.index) or 52,
                     color = tonumber(data.blip.color) or 0,
-                    scale = tonumber(data.blip.scale) or 0.5
+                    scale = tonumber(data.blip.scale) or 0.5,
+                    shortRange = data.blip.shortRange ~= false
                 }
             end
 

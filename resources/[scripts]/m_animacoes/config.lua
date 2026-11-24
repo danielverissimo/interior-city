@@ -4,6 +4,15 @@
 
 cfg = {}
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- CONFIGURAÇÕES DO PAINEL PREMIUM
+-----------------------------------------------------------------------------------------------------------------------------------------
+cfg.comandoPainel = "anim"
+cfg.teclaRoleta = "O"
+cfg.teclaCancelar = "F6"
+cfg.maxFavoritos = 8
+cfg.chaveFavoritos = "m_animacoes:favoritos"
+
 cfg.animacoes = { ----------- Caso queira mudar o nome das animações pode mudar! não irá interferir em nada.
 
 	{ nome = "radio2" , prop = "prop_boombox_01" , flag = 50 , hand = 57005 , pos1 = 0.30 , pos2 = 0 , pos3 = 0 , pos4 = 0 , pos5 = 260.0 , pos6 = 60.0 },

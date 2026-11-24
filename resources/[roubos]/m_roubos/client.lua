@@ -41,7 +41,7 @@ Citizen.CreateThread(function()
 		local coords = GetEntityCoords(ped)
 		for k,v in pairs(Config.roubos) do
 			local distance = #(coords - vector3(v.x,v.y,v.z))
-			if distance <= 5 and not andamento then
+			if distance <= 5 and not andamento and not (v.type=='caixa' and AtmRobberyClient and AtmRobberyClient.isBusyNear(coords)) then
 				oInfinity = 4
 				if distance <= 1.2 then
 					drawTxt("PRESSIONE  ~b~G~w~  PARA INICIAR O ROUBO",4,0.5,0.93,0.50,255,255,255,180)
@@ -124,10 +124,16 @@ Citizen.CreateThread(function()
 		if andamento then
 			segundos = segundos - 1
 			if segundos <= 0 then
-				andamento = false
-				segundos = 0
-				vSERVER.givePayment()
-				restoreRobberyVisuals()
+				local paid = vSERVER.givePayment()
+				if paid then
+					andamento = false
+					segundos = 0
+					restoreRobberyVisuals()
+				else
+					-- O relogio do servidor decide a conclusao; evita perder o
+					-- pagamento quando o contador local termina um tick antes.
+					segundos = 1
+				end
 			end
 		end
 	end

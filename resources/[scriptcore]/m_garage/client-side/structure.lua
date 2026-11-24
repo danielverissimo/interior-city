@@ -1,3 +1,20 @@
+local function setGarageFuel(vehicle, fuelPercent)
+    local capacity = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fPetrolTankVolume")
+    if capacity > 0 then
+        local percent = math.max(0, math.min(100, tonumber(fuelPercent) or 100))
+        SetVehicleFuelLevel(vehicle, capacity * percent / 100)
+    end
+end
+
+local function garageVehicleImage(spawn)
+    return (main.vehicleImages or {})[string.lower(spawn)] or (main.dir .. spawn .. '.png')
+end
+
+local function garageModelAvailable(spawn)
+    local model = GetHashKey(spawn)
+    return IsModelInCdimage(model) and IsModelAVehicle(model)
+end
+
 function requestVehiclesUserTable()
     local tableVehiclesUser = {}
 
@@ -10,7 +27,7 @@ function requestVehiclesUserTable()
 
         for _, vehicleData in pairs(list) do
 
-            if types[opennedGarageType].listCars == nil or types[opennedGarageType].listCars[vehicleClasses[GetVehicleClassFromName(GetHashKey(vehicleData.vehicle))]] or vehicleClasses[GetVehicleClassFromName(GetHashKey(vehicleData.vehicle))] == nil then
+            if garageModelAvailable(vehicleData.vehicle) and (types[opennedGarageType].listCars == nil or types[opennedGarageType].listCars[vehicleClasses[GetVehicleClassFromName(GetHashKey(vehicleData.vehicle))]] or vehicleClasses[GetVehicleClassFromName(GetHashKey(vehicleData.vehicle))] == nil) then
                 local typeCar = ((listCars[GetHashKey(vehicleData.vehicle)] and listCars[GetHashKey(vehicleData.vehicle)]["type"] == "vip") and "special" or "normal")
                 local parametersInsertVehicle = {
                     ["type"] = typeCar,
@@ -18,7 +35,7 @@ function requestVehiclesUserTable()
                     ["name"] = (listCars[GetHashKey(vehicleData.vehicle)] == nil) and vehicleData.vehicle or listCars[GetHashKey(vehicleData.vehicle)].name,
                     ["category"] = vehicleClassesTranslated[GetVehicleClassFromName(GetHashKey(vehicleData.vehicle))],
                     ["plate"] = vehicleData.plate,
-                    ["image_url"] = main["dir"]..vehicleData.vehicle..'.png',
+                    ["image_url"] = garageVehicleImage(vehicleData.vehicle),
                     ["max_speed"] = math.floor(GetVehicleModelEstimatedMaxSpeed(GetHashKey(vehicleData.vehicle)) * 3.605936 or 0),
                     ["agility"] = math.floor((GetVehicleModelEstimatedAgility(GetHashKey(vehicleData.vehicle)))*100 or 0),
                     ["braking"] = math.floor((GetVehicleModelMaxBraking(GetHashKey(vehicleData.vehicle))/1.5)*100 or 0),
@@ -35,6 +52,7 @@ function requestVehiclesUserTable()
         local arrestedVehicles = serverFunctions.getOrgArrestedVehicles(types[opennedGarageType].vehicles)
         local plate = serverFunctions.getUserPlate()
         for _, vehicleData in pairs(types[opennedGarageType].vehicles) do
+            if garageModelAvailable(vehicleData.vehicle) then
 
             local typeCar = ((listCars[GetHashKey(vehicleData.vehicle)] and listCars[GetHashKey(vehicleData.vehicle)]["type"] == "vip") and "special" or "normal")
 
@@ -44,7 +62,7 @@ function requestVehiclesUserTable()
                 ["name"] = (listCars[GetHashKey(vehicleData.vehicle)] == nil) and vehicleData.vehicle or listCars[GetHashKey(vehicleData.vehicle)].name,
                 ["category"] = vehicleClassesTranslated[GetVehicleClassFromName(GetHashKey(vehicleData.vehicle))],
                 ["plate"] = plate,
-                ["image_url"] = main["dir"]..vehicleData.vehicle..'.png',
+                ["image_url"] = garageVehicleImage(vehicleData.vehicle),
                 ['max_speed'] = math.floor(GetVehicleModelEstimatedMaxSpeed(GetHashKey(vehicleData.vehicle)) * 3.605936 or 0),
                 ['braking'] = math.floor((GetVehicleModelMaxBraking(GetHashKey(vehicleData.vehicle))/1.5)*100 or 0),
                 ['agility'] = math.floor((GetVehicleModelEstimatedAgility(GetHashKey(vehicleData.vehicle)))*100 or 0),
@@ -56,6 +74,7 @@ function requestVehiclesUserTable()
             }
 
             table.insert(tableVehiclesUser, parametersInsertVehicle)
+            end
         end
     end
 
@@ -83,6 +102,10 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function spawnVehicle(vehicleData)
+    if not garageModelAvailable(vehicleData.key) then
+        TriggerEvent("Notify", "negado", "Este veiculo nao esta disponivel na cidade.", 5)
+        return
+    end
     if segundos <= 0 then
         segundos = 2
         local spawnCoords = clientFunctions.garageCheckSpawnLock(opennedGarageId)
@@ -148,12 +171,23 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 RegisterNetEvent("garage:clientSpawnVehicle",function(name, info, isPersonal, spawnLoc)
+    if not garageModelAvailable(name) then
+        TriggerEvent("Notify", "negado", "Este veiculo nao esta disponivel na cidade.", 5)
+        return
+    end
     local mhash = GetHashKey(name)
     if not blockDuplicate[name] then
         blockDuplicate[name] = true
         SetTimeout(10 * 1000, function() if blockDuplicate[name] then blockDuplicate[name] = nil end end)
 
+        local modelDeadline = GetGameTimer() + 15000
         while not HasModelLoaded(mhash) do
+            if GetGameTimer() >= modelDeadline then
+                blockDuplicate[name] = nil
+                SetModelAsNoLongerNeeded(mhash)
+                TriggerEvent("Notify", "negado", "Nao foi possivel carregar o veiculo. Tente novamente.", 5)
+                return
+            end
             RequestModel(mhash)
 
             Wait(200)
@@ -185,11 +219,10 @@ RegisterNetEvent("garage:clientSpawnVehicle",function(name, info, isPersonal, sp
                 SetVehicleOnGroundProperly(veh)
                 SetVehRadioStation(veh, "OFF")
                 SetVehicleDirtLevel(veh, 0.0)
-                SetVehicleDoorsLocked(veh, 2)
-                SetPedIntoVehicle(PlayerPedId(),veh,-1)
+                SetVehicleDoorsLocked(veh, 1)
                 SetVehicleEngineHealth(veh, info.engine + 0.0)
                 SetVehicleBodyHealth(veh, info.body + 0.0)
-                SetVehicleFuelLevel(veh, info.fuel + 0.0)
+                setGarageFuel(veh, info.fuel)
                 SetModelAsNoLongerNeeded(mhash)
                 SetVehicleMods(veh, info.custom)
                 TriggerEvent("stancetuning:Apply",veh,name)
@@ -224,11 +257,10 @@ RegisterNetEvent("garage:clientSpawnVehicle",function(name, info, isPersonal, sp
                 SetVehicleOnGroundProperly(veh)
                 SetVehRadioStation(veh, "OFF")
                 SetVehicleDirtLevel(veh, 0.0)
-                SetVehicleDoorsLocked(veh, 2)
-                SetPedIntoVehicle(PlayerPedId(),veh,-1)
+                SetVehicleDoorsLocked(veh, 1)
                 SetVehicleEngineHealth(veh, info.engine + 0.0)
                 SetVehicleBodyHealth(veh, info.body + 0.0)
-                SetVehicleFuelLevel(veh, info.fuel + 0.0)
+                setGarageFuel(veh, info.fuel)
                 SetModelAsNoLongerNeeded(mhash)
                 SetVehicleMods(veh, info.custom)
                 TriggerServerEvent("garage:registerVehicle", name, netid, isPersonal, info.plate)
@@ -236,10 +268,10 @@ RegisterNetEvent("garage:clientSpawnVehicle",function(name, info, isPersonal, sp
                 if info.opennedGarageType and info.opennedGarageType:find("Recrutamento") then
                     TriggerServerEvent("garage:registerFacVehicle", name, netid, info.opennedGarageType)
                 end
-                SetVehicleLivery(GetVehiclePedIsIn(PlayerPedId()), info.livery)
+                SetVehicleLivery(veh, info.livery)
 
                 if info.fullTuning then
-                    TriggerEvent('vehtuning', VehToNet(veh))
+                    TriggerEvent('vehtuning', veh)
                 end
             end
         end
@@ -267,15 +299,14 @@ RegisterNetEvent("garage:updateVehicle",function(netid, info, isPersonal)
 
         local nveh = NetToVeh(netid)
         if nveh then
-            SetVehicleDoorsLocked(nveh, 2)
+            SetVehicleDoorsLocked(nveh, 1)
             SetEntityAsMissionEntity(nveh, true, true)
             SetVehicleOnGroundProperly(nveh)
             SetVehRadioStation(nveh, "OFF")
             SetVehicleDirtLevel(nveh, 0.0)
-            SetPedIntoVehicle(PlayerPedId(),nveh,-1)
             SetVehicleEngineHealth(nveh, info.engine + 0.0)
             SetVehicleBodyHealth(nveh, info.body + 0.0)
-            SetVehicleFuelLevel(nveh, info.fuel + 0.0)
+            setGarageFuel(nveh, info.fuel)
             SetVehicleMods(nveh, info.custom)          
         end
     else
@@ -298,15 +329,14 @@ RegisterNetEvent("garage:updateVehicle",function(netid, info, isPersonal)
 
         local nveh = NetToVeh(netid)
         if nveh then
-            SetVehicleDoorsLocked(nveh, 2)
+            SetVehicleDoorsLocked(nveh, 1)
             SetEntityAsMissionEntity(nveh, true, true)
             SetVehicleOnGroundProperly(nveh)
             SetVehRadioStation(nveh, "OFF")
             SetVehicleDirtLevel(nveh, 0.0)
-            SetPedIntoVehicle(PlayerPedId(),nveh,-1)
             SetVehicleEngineHealth(nveh, info.engine + 0.0)
             SetVehicleBodyHealth(nveh, info.body + 0.0)
-            SetVehicleFuelLevel(nveh, info.fuel + 0.0)
+            setGarageFuel(nveh, info.fuel)
             SetVehicleMods(nveh, info.custom)          
         end
     end

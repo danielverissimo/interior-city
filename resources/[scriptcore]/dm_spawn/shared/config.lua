@@ -2,21 +2,6 @@ Config = {}
 
 Config.Spawns = {
     {
-        name = "Paleto",
-        image = "https://files.catbox.moe/5448b9.png",
-        coords = {-769.37,5592.07,33.4}
-    },
-    {
-        name = "Hospital",
-        image = "https://files.catbox.moe/3bxq8v.png",
-        coords = {1164.31,-1520.65,34.85},
-    },
-    {
-        name = "Vermelho",
-        image = "https://files.catbox.moe/k5hfje.png",
-        coords = {-348.88,-874.74,31.31},
-    },
-    {
         name = "Praça",
         image = "https://files.catbox.moe/4zmndw.png",
         coords = {218.87,-808.39,30.7},
@@ -24,7 +9,7 @@ Config.Spawns = {
 }
 
 Config.Orgs_Spawns = {
-    ['perm.motoclube'] = {996.76,-97.46,74.32},
+    ['perm.vermelhos'] = {996.76,-97.46,74.32},
     ['perm.cv'] = {1318.88,-715.3,65.23},
     ['perm.central'] = {-1505.76,76.78,55.62},
     ['perm.bronks'] = {1292.87,-184.2,107.54},

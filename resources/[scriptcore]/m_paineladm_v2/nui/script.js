@@ -1168,8 +1168,9 @@ function renderGroups() {
 }
 
 function itemImage(item) {
+    if (item === "diamantes") return "imgs/diamantes.svg";
     const base = state.config.images?.items || "";
-    return `${base}${encodeURIComponent(item)}.png`;
+    return window.htdocsItemImage?.(item) || `${base}${encodeURIComponent(item)}.png`;
 }
 
 function vehicleImage(spawn) {
@@ -1272,7 +1273,7 @@ function renderWeapons() {
 
 function vipItemImage(index) {
     const base = state.vipAdmin?.images?.items || state.bootstrap?.vipAdmin?.images?.items || state.config.images?.items || "";
-    return `${base}${encodeURIComponent(String(index || ""))}.png`;
+    return window.htdocsItemImage?.(index) || `${base}${encodeURIComponent(String(index || ""))}.png`;
 }
 
 function vipVehicleImage(spawn, images = null) {
@@ -3441,7 +3442,7 @@ function renderLogsEditor(category, subcategory = null) {
             </span>
             <span class="log-webhook-input-wrap">
                 <span>WEBHOOK DO DISCORD</span>
-                <input class="input log-webhook-input" type="text" name="${escapeHtml(log.key)}" value="${escapeHtml(log.webhook || "")}" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" data-log-webhook="${escapeHtml(log.key)}">
+                <input class="input log-webhook-input" type="text" name="${escapeHtml(log.key)}" value="${escapeHtml(log.webhook || "")}" placeholder="" autocomplete="off" spellcheck="false" data-log-webhook="${escapeHtml(log.key)}">
             </span>
         </label>`).join("");
 

@@ -884,7 +884,7 @@ interiorID = GetInteriorAtCoords(-802.3,175.0,72.8)  -- Mansão do Michael
 		RefreshInterior(interiorID)
 	end
 
-interiorID = GetInteriorAtCoords(1107.0,-3157.3,-37.5)  -- Motoclube
+interiorID = GetInteriorAtCoords(1107.0,-3157.3,-37.5)  -- Vermelhos
 	if IsValidInterior(interiorID) then
 		EnableInteriorProp(interiorID, "coke_stash1")
 		EnableInteriorProp(interiorID, "coke_stash2")
@@ -898,7 +898,7 @@ interiorID = GetInteriorAtCoords(1107.0,-3157.3,-37.5)  -- Motoclube
 		RefreshInterior(interiorID)
 	end
 
-interiorID = GetInteriorAtCoords(998.4,-3164.7,-38.9)  -- Motoclube2
+interiorID = GetInteriorAtCoords(998.4,-3164.7,-38.9)  -- Vermelhos2
 	if IsValidInterior(interiorID) then
 		EnableInteriorProp(interiorID, "coke_large")
 		EnableInteriorProp(interiorID, "decorative_01")

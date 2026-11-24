@@ -303,6 +303,30 @@ local function loadVehicleCatalog()
         seedGameVehicles()
     end
 
+    -- O pack faz parte da instalacao: nao depende de edicao manual do JSON.
+    local bundledVehicles = {}
+    for _, list in ipairs({module("vrp", "cfg/carros_som").vehicles, module("vrp", "cfg/veiculos_adicionados")}) do
+        for _, vehicle in ipairs(list) do bundledVehicles[#bundledVehicles + 1] = vehicle end
+    end
+    for _, vehicle in ipairs(bundledVehicles) do
+        local found = false
+        for _, entry in ipairs(savedVehicles.addon) do
+            if entry.spawn:lower() == vehicle.spawn then
+                entry.name = vehicle.name
+                entry.image = entry.image or vehicle.image
+                found = true
+            end
+        end
+        for index = #savedVehicles.game, 1, -1 do
+            if savedVehicles.game[index].spawn:lower() == vehicle.spawn then
+                table.remove(savedVehicles.game, index)
+            end
+        end
+        if not found then
+            savedVehicles.addon[#savedVehicles.addon + 1] = { spawn = vehicle.spawn, name = vehicle.name, image = vehicle.image }
+        end
+    end
+
     table.sort(savedVehicles.game, function(a, b) return a.name:lower() < b.name:lower() end)
     table.sort(savedVehicles.addon, function(a, b) return a.name:lower() < b.name:lower() end)
     saveVehicleCatalog()
@@ -3186,7 +3210,7 @@ local function getServerGroups()
     return groups
 end
 
-getItems = function()
+getItems = function(includePremium)
     local items = {}
     local added = {}
     local activeItems = vRP.getAllItens() or {}
@@ -3227,6 +3251,7 @@ getItems = function()
         end
     end
 
+    if includePremium and not added.diamantes then items[#items+1]={index='diamantes',name='Diamantes'} end
     table.sort(items, function(a, b)
         local an = a.name:lower()
         local bn = b.name:lower()
@@ -5075,7 +5100,7 @@ function API.bootstrap()
         stats = onlineStats,
         players = players,
         groups = getServerGroups(),
-        items = getItems(),
+        items = getItems(true),
         weapons = getWeapons(),
         vehicles = publicVehicles(),
         locations = publicLocations(),
@@ -6090,6 +6115,16 @@ function API.execute(action, payload)
 
         amount = math.min(amount, ServerConfig.Limits.maxAmount)
 
+        if item:lower()=='diamantes' then
+            if GetResourceState('luxurymotors')~='started' then return result(false,'A carteira de diamantes esta indisponivel.') end
+            local called,ok,message=pcall(function()
+                return exports.luxurymotors:adminCreditDiamonds(playerSource,actorId,amount)
+            end)
+            if not called then return result(false,'Nao foi possivel creditar os diamantes. Confira o console.') end
+            if ok then webhookLog(actorId,action,('Propria carteira | diamantes x%d'):format(amount)) end
+            return result(ok==true,message)
+        end
+
         local allItems = vRP.getAllItens() or {}
         if not isAllowedPanelItem(item, allItems) then
             return result(false, "Este item não está disponível no catálogo do servidor.")
@@ -6203,6 +6238,7 @@ function API.execute(action, payload)
 
     if action == "spawn_veh" then
         local vehicle = clampString(payload.vehicle, ServerConfig.Limits.maxString):lower()
+        vehicle = module("vrp", "cfg/carros_som").resolve(vehicle)
         if vehicle == "" then return result(false, "Informe o spawn do veículo.") end
 
         TriggerClientEvent("m_paineladm_v2:spawnVehicle", playerSource, vehicle)

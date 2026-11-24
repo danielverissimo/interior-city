@@ -5,8 +5,8 @@ window.addEventListener("message", ({ data }) => {
   if (data.CharacterMode == false) {
     app.CloseCharacterMode();
   }
-  if (data.whitelist === true) whitelistApp.open(data);
-  if (data.whitelist === false) whitelistApp.close();
+  if (data.identity === true) identityForm.open(data);
+  if (data.identity === false) identityForm.close();
 
   if (data.activationScreen === true) document.querySelector('#activationScreen').style.display = 'flex';
   if (data.activationScreen === false) document.querySelector('#activationScreen').style.display = 'none';
@@ -14,10 +14,7 @@ window.addEventListener("message", ({ data }) => {
 
 if (!window.invokeNative) {
   document.body.style.background = "#1c1c1c"
-  window.postMessage({
-    whitelist: true,
-    id: 9999
-  })
+  window.postMessage({ identity: true }, "*")
   // window.postMessage({
   //   activationScreen: true
   // }, '*');

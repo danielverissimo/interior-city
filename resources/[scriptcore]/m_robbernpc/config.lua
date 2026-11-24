@@ -26,9 +26,8 @@ Config.TrunkOpenAnimation = {
     flag = 1
 }
 
--- Item necessário. Por padrão a lockpick NÃO é consumida.
+-- Desgaste da lockpick controlado pelo vRP: quebra entre 1 e 3 usos.
 Config.LockpickItem = 'lockpick'
-Config.ConsumeLockpick = false
 
 -- Integração com o inventário enviado pelo usuário.
 Config.InventoryResource = 'inventory'
@@ -88,7 +87,7 @@ Config.RadarAlreadyInstalledText = 'Este veículo já possui um radar oculto ins
 Config.PoliceRadarActivatedText = 'O veículo roubado possui um radar oculto. O meliante será rastreado por 1 minuto e 30 segundos.'
 
 -- Novo comportamento quando um veículo com rastreador é arrombado.
-Config.RadarVehicleAlarmDuration = 30000 -- duração do alarme do carro em ms
+Config.TrunkVehicleAlarmDuration = 30000 -- duração do alarme ao tentar arrombar o porta-malas, em ms
 Config.RadarRecoveredText = 'Você encontrou e removeu o rastreador oculto do veículo.'
 Config.RobberTrackedText = 'VOCÊ ESTÁ SENDO RASTREADO,FUJA!'
 Config.RobberTrackingEndedText = 'O sinal do rastreador foi perdido. Você não está mais sendo rastreado.'
@@ -176,32 +175,31 @@ Config.NPCDrugSales = {
         [29] = true  -- ARMY
     },
 
-    -- Valores iguais aos do drogas_entregas enviado. "baseado" foi acrescentado
-    -- e pode ser ajustado livremente aqui sem mexer no código.
+    -- Precos por unidade na venda de rua. Rotas possuem configuracao propria.
     Drugs = {
         cocaina = {
             item = 'cocaina',
             label = 'Cocaína',
-            minPricePerUnit = 2500,
-            maxPricePerUnit = 2500
+            minPricePerUnit = 100,
+            maxPricePerUnit = 100
         },
         metanfetamina = {
             item = 'metanfetamina',
             label = 'Metanfetamina',
-            minPricePerUnit = 1000,
-            maxPricePerUnit = 1000
+            minPricePerUnit = 100,
+            maxPricePerUnit = 100
         },
         malote_maconha = {
             item = 'malote-maconha',
             label = 'Malote de Maconha',
-            minPricePerUnit = 2500,
-            maxPricePerUnit = 2500
+            minPricePerUnit = 120,
+            maxPricePerUnit = 120
         },
         baseado = {
             item = 'baseado',
             label = 'Baseado',
-            minPricePerUnit = 500,
-            maxPricePerUnit = 500
+            minPricePerUnit = 120,
+            maxPricePerUnit = 120
         }
     },
 
@@ -223,27 +221,48 @@ Config.NPCDrugSales = {
     }
 }
 
--- Quantos itens DIFERENTES entram em cada porta-malas.
-Config.LootCount = 4
-
--- Os IDs abaixo estão em minúsculo porque o inventory/vRP desta base usa
--- os índices do arquivo inventory/config/shared.items.lua em minúsculo.
+-- Loot exclusivo de porta-malas NPC: 1 a 2 objetos comuns, uma unidade cada.
+Config.LootMinCount = 1
+Config.LootCount = 2
 Config.Loot = {
-    { item = 'celular',          min = 1,  max = 1  },
-    { item = 'repairkit2',       min = 1,  max = 1  },
-    { item = 'weapon_bat',       min = 1,  max = 1  }, -- WEAPON_BAT
-    { item = 'weapon_pistol_mk2',min = 1,  max = 1  }, -- WEAPON_PISTOL_MK2
-    { item = 'ammo_pistol_mk2',  min = 10, max = 25 }, -- AMMO_PISTOL_MK2
-    { item = 'weapon_knife',     min = 1,  max = 1  }, -- WEAPON_KNIFE
-    { item = 'energetico',       min = 1,  max = 1  },
-    { item = 'baseado',          min = 1,  max = 1  },
-    { item = 'radio',            min = 1,  max = 1  },
-    { item = 'alianca',          min = 1,  max = 1  },
-    { item = 'mochila',          min = 1,  max = 1  },
+    {item='relogioroubado', min=1, max=1},
+    {item='colarroubado', min=1, max=1},
+    {item='anelroubado', min=1, max=1},
+    {item='brincoroubado', min=1, max=1},
+    {item='pulseiraroubada', min=1, max=1}
+}
 
-    { item = 'relogioroubado',       min = 1,  max = 1  },
-    { item = 'colarroubado',          min = 1,  max = 1  },
-    { item = 'anelroubado',            min = 1,  max = 1  },
-    { item = 'brincoroubado',          min = 1,  max = 1  },
-    { item = 'pulseiraroubada',          min = 1,  max = 1  }
+-- Cada grupo tem UM sorteio por carro. Escolhe apenas um item do grupo.
+-- As probabilidades sao medias independentes, nao garantias a cada N carros.
+Config.NPCLootGroups = {
+    {chance=10, items={ -- ocasionalmente um medicamento comum
+        {item='dipirona', min=1, max=1},
+        {item='paracetamol', min=1, max=1},
+        {item='dorflex', min=1, max=1}
+    }},
+    {chance=5, items={ -- 1 em 20 carros: faca OU bastao
+        {item='weapon_knife', min=1, max=1},
+        {item='weapon_bat', min=1, max=1}
+    }},
+    {chance=2, items={ -- 1 em 50 carros: uma Five-Seven
+        {item='weapon_pistol_mk2', min=1, max=1}
+    }},
+    {chance=2, items={ -- 1 em 50 carros: poucas municoes de Five
+        {item='ammo_pistol_mk2', min=3, max=6}
+    }}
+}
+
+Config.PedRobbery = {
+    Distance = 8.0,
+    HandsUpTime = 3500,
+    HandsOnHeadTime = 4000,
+    StandUpTime = 900,
+    HandOverTime = 1900,
+    AimGraceTime = 650,
+    SessionTimeout = 18000,
+    CashChance = 50,
+    CashMin = 50,
+    CashMax = 150,
+    PoliceIntervalMin = 1,
+    PoliceIntervalMax = 5
 }

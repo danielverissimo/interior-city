@@ -63,13 +63,24 @@ local function getUserCache(user_id)
     return AmmoCache[user_id]
 end
 
+local function expireAmmo(state)
+    if state.expiresAt and state.expiresAt <= os.time() then
+        state.clip = 0
+        state.reserve = 0
+        state.expiresAt = nil
+        state.revision = state.revision + 1
+        state.dirty = true
+    end
+    return state
+end
+
 local function loadAmmoState(user_id, weapon)
     local cache = getUserCache(user_id)
     if cache[weapon] then
-        return cache[weapon]
+        return expireAmmo(cache[weapon])
     end
 
-    local rows = exports.oxmysql:executeSync([[SELECT clip, reserve, revision FROM inventory_weapon_ammo WHERE user_id = ? AND weapon = ? LIMIT 1]], {
+    local rows = exports.oxmysql:executeSync([[SELECT clip, reserve, revision, expires_at FROM inventory_weapon_ammo WHERE user_id = ? AND weapon = ? LIMIT 1]], {
         user_id,
         weapon
     }) or {}
@@ -77,10 +88,12 @@ local function loadAmmoState(user_id, weapon)
     local clip = 0
     local reserve = 0
     local revision = 0
+    local storedExpiry = 0
     if rows[1] then
         clip = clampInt(rows[1].clip, 0, MAX_AMMO)
         reserve = clampInt(rows[1].reserve, 0, MAX_AMMO)
         revision = math.max(0, math.floor(tonumber(rows[1].revision) or 0))
+        storedExpiry = tonumber(rows[1].expires_at) or 0
     end
 
     if clip + reserve > MAX_AMMO then
@@ -91,19 +104,32 @@ local function loadAmmoState(user_id, weapon)
         clip = clip,
         reserve = reserve,
         dirty = false,
-        revision = revision
+        revision = revision,
+        expiresAt = clip + reserve > 0 and vRP.getItemExpiry(
+            "ammo_" .. weapon:gsub("^WEAPON_", ""):lower(),
+            storedExpiry > 0 and storedExpiry or nil
+        ) or nil
     }
+    if (cache[weapon].expiresAt or 0) ~= storedExpiry then
+        cache[weapon].revision = revision + 1
+        cache[weapon].dirty = true
+    end
 
-    return cache[weapon]
+    return expireAmmo(cache[weapon])
 end
 
-local function setAmmoState(user_id, weapon, total, clip)
+local function setAmmoState(user_id, weapon, total, clip, expiresAt)
     total = clampInt(total, 0, MAX_AMMO)
     clip = clampInt(clip, 0, total)
 
     local state = loadAmmoState(user_id, weapon)
     state.clip = clip
     state.reserve = math.max(0, total - clip)
+    if total <= 0 then
+        state.expiresAt = nil
+    elseif expiresAt then
+        state.expiresAt = math.min(state.expiresAt or expiresAt, expiresAt)
+    end
     state.revision = (state.revision or 0) + 1
     state.dirty = true
     return state
@@ -113,15 +139,16 @@ local function saveAmmoState(user_id, weapon, state, sync)
     if not state then return end
 
     local query = [[
-        INSERT INTO inventory_weapon_ammo (user_id, weapon, clip, reserve, revision)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO inventory_weapon_ammo (user_id, weapon, clip, reserve, revision, expires_at)
+        VALUES (?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
             clip = IF(VALUES(revision) >= revision, VALUES(clip), clip),
             reserve = IF(VALUES(revision) >= revision, VALUES(reserve), reserve),
+            expires_at = IF(VALUES(revision) >= revision, VALUES(expires_at), expires_at),
             revision = GREATEST(revision, VALUES(revision)),
             updated_at = IF(VALUES(revision) >= revision, CURRENT_TIMESTAMP, updated_at)
     ]]
-    local params = { user_id, weapon, state.clip or 0, state.reserve or 0, state.revision or 0 }
+    local params = { user_id, weapon, state.clip or 0, state.reserve or 0, state.revision or 0, state.expiresAt or 0 }
 
     local revision = state.revision or 0
     if sync then
@@ -236,6 +263,12 @@ end
 local function captureActive(user_id, source)
     local active = ActiveWeapons[user_id]
     if not active then return nil end
+
+    if active.ammoExpiresAt and active.ammoExpiresAt <= os.time() then
+        active.total = 0
+        loadAmmoState(user_id, active.weapon)
+        return active
+    end
 
     local current = getClientWeaponState(source)
     if current and current.weapon == active.weapon then
@@ -387,7 +420,7 @@ function HotbarWeapons.DetachQuickSlotAmmo(source, user_id, slot, item)
         local targetSlot = nil
         for i = MAX_HOTBAR_SLOT + 1, 58 do
             local data = vRP.getSlotItem(user_id, tostring(i))
-            if data and data.item == ammoItem then
+            if data and data.item == ammoItem and not vRP.isInventoryItemExpired(data) then
                 targetSlot = tostring(i)
                 break
             end
@@ -404,9 +437,9 @@ function HotbarWeapons.DetachQuickSlotAmmo(source, user_id, slot, item)
         -- Fallback lets vRP stack/place the ammo if the visible main inventory
         -- is full. The important rule here is that no remaining round is lost.
         if targetSlot then
-            vRP.giveInventoryItem(user_id, ammoItem, total, false, targetSlot)
+            vRP.giveInventoryItem(user_id, ammoItem, total, false, targetSlot, ammo.expiresAt)
         else
-            vRP.giveInventoryItem(user_id, ammoItem, total, false)
+            vRP.giveInventoryItem(user_id, ammoItem, total, false, nil, ammo.expiresAt)
         end
     end
 
@@ -444,6 +477,10 @@ function HotbarWeapons.UseSlot(source, user_id, slot, requestedAmount)
             action = "empty",
             hotbar = snapshot(user_id)
         }
+    end
+
+    if vRP.isInventoryItemExpired(slotData) then
+        return { error = "Este item venceu. Use a opção de descarte.", hotbar = snapshot(user_id) }
     end
 
     local config = Items[slotData.item]
@@ -502,7 +539,8 @@ function HotbarWeapons.UseSlot(source, user_id, slot, requestedAmount)
             slot = slot,
             weapon = weapon,
             item = slotData.item,
-            total = total
+            total = total,
+            ammoExpiresAt = ammo.expiresAt
         }
 
         syncVrpWeapons(user_id, oldWeapon, weapon, total)
@@ -558,6 +596,10 @@ function HotbarWeapons.UseSlot(source, user_id, slot, requestedAmount)
             return { error = "Esta munição não pertence à arma equipada.", hotbar = snapshot(user_id) }
         end
 
+        if active.ammoExpiresAt and active.ammoExpiresAt <= os.time() then
+            HotbarWeapons.ForceHolster(source, user_id)
+            return { error = "A munição carregada venceu. Equipe a arma para recarregar.", hotbar = snapshot(user_id) }
+        end
         local clientState = getClientWeaponState(source)
         local total = 0
         local clip = 0
@@ -594,7 +636,7 @@ function HotbarWeapons.UseSlot(source, user_id, slot, requestedAmount)
             return { error = "Você não possui munição suficiente.", hotbar = snapshot(user_id) }
         end
 
-        if not vRP.tryGetInventoryItem(user_id, slotData.item, amount, slot) then
+        if not vRP.tryGetInventoryItem(user_id, slotData.item, amount, false, slot) then
             return { error = "Não foi possível utilizar esta munição.", hotbar = snapshot(user_id) }
         end
 
@@ -608,7 +650,8 @@ function HotbarWeapons.UseSlot(source, user_id, slot, requestedAmount)
         newClip = math.min(newClip, newTotal)
 
         active.total = newTotal
-        setAmmoState(user_id, active.weapon, newTotal, newClip)
+        local ammo = setAmmoState(user_id, active.weapon, newTotal, newClip, slotData.expiresAt)
+        active.ammoExpiresAt = ammo.expiresAt
         syncVrpWeapons(user_id, nil, active.weapon, newTotal)
 
         if InventoryAudit then
@@ -982,6 +1025,7 @@ CreateThread(function()
             clip INT NOT NULL DEFAULT 0,
             reserve INT NOT NULL DEFAULT 0,
             revision BIGINT NOT NULL DEFAULT 0,
+            expires_at BIGINT NOT NULL DEFAULT 0,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (user_id, weapon)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -992,6 +1036,11 @@ CreateThread(function()
     exports.oxmysql:executeSync([[
         ALTER TABLE inventory_weapon_ammo
         ADD COLUMN IF NOT EXISTS revision BIGINT NOT NULL DEFAULT 0 AFTER reserve
+    ]])
+
+    exports.oxmysql:executeSync([[
+        ALTER TABLE inventory_weapon_ammo
+        ADD COLUMN IF NOT EXISTS expires_at BIGINT NOT NULL DEFAULT 0
     ]])
 
     exports.oxmysql:executeSync([[
@@ -1023,7 +1072,8 @@ CreateThread(function()
             local source = vRP.getUserSource(user_id)
             if source then
                 local slotData = vRP.getSlotItem(user_id, tostring(active.slot))
-                if not slotData or slotData.item ~= active.item then
+                if not slotData or slotData.item ~= active.item or vRP.isInventoryItemExpired(slotData)
+                    or (active.ammoExpiresAt and active.ammoExpiresAt <= os.time()) then
                     HotbarWeapons.ForceHolster(source, user_id)
                 end
             end

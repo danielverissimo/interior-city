@@ -14,9 +14,11 @@ RandomCopsOnScenarios = false
 RandomCops = false
 RandomCopsNotOnScenarios = false
 DisableVehicleDistlights = true
-PedDensity = 4.0 --- Quantidade de NPCS que irão aparecer
-ScenarioPedDensity = 4.0,4.0 ----- Quantida de de NPCS que irão aparecer por lugar
-VehicleDensity = 4.0  ---- Quantidade de NPCS que irão aparecer em veiculos
+-- As densidades ambientais usam a faixa de 0.0 a 1.0 (populacao normal).
+PedDensity = 1.0
+ScenarioPedDensity = 1.0
+ScenarioPedDensityExterior = 0.5
+VehicleDensity = 1.0
 RandomVehicle = 0.3 ----  Variação de carros 
 ParkedVehicleDensity = 0.0   --- Veiculos estacionados 
 ParkedVehicles = 0.0    ----- veiculos estacionados
@@ -40,7 +42,7 @@ local function DensityControl()
                 SetCreateRandomCopsOnScenarios(RandomCopsOnScenarios)
                 SetCreateRandomCopsNotOnScenarios(RandomCopsNotOnScenarios)
                 SetPedDensityMultiplierThisFrame(PedDensity)
-                SetScenarioPedDensityMultiplierThisFrame(ScenarioPedDensity)
+                SetScenarioPedDensityMultiplierThisFrame(ScenarioPedDensity, ScenarioPedDensityExterior)
                 StartAudioScene(AudioScene)
                 SetAudioFlag(AudioFlag,true)
                 DistantCopCarSirens(CopCarSirens)
@@ -55,7 +57,7 @@ local function DensityControl()
                     RemoveVehiclesFromGeneratorsInArea(x - 500.0, y - 500.0, z - 500.0, x + 500.0, y + 500.0, z + 500.0);
                 end
 
-            Wait(7)
+            Wait(0) -- As natives ThisFrame precisam ser aplicadas a cada frame.
         end
     end)
 end
@@ -87,6 +89,44 @@ local function AiControl()
     until not finished
     EndFindPed(handle)
 end
+
+-- Recupera pedestres ambientais ociosos na área simulada por este cliente.
+-- Cenários, interações e NPCs de outros resources conservam suas tarefas.
+local function canResumeWalking(ped)
+    if IsPedAPlayer(ped) or not IsPedHuman(ped) or IsEntityDead(ped) then return false end
+    local population = GetEntityPopulationType(ped)
+    if population < 1 or population > 5 or IsEntityAMissionEntity(ped) then return false end
+    if NetworkGetEntityIsNetworked(ped) and not NetworkHasControlOfEntity(ped) then return false end
+    if IsEntityPositionFrozen(ped) or not HasCollisionLoadedAroundEntity(ped) then return false end
+    if IsPedInAnyVehicle(ped, true) or IsPedRagdoll(ped) or IsPedFalling(ped) then return false end
+    if IsPedFleeing(ped) or IsPedInCombat(ped, 0) or IsPedUsingAnyScenario(ped) then return false end
+    if IsPedActiveInScenario(ped) or GetEntitySpeed(ped) >= 0.25 then return false end
+    local taskStatus = GetScriptTaskStatus(ped, joaat('SCRIPT_TASK_ANY'))
+    return taskStatus == 3 or taskStatus == 7
+end
+
+CreateThread(function()
+    local idleSince = {}
+    while true do
+        local now = GetGameTimer()
+        local playerCoords = GetEntityCoords(PlayerPedId())
+        local nearbyIdle = {}
+        for _, ped in ipairs(GetGamePool('CPed')) do
+            if DoesEntityExist(ped) and #(GetEntityCoords(ped) - playerCoords) <= 100.0
+                and canResumeWalking(ped) then
+                local since = idleSince[ped] or now
+                if now - since >= 6000 then
+                    TaskWanderStandard(ped, 10.0, 10)
+                    since = now
+                end
+                nearbyIdle[ped] = since
+            end
+        end
+        idleSince = nearbyIdle
+        Wait(2000)
+    end
+end)
+
 
 local function setTrains()
     SwitchTrainTrack(0, true)

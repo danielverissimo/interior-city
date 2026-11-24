@@ -1,14 +1,22 @@
-local function RegisterRoutes()
-    local routes = {
+local purchasePending = false
+local routes = {
 
       ["PULL_NEAREST"] = function(data)
         serverFunctions.storeProximityVehicle(20.0)
       end,
 
       ['UPDATE_CUSTOM'] = function (res)
-        changeCloth(res["custom"])
+        if not skinshopOpen or type(res) ~= "table" or type(res.custom) ~= "table" then return false end
+        local index = tonumber(res.index)
+        if not index or index % 1 ~= 0 then return false end
+        local item = getShopCloth(index)
+        if not item or item.index_name ~= res.custom.index_name then return false end
+        if type(res.custom.model) ~= "table" or type(res.custom.texture) ~= "table" then return false end
+        res.custom.id = item.id
+        res.custom.type = item.type
+        if not changeCloth(res.custom) then return false end
 
-        updateNuiLimitCloths(res["index"], res["custom"])
+        updateNuiLimitCloths(index, res.custom)
 
         return true
       end,
@@ -34,20 +42,38 @@ local function RegisterRoutes()
       end,
 
       ['SAVE'] = function()
-        clientFunctions.saveClothInServer()
-        TriggerEvent("Notify","sucesso","Você pagou R$ 100,00 Nas roupas.",5)
-        return true
+        if not skinshopOpen or purchasePending then return false end
+        purchasePending = true
+        local ok, message = clientFunctions.saveClothInServer()
+        purchasePending = false
+        if ok then
+            TriggerEvent("Notify", "sucesso", ("Roupas salvas. Valor pago: R$ %d."):format(SkinshopPurchasePrice), 5)
+        else
+            TriggerEvent("Notify", "negado", message or "Não foi possível salvar as roupas.", 5)
+        end
+        return ok, message
       end,
 
       ['CLOSE'] = function(res)
-        clientFunctions.closeNuiShopAndReset()
+        if purchasePending then return false end
+        if skinshopOpen then clientFunctions.closeNuiShopAndReset() end
+        return true
      end,
-    }
-  
+}
+
+exports("handleShopUi", function(action, data)
+    if GetInvokingResource() ~= "intc_lojaroupas" or not skinshopOpen or not routes[action] then return false end
+    return routes[action](data)
+end)
+
+local function RegisterRoutes()
     for k, v in pairs(routes) do
       RegisterNuiCallback(k, function(data, cb)
-        cb(v(data))
+        local response = v(data)
+        cb(response)
       end)
     end
   end
 CreateThread(RegisterRoutes)
+
+

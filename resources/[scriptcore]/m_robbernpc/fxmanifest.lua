@@ -15,7 +15,9 @@ shared_scripts {
 }
 
 client_script 'client.lua'
-server_script 'server.lua'
+client_script 'lockpick_client.lua'
+client_script 'ped_robbery_client.lua'
+server_scripts { 'lockpick_server.lua', 'npc_loot.lua', 'server.lua', 'ped_robbery_server.lua' }
 
 ui_page 'nui/index.html'
 
@@ -23,6 +25,8 @@ files {
     'nui/index.html',
     'nui/style.css',
     'nui/script.js',
+    'nui/lockpick.js',
+    'nui/lockpick.css',
     'nui/img/*.svg'
 }
 

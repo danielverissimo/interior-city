@@ -1,0 +1,32 @@
+Bot de whitelist da Interior City
+
+O comando /whitelist abre um questionário privado no Discord. São dez perguntas,
+com aprovação a partir de 70% de acertos. Em cada pergunta, clique em Digitar
+resposta e informe 1, 2 ou 3. O resultado mostra a contagem de acertos e erros.
+Em questionario.json, o campo answer começa em 0. Por exemplo, answer 0
+corresponde à primeira alternativa.
+
+Instalação no Discord
+
+1. Crie uma aplicação com bot no Discord Developer Portal.
+2. Instale a aplicação no seu servidor com os escopos bot e applications.commands.
+3. Dê ao bot a permissão Gerenciar Cargos. Coloque o cargo do bot acima do cargo
+   usado para identificar os aprovados.
+4. Copie .env.example para .env. Preencha o token do bot, o ID do servidor do
+   Discord e o ID do cargo de aprovado. O token fica apenas no servidor.
+
+Execução
+
+Com Node.js 22.12 ou mais recente instalado, abra um terminal na pasta
+bot-whitelist e rode npm install seguido de npm start. Mantenha o processo
+rodando para que o comando possa receber novas respostas.
+
+Integração com o FiveM
+
+Preencha as três variáveis interior_discord_* indicadas em config/config.cfg
+com o mesmo servidor, cargo e token. Carregue essa configuração antes de
+reiniciar o FiveM. A conexão no FiveM verifica o cargo no Discord. O bot
+concede esse cargo quando o jogador passa no questionário.
+
+Teste com uma conta que ainda não tem o cargo. Depois da aprovação, confira
+se o Discord atribuiu o cargo e entre no FiveM com a mesma conta aberta.

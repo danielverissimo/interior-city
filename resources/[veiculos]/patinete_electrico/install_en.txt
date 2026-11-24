@@ -1,0 +1,54 @@
+addOn
+
+/////////////////////////////////////
+1º ADD 
+mods / update / x64 / dlcpacks
+	
+ - Create a folder named  serv_electricscooter  within the mass dlcpacks
+ - Drag the contents of the .zip folder into the created folder.
+
+
+/////////////////////////////////////
+2º ADD
+ mods / update / update.rpf / common / data
+	
+ - Drag the following files "DLCLIST.XML" and "EXTRATITLEUPDATE.META" to the Desktop, 
+ then open with Notepad, adding the following lines of code.
+	
+ “DLCLIST.XML”
+	
+ <Item>dlcpacks:/serv_electricscooter/</Item>
+	
+ “EXTRATITLEUPDATE.META”
+	
+ <Item type="SExtraTitleUpdateMount">
+	<deviceName>dlc_serv_electricscooter:/</deviceName>
+	<path>update:/dlc_serv_electricscooter/</path>
+ </Item>
+
+ Save the two edits and resubmit to the "Date" folder in the path mods / update / update.rpf / common / data
+
+
+/////////////////////////////////////
+3º Spawm
+ For "Spawn" the car you have to have a Trainer installed and choose the option "Spawm by name" and write
+serv_electricscooter
+
+
+/////////////////////////////////////
+
+4º Download - Map Editor
+- Download the latest version of Map Editor
+Link https://www.gta5-mods.com/scripts/map-editor
+
+
+/////////////////////////////////////
+5º Add - Map Editor
+- Download folder contents ...-MapEditor.zip into the folder scripts.
+
+
+/////////////////////////////////////
+6º Add - Mapa
+- Copy file pcGAMESmods_ElectricScooter and paste into the folder /scripts/AutoloadMaps/. 
+- If the folder AutoloadMaps not exist is just create.
+

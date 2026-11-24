@@ -371,17 +371,18 @@ function API.swapSlot(from_slot, from_amount, to_slot)
     if not to_slot_data then
         -- Alteração de slot, não há item no slot de destino.
         if from_slot_data.amount then
-            if vRP.tryGetInventoryItem(user_id, from_slot_data.item, from_amount, false, from_slot) then
-                vRP.giveInventoryItem(user_id, from_slot_data.item, from_amount, false, ts(to_slot))
+            if vRP.tryGetInventoryItem(user_id, from_slot_data.item, from_amount, false, from_slot, true) then
+                vRP.giveInventoryItem(user_id, from_slot_data.item, from_amount, false, ts(to_slot), from_slot_data.expiresAt)
                 moved = true
             end
         end
     else
         local sameItems = from_slot_data.item == to_slot_data.item
+            and vRP.isInventoryItemExpired(from_slot_data) == vRP.isInventoryItemExpired(to_slot_data)
         if sameItems then
             if fullAmount then
-                if vRP.tryGetInventoryItem(user_id, from_slot_data.item, from_slot_data.amount, false, ts(from_slot)) then
-                    vRP.giveInventoryItem(user_id, to_slot_data.item, from_amount, false, ts(to_slot))
+                if vRP.tryGetInventoryItem(user_id, from_slot_data.item, from_amount, false, ts(from_slot), true) then
+                    vRP.giveInventoryItem(user_id, to_slot_data.item, from_amount, false, ts(to_slot), from_slot_data.expiresAt)
                     moved = true
                 end
             end
@@ -511,8 +512,8 @@ function API.sendItem(slot, amount)
                             return
                         end
                     end
-                    if vRP.tryGetInventoryItem(user_id, slot_data.item, amount, ts(slot)) then
-                        vRP.giveInventoryItem(tUserId, slot_data.item, amount, true)
+                    if vRP.tryGetInventoryItem(user_id, slot_data.item, amount, false, ts(slot), true) then
+                        vRP.giveInventoryItem(tUserId, slot_data.item, amount, true, nil, slot_data.expiresAt)
                         if InventoryAudit then
                             local itemDetails = InventoryAudit.ItemDetails(slot_data.item, amount)
                             InventoryAudit.Log("inventory_item_sent", {
@@ -589,6 +590,9 @@ function API.useItem(slot, amount)
         end
         local slot_data = vRP.getSlotItem(user_id, slot) or false
         if slot_data then
+            if vRP.isInventoryItemExpired(slot_data) then
+                return { error = "Este item venceu. Use a opção de descarte." }
+            end
             if Items[slot_data.item] then
                 -- Alimentos e bebidas ficam totalmente indisponíveis quando o
                 -- sistema global de fome/sede é desligado no Painel ADM. A
@@ -618,7 +622,7 @@ function API.useItem(slot, amount)
                     Items[slot_data.item].func(user_id, source, slot_data.item, slot, function(cb)
                         if type(cb) == "table" and cb.error then
                             if cb.error and not Items[slot_data.item].keep_item then
-                                vRP.giveInventoryItem(user_id, slot_data.item, 1, true, slot)
+                                vRP.giveInventoryItem(user_id, slot_data.item, 1, true, slot, slot_data.expiresAt)
                             end
                             return p:resolve(cb)
                         end
@@ -743,6 +747,14 @@ RegisterNetEvent("vrp_inventory:useItem", API.useItem)
 function API.dropItem(slot, amount)
     local source = source
     local user_id = vRP.getUserId(source)
+    amount = tonumber(amount)
+    if not amount or amount ~= amount or amount == math.huge or amount <= 0 or amount % 1 ~= 0 then
+        return { error = 'Quantidade inválida.' }
+    end
+    if type(slot) ~= 'string' and type(slot) ~= 'number' then
+        return { error = 'Slot inválido.' }
+    end
+    slot = tostring(slot)
     if user_id then
         if HotbarWeapons then
             local active = HotbarWeapons.GetActive(user_id)
@@ -757,6 +769,9 @@ function API.dropItem(slot, amount)
         if (GetEntityHealth(GetPlayerPed(source))) <= 101 then return { error = "Você está morto." } end
         local slot_data = vRP.getSlotItem(user_id, slot)
         if slot_data then
+            if not Items[slot_data.item] or amount > (tonumber(slot_data.amount) or 0) then
+                return { error = 'Item ou quantidade indisponível.' }
+            end
             if Items[slot_data.item] then
                 if Items[slot_data.item].type == "equip" or Items[slot_data.item].type == "recharge" or slot_data.item == "dinheirosujo" then
                     return { error = "Você não pode dropar esse item." }
@@ -767,12 +782,12 @@ function API.dropItem(slot, amount)
                 TriggerClientEvent("Notify",source,"negado","Você não pode dropar armas ou munições.")
                 return
             end
-            if vRP.tryGetInventoryItem(user_id, slot_data.item, amount, slot) then
+            if vRP.tryGetInventoryItem(user_id, slot_data.item, amount, false, slot, true) then
                 vRPc._playAnim(source, true, { { "pickup_object", "pickup_low" } }, false)
                 PickupSystem:Create({
                     src = source,
                     user_id = user_id
-                }, slot_data.item, amount, GetEntityCoords(GetPlayerPed(source)))
+                }, slot_data.item, amount, GetEntityCoords(GetPlayerPed(source)), slot_data.expiresAt)
                 if InventoryAudit then
                     InventoryAudit.Log("inventory_item_dropped", {
                         actorId = user_id,

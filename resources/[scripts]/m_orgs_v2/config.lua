@@ -5,15 +5,15 @@ Config.Main = {
     cmdAdm = 'painelfacadm', -- Comando para abrir Painel ADM
     createAutomaticOrganizations = true,
     storeUrl = '', -- Link da Sua Loja
-    serverLogo = "https://cdn.discordapp.com/attachments/995209318448238682/1441893036530339882/Logo_TocadoMago_Delux_Azul.png?ex=696b4cc8&is=6969fb48&hm=a4d86a5ad3073b94f2f404a47e7fa09cc04462822219e11a93bfd42a3ed93cf0&",
+    serverLogo = "https://cfx-nui-vrp/loading/logo.png",
     blackList = 0,
     ImgLink = 'http://104.234.65.115/images/',
     clearChestLogs = 7 -- Dias para manter os logs de baú
 }
 
 Config.weebhooks = {
-    Withdraw = (IsDuplicityVersion() and GetConvar("ic_secret_m_orgs_v2_webhook", GetConvar("interior_city_webhook_logs", "")) or ""),
-    Deposit = (IsDuplicityVersion() and GetConvar("ic_secret_m_orgs_v2_webhook", GetConvar("interior_city_webhook_logs", "")) or ""),
+    Withdraw = '',
+    Deposit = '',
 }
 
 Config.defaultPermissions = { 
@@ -195,7 +195,7 @@ Config.Groups = {
 
         }
     },
-    ['Motoclube'] = {
+    ['Vermelhos'] = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
@@ -212,28 +212,28 @@ Config.Groups = {
         },
 
         List = {
-            ['LiderMotoclube'] = {
-                prefix = 'LiderMotoclube',
+            ['LiderVermelhos'] = {
+                prefix = 'LiderVermelhos',
                 tier = 1,
             },
-            ['SubLiderMotoclube'] = {
-                prefix = 'SubLiderMotoclube',
+            ['SubLiderVermelhos'] = {
+                prefix = 'SubLiderVermelhos',
                 tier = 2,
             },
-            ['GerenteMotoclube'] = {
-                prefix = 'GerenteMotoclube',
+            ['GerenteVermelhos'] = {
+                prefix = 'GerenteVermelhos',
                 tier = 3,
             },
-            ['RecrutadorMotoclube'] = {
-                prefix = 'GerenteMotoclube',
+            ['RecrutadorVermelhos'] = {
+                prefix = 'GerenteVermelhos',
                 tier = 6,
             },
-            ['MembroMotoclube'] = {
-                prefix = 'MembroMotoclube',
+            ['MembroVermelhos'] = {
+                prefix = 'MembroVermelhos',
                 tier = 7,
             },
-            ['RecrutadorMotoclube'] = {
-                prefix = 'RecrutadorMotoclube',
+            ['RecrutadorVermelhos'] = {
+                prefix = 'RecrutadorVermelhos',
                 tier = 8,
             },
 
@@ -330,97 +330,7 @@ Config.Groups = {
 
         }
     },
-    ['Vermelhos'] = {
-        Config = {
-            Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
-                amount = Config.DefaultSallary.amount, -- Valor que vai receber
-                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
-            },
-
-            Goals = { -- METAS
-                defaultReward = 300, -- Valor Padrão da recompensa ( obs Lider consegue alterar in-game )
-                itens = {
-                    ["capsulas"] = 500,
-                }
-            }
-        },
-
-        List = {
-            ['LiderVermelhos'] = {
-                prefix = 'LiderVermelhos',
-                tier = 1,
-            },
-            ['SubLiderVermelhos'] = {
-                prefix = 'SubLiderVermelhos',
-                tier = 2,
-            },
-            ['GerenteVermelhos'] = {
-                prefix = 'GerenteVermelhos',
-                tier = 3,
-            },
-            ['RecrutadorVermelhos'] = {
-                prefix = 'GerenteVermelhos',
-                tier = 6,
-            },
-            ['MembroVermelhos'] = {
-                prefix = 'MembroVermelhos',
-                tier = 7,
-            },
-            ['RecrutadorVermelhos'] = {
-                prefix = 'RecrutadorVermelhos',
-                tier = 8,
-            },
-
-
-        }
-    },
-    ['Verdes'] = {
-        Config = {
-            Salary = { -- SALARIO FAC
-                active = false, -- Se vai esta ativo ou nao
-                amount = Config.DefaultSallary.amount, -- Valor que vai receber
-                time = Config.DefaultSallary.time, -- tempo em tempo que vai receber salario em minuto(s)
-            },
-
-            Goals = { -- METAS
-                defaultReward = 300, -- Valor Padrão da recompensa ( obs Lider consegue alterar in-game )
-                itens = {
-                    ["pecadearma"] = 500,
-                }
-            }
-        },
-
-        List = {
-            ['LiderVerdes'] = {
-                prefix = 'LiderVerdes',
-                tier = 1,
-            },
-            ['SubLiderVerdes'] = {
-                prefix = 'SubLiderVerdes',
-                tier = 2,
-            },
-            ['GerenteVerdes'] = {
-                prefix = 'GerenteVerdes',
-                tier = 3,
-            },
-            ['RecrutadorVerdes'] = {
-                prefix = 'GerenteVerdes',
-                tier = 6,
-            },
-            ['MembroVerdes'] = {
-                prefix = 'MembroVerdes',
-                tier = 7,
-            },
-            ['RecrutadorVerdes'] = {
-                prefix = 'RecrutadorVerdes',
-                tier = 8,
-            },
-
-
-        }
-    },
-    ['Franca'] = {
+    ['Azul'] = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
@@ -437,28 +347,28 @@ Config.Groups = {
         },
 
         List = {
-            ['LiderFranca'] = {
-                prefix = 'LiderFranca',
+            ['LiderAzul'] = {
+                prefix = 'LiderAzul',
                 tier = 1,
             },
-            ['SubLiderFranca'] = {
-                prefix = 'SubLiderFranca',
+            ['SubLiderAzul'] = {
+                prefix = 'SubLiderAzul',
                 tier = 2,
             },
-            ['GerenteFranca'] = {
-                prefix = 'GerenteFranca',
+            ['GerenteAzul'] = {
+                prefix = 'GerenteAzul',
                 tier = 3,
             },
-            ['RecrutadorFranca'] = {
-                prefix = 'GerenteFranca',
+            ['RecrutadorAzul'] = {
+                prefix = 'GerenteAzul',
                 tier = 6,
             },
-            ['MembroFranca'] = {
-                prefix = 'MembroFranca',
+            ['MembroAzul'] = {
+                prefix = 'MembroAzul',
                 tier = 7,
             },
-            ['RecrutadorFranca'] = {
-                prefix = 'RecrutadorFranca',
+            ['RecrutadorAzul'] = {
+                prefix = 'RecrutadorAzul',
                 tier = 8,
             },
 
@@ -555,7 +465,28 @@ Config.Groups = {
 
         }
     },
-    ['Colombia'] = {
+    ['Jamaica'] = {
+        Config = {
+            Salary = {
+                active = false,
+                amount = Config.DefaultSallary.amount,
+                time = Config.DefaultSallary.time,
+            },
+            Goals = {
+                defaultReward = 300,
+                itens = {
+                    ["folhamaconha"] = 500,
+                },
+            },
+        },
+        List = {
+            ['LiderJamaica'] = { prefix = 'LiderJamaica', tier = 1 },
+            ['SubLiderJamaica'] = { prefix = 'SubLiderJamaica', tier = 2 },
+            ['GerenteJamaica'] = { prefix = 'GerenteJamaica', tier = 3 },
+            ['MembroJamaica'] = { prefix = 'MembroJamaica', tier = 7 },
+        },
+    },
+    ['Verdes'] = {
         Config = {
             Salary = { -- SALARIO FAC
                 active = false, -- Se vai esta ativo ou nao
@@ -572,28 +503,28 @@ Config.Groups = {
         },
 
         List = {
-            ['LiderColombia'] = {
-                prefix = 'LiderColombia',
+            ['LiderVerdes'] = {
+                prefix = 'LiderVerdes',
                 tier = 1,
             },
-            ['SubLiderColombia'] = {
-                prefix = 'SubLiderColombia',
+            ['SubLiderVerdes'] = {
+                prefix = 'SubLiderVerdes',
                 tier = 2,
             },
-            ['GerenteColombia'] = {
-                prefix = 'GerenteColombia',
+            ['GerenteVerdes'] = {
+                prefix = 'GerenteVerdes',
                 tier = 3,
             },
-            ['RecrutadorColombia'] = {
-                prefix = 'GerenteColombia',
+            ['RecrutadorVerdes'] = {
+                prefix = 'GerenteVerdes',
                 tier = 6,
             },
-            ['MembroColombia'] = {
-                prefix = 'MembroColombia',
+            ['MembroVerdes'] = {
+                prefix = 'MembroVerdes',
                 tier = 7,
             },
-            ['RecrutadorColombia'] = {
-                prefix = 'RecrutadorColombia',
+            ['RecrutadorVerdes'] = {
+                prefix = 'RecrutadorVerdes',
                 tier = 8,
             },
 

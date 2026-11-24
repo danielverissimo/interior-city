@@ -1,0 +1,19 @@
+
+fx_version 'cerulean'
+game 'gta5'
+version '1.0.5'
+author 'Gustavera Mods discord.gg/TPM6x6u'
+
+this_is_a_map "yes"
+
+files {
+    'stream/*'
+}
+
+data_file 'DLC_ITYP_REQUEST' 'stream/YTYP/mp_residential.ytyp'
+
+
+-- 🛡️ Dump realizado com o ColdGG Dumper!
+
+-- 🔹 Discord ColdGG: https://discord.gg/coldgg
+-- 🔹 Convite permanente: https://discord.gg/gCXdybN6UK

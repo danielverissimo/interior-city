@@ -33,7 +33,7 @@ function API.deleteItem(slot, amount)
         end
     end
     -- The fifth argument selects the exact slot; the fourth controls notifications.
-    if not vRP.tryGetInventoryItem(userId, item.item, amount, false, slot) then
+    if not vRP.tryGetInventoryItem(userId, item.item, amount, false, slot, true) then
         return { error = "Não foi possível jogar o item fora." }
     end
     if InventoryAudit then

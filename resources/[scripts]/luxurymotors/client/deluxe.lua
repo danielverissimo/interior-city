@@ -8,7 +8,9 @@ function RefreshDeluxeBlip()
     SetBlipSprite(mapBlip, 326)
     SetBlipColour(mapBlip, 46)
     SetBlipScale(mapBlip, 0.75)
-    SetBlipAsShortRange(mapBlip, true)
+    SetBlipAsShortRange(mapBlip, false)
+    SetBlipDisplay(mapBlip, 4)
+    SetBlipHiddenOnLegend(mapBlip, false)
     BeginTextCommandSetBlipName('STRING')
     AddTextComponentString('LuxuryMotors | Concessionária')
     EndTextCommandSetBlipName(mapBlip)
@@ -17,6 +19,15 @@ end
 RegisterNetEvent('luxurymotors:syncDeluxe', function(config)
     ApplyDeluxeLocation(config)
     RefreshDeluxeBlip()
+end)
+
+CreateThread(function()
+    Wait(500)
+    RefreshDeluxeBlip()
+    while true do
+        if DeluxeConfig.enabled and (not mapBlip or not DoesBlipExist(mapBlip)) then RefreshDeluxeBlip() end
+        Wait(10000)
+    end
 end)
 
 AddEventHandler('onResourceStop', function(resource)

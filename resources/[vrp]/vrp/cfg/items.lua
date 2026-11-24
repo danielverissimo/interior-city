@@ -2,6 +2,30 @@ local cfg = {}
 -- ITEM | NOME | DESC | TYPE | PESO | FOME | SEDE
 
 cfg.items = {
+    ["frasco"] = { "Frasco", "none", 0.1, nil, nil },
+    ["papelespecial"] = { "Papel Especial", "none", 0.1, nil, nil },
+    ["ziplock"] = { "Ziplock", "none", 0.05, nil, nil },
+    ["florcannabis"] = { "Flor de Cannabis", "none", 0.3, nil, nil },
+    ["haxixebruto"] = { "Haxixe bruto", "none", 0.3, nil, nil },
+    ["haxixe"] = { "Haxixe embalado", "none", 0.3, nil, nil },
+    ["lancaperfume"] = { "Lança Perfume", "usar", 0.3, nil, nil },
+    -- Comidas do interior
+    ["pamonha"] = { "Pamonha", "usar", 0.5, 24, 0 },
+    ["curau"] = { "Curau", "usar", 0.2, 16, 0 },
+    ["tapioca"] = { "Tapioca", "usar", 0.5, 32, 0 },
+    ["cuscuz"] = { "Cuscuz", "usar", 0.5, 32, 0 },
+    ["bolodemilho"] = { "Bolo de Milho", "usar", 0.5, 18, 0 },
+    ["galinhada"] = { "Galinhada", "usar", 2, 100, 0 },
+    ["arrozcompequi"] = { "Arroz com Pequi", "usar", 2, 100, 0 },
+    ["feijaotropeiro"] = { "Feijão Tropeiro", "usar", 2, 100, 0 },
+    ["arrozcarreteiro"] = { "Arroz Carreteiro", "usar", 2, 100, 0 },
+    ["docedeleite"] = { "Doce de Leite", "usar", 0.5, 14, 0 },
+    ["goiabada"] = { "Goiabada", "usar", 0.5, 14, 0 },
+    ["pacoca"] = { "Paçoca", "usar", 0.5, 14, 0 },
+    ["pedemoleque"] = { "Pé de Moleque", "usar", 0.5, 14, 0 },
+    ["caldodecana"] = { "Caldo de Cana", "usar", 0.5, 0, 36 },
+    ["cafecoado"] = { "Café Coado", "usar", 0.25, 0, 20 },
+
 	["none"] = { "none", "none", 0.0, nil, nil},
 	["roupas"] = { "Roupas", "none", 0.0, nil, nil},
 	["money"] = { "Dinheiro","none", 0.00001, nil, nil},
@@ -54,8 +78,6 @@ cfg.items = {
 
 	-- Mecanica
 	["pneus"] = { "Pneus","usar", 10.0, nil, nil},
-	["repairkit"] = { "Jogue Fora", "none", 1.0, nil, nil},
-	["repairkit2"] = { "Jogue Fora", "usar", 1.0, nil, nil},
 	["repairkit3"] = { "Kit de Reparos", "usar", 1.0, nil, nil},
 	-- ["militec"] = { "Militec", "usar", 1.0, nil, nil},
 	-- ["suspensaoar"] = { "Suspensaoar", "usar", 1.0, nil, nil},
@@ -191,23 +213,6 @@ cfg.items = {
 	["rubi"] = { "Rubi", "none", 1.0, nil, nil},
 	["safira"] = { "Safira", "none", 1.0, nil, nil},
 
-	-- COMIDAS E BEBIDAS DO INTERIOR
-	["pamonha"] = { "Pamonha", "comer", 0.5, -24, nil},
-	["curau"] = { "Curau", "comer", 0.2, -16, nil},
-	["tapioca"] = { "Tapioca", "comer", 0.5, -32, nil},
-	["cuscuz"] = { "Cuscuz", "comer", 0.5, -32, nil},
-	["bolodemilho"] = { "Bolo de Milho", "comer", 0.5, -18, nil},
-	["galinhada"] = { "Galinhada", "comer", 2.0, -50, nil},
-	["arrozcompequi"] = { "Arroz com Pequi", "comer", 2.0, -50, nil},
-	["feijaotropeiro"] = { "Feijão Tropeiro", "comer", 2.0, -50, nil},
-	["arrozcarreteiro"] = { "Arroz Carreteiro", "comer", 2.0, -50, nil},
-	["docedeleite"] = { "Doce de Leite", "comer", 0.5, -14, nil},
-	["goiabada"] = { "Goiabada", "comer", 0.5, -14, nil},
-	["pacoca"] = { "Paçoca", "comer", 0.5, -14, nil},
-	["pedemoleque"] = { "Pé de Moleque", "comer", 0.5, -14, nil},
-	["caldodecana"] = { "Caldo de Cana", "beber", 0.5, nil, -36},
-	["cafecoado"] = { "Café Coado", "beber", 0.25, nil, -20},
-
 	-- COMIDAS
 
 	["pao"] = { "Pao", "comer", 0.5, -18, nil},
@@ -219,7 +224,7 @@ cfg.items = {
 	["pipoca"] = { "Pipoca", "comer", 0.3, -12, nil},
 	["donut"] = { "Donut", "comer", 0.2, -16, nil},
 	["paoq"] = { "Pao de Queijo", "comer", 0.3, -20, nil},
-	["marmita"] = { "Marmitex", "comer", 2.0, -50, nil},
+	["marmita"] = { "Marmitex", "comer", 2.0, -100, nil},
 	["coxinha"] = { "Coxinha", "comer", 0.5, -24, nil},
 
 	-- BEBIDAS
@@ -257,6 +262,7 @@ cfg.items = {
 	["camisinha"] = { "Camisinha", "remedio", 0.05, 5, nil},
 	["fluoxetina"] = { "Fluoxetina", "remedio", 0.05, 5, nil},
 	["bandagem"] = { "Bandagem", "remedio", 0.5, 5, nil},
+	["adrenalina"] = { "Adrenalina", "usar", 0.25, nil, nil },
 	
 	-- PISTOLAS
 	

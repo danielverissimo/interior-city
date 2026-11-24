@@ -3,6 +3,8 @@ local currentVehicle = 0
 local currentRearCoords = nil
 local validationCounter = 0
 local pendingValidation = nil
+local lastVehicleValidationAt = -1500
+local robberyRequestCounter = 0
 local requestPending = false
 local robberyBusy = false
 local activeRobberyVehicle = 0
@@ -28,6 +30,8 @@ local drugInventoryStateKnown = false
 local drugGlanceSeen = {}
 local drugGlanceToken = {}
 local drugGlanceActivePed = 0
+-- NPCs com tasks alteradas por este resource, inclusive olhares e disfarces.
+local controlledDrugPeds = {}
 
 local function notify(kind, text, time)
     TriggerEvent('Notify', kind, text, time or 5)
@@ -349,6 +353,7 @@ local function holdNpcForDeal(ped, timeoutSeconds)
         NetworkRequestControlOfEntity(ped)
     end
 
+    controlledDrugPeds[ped] = GetEntityModel(ped)
     SetBlockingOfNonTemporaryEvents(ped, true)
     SetPedKeepTask(ped, true)
     ClearPedTasks(ped)
@@ -363,6 +368,7 @@ local function holdNpcForDeal(ped, timeoutSeconds)
 end
 
 local function releaseNpcAfterDeal(ped, shouldWander)
+    controlledDrugPeds[ped] = nil
     if ped == 0 or not DoesEntityExist(ped) then return end
 
     NetworkRequestControlOfEntity(ped)
@@ -673,6 +679,7 @@ CreateThread(function()
                     end
 
                     if DoesEntityExist(ped) then
+                        controlledDrugPeds[ped] = GetEntityModel(ped)
                         SetBlockingOfNonTemporaryEvents(ped, true)
                         SetPedKeepTask(ped, true)
                         ClearPedTasks(ped)
@@ -963,6 +970,7 @@ RegisterNetEvent('m_robbernpc:drug:undercover', function(data)
 
             if not DoesEntityExist(ped) then return end
 
+            controlledDrugPeds[ped] = GetEntityModel(ped)
             SetBlockingOfNonTemporaryEvents(ped, true)
             SetPedKeepTask(ped, true)
             ClearPedTasks(ped)
@@ -1198,6 +1206,7 @@ local function findClosestRearVehicle()
 end
 
 local function requestVehicleValidation(vehicle)
+    lastVehicleValidationAt = GetGameTimer()
     local netId = ensureNetworked(vehicle)
     if netId == 0 then
         currentVehicle = 0
@@ -1208,15 +1217,22 @@ local function requestVehicleValidation(vehicle)
     pendingValidation = {
         id = validationCounter,
         netId = netId,
-        vehicle = vehicle
+        vehicle = vehicle,
+        startedAt = GetGameTimer()
     }
 
     TriggerServerEvent('m_robbernpc:validateCandidate', netId, validationCounter)
 end
 
+local function shouldRetryVehicleValidation(vehicle, now)
+    if vehicle == 0 or currentVehicle ~= 0 then return false end
+    if pendingValidation and now - pendingValidation.startedAt < 3000 then return false end
+    return now - lastVehicleValidationAt >= 1500
+end
+
 RegisterNetEvent('m_robbernpc:candidateResult', function(validationId, netId, eligible)
     if not pendingValidation then return end
-    if pendingValidation.id ~= validationId or pendingValidation.netId ~= netId then return end
+    if pendingValidation.id ~= tonumber(validationId) or pendingValidation.netId ~= tonumber(netId) then return end
     if currentRawVehicle ~= pendingValidation.vehicle then return end
 
     if eligible and DoesEntityExist(pendingValidation.vehicle) then
@@ -1253,6 +1269,9 @@ CreateThread(function()
                 if vehicle ~= 0 then
                     requestVehicleValidation(vehicle)
                 end
+            elseif shouldRetryVehicleValidation(vehicle, GetGameTimer()) then
+                pendingValidation = nil
+                requestVehicleValidation(vehicle)
             elseif currentVehicle ~= 0 then
                 if not localVehicleAllowed(currentVehicle) then
                     currentRawVehicle = 0
@@ -1323,6 +1342,18 @@ RegisterCommand('m_robbernpc:interact', function()
     end
 
     requestPending = true
+    robberyRequestCounter = robberyRequestCounter + 1
+    local requestId = robberyRequestCounter
+    SetTimeout(20000, function()
+        if requestPending and robberyRequestCounter == requestId then
+            requestPending = false
+            currentRawVehicle = 0
+            currentVehicle = 0
+            currentRearCoords = nil
+            pendingValidation = nil
+            notify('aviso', 'A tentativa nao recebeu resposta. Aproxime-se do porta-malas e tente novamente.', 5)
+        end
+    end)
     hidePrompt()
 
     TriggerServerEvent('m_robbernpc:tryStart', netId, {
@@ -1342,18 +1373,17 @@ RegisterNetEvent('m_robbernpc:vehicleAlarm', function(netId, duration)
     local vehicle = NetToVeh(tonumber(netId) or 0)
     if vehicle == 0 or not DoesEntityExist(vehicle) then return end
 
-    NetworkRequestControlOfEntity(vehicle)
     local timeout = GetGameTimer() + 1000
     while not NetworkHasControlOfEntity(vehicle) and GetGameTimer() < timeout do
-        Wait(0)
         NetworkRequestControlOfEntity(vehicle)
+        Wait(0)
     end
 
-    -- Alarme nativo do GTA V. O rastreador continua oculto; o ladrão apenas
-    -- percebe que aquele veículo disparou o alarme ao iniciar o arrombamento.
+    if not DoesEntityExist(vehicle) then return end
+
     SetVehicleAlarm(vehicle, true)
-    SetVehicleAlarmTimeLeft(vehicle, math.max(1000, tonumber(duration) or 30000))
     StartVehicleAlarm(vehicle)
+    SetVehicleAlarmTimeLeft(vehicle, math.max(1000, tonumber(duration) or 30000))
 end)
 
 RegisterNetEvent('m_robbernpc:robberTracker:start', function(seconds, text)
@@ -1400,6 +1430,15 @@ RegisterNetEvent('m_robbernpc:attemptStarted', function(netId)
     if activeRobberyVehicle ~= 0 then
         faceTrunk(ped, activeRobberyVehicle)
     end
+end)
+
+AddEventHandler('m_robbernpc:releaseLockpick', function()
+    robberyBusy = false
+    requestPending = false
+    activeRobberyVehicle = 0
+    stopRobberyAnimation(PlayerPedId())
+    FreezeEntityPosition(PlayerPedId(), false)
+    hidePrompt()
 end)
 
 RegisterNetEvent('m_robbernpc:attemptEnded', function(success)
@@ -1662,6 +1701,23 @@ end)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
+
+    -- Timers deixam de existir no restart. Libera somente os NPCs alterados
+    -- por este resource, sem aguardar controle de rede durante o encerramento.
+    for npc, model in pairs(controlledDrugPeds) do
+        if DoesEntityExist(npc) and GetEntityModel(npc) == model and not IsPedAPlayer(npc) then
+            NetworkRequestControlOfEntity(npc)
+            if NetworkHasControlOfEntity(npc) then
+                SetBlockingOfNonTemporaryEvents(npc, false)
+                SetPedKeepTask(npc, false)
+                ClearPedTasks(npc)
+                if not IsEntityDead(npc) and not IsPedInAnyVehicle(npc, false) then
+                    TaskWanderStandard(npc, 10.0, 10)
+                end
+            end
+        end
+    end
+    controlledDrugPeds = {}
 
     hidePrompt()
     SendNUIMessage({ action = 'trackerStop' })

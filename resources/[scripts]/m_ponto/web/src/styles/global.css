@@ -71,3 +71,55 @@ input[type="number"]::-webkit-outer-spin-button {
     zoom: 0.6;
   }
 }
+.clock-legacy {
+  width: 932px;
+  height: 586px;
+  padding: 1.31rem 1.63rem;
+  background: #101215;
+  border: 18px solid #050505;
+  border-radius: 24px;
+}
+
+#interface.clock-only {
+  --point-gold: #d4bd8b;
+  --point-muted: #aab0b2;
+  width: min(25rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 1.25rem;
+  border: 1px solid #d4bd8b40;
+  border-radius: 12px;
+  background: #121619;
+  box-shadow: 0 16px 48px #0008;
+  zoom: 1;
+}
+
+.clock-only > .flex > div,
+.clock-only .muted,
+.clock-only .foreground {
+  width: 100%;
+  min-width: 0;
+}
+
+.clock-only .muted {
+  height: auto;
+  overflow: hidden;
+  border: 1px solid #ffffff15;
+  border-radius: 7px;
+  background: #171c20;
+}
+
+.clock-only .foreground { background: #ffffff07; }
+.clock-only .muted button {
+  width: calc(100% - 2rem);
+  margin-bottom: 1rem;
+  background: var(--point-gold);
+  color: #191c1d;
+}
+.clock-only .muted button:hover:enabled { background: #e4ce9d; }
+.clock-only .muted button:focus-visible { outline: 2px solid #f3e2ba; outline-offset: 3px; }
+.clock-only .muted .absolute { background: var(--point-gold); }
+.clock-only .muted svg path { fill: var(--point-gold); }
+.clock-only .foreground > p:last-child { color: var(--point-gold); }
+.clock-only [class*="text-white/"] { color: var(--point-muted); }
+.clock-only .muted .overflow-auto { scrollbar-color: var(--point-gold) #ffffff10; }

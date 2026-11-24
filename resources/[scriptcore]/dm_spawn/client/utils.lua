@@ -23,7 +23,8 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 function AnimateCameraToCharacter(targetX, targetY, targetZ, duration)
     local startTime = GetGameTimer()
-    local startX, startY, startZ = table.unpack(GetCamCoord(state.camera))
+    local startCoords = GetCamCoord(state.camera)
+    local startX, startY, startZ = startCoords.x, startCoords.y, startCoords.z
     
     Citizen.CreateThread(function()
         while true do
@@ -32,13 +33,6 @@ function AnimateCameraToCharacter(targetX, targetY, targetZ, duration)
                 break
             end
             local playerPed = PlayerPedId()
-            local playerPos = GetEntityCoords(playerPed)
-            if #(playerPos - vector3(-425.07, 1125.78, 325.86)) > 2.0 then
-                StartPlayerTeleport(playerPed, -425.07, 1125.78, 325.86, 338.0, false, true, false)
-                while IsPlayerTeleportActive(playerPed) do
-                    Citizen.Wait(0)
-                end
-            end
             local progress = elapsedTime / duration
             local currentX = startX + (targetX - startX) * progress
             local currentY = startY + (targetY - startY) * progress
@@ -70,6 +64,12 @@ end)
 -- OPEN UI
 -----------------------------------------------------------------------------------------------------------------------------------------
 function OpenUi()
+    if state.isOpen then
+        SendNUIMessage({ action = 'open' })
+        SetNuiFocus(true, true)
+        return
+    end
+    _G.Teleporting = false
     LocalPlayer.state.isSpawnActived = true
     state.isOpen = true
     StartFade()
@@ -106,10 +106,14 @@ function OpenUi()
     SetEntityHeading(playerPed, 96.46)
     Wait(3400)
     Citizen.CreateThread(function()
-        while true do
+        local deadline = GetGameTimer() + 8000
+        while state.isOpen do
             local playerPed = PlayerPedId()
             local playerPos = GetEntityCoords(playerPed)
-            if #(playerPos - targetCoords) < 1.0 and HasCollisionLoadedAroundEntity(playerPed) then
+            if (#(playerPos - targetCoords) < 1.0 and HasCollisionLoadedAroundEntity(playerPed)) or GetGameTimer() >= deadline then
+                -- The spawn choices must remain usable even if camera setup fails.
+                SendNUIMessage({ action = 'open' })
+                SetNuiFocus(true, true)
                 EndFade()
 
                 -- Jogador está na posição correta, inicia a câmera
@@ -126,16 +130,12 @@ function OpenUi()
                 break
             else
                 -- Jogador não está na posição correta, teletransporta novamente
-                -- RequestCollisionAtCoord(targetCoords.x, targetCoords.y, targetCoords.z)
+                RequestCollisionAtCoord(targetCoords.x, targetCoords.y, targetCoords.z)
                 SetEntityCoords(playerPed, targetCoords.x, targetCoords.y, targetCoords.z)
                 SetEntityHeading(playerPed, 338.0)
             end
             Citizen.Wait(100)
         end
-        SendNUIMessage({
-            action = "open"
-        })
-        SetNuiFocus(true, true)
     end)
 
 end
@@ -159,7 +159,11 @@ function CloseUi()
     setBucket(false)
     -- Restaura a visibilidade do personagem e a câmera padrão
     SetEntityVisible(PlayerPedId(), true)
-    SetCamActive(state.camera, false)
+    if state.camera and DoesCamExist(state.camera) then
+        SetCamActive(state.camera, false)
+        DestroyCam(state.camera, false)
+        state.camera = nil
+    end
     RenderScriptCams(false, false, 0, true, true)
     LocalPlayer.state.isSpawnActived = false
 end

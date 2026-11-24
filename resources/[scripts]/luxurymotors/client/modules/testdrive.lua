@@ -70,7 +70,7 @@ local function restoreFromTestDrive(reopenDealership, reason)
     testDriveReturning = false
 end
 
-function InitializeTestDrive(vehicle, indexLocation)
+function InitializeTestDrive(vehicle, indexLocation, color)
     if InTestDrive or testDriveReturning then return false end
     if type(vehicle) ~= 'string' or vehicle == '' or type(indexLocation) ~= 'number' then
         notifyTestDrive("Não foi possível identificar o veículo ou a concessionária.")
@@ -137,6 +137,13 @@ function InitializeTestDrive(vehicle, indexLocation)
     SetVehicleOnGroundProperly(vehicleEntity)
     SetVehRadioStation(vehicleEntity, "OFF")
     SetVehicleDirtLevel(vehicleEntity, 0.0)
+    if type(color) == 'string' then
+        local r,g,b = color:match('rgba%((%d+),%s*(%d+),%s*(%d+)')
+        if r then
+            SetVehicleCustomPrimaryColour(vehicleEntity, math.min(255,tonumber(r)), math.min(255,tonumber(g)), math.min(255,tonumber(b)))
+            SetVehicleCustomSecondaryColour(vehicleEntity, math.min(255,tonumber(r)), math.min(255,tonumber(g)), math.min(255,tonumber(b)))
+        end
+    end
     SetVehicleDoorsLocked(vehicleEntity, 1)
     SetVehicleEngineHealth(vehicleEntity, 1000.0)
     SetVehicleBodyHealth(vehicleEntity, 1000.0)

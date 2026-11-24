@@ -150,7 +150,7 @@ local function findFactionCategory(userId, categories)
             local score = nil
 
             -- Regra mais confiável: _config.orgName da própria vRP bate com a
-            -- categoria cadastrada no painel ADM (Mafia, Cartel, Colombia...).
+            -- categoria cadastrada no painel ADM (Mafia, Cartel, Verdes...).
             if normalizedOrg ~= "" and normalizedOrg == categoryKey then
                 score = 100000 + #categoryKey
             -- Fallback pedido pelo usuário: MembroMafia, LiderMafia,

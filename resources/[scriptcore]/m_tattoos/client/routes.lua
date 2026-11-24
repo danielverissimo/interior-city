@@ -12,10 +12,6 @@ local function RegisterRoutes()
     ["VERTICAL"] = function(floatPos)
       moveCamPosition("VERTICAL", floatPos)
       return true
-    end,
-    ['CLOSE'] = function()
-      SetNuiFocus(false, false)
-      return true
     end
   }
 

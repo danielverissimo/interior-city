@@ -24,7 +24,7 @@ vRP.tempSource = {}
 -- PREPARE
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local prepared_queries = {}
-local GeneratingCache = false 
+local connectionCachesReady = false
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- PREPARE
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,13 +47,6 @@ end
 -- BASE.LUA
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function vRP.setUData(user_id,key,value)
-	if key=='vRP:datatable' and type(vRP.icConfigFilterGroupData)=='function' then
-		local ok,data=pcall(json.decode,value or '{}')
-		if ok and type(data)=='table' then
-			local filtered,changed=vRP.icConfigFilterGroupData(data)
-			if changed then value=json.encode(filtered) end
-		end
-	end
 	exports["oxmysql"]:executeSync([[
 		REPLACE INTO `vrp_user_data`(`user_id`,`dkey`,`dvalue`) VALUES(?,?,?)
 	]],{ 
@@ -135,12 +128,12 @@ local identifier = {
 
 function identifier:createCache()
 	local rows = vRP.query("vRP/getAllIdentifiers", {})
+	assert(type(rows) == "table", "Falha ao carregar identificadores.")
 	for i = 1, #rows do
 		if not self.cache[rows[i].user_id] then self.cache[rows[i].user_id] = {} end
 		self.cache[rows[i].user_id][#self.cache[rows[i].user_id] + 1] = rows[i].identifier
 	end
 
-	GeneratingCache = true
 end
 
 function identifier:set(identifier, user_id)
@@ -234,7 +227,7 @@ function vRP.isWhitelisted(user_id)
 	if #rows > 0 then
 		return rows[1].whitelist
 	else
-		return true
+		return false
 	end
 end
 
@@ -273,9 +266,7 @@ end
 -- FUNCTION GERAIS
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function vRP.getUserDataTable(user_id)
-	local data=vRP.user_tables[user_id]
-	if type(vRP.icConfigFilterGroupData)=='function' then vRP.icConfigFilterGroupData(data) end
-	return data
+	return vRP.user_tables[user_id]
 end
 
 function vRP.getUserApparence(user_id)
@@ -315,6 +306,13 @@ end
 function vRP.getInventory(user_id)
 	local data = vRP.user_tables[user_id]
 	if data then
+		for slot, entry in pairs(data.inventory or {}) do
+			if type(entry) == "table" and (entry.item == "repairkit" or entry.item == "repairkit2") then
+				data.inventory[slot] = nil
+			elseif type(entry) == "table" and vRP.getItemExpiry then
+				entry.expiresAt = vRP.getItemExpiry(entry.item, entry.expiresAt)
+			end
+		end
 		return data.inventory
 	end
 	return false
@@ -351,14 +349,14 @@ vRP.prepare("mirtin_bans/getUserBans", "SELECT user_id,banimento,desbanimento,mo
 vRP.prepare("mirtin_bans/addToken","INSERT IGNORE INTO mirtin_bans_hwid(id,token) VALUES(@user_id,@token)")
 
 local geral = {
-	logo = module("vrp", "lib/branding").logo(), -- LOGO do Servidor
+	logo = "https://i.postimg.cc/65x2qXcC/paulologo.png", -- LOGO do Servidor
     background = "https://cdn.discordapp.com/attachments/403296672748142595/875522538510368858/download_1.jpg", -- Fundo da Tela de banimento
     discord = "https://discord.gg/", -- Discord do Servidor (Colocar https://)
 
     color = 6356736, -- Cor da Lateral do WeebHook
-    footer = "© CIDADE TocadoMagoDelux", -- RODAPE do WeebHook
+    footer = "© CIDADE Interior City", -- RODAPE do WeebHook
 
-    whookHWIDlogin = GetConvar("ic_secret_vrp_webhook", GetConvar("interior_city_webhook_logs", "")), -- WEEBHOOK para quando o estiver banido HWID e logar com outra conta.
+    whookHWIDlogin = "", -- WEEBHOOK para quando o estiver banido HWID e logar com outra conta.
 }
 
 local hwid = {
@@ -367,11 +365,9 @@ local hwid = {
 
 function hwid:createCache()
 	local query = vRP.query("getAllTokens", {})
-
-	if query then
-		for i = 1, #query do
-			self.list[query[i].token] = query[i].id
-		end
+	assert(type(query) == "table", "Falha ao carregar bloqueios por HWID.")
+	for i = 1, #query do
+		self.list[query[i].token] = query[i].id
 	end
 end
 
@@ -400,10 +396,8 @@ function hwid:checkBanned(src, user_id)
 					vRP.execute("mirtin/insertBanned", { user_id = user_id, motivo = "Banido HWID! ID ANTIGO: "..self.list[tokens[i]], banimento = os.date("%d/%m/%Y as %H:%M"), desbanimento = "Nunca", time = 0, hwid = 0 })
 
 					local card = '{ "type": "AdaptiveCard", "$schema": "http://adaptivecards.io/schemas/adaptive-card.json", "version": "1.3", "body": [ { "type": "Image", "url": "'..geral['logo']..'", "spacing": "Large", "size": "Large", "horizontalAlignment": "Center" }, { "type": "Container", "separator": true, "items": [ { "type": "TextBlock", "text": "Você está banido da cidade.", "wrap": true, "fontType": "Default", "weight": "Bolder", "color": "Attention", "size": "Large", "horizontalAlignment": "Center", "spacing": "None" } ] }, { "type": "TextBlock", "text": "Seu ID: '..user_id..'", "wrap": true, "size": "Medium", "color": "Warning", "fontType": "Default", "weight": "Bolder" }, { "type": "TextBlock", "text": "Motivo: Você foi banido no ID: '.. self.list[tokens[i]] ..'", "wrap": true, "size": "Medium", "color": "Warning", "weight": "Bolder" }, { "type": "TextBlock", "text": "Data do Banimento: '.. os.date("%d/%m/%Y") ..'", "wrap": true, "weight": "Bolder", "color": "Warning", "size": "Medium" }, { "type": "TextBlock", "text": "Data do Desbanimento: '.. query[1].desbanimento ..'", "wrap": true, "size": "Medium", "weight": "Bolder", "color": "Warning" }, { "type": "Container", "separator": true }, { "type": "ActionSet", "actions": [ { "type": "Action.OpenUrl", "title": "Acesse o Discord", "url": "'..geral['discord']..'", "iconUrl": "https://discord.com/assets/3437c10597c1526c3dbd98c737c2bcae.svg" } ] } ], "minHeight": "200px", "backgroundImage": { "url": "'..geral['background']..'" } }'
-					local corpoBan = { { ["color"] = geral['color'], ["title"] = "**".. ":no_entry: BAN HWID | Tentativa de Login " .."**\n", ["thumbnail"] = geral['logo']:match("^https://") and { ["url"] = geral['logo'] } or nil, ["description"] = "**ID NOVO:**\n```cs\n"..user_id.."```\n**ID ANTIGO: **\n```cs\n"..self.list[tokens[i]].."```\n**Data:** ```cs\n "..os.date("%d/%m/%Y as %H:%M").."``` ", ["footer"] = { ["text"] = geral['footer'], }, } }
-					if geral["whookHWIDlogin"] ~= "" then
+					local corpoBan = { { ["color"] = geral['color'], ["title"] = "**".. ":no_entry: BAN HWID | Tentativa de Login " .."**\n", ["thumbnail"] = { ["url"] = geral['logo'] }, ["description"] = "**ID NOVO:**\n```cs\n"..user_id.."```\n**ID ANTIGO: **\n```cs\n"..self.list[tokens[i]].."```\n**Data:** ```cs\n "..os.date("%d/%m/%Y as %H:%M").."``` ", ["footer"] = { ["text"] = geral['footer'], }, } }
 					PerformHttpRequest(geral['whookHWIDlogin'], function(err, text, headers) end, 'POST', json.encode({embeds = corpoBan}), { ['Content-Type'] = 'application/json' })
-					end
 
 					return true, card
 				end
@@ -434,11 +428,9 @@ local Ips = {
 
 function Ips:CreateCache()
 	local query = vRP.query("getAllIps", {})
-
-	if query then
-		for i = 1, #query do
-			self.list[query[i].ip] = query[i].user_id
-		end
+	assert(type(query) == "table", "Falha ao carregar bloqueios por IP.")
+	for i = 1, #query do
+		self.list[query[i].ip] = query[i].user_id
 	end
 end
 
@@ -512,36 +504,6 @@ function vRP.removeBanIp(user_id)
 end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- IC Admin: operações server-side autenticadas atualizam caches após commit SQL.
-exports('icAdminRefreshBanCaches', function()
-    if GetInvokingResource() ~= 'ic_admin' then return false end
-    hwid.list = {}
-    Ips.list = {}
-    hwid:createCache()
-    Ips:CreateCache()
-    return true
-end)
-exports('icAdminForgetUser', function(userId)
-    if GetInvokingResource() ~= 'ic_admin' then return false end
-    userId = tonumber(userId)
-    if not userId or vRP.getUserSource(userId) then return false end
-    vRP.user_tables[userId] = nil
-    vRP.user_tmp_tables[userId] = nil
-    vRP.user_appareance[userId] = nil
-    identifier.cache[userId] = nil
-    vRP.rusers[userId] = nil
-    for key, id in pairs(vRP.users) do if tonumber(id) == userId then vRP.users[key] = nil end end
-    for key, id in pairs(vRP.tempSource) do if tonumber(id) == userId then vRP.tempSource[key] = nil end end
-    for key, id in pairs(vRP.user_through_src) do if tonumber(id) == userId then vRP.user_through_src[key] = nil end end
-    local rows = vRP.query('vRP/getAllIdentifiers', {})
-    for _, row in ipairs(rows or {}) do
-        if tonumber(row.user_id) == userId then identifier:set(row.identifier, userId) end
-    end
-    if type(vRP.icAdminClearMoneyCache) == 'function' then vRP.icAdminClearMoneyCache(userId) end
-    vRP.updateIdentity(userId)
-    return true
-end)
-
 -- QUEUE
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local ConfigQUEUE = {
@@ -656,7 +618,7 @@ end)
 -- A vRP não possui dependência obrigatória do painel para evitar ciclo entre resources.
 -- Quando o Mage Admin ainda não iniciou/reiniciou, as logs ficam em uma fila curta em memória
 -- e são reenviadas assim que o export server-side voltar a ficar disponível.
-local MAGE_ADMIN_LOG_RESOURCE = GetConvar("ic_admin_service_resource", "ic_admin")
+local MAGE_ADMIN_LOG_RESOURCE = "m_paineladm_v2"
 local MAGE_ADMIN_LOG_QUEUE_MAX = 250
 local mageAdminLogQueue = {}
 local mageConnectionAudit = {}
@@ -930,24 +892,71 @@ end
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CONECTANDO NO SERVIDOR
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+local function checkDiscordWhitelist(identifiers)
+	local guild = GetConvar("interior_discord_guild_id", "")
+	local role = GetConvar("interior_discord_whitelist_role_id", "")
+	local token = GetConvar("interior_discord_bot_token", "")
+	if not guild:match("^%d+$") or not role:match("^%d+$") or token == "" then
+		return false, "A verificação do Discord ainda não está configurada. Entre em contato com a equipe."
+	end
+
+	local discordId
+	for _, identifier in ipairs(identifiers) do
+		discordId = identifier:match("^discord:(%d+)$")
+		if discordId then break end
+	end
+	if not discordId then
+		return false, "Abra o Discord com sua conta aprovada e reconecte ao FiveM."
+	end
+
+	local result = promise.new()
+	local finished = false
+	local function resolve(approved, message)
+		if finished then return end
+		finished = true
+		result:resolve({ approved = approved, message = message })
+	end
+
+	local unavailable = "Não foi possível consultar o Discord. Tente novamente em instantes."
+	local denied = "Sua whitelist ainda não foi aprovada no Discord da Interior City."
+	SetTimeout(8000, function() resolve(false, unavailable) end)
+	PerformHttpRequest(("https://discord.com/api/v10/guilds/%s/members/%s"):format(guild, discordId),
+		function(status, body)
+			if status == 404 then return resolve(false, denied) end
+			if status ~= 200 then return resolve(false, unavailable) end
+			local ok, member = pcall(json.decode, body or "")
+			if not ok or type(member) ~= "table" or type(member.roles) ~= "table" then
+				return resolve(false, unavailable)
+			end
+			for _, memberRole in ipairs(member.roles) do
+				if memberRole == role then return resolve(true) end
+			end
+			resolve(false, denied)
+		end, "GET", "", { Authorization = "Bot " .. token }, { followLocation = false })
+
+	local approval = Citizen.Await(result)
+	return approval.approved, approval.message
+end
+
 AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
 	local source = source
+	deferrals.defer()
+	Wait(0)
+
 	local connectionAudit = mageBeginConnectionAudit(source, name)
 
-	if not GeneratingCache then
-		mageLogConnectionFailure(source, nil, "Inicialização da vRP", "O cache de identificação ainda não estava disponível.")
-		deferrals.update("[TocadoMagoDelux] Ops, houve um problema. tente novamente.")
+	if not connectionCachesReady then
+		mageLogConnectionFailure(source, nil, "Inicialização da vRP", "Os caches de conexão ainda não estavam disponíveis.")
+		deferrals.done("[Interior City] O servidor ainda está inicializando. Tente novamente em instantes.")
 		return
 	end
-	
-	deferrals.defer()
 
 	local ids       = GetPlayerIdentifiers(source)
 	local playerIP  = GetPlayerEndpoint(source)
 
 	if ids == nil or #ids == 0 then
 		mageLogConnectionFailure(source, nil, "Leitura de identificadores", "Nenhum identificador válido foi recebido do jogador.")
-		deferrals.done("[TocadoMagoDelux] Ocorreu um problema de identidade.")
+		deferrals.done("[Interior City] Ocorreu um problema de identidade.")
 		return
 	end
 
@@ -964,26 +973,28 @@ AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
 				end
 				if not allowed then
 					mageLogConnectionFailure(source, nil, "Acesso antecipado", "O identificador do jogador não possui acesso antecipado liberado.")
-					deferrals.done("[TocadoMagoDelux] Ainda não está na hora! " ..iden)
+					deferrals.done("[Interior City] Ainda não está na hora! " ..iden)
 					return
 				end
 			end
 		end
 	end
 
+	deferrals.update("[Interior City] Verificando sua aprovação no Discord...")
+	Wait(0)
+	local approved, denial = checkDiscordWhitelist(ids)
+	if not approved then
+		mageLogConnectionFailure(source, nil, "Whitelist Discord", denial)
+		deferrals.done("[Interior City] " .. denial)
+		return
+	end
+
 	local user_id = vRP.getUserIdByIdentifiers(ids)
 	if not user_id then
 		mageLogConnectionFailure(source, nil, "Resolução de passaporte", "A vRP não conseguiu localizar ou criar um passaporte para os identificadores recebidos.")
-		deferrals.done("[TocadoMagoDelux] Ocorreu um problema de identificação.")
+		deferrals.done("[Interior City] Ocorreu um problema de identificação.")
 		return
 	end
-    if GetResourceState('ic_admin') == 'started' then
-        local ok, locked = pcall(function() return exports['ic_admin']:isUserInMaintenance(user_id) end)
-        if ok and locked then
-            deferrals.done('Manutenção administrativa em andamento. Reconecte em instantes.')
-            return
-        end
-    end
 	connectionAudit.userId = user_id
 
 	if ConfigQUEUE.active then
@@ -991,7 +1002,7 @@ AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
 
 		while QUEUE:get(source) and ConfigQUEUE.active and not QUEUE.Priority[user_id] do
 			local myPos = QUEUE:get(source)
-			deferrals.update("[TocadoMagoDelux] Seu ID: ( "..user_id.." ), Você está na fila na posição "..myPos.."/".. #QUEUE.List .." Tempo estimado: ".. ConvertTime(myPos * ConfigQUEUE.delay) ..".")
+			deferrals.update("[Interior City] Seu ID: ( "..user_id.." ), Você está na fila na posição "..myPos.."/".. #QUEUE.List .." Tempo estimado: ".. ConvertTime(myPos * ConfigQUEUE.delay) ..".")
 			Wait(1000)
 		end
 	end
@@ -1010,13 +1021,6 @@ AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
 		return
 	end
 
-    if GetResourceState('ic_admin') == 'started' then
-        local ok, locked = pcall(function() return exports['ic_admin']:isUserInMaintenance(user_id) end)
-        if ok and locked then
-            deferrals.done('Manutenção administrativa em andamento. Reconecte em instantes.')
-            return
-        end
-    end
 	local plySource = vRP.user_sources[user_id]
 	if plySource then
 		DropPlayer(plySource, "Alguem se conectou em sua conta")
@@ -1208,7 +1212,16 @@ end)
 -- THREAD
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CreateThread(function()
-	hwid:createCache()
-	identifier:createCache()
-	Ips:CreateCache()
+	while not connectionCachesReady do
+		local ok, err = pcall(function()
+			hwid:createCache()
+			Ips:CreateCache()
+			identifier:createCache()
+		end)
+		connectionCachesReady = ok
+		if not ok then
+			print(("[Interior City] Falha ao carregar os caches de conexão: %s"):format(tostring(err)))
+			Wait(10000)
+		end
+	end
 end)

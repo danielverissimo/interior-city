@@ -43,6 +43,7 @@ CreateThread(function()
         if org and distance < 5 then
             sleep = 3
             local orgData = Config.Orgs[org]
+            DrawMarker(27,resultCoords.x,resultCoords.y,resultCoords.z-0.95,0.0,0.0,0.0,0.0,0.0,0.0,0.7,0.7,0.7,55,155,255,180,false,false,2,false,nil,nil,false)
             DrawText3D(resultCoords, "~g~[E]~w~ Ponto - "..org)
             if IsControlJustPressed(0, 38) then
                 local success, group, startTime, userInfo = Remote.checkOrgData(org)
@@ -51,7 +52,8 @@ CreateThread(function()
                     nearestOrg = org
                     userGroup = group
                     SendNUIMessage({ action = 'open', data = {
-                        point = startTime
+                        point = startTime,
+                        clockOnly = orgData.clockOnly == true
                     }})
                     SetNuiFocus(true, true)
                 else

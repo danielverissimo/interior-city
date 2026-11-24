@@ -13,6 +13,8 @@ config.webhookTransferir= ""
 config.antiFlood = { status = true, ban = false, webhook = "" }
 config.bancoBlips = { showBlip = true, bMapType = 207, bColor = 4, bText = "Banco", bScale = 0.5 }
 config.atmBlips = { showBlip = false, bMapType = 207, bColor = 4, bText = "ATM", bScale = 0.2 }
+config.atmModels = { 'prop_atm_01', 'prop_atm_02', 'prop_atm_03', 'prop_fleeca_atm' }
+config.atmInteractionDistance = 2.0
 
 config.bancos = {
 	{x=149.87, y=-1040.82, z=29.38},

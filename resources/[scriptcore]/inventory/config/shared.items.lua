@@ -1,5 +1,26 @@
 local blips = {}
 local func = exports["vrp"]
+local drugUseInProgress = {}
+local drugUseAnimationMs = 8000
+
+local medicineBusyUntil = {}
+local medicineUseTimes = {bandagem=25, cicatricure=23, dorflex=48}
+local function UseHealingMedicine(user_id, source, item, slot, cb)
+    local now = GetGameTimer()
+    if medicineBusyUntil[user_id] and now < medicineBusyUntil[user_id] then
+        return cb({error='Aguarde o efeito do remedio atual terminar.'})
+    end
+    local ped = GetPlayerPed(source)
+    if not ped or ped == 0 then return cb({error='Personagem indisponivel.'}) end
+    local health = GetEntityHealth(ped)
+    if health <= 110 then return cb({error='Voce precisa estar consciente para usar este item.'}) end
+    if health >= 300 then return cb({error='Sua vida ja esta cheia.'}) end
+    local duration = medicineUseTimes[item]
+    if not duration then return cb({error='Remedio invalido.'}) end
+    medicineBusyUntil[user_id] = now + (duration+1)*1000
+    Remote._beginHealingMedicine(source, item)
+    return cb(true)
+end
 
 local function NeedsEnabled()
     local ok, enabled = pcall(function()
@@ -46,35 +67,120 @@ local Comer = function(user_id, source, item, slot, cb)
     return cb(true)
 end
 
-local OthersDrugs = function(user_id, source, item, slot, cb)
-    if vRP.hasPermission(user_id, 'perm.kids') then
-        TriggerClientEvent("Notify", source, "negado", "Você não pode usar droga..", 5)
+local ComerDoce = function(user_id, source, item, slot, cb)
+    return Comer(user_id, source, item, slot, function(result)
+        if result == true then
+            SetTimeout(5000, function()
+                Remote._setEnergetico(source, true)
+                SetTimeout(5000, function()
+                    Remote._setEnergetico(source, false)
+                end)
+            end)
+        end
+        return cb(result)
+    end)
+end
+
+local drugDoseLimit = 5
+local drugDoseWindow = 10 * 60
+local drugDoseHistory = {}
+local overdoseInProgress = {}
+
+local function applyDrugOverdose(user_id, source)
+    TriggerClientEvent("Notify", source, "negado",
+        "Overdose: você passou do limite de doses e está perdendo vida.", 8000)
+
+    if overdoseInProgress[user_id] then return end
+    overdoseInProgress[user_id] = true
+    local damageTicks, tickInterval = 6, 2000
+    TriggerClientEvent("inventory:drugOverdose", source, damageTicks * tickInterval)
+
+    local ped = GetPlayerPed(source)
+    CreateThread(function()
+        for _ = 1, damageTicks do
+            Wait(tickInterval)
+            if vRP.getUserId(source) ~= user_id or GetPlayerPed(source) ~= ped then break end
+            local health = GetEntityHealth(ped)
+            if health <= 101 then break end
+            vRPc._setHealth(source, math.max(101, health - 5))
+        end
+        overdoseInProgress[user_id] = nil
+    end)
+end
+
+local function consumeDrug(user_id, source, item, slot, cb, canUse)
+    if vRP.hasPermission(user_id, "perm.kids") then
+        TriggerClientEvent("Notify", source, "negado", "Você não pode usar drogas.", 5)
         return cb(false)
     end
-    if not Remote.isInDrug(source) then
-        if GetEntityHealth(GetPlayerPed(source)) > 101 then
-            if vRP.tryGetInventoryItem(user_id, item, 1, true, slot) then
-                vRPc._playAnim(source, true, { { "mp_player_int_uppersmoke", "mp_player_int_smoke" } }, true)
 
-                if item == "balinha" then
-                    Remote._useBandagem(source, true, 'Balinha')
-                end
-
-                if item == 'maconha' then
-                    TriggerClientEvent('activateNitro', source)
-                end
-
-                SetTimeout(2000,
-                    function()
-                        vRPc._stopAnim(source, false)
-                        TriggerClientEvent("inventory:useDrugs", source, item)
-                    end)
-                return cb(true)
-            end
-        end
+    local ped = GetPlayerPed(source)
+    if drugUseInProgress[user_id] or ped == 0 or GetEntityHealth(ped) <= 101 then
+        return cb(false)
     end
-    return cb(false)
+    drugUseInProgress[user_id] = true
+
+    local now = os.time()
+    local doses = drugDoseHistory[user_id]
+    if not doses or (doses.blockedUntil and now >= doses.blockedUntil) then
+        doses = {}
+    end
+    while doses[1] and doses[1] <= now - drugDoseWindow do
+        table.remove(doses, 1)
+    end
+
+    local overdose = doses.blockedUntil ~= nil
+    if (not overdose and Remote.isInDrug(source)) or (canUse and not canUse(source)) then
+        drugUseInProgress[user_id] = nil
+        return cb(false)
+    end
+    if not vRP.tryGetInventoryItem(user_id, item, 1, true, slot) then
+        drugUseInProgress[user_id] = nil
+        return cb(false)
+    end
+
+    if overdose then
+        drugUseInProgress[user_id] = nil
+        applyDrugOverdose(user_id, source)
+        return cb(true)
+    end
+
+    doses[#doses + 1] = now
+    drugDoseHistory[user_id] = doses
+    if #doses == drugDoseLimit then
+        doses.blockedUntil = now + drugDoseWindow
+        TriggerClientEvent("Notify", source, "aviso",
+            "Você chegou ao limite de 5 doses. Aguarde 10 minutos para evitar uma overdose.", 8000)
+    end
+
+    local lastDose = now
+    SetTimeout(drugDoseWindow * 1000, function()
+        local current = drugDoseHistory[user_id]
+        if current == doses and current[#current] == lastDose then
+            drugDoseHistory[user_id] = nil
+        end
+    end)
+
+    if item == "balinha" then
+        Remote._useBandagem(source, true, "Balinha")
+    elseif item == "cogumelo" then
+        Remote._useBandagem(source, true, "Cogumelo")
+    elseif item == "maconha" then
+        TriggerClientEvent("activateNitro", source)
+    end
+
+    vRPc._playAnim(source, true, { { "mp_player_int_uppersmoke", "mp_player_int_smoke" } }, true)
+    SetTimeout(drugUseAnimationMs, function()
+        if vRP.getUserId(source) == user_id then
+            vRPc._stopAnim(source, true)
+            TriggerClientEvent("inventory:useDrugs", source, item)
+        end
+        drugUseInProgress[user_id] = nil
+    end)
+    return cb(true)
 end
+
+local OthersDrugs = consumeDrug
 
 local Beber = function(user_id, source, item, slot, cb)
     if not ApplyNeeds(user_id, source, item) then
@@ -91,6 +197,20 @@ local Beber = function(user_id, source, item, slot, cb)
     return cb(true)
 end
 local Remedio = function(user_id, source, item, slot, cb)
+end
+
+local BeberCafeCoado = function(user_id, source, item, slot, cb)
+    return Beber(user_id, source, item, slot, function(result)
+        if result == true then
+            SetTimeout(5000, function()
+                Remote._setEnergetico(source, true)
+                SetTimeout(15000, function()
+                    Remote._setEnergetico(source, false)
+                end)
+            end)
+        end
+        return cb(result)
+    end)
 end
 
 local Beber_Alcoolico = function(user_id, source, item, slot, cb)
@@ -111,7 +231,26 @@ local Beber_Alcoolico = function(user_id, source, item, slot, cb)
 
     return cb(true)
 end
+local interiorFoodProps = {
+    ["pamonha"] = "coxinha",
+    ["curau"] = "donut",
+    ["tapioca"] = "sanduiche",
+    ["cuscuz"] = "sanduiche",
+    ["bolodemilho"] = "pao",
+    ["galinhada"] = "marmita",
+    ["arrozcompequi"] = "marmita",
+    ["feijaotropeiro"] = "marmita",
+    ["arrozcarreteiro"] = "marmita",
+    ["docedeleite"] = "barrac",
+    ["goiabada"] = "barrac",
+    ["pacoca"] = "barrac",
+    ["pedemoleque"] = "barrac",
+    ["caldodecana"] = "sucol",
+    ["cafecoado"] = "cafe",
+}
+
 function play_drink(source, tipo, segundos)
+    tipo = interiorFoodProps[tipo] or tipo
     local prop = ""
     -- BEBIDAS
     if tipo == "energetico" then
@@ -153,6 +292,7 @@ function play_drink(source, tipo, segundos)
 end
 
 function play_eat(source, tipo, segundos)
+    tipo = interiorFoodProps[tipo] or tipo
     local prop = ""
     -- COMIDAS
     if tipo == "pao" then
@@ -186,6 +326,23 @@ function play_eat(source, tipo, segundos)
 end
 
 Items = {
+    -- Comidas do interior
+    ["pamonha"] = { index = "pamonha", name = "Pamonha", png = "pamonha", weight = 0.5, type = "use", needs = { hunger = 24, thirst = 0 }, func = Comer },
+    ["curau"] = { index = "curau", name = "Curau", png = "curau", weight = 0.2, type = "use", needs = { hunger = 16, thirst = 0 }, func = Comer },
+    ["tapioca"] = { index = "tapioca", name = "Tapioca", png = "tapioca", weight = 0.5, type = "use", needs = { hunger = 32, thirst = 0 }, func = Comer },
+    ["cuscuz"] = { index = "cuscuz", name = "Cuscuz", png = "cuscuz", weight = 0.5, type = "use", needs = { hunger = 32, thirst = 0 }, func = Comer },
+    ["bolodemilho"] = { index = "bolodemilho", name = "Bolo de Milho", png = "bolodemilho", weight = 0.5, type = "use", needs = { hunger = 18, thirst = 0 }, func = Comer },
+    ["galinhada"] = { index = "galinhada", name = "Galinhada", png = "galinhada", weight = 2, type = "use", needs = { hunger = 100, thirst = 0 }, func = Comer },
+    ["arrozcompequi"] = { index = "arrozcompequi", name = "Arroz com Pequi", png = "arrozcompequi", weight = 2, type = "use", needs = { hunger = 100, thirst = 0 }, func = Comer },
+    ["feijaotropeiro"] = { index = "feijaotropeiro", name = "Feijão Tropeiro", png = "feijaotropeiro", weight = 2, type = "use", needs = { hunger = 100, thirst = 0 }, func = Comer },
+    ["arrozcarreteiro"] = { index = "arrozcarreteiro", name = "Arroz Carreteiro", png = "arrozcarreteiro", weight = 2, type = "use", needs = { hunger = 100, thirst = 0 }, func = Comer },
+    ["docedeleite"] = { index = "docedeleite", name = "Doce de Leite", png = "docedeleite", weight = 0.5, type = "use", needs = { hunger = 14, thirst = 0 }, func = ComerDoce },
+    ["goiabada"] = { index = "goiabada", name = "Goiabada", png = "goiabada", weight = 0.5, type = "use", needs = { hunger = 14, thirst = 0 }, func = ComerDoce },
+    ["pacoca"] = { index = "pacoca", name = "Paçoca", png = "pacoca", weight = 0.5, type = "use", needs = { hunger = 14, thirst = 0 }, func = ComerDoce },
+    ["pedemoleque"] = { index = "pedemoleque", name = "Pé de Moleque", png = "pedemoleque", weight = 0.5, type = "use", needs = { hunger = 14, thirst = 0 }, func = ComerDoce },
+    ["caldodecana"] = { index = "caldodecana", name = "Caldo de Cana", png = "caldodecana", weight = 0.5, type = "use", needs = { hunger = 0, thirst = 36 }, func = Beber },
+    ["cafecoado"] = { index = "cafecoado", name = "Café Coado", png = "cafecoado", weight = 0.25, type = "use", needs = { hunger = 0, thirst = 20 }, func = BeberCafeCoado },
+
     ["weapon_hammer"] = {
         index = "weapon_hammer",
         name = "Hammer",
@@ -285,7 +442,15 @@ Items = {
         name = "Dipirona",
         png = "dipirona",
         weight = 0.05,
-        type = "use"
+        type = "use",
+        func = function(user_id, source, item, slot, cb)
+            local ped = GetPlayerPed(source)
+            if not ped or ped == 0 or GetEntityHealth(ped) <= 110 then
+                return cb({error='Voce precisa estar consciente para usar este item.'})
+            end
+            Remote._takePillAnimation(source)
+            return cb(true)
+        end
     },
 
     ["opiopapoula"] = {
@@ -694,14 +859,6 @@ Items = {
         type = "use"
     },
 
-    ["repairkit2"] = {
-        index = "repairkit2",
-        name = "Jogue Fora",
-        png = "repairkit2",
-        weight = 1.0,
-        type = "use"
-    },
-
     ["ammo_combatpistol"] = {
         index = "ammo_combatpistol",
         name = "M-Glock",
@@ -892,6 +1049,22 @@ Items = {
         type = "use"
     },
 
+
+    ["ziplock"] = {
+        index = "ziplock",
+        name = "Ziplock",
+        png = "ziplock",
+        weight = 0.05,
+        type = "use"
+    },
+
+    ["florcannabis"] = {
+        index = "florcannabis",
+        name = "Flor de Cannabis",
+        png = "florcannabis",
+        weight = 0.3,
+        type = "use"
+    },
 
     ["folhamaconha"] = {
         index = "folhamaconha",
@@ -1226,7 +1399,8 @@ Items = {
         name = "Cicatricure",
         png = "cicatricure",
         weight = 0.05,
-        type = "use"
+        type = "use",
+        func = UseHealingMedicine
     },
 
     ["weapon_specialcarbine_mk2"] = {
@@ -1330,7 +1504,7 @@ Items = {
         png = "marmita",
         weight = 2.0,
         type = "use",
-        needs = { hunger = 50, thirst = 0 },
+        needs = { hunger = 100, thirst = 0 },
         func = Comer
     },
 
@@ -1496,29 +1670,18 @@ Items = {
         type = "use",
         keep_item = true,
         func = function(user_id, source, item, slot, cb)
-            if vRP.hasPermission(user_id, 'perm.kids') then
-                TriggerClientEvent("Notify", source, "negado", "Você não pode usar droga..", 5)
-                return cb(false)
-            end
-            if not Remote.isInDrug(source) then
-                local armour = vRPc.getArmour(source)
-                if armour > 0 then
-                    if vRP.tryGetInventoryItem(user_id, item, 1, true, slot) then
-                        vRPc._playAnim(source, true, { { "mp_player_int_uppersmoke", "mp_player_int_smoke" } }, true)
-
-                        SetTimeout(2000,
-                            function()
-                                vRPc._stopAnim(source, false)
-                                TriggerClientEvent("inventory:useDrugs", source, item)
-                            end)
-                        return cb(true)
-                    end
-                else
-                    TriggerClientEvent("Notify", source, "negado",
-                        "Você não possui um colete equipado para usar a droga.", 5)
+            return consumeDrug(user_id, source, item, slot, cb, function(player)
+                local armour = tonumber(vRPc.getArmour(player))
+                if not armour or armour <= 0 then
+                    TriggerClientEvent("Notify", player, "negado", "Você precisa estar com colete para usar metanfetamina.", 5)
+                    return false
                 end
-            end
-            return cb(false)
+                if armour >= 100 and Remote.hasMethArmourReinforcement(player) then
+                    TriggerClientEvent("Notify", player, "negado", "Seu colete já está reforçado.", 5)
+                    return false
+                end
+                return true
+            end)
         end
     },
 
@@ -1933,27 +2096,8 @@ Items = {
         png = "bandagem",
         weight = 0.5,
         type = "use",
-        keep_item = true,
-        func = function(user_id, source, item, slot, cb)
-            if vRP.tryGetInventoryItem(user_id, item, 1, true, slot) then
-                vRPc._CarregarObjeto(source, "amb@world_human_clipboard@male@idle_a", "idle_c", "v_ret_ta_firstaid", 49,
-                    60309)
-
-                TriggerClientEvent("progress", source, 15)
-                SetTimeout(15 * 1000, function()
-                    vRPc._DeletarObjeto(source)
-                    Remote._useBandagem(source, true, 'Bandagem')
-                    TriggerClientEvent("Notify", source, "importante",
-                        "Você utilizou a bandagem, não tome nenhum tipo de dano para não ser cancelada.", 5)
-                end)
-                func:setCooldown(user_id, "inventario", 5)
-
-                return cb(true)
-            end
-            return cb(false)
-        end
+        func = UseHealingMedicine
     },
-
     ["barrier"] = {
         index = "barrier",
         name = "Tenda",
@@ -2203,28 +2347,11 @@ Items = {
         type = "use",
         keep_item = true,
         func = function(user_id, source, item, slot, cb)
-            if vRP.hasPermission(user_id, 'perm.kids') then
-                TriggerClientEvent("Notify", source, "negado", "Você não pode usar droga..", 5)
-                return cb(false)
-            end
-            if not Remote.isInDrug(source) then
-                if GetEntityHealth(GetPlayerPed(source)) > 250 and GetEntityHealth(GetPlayerPed(source)) > 101 then
-                    TriggerEvent("Notify", "negado",
-                        "Você não pode utilizer com esse quantidade de vida.", 5)
-                else
-                    if vRP.tryGetInventoryItem(user_id, item, 1, true, slot) then
-                        Remote._useBandagem(source, true, 'Cogumelo')
-                        vRPc._playAnim(source, true, { { "mp_player_int_uppersmoke", "mp_player_int_smoke" } }, true)
-                        SetTimeout(2000,
-                            function()
-                                vRPc._stopAnim(source, false)
-                                TriggerClientEvent("inventory:useDrugs", source, item)
-                            end)
-                        return cb(true)
-                    end
-                end
-            end
-            return cb(false)
+            return consumeDrug(user_id, source, item, slot, cb, function(player)
+                if GetEntityHealth(GetPlayerPed(player)) <= 250 then return true end
+                TriggerClientEvent("Notify", player, "negado", "Você está com muita vida para usar cogumelo.", 5)
+                return false
+            end)
         end
     },
 
@@ -2241,14 +2368,6 @@ Items = {
         name = "Corpo de Pistol",
         png = "m-corpo_pistol_mk2",
         weight = 1.5,
-        type = "use"
-    },
-
-    ["repairkit"] = {
-        index = "repairkit",
-        name = "Jogue Fora",
-        png = "repairkit",
-        weight = 1.0,
         type = "use"
     },
 
@@ -2441,7 +2560,7 @@ Items = {
                 return cb(false)
             end
 
-			local vehicle = vRPc.getNearestVehicle(source,3)
+			local vehicle = Remote.getNearestRepairVehicle(source)
             if not vehicle then return cb(false) end
 
             local blockedVehicles = {
@@ -2455,43 +2574,43 @@ Items = {
             }
 
             local vehicleEntity = NetworkGetEntityFromNetworkId(vehicle)
+            local ped = GetPlayerPed(source)
+            if ped == 0 or vehicleEntity == 0 or not DoesEntityExist(vehicleEntity)
+                or GetEntityType(vehicleEntity) ~= 2
+                or #(GetEntityCoords(ped) - GetEntityCoords(vehicleEntity)) > 3.5 then
+                return cb(false)
+            end
+
             if blockedVehicles[GetEntityModel(vehicleEntity)] then
                 TriggerClientEvent("Notify", source, "negado", "Você não pode reparar este veiculo.")
                 return cb(false)
             end
             
-            if not vRP.hasPermission(user_id, "perm.mecanica") then
-                if vRP.tryGetInventoryItem(user_id, "repairkit3", 1, true, slot) then
-                    TriggerClientEvent("Notify", source, "aviso", "Você começou a reparar o veiculo.", 5)
-                    vRPc._playAnim(source, false, { { "mini@repair", "fixing_a_player" } }, true)
-                    TriggerClientEvent("progress", source, 10)
-                    exports["vrp"]:setBlockCommand(user_id, 10)
-                    TriggerClientEvent('abrircapo', source)
-                    exports.vrp_player:addSeatCooldown(user_id, 10)
-                    SetTimeout(10000, function()
-                        TriggerClientEvent("reparar", source, vehicle)
-                        vRPc._stopAnim(source, false)
-                        TriggerClientEvent("Notify", source, "sucesso", "Você reparou o veiculo.", 5)
-                    end)
-                    return cb(true)
-                end
-            elseif vRP.hasPermission(user_id, "perm.mecanica") then
-                    TriggerClientEvent("Notify", source, "aviso", "Você começou a reparar o veiculo.", 5)
-                    vRPc._playAnim(source, false, { { "mini@repair", "fixing_a_player" } }, true)
-                    TriggerClientEvent("progress", source, 10)
-                    exports["vrp"]:setBlockCommand(user_id, 10)
-                    TriggerClientEvent('abrircapo', source)
-                    exports.vrp_player:addSeatCooldown(user_id, 10)
-                    SetTimeout(10000, function()
-                        TriggerClientEvent("reparar", source, vehicle)
-                        vRPc._stopAnim(source, false)
-                        TriggerClientEvent("Notify", source, "sucesso", "Você reparou o veiculo.", 5)
-                    end)
-                    return cb(true)
+            if not vRP.hasPermission(user_id, "perm.mecanica")
+                and not vRP.tryGetInventoryItem(user_id, "repairkit3", 1, true, slot) then
+                return cb(false)
             end
 
-            
-            return cb(false)
+            local repairSeconds = 35
+            TriggerClientEvent("Notify", source, "aviso", "Você começou a reparar o veículo.", 5)
+            vRPc._playAnim(source, false, { { "mini@repair", "fixing_a_player" } }, true)
+            TriggerClientEvent("progress", source, repairSeconds, "Reparando veículo")
+            exports["vrp"]:setBlockCommand(user_id, repairSeconds)
+            TriggerClientEvent("abrircapo", source)
+            exports.vrp_player:addSeatCooldown(user_id, repairSeconds)
+            SetTimeout(repairSeconds * 1000, function()
+                if vRP.getUserId(source) ~= user_id then return end
+
+                vRPc._stopAnim(source, false)
+                if not DoesEntityExist(vehicleEntity) or NetworkGetEntityFromNetworkId(vehicle) ~= vehicleEntity then
+                    TriggerClientEvent("Notify", source, "negado", "O veículo ficou indisponível.", 5)
+                    return
+                end
+
+                TriggerClientEvent("syncreparar", -1, vehicle)
+                TriggerClientEvent("Notify", source, "sucesso", "Você reparou o veículo.", 5)
+            end)
+            return cb(true)
         end
     },
 
@@ -2585,7 +2704,14 @@ Items = {
         name = "C4",
         png = "c4",
         weight = 0.1,
-        type = "use"
+        type = "use",
+        keep_item = true,
+        func = function(user_id, source, item, slot, cb)
+            if GetResourceState('m_roubos')~='started' then return cb({error='Sistema de roubos indisponivel.'}) end
+            Remote._closeInventory(source)
+            TriggerClientEvent('m_roubos:useC4',source)
+            return cb(true) -- A C4 e consumida pelo servidor do roubo, apos validar os requisitos.
+        end
     },
 
     ["c-polvora"] = {
@@ -2620,16 +2746,18 @@ Items = {
         type = "use",
         keep_item = true,
         func = function(user_id, source, item, slot, cb)
+            local handled, completed = exports["vrp"]:useNpcVehicleLockpick(source,slot)
+            if handled then return cb(completed) end
             local plate, mName, mNet, mPortaMalas, mPrice, mLock, mModel = vRPc.ModelName(source, 7)
             if not plate then
                 TriggerClientEvent("Notify", source, "negado", "Você não está perto de um veículo.", 5)
                 return cb(false)
             end
 
-            -- Veículos sem registro pertencem à população/NPC e nunca podem ser roubados.
+            -- A ligação direta de NPC é tratada acima, dentro do veículo.
             local plateUser = vRP.getUserByRegistration(plate)
             if not plateUser then
-                TriggerClientEvent("Notify", source, "negado", "Veículos de NPC não podem ser roubados.", 5)
+                TriggerClientEvent("Notify", source, "negado", "Entre no veículo de NPC e use a lockpick no banco do motorista.", 5)
                 return cb(false)
             end
 
@@ -2646,7 +2774,7 @@ Items = {
                 return cb(false)
             end
 
-            if vRP.tryGetInventoryItem(user_id, "lockpick", 1, true, slot) then
+            if vRP.useLockpick(user_id, slot) then
                 Remote._closeInventory(source)
 
                 -- O chamado é disparado no momento da tentativa, independentemente
@@ -2706,6 +2834,7 @@ Items = {
 
                 vRPc._stopAnim(source, false)
             end
+            cb(true)
         end
     },
 
@@ -3194,7 +3323,8 @@ Items = {
         name = "Dorflex",
         png = "dorflex",
         weight = 0.05,
-        type = "use"
+        type = "use",
+        func = UseHealingMedicine
     },
 
     ["gadget_parachute"] = {
@@ -3781,9 +3911,33 @@ Items = {
         func = OthersDrugs
     },
 
+    ["frasco"] = {
+        index = "frasco",
+        name = "Frasco",
+        png = "frasco",
+        weight = 0.1,
+        type = "use"
+    },
+
+    ["papelespecial"] = {
+        index = "papelespecial",
+        name = "Papel Especial",
+        png = "papelespecial",
+        weight = 0.1,
+        type = "use"
+    },
+
     ["haxixe"] = {
         index = "haxixe",
-        name = "Haxixe",
+        name = "Haxixe embalado",
+        png = "haxixe",
+        weight = 0.3,
+        type = "use"
+    },
+
+    ["haxixebruto"] = {
+        index = "haxixebruto",
+        name = "Haxixe bruto",
         png = "haxixe",
         weight = 0.3,
         type = "use"
@@ -4242,6 +4396,28 @@ function itemBodyList(item)
     if Items[item] then
         return Items[item]
     end
+end
+
+-- Prazo em dias corridos. Defina exceções por item em itemDays.
+local defaultExpiryDays = 30
+local perishableDays = 3
+local itemDays = { lockpick = 5 }
+local equipmentDays = { equip = 10, recharge = 5 }
+local expiringEquipment = { radio = true, celular = true }
+
+function itemExpiryDuration(item)
+    local definition = Items[item]
+    if not definition then return nil end
+
+    local days = itemDays[item] or equipmentDays[definition.type]
+    if days == nil and definition.needs and item ~= "water" and definition.func ~= Beber_Alcoolico then
+        days = perishableDays
+    elseif days == nil and (definition.needs or expiringEquipment[item]) then
+        days = defaultExpiryDays
+    end
+    if not days or days <= 0 then return nil end
+
+    return math.floor(days * 86400)
 end
 
 function itemIndexList(item)

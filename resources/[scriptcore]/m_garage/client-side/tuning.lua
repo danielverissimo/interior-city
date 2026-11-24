@@ -52,7 +52,7 @@ local wheeltype = {
 	["highend"] = 7,
 }
 
-function SetVehicleMods(veh,myveh) 
+local function applySavedVehicleMods(veh,myveh)
 	SetVehicleModKit(veh,0)
 	if not myveh or not myveh.customPcolor then
 		return
@@ -111,6 +111,13 @@ function SetVehicleMods(veh,myveh)
 		end
 	end
 
+end
+
+function SetVehicleMods(veh, myveh)
+	applySavedVehicleMods(veh, myveh)
+	if GetResourceState("carros_som_rebaixados") == "started" then
+		exports["carros_som_rebaixados"]:applySoundWall(veh)
+	end
 end
 
 function setNeon(veh,toggle)

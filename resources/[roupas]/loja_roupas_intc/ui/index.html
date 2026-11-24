@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interior City · Vestiário</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main id="locker" class="locker" aria-labelledby="title" tabindex="-1" hidden>
+    <header class="header">
+      <div class="brand" aria-hidden="true">IC</div>
+      <div class="heading"><span>INTERIOR CITY</span><h1 id="title">Vestiário</h1></div>
+      <button id="close" class="close" type="button" aria-label="Fechar">×</button>
+    </header>
+    <section class="content" aria-labelledby="room">
+      <div class="section-heading"><h2 id="room"></h2><div class="section-tools"><span id="count"></span><button id="edit" class="edit" type="button" hidden>Editar</button></div></div>
+      <div id="uniforms" class="uniforms"></div>
+      <form id="editor" class="editor" hidden>
+        <div class="editor-selects">
+          <label>Uniforme<select id="editor-uniform"></select></label>
+          <label>Personagem<select id="editor-gender"><option value="feminino">Feminino</option><option value="masculino">Masculino</option></select></label>
+        </div>
+        <div class="editor-legend" aria-hidden="true"><span>Peça</span><span>Modelo</span><span>Variação</span></div>
+        <div id="editor-parts"></div>
+        <div class="editor-actions"><button id="editor-back" type="button">Voltar</button><button id="editor-save" type="submit">Salvar números</button></div>
+      </form>
+    </section>
+    <footer class="footer">
+      <p id="status" role="status"></p>
+      <button id="remove" class="remove" type="button">Retirar uniforme</button>
+      <span class="shortcut"><kbd>ESC</kbd> para fechar</span>
+    </footer>
+  </main>
+</body>
+</html>

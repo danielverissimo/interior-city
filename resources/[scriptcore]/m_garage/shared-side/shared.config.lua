@@ -1,5 +1,17 @@
 main = {
 	dir = "http://127.0.0.1/vrp_images/",
+	vehicleImages = {
+		l200bopeg = "./images/vehicles/l200bopeg.png",
+		wrx7pol = "./images/vehicles/wrx7pol.png",
+		agsvorollapm = "./images/vehicles/agsvorollapm.png",
+		agswxtpm = "./images/vehicles/agswxtpm.png",
+		ktarvpol = "./images/vehicles/ktarvpol.png",
+		polgt63 = "./images/vehicles/polgt63.png",
+		africachoque = "./images/vehicles/africachoque.png",
+		k1250pol = "./images/vehicles/k1250pol.png",
+		wrdefhp = "./images/vehicles/wrdefhp.png",
+		wrsprhp = "./images/vehicles/wrsprhp.png",
+	},
 	spawnClientVehicle = true, -- Spawnar veiculo via client-side
 
 	clearVehicle = { -- LIMPAR VEICULOS QUE NÃO ESTEJAM USADOS

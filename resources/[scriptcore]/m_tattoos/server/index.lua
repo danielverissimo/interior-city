@@ -4,7 +4,6 @@
 local Tunnel = module("vrp","lib/Tunnel")
 local Proxy = module("vrp","lib/Proxy")
 vRP = Proxy.getInterface("vRP")
-vRPclient = Tunnel.getInterface("vRP")
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- CONNECTION
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -29,24 +28,6 @@ function cRP.updateTattoo(status)
 
         TriggerClientEvent("Notify",source,"sucesso","Você pagou R$ 100,00 Nas tatuagens.",5)
 
-	end
-end
-
-function cRP.sgetCustomization()
-	local source = source
-	local user_id = vRP.getUserId(source)
-    local old_custom = vRPclient.getCustomization(source)
-
-	if user_id then
-         idle_copy = vRP.save_idle_custom(source,old_custom)
-	end
-end
-
-function cRP.setClothes(clothes)
-	local source = source
-	local user_id = vRP.getUserId(source)
-	if user_id then
-        vRP.removeCloak(source)
 	end
 end
 

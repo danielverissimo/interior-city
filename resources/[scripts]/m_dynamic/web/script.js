@@ -1,148 +1,127 @@
 const app = {
-  open: ({ targets, status, type }) => {
-    const list = document.querySelector('.list');
-    const action = document.querySelector('.status');
+  modalCleanup: null,
+  open({ targets = [], status = 'close', title = 'Ações rápidas' }) {
+    this.closeModal();
     document.body.style.display = 'block';
-
-    list.innerHTML = '';
-    app.updateStatus(action, status);
-    app.renderTargets(targets, type);
-  },
-
-  renderTargets: (targets, type) => {
+    document.querySelector('.menu-title').textContent = title;
     const list = document.querySelector('.list');
-    targets.forEach(target => {
-      const div = app.createTargetElement(target);
-      div.addEventListener('click', () => app.handleTargetClick(target, type));
-      list.appendChild(div);
-    });
-  },
-
-  createTargetElement: (target) => {
-    const div = document.createElement('div');
-    div.classList.add('target');
-    if (!target.image) {
-      div.classList.add('no-image');
+    list.replaceChildren();
+    this.updateStatus(document.querySelector('.status'), status);
+    if (!targets.length) {
+      const empty = document.createElement('p');
+      empty.className = 'empty';
+      empty.textContent = 'Nenhuma roupa salva. Volte e escolha Salvar.';
+      list.appendChild(empty);
     }
-
-    const imageHtml = target.image ? `<img src="${target.image}" alt="${target.name}">` : '';
-    const trashHtml = target.delete ? '<img class="trash" src="./assets/trash.svg" alt="trash">' : '';
-
-    div.innerHTML = `
-      ${imageHtml}
-      <p>${target.name}</p>
-      ${trashHtml}
-    `;
-
+    targets.forEach(target => list.appendChild(this.createTargetElement(target)));
+  },
+  createTargetElement(target) {
+    const row = document.createElement('div');
+    row.className = 'target-row';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'target';
+    if (target.image) {
+      const image = document.createElement('img');
+      image.src = target.image; image.alt = '';
+      button.appendChild(image);
+    }
+    const text = document.createElement('span');
+    text.className = 'target-text';
+    const name = document.createElement('strong');
+    name.textContent = target.name;
+    text.appendChild(name);
+    if (target.description) {
+      const description = document.createElement('small');
+      description.textContent = target.description;
+      text.appendChild(description);
+    }
+    button.appendChild(text);
+    if (target.type === 'menu') {
+      const arrow = document.createElement('span');
+      arrow.className = 'chevron'; arrow.textContent = '›';
+      button.appendChild(arrow);
+    }
+    button.addEventListener('click', () => target.modal ? this.showModal() : this.sendRequest('target', { target }));
+    row.appendChild(button);
     if (target.delete) {
-      const trashIcon = div.querySelector('.trash');
-      trashIcon.addEventListener('click', (event) => {
-        event.stopPropagation();
-        app.sendRequest('deleteOutfit', { target, type: 'delete' });
-      });
+      const trash = document.createElement('button');
+      trash.type = 'button'; trash.className = 'trash';
+      trash.title = 'Excluir ' + target.name;
+      trash.setAttribute('aria-label', trash.title);
+      const icon = document.createElement('img'); icon.src = './assets/trash.svg'; icon.alt = '';
+      trash.appendChild(icon);
+      trash.addEventListener('click', () => this.sendRequest('deleteOutfit', { target }));
+      row.appendChild(trash);
     }
-
-    return div;
+    return row;
   },
-
-  handleTargetClick: (target, type) => {
-    if (target.modal) {
-      app.showModal(target, type);
-    } else  {
-      app.sendRequest('target', { target, type });
-    }
-  },
-
-  showModal: (target, type) => {
+  showModal() {
+    this.closeModal();
     const modal = document.querySelector('.modal');
-    const input = modal.querySelector('.input input');
-    const saveButton = document.querySelector('#save');
-    const closeButton = document.querySelector('#close');
-
+    const input = modal.querySelector('input');
     modal.style.display = 'flex';
-    input.focus();
-
-    const saveHandler = () => {
-      app.sendRequest('saveOutfit', { target, type, name: input.value });
-      app.closeModal(modal, input, saveHandler, closeHandler);
-    };
-
-    const closeHandler = () => {
-      app.closeModal(modal, input, saveHandler, closeHandler);
-    };
-
-    saveButton.addEventListener('click', saveHandler);
-    closeButton.addEventListener('click', closeHandler);
-  },
-
-  closeModal: (modal, input, saveHandler, closeHandler) => {
-    modal.style.display = 'none';
     input.value = '';
-    document.querySelector('#save').removeEventListener('click', saveHandler);
-    document.querySelector('#close').removeEventListener('click', closeHandler);
-  },
-
-  sendRequest: (endpoint, data) => {
-    fetch(`https://${GetParentResourceName()}/${endpoint}`, {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-  },
-
-  updateStatus: (actionElement, status) => {
-    const statusMap = {
-      home: 'close',
-      close: 'close',
-      back: 'back'
+    input.focus();
+    const save = () => {
+      const name = input.value.trim();
+      if (!name) { input.setCustomValidity('Digite um nome para a roupa.'); input.reportValidity(); return; }
+      input.setCustomValidity('');
+      this.sendRequest('saveOutfit', { name });
     };
-
-    const newStatus = statusMap[status] || status;
-    actionElement.src = `./assets/${newStatus}.svg?v=${Date.now()}`;
-    actionElement.setAttribute('status', newStatus);
+    const cancel = () => this.closeModal();
+    const onKey = e => { if (e.key === 'Enter') { e.preventDefault(); save(); } };
+    const onInput = () => input.setCustomValidity('');
+    const saveButton = document.querySelector('#save'), closeButton = document.querySelector('#close');
+    saveButton.addEventListener('click', save);
+    closeButton.addEventListener('click', cancel);
+    input.addEventListener('keydown', onKey);
+    input.addEventListener('input', onInput);
+    this.modalCleanup = () => {
+      saveButton.removeEventListener('click', save); closeButton.removeEventListener('click', cancel);
+      input.removeEventListener('keydown', onKey); input.removeEventListener('input', onInput);
+    };
   },
-
-  goBack: (element) => {
-    const attribute = element.getAttribute('status');
-    if (attribute === 'close') {
-      app.close();
-      app.sendRequest('close', {});
-    } else if (attribute === 'back') {
-      app.sendRequest('back', {});
-    }
+  closeModal() {
+    if (this.modalCleanup) this.modalCleanup();
+    this.modalCleanup = null;
+    document.querySelector('.modal').style.display = 'none';
   },
-
-  close: () => {
+  async sendRequest(endpoint, data) {
+    try {
+      const response = await fetch('https://' + GetParentResourceName() + '/' + endpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json; charset=UTF-8' }, body: JSON.stringify(data)
+      });
+      if (!response.ok) throw Error('HTTP ' + response.status);
+      await response.json();
+      if (endpoint === 'saveOutfit' || endpoint === 'deleteOutfit') this.close();
+    } catch (error) { console.error('[m_dynamic]', endpoint, error); }
+  },
+  updateStatus(element, status) {
+    const back = status === 'back';
+    element.src = './assets/' + (back ? 'back' : 'close') + '.svg';
+    element.setAttribute('status', back ? 'back' : 'close');
+    element.alt = back ? 'Voltar' : 'Fechar';
+    element.parentElement.setAttribute('aria-label', element.alt);
+  },
+  goBack(element) {
+    const endpoint = element.getAttribute('status') === 'back' ? 'back' : 'close';
+    if (endpoint === 'close') this.close();
+    this.sendRequest(endpoint, {});
+  },
+  close() {
+    this.closeModal();
     document.body.style.display = 'none';
-    document.querySelector('.list').innerHTML = '';
+    document.querySelector('.list').replaceChildren();
   }
 };
-
 window.addEventListener('message', ({ data }) => {
-  if (data.action === 'open') {
-    app.open(data);
-  } else if (data.action === 'close') {
-    app.close();
-  } else if (data.action === 'updateStatus') {
-    const action = document.querySelector('.status');
-    app.updateStatus(action, data.status);
+  if (data.action === 'open') app.open(data);
+  else if (data.action === 'close') app.close();
+});
+window.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    if (app.modalCleanup) app.closeModal();
+    else { app.close(); app.sendRequest('close', {}); }
   }
 });
-
-window.addEventListener('keydown', ({ keyCode }) => {
-  if (keyCode === 27) {
-    app.sendRequest('close', {});
-    app.close();
-  }
-});
-
-if (!window.invokeNative) {
-  window.postMessage({
-    action: 'open',
-    targets: [
-      { name: 'Porta malas', image: './assets/vehicle.svg', delete: true },
-      { name: 'Porta malas', image: './assets/vehicle.svg', delete: false },
-      { name: 'Porta malas', image: './assets/vehicle.svg', delete: true, modal: true }
-    ],
-    status: 'back'
-  });
-}

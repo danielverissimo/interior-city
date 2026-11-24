@@ -27,6 +27,13 @@ local function initialize()
     f.washPermissions=f.washPermissions or {}
     f.vaultPermissions=f.vaultPermissions or {}
   end
+  if not state.vanillaPointRemoved and state.factions.vanilla then
+    local vanilla=state.factions.vanilla
+    vanilla.enabled=false
+    vanilla.coords=nil
+    state.vanillaPointRemoved=true
+    save()
+  end
 end
 initialize()
 local function admin(id)
